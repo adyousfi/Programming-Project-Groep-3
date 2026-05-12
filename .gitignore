@@ -1,69 +1,29 @@
-# Dependencies
+# Git ignore file
+# Ignore node modules, build output, env files, and OS-specific files
 node_modules/
-jspm_packages/
-bower_components/
-
-# Build outputs
 dist/
 build/
-out/
-*.min.js
-*.bundle.js
-
-# Logs
-logs/
-*.log
+.env
+.env.local
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-lerna-debug.log*
 pnpm-debug.log*
-
-# Runtime data
-pids/
-*.pid
-*.seed
-*.pid.lock
-
-# Testing
-coverage/
-.nyc_output/
-*.lcov
-
-# Environment variables
-.env
-.env.local
-.env.*.local
-.env.development
-.env.test
-.env.production
-
-# Cache directories
-.cache/
-.parcel-cache/
-.npm/
-.yarn/
-.eslintcache
-.stylelintcache
-.node_repl_history
-
-# IDE/Editor files
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
 .DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.log
 
-# Optional files
-*.tsbuildinfo
-.pnp.*
-.yarn/install-state.gz
+# Ignore generated files
+*.class
+*.jar
+*.war
+*.dll
+*.exe
+*.out
 
-# Misc
-.vercel
-.netlify
-.next/
-.nuxt/
-.vuepress/dist
-.serverless/
+# Ignore temporary files
+*.tmp
+*.temp
+~*
