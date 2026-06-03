@@ -1,0 +1,22 @@
+{
+  "name": "stagemonitoringtool",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start":"node testdb.js",
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "vite": "^8.0.12"
+  },
+  "dependencies": {
+    "@sequelize/core": "^7.0.0-alpha.48",
+    "@sequelize/mssql": "^7.0.0-alpha.48",
+    "mssql": "^12.5.5",
+    "sequelize": "^6.37.8",
+    "tedious": "^19.2.1"
+  }
+}
