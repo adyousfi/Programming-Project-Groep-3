@@ -1,8 +1,22 @@
 import sequelize from "../dbConnection.js";
 import { DataTypes, Deferrable } from "sequelize";
 
+
+export const ROLES = {
+    STUDENT: 'student',
+    TEACHER: 'teacher',
+    ADMIN: 'admin'
+};
 // 2. Call .define() on your lowercase 'sequelize' instance variable
 const User = sequelize.define("User", {
+    
+    user_id:{
+      type: DataTypes.INTEGER,
+      allowNull:true,
+      primaryKey: true,
+      autoIncrement: true,
+    },
+
     first_name: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -16,7 +30,12 @@ const User = sequelize.define("User", {
         allowNull: false,
         unique: true
     },
-    password: {
+    role: {
+        // 2. Feed the array values directly into the ENUM
+        type: DataTypes.ENUM(Object.values(ROLES)),
+        allowNull: false
+    },
+    password: { 
         type: DataTypes.STRING,
         allowNull: false
     },

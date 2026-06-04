@@ -1,7 +1,8 @@
 import { configDotenv } from "dotenv";
 import sequelize from "./dbConnection.js";
 import "./userModel/user.js"
-
+import User from "./userModel/user.js";
+import seedDatabase from "./seedDb.js";
 const run = async () => {
   try {
     await sequelize.authenticate();
@@ -25,3 +26,5 @@ const run = async () => {
 };
 
 run();
+
+seedDatabase();
