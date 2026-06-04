@@ -19,7 +19,7 @@ export function renderStageformulier(container) {
                             </div>
                             <div class="form-group">
                                 <label for="student-nummer">Studentnummer *</label>
-                                <input type="text" id="student-nummer" value="">
+                                <input type="number" id="student-nummer" value="">
                             </div>
                         </div>
                     </div>
@@ -82,16 +82,16 @@ export function renderStageformulier(container) {
 
     // Sluit functionaliteit (Terug naar student dashboard)
     const goBack = () => {
-        window.location.search = '?role=student';
+        window.location.href = '/?role=student';
     };
 
     const closeBtn = container.querySelector('.form-close-btn');
     const cancelBtn = container.querySelector('.btn-secondary');
     const submitBtn = container.querySelector('.btn-primary');
-    
+
     if (closeBtn) closeBtn.addEventListener('click', goBack);
     if (cancelBtn) cancelBtn.addEventListener('click', goBack);
-    
+
     // Validatie bij indienen
     if (submitBtn) {
         submitBtn.addEventListener('click', () => {
@@ -99,22 +99,22 @@ export function renderStageformulier(container) {
             let hasEmptyFields = false;
             let invalidEmail = false;
             let invalidEmailMessage = '';
-            
+
             // Lijst met bekende tijdelijke domeinen (blokkeerlijst)
             const blockedDomains = ['tempmail.com', '10minutemail.com', 'guerrillamail.com', 'mailinator.com', 'yopmail.com'];
-            
+
             inputs.forEach(input => {
                 const val = input.value.trim();
-                
+
                 if (val === '') {
                     hasEmptyFields = true;
                     input.style.borderColor = '#dc3545'; // Maak de rand rood
                 } else {
                     input.style.borderColor = '#ced4da'; // Herstel de originele randkleur
-                    
+
                     // Specifieke E-mail Validatie
                     if (input.id === 'mentor-email') {
-                        // 1. Basis Regex voor een correct email formaat (iets@iets.iets)
+                        // 1. Basis regular expression voor een correct email formaat (iets@iets.iets)
                         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
                         if (!emailRegex.test(val)) {
                             invalidEmail = true;
@@ -133,20 +133,19 @@ export function renderStageformulier(container) {
                 }
             });
 
-            // Conditional checks
+            // Conditional checks voor leeg fields
             if (hasEmptyFields) {
                 alert('Ho even! Je bent gestopt. Zorg ervoor dat alle verplichte velden zijn ingevuld voordat je kan indienen.');
                 return; // Stopt het indienen
             }
-            
+
             if (invalidEmail) {
                 alert(`Fout bij e-mail: ${invalidEmailMessage}`);
                 return; // Stopt het indienen vanwege de e-mail
             }
-            
-            // Als alles is ingevuld en geldig is
-            alert('Formulier succesvol ingediend!');
-            goBack();
+
+            // Als alles is ingevuld en geldig is → ga naar de wachtpagina
+            window.location.href = '/?role=wachten';
         });
     }
 }

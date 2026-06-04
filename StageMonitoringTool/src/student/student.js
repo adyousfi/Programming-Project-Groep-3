@@ -82,7 +82,7 @@ export function renderStudentDashboard(container, userName = '[Studentnaam place
     const indienenBtn = container.querySelector('.primary-button');
     if (indienenBtn) {
         indienenBtn.addEventListener('click', () => {
-            window.location.search = '?role=stageformulier';
+            window.location.href = '/?role=stageformulier';
         });
     }
 }
