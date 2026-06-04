@@ -297,3 +297,10 @@
 
 .bd-historiek-feedback-titel { margin: 0 0 2px; }
 .bd-historiek-feedback       { margin: 0; color: #374151; }
+
+.bd-historiek-tekst {
+  font-size: 14px;
+  color: #6b7280;
+  font-style: italic;
+  margin: 0;
+}

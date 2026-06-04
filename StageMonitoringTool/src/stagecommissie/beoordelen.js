@@ -189,3 +189,39 @@ function toonHistoriek(aanvraag, beslissing, feedback) {
     import('./aanvragen.js').then(function(m) { m.renderAanvragen(); });
   });
 }
+
+export function renderDetails(aanvraag) {
+  document.querySelector('#app').innerHTML = `
+    <div class="bd-page">
+      <header class="bd-header">
+        <h1 class="bd-header-title">Stage Monitoring Tool</h1>
+        <div class="bd-header-right">
+          <div class="bd-header-user">
+            <span class="bd-header-naam">Prof. De Vries</span>
+            <span class="bd-header-rol">Stagecommissie</span>
+          </div>
+          <button class="bd-header-btn">Uitloggen</button>
+        </div>
+      </header>
+      <div class="bd-content">
+        <a href="#" class="bd-terug" id="bd-terug3">← Terug naar dashboard</a>
+        <h2 class="bd-titel">Stage Aanvraag Details</h2>
+
+        ${detailKaart(aanvraag, aanvraag.status)}
+
+        <div class="bd-card">
+          <div class="bd-sectie">
+            <h4 class="bd-sectie-titel">Beoordelingshistoriek</h4>
+            <p class="bd-historiek-tekst">${statusLabel(aanvraag.status)} zonder feedback</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  `;
+
+  document.querySelector('#bd-terug3').addEventListener('click', function(e) {
+    e.preventDefault();
+    import('./aanvragen.js').then(function(m) { m.renderAanvragen(); });
+  });
+}

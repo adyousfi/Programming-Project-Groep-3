@@ -44,7 +44,9 @@ function renderKaarten(lijst) {
             <p class="sc-card-functie">${a.functie}</p>
             <p class="sc-card-bedrijf">${a.bedrijf.naam}</p>
             <p class="sc-card-datum">Ingediend op: ${a.datum}</p>
-            <button class="sc-card-btn" data-id="${a.id}">Beoordelen</button>
+            <button class="sc-card-btn" data-id="${a.id}" data-actie="${a.status === 'in_afwachting' ? 'beoordelen' : 'details'}">
+              ${a.status === 'in_afwachting' ? 'Beoordelen' : 'Details Bekijken'}
+            </button>
           </div>
           <span class="sc-badge sc-badge--${a.status}">${statusLabel(a.status)}</span>
         </div>
@@ -58,7 +60,11 @@ function setupBeoordelen() {
     btn.addEventListener('click', function() {
       const id = parseInt(btn.dataset.id);
       const aanvraag = aanvragen.find(function(a) { return a.id === id; });
-      import('./beoordelen.js').then(function(m) { m.renderBeoordelen(aanvraag); });
+      if (btn.dataset.actie === 'details') {
+        import('./beoordelen.js').then(function(m) { m.renderDetails(aanvraag); });
+      } else {
+        import('./beoordelen.js').then(function(m) { m.renderBeoordelen(aanvraag); });
+      }
     });
   });
 }
