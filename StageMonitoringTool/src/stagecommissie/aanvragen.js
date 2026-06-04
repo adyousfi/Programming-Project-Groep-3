@@ -23,13 +23,23 @@ function renderKaarten(lijst) {
             <p class="sc-card-functie">${a.functie}</p>
             <p class="sc-card-bedrijf">${a.bedrijf}</p>
             <p class="sc-card-datum">Ingediend op: ${a.datum}</p>
-            <button class="sc-card-btn">Beoordelen</button>
+            <button class="sc-card-btn" data-id="${a.id}">Beoordelen</button>
           </div>
           <span class="sc-badge sc-badge--${a.status}">${statusLabel(a.status)}</span>
         </div>
       </div>
     `;
   }).join('');
+}
+
+function setupBeoordelen() {
+  document.querySelectorAll('.sc-card-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      const id = parseInt(btn.dataset.id);
+      const aanvraag = aanvragen.find(function(a) { return a.id === id; });
+      import('./beoordelen.js').then(function(m) { m.renderBeoordelen(aanvraag); });
+    });
+  });
 }
 
 function setupFilter() {
@@ -48,6 +58,7 @@ function setupFilter() {
         : aanvragen;
 
       kaartenDiv.innerHTML = renderKaarten(gefilterd);
+      setupBeoordelen();
     });
   });
 }
@@ -84,4 +95,5 @@ export function renderAanvragen() {
   `;
 
   setupFilter();
+  setupBeoordelen();
 }
