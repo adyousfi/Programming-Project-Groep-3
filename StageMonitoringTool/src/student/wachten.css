@@ -81,3 +81,87 @@
     flex-direction: column;
     overflow-y: auto;
 }
+
+/* Stepper */
+.stepper-wrapper {
+    background-color: #ffffff;
+    border-bottom: 1px solid #e9ecef;
+    padding: 1.25rem 2rem;
+}
+
+.stepper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.3rem;
+    min-width: 80px;
+}
+
+.step-circle {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    font-weight: 600;
+    background-color: #e9ecef;
+    color: #adb5bd;
+    border: 2px solid #dee2e6;
+}
+
+.step.completed .step-circle {
+    background-color: #198754;
+    color: #ffffff;
+    border-color: #198754;
+}
+
+.step.active .step-circle {
+    background-color: #0d6efd;
+    color: #ffffff;
+    border-color: #0d6efd;
+}
+
+.step-label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #495057;
+    text-align: center;
+}
+
+.step.active .step-label {
+    color: #0d6efd;
+}
+
+.step.completed .step-label {
+    color: #198754;
+}
+
+.step-sub {
+    font-size: 0.7rem;
+    color: #adb5bd;
+    text-align: center;
+}
+
+.step.active .step-sub,
+.step.completed .step-sub {
+    color: #6c757d;
+}
+
+.step-line {
+    flex: 1;
+    height: 2px;
+    background-color: #dee2e6;
+    margin-bottom: 1.5rem;
+}
+
+.step-line.completed {
+    background-color: #198754;
+}
