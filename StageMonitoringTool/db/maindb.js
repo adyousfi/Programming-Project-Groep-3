@@ -3,6 +3,7 @@ import sequelize from "./dbConnection.js";
 import "./userModel/user.js"
 import User from "./userModel/user.js";
 import seedDatabase from "./seedDb.js";
+import createUser from "./controllers/userController.js";
 const run = async () => {
   try {
     await sequelize.authenticate();
@@ -28,3 +29,5 @@ const run = async () => {
 run();
 
 seedDatabase();
+
+createUser()

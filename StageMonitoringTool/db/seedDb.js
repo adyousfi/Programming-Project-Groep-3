@@ -3,6 +3,14 @@ import { ENUM } from "sequelize";
 import sequelize from "./dbConnection.js";
 import User, { ROLES } from "./userModel/user.js";
 
+const user1 = ({
+    first_name: "huh",
+    last_name: "hah",
+    email: "helnah@hotmail.com",
+    password: "hashpassword",
+    role: ROLES.STUDENT
+})
+
 const dummyUsers = [
   {
     first_name: "John",
@@ -47,7 +55,8 @@ const seedDatabase = async () => {
 
     // 3. Bulk insert the dummy data
     await User.bulkCreate(dummyUsers, { validate: true });
-    console.log("Successfully seeded 4 users into the database!");
+    await User.create(user1, {validate: true});
+    console.log("Successfully seeded 5 users into the database!");
 
   } catch (error) {
     console.error("Error seeding database:", error);
