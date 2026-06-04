@@ -12,27 +12,63 @@ export function renderStageformulier(container) {
                 <div class="form-body">
                     <div class="form-section">
                         <h3 class="section-title">Studentgegevens</h3>
-                        <!-- Velden komen hier -->
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="student-naam">Naam *</label>
+                                <input type="text" id="student-naam" value="">
+                            </div>
+                            <div class="form-group">
+                                <label for="student-nummer">Studentnummer *</label>
+                                <input type="text" id="student-nummer" value="">
+                            </div>
+                        </div>
                     </div>
                     
                     <div class="form-section">
                         <h3 class="section-title">Bedrijfsgegevens</h3>
-                        <!-- Velden komen hier -->
+                        <div class="form-group">
+                            <label for="bedrijf-naam">Bedrijfsnaam *</label>
+                            <input type="text" id="bedrijf-naam" value="">
+                        </div>
+                        <div class="form-group">
+                            <label for="bedrijf-adres">Adres *</label>
+                            <input type="text" id="bedrijf-adres" value="">
+                        </div>
                     </div>
                     
                     <div class="form-section">
                         <h3 class="section-title">Stagementor / Werkbegeleider</h3>
-                        <!-- Velden komen hier -->
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="mentor-naam">Naam *</label>
+                                <input type="text" id="mentor-naam" value="">
+                            </div>
+                            <div class="form-group">
+                                <label for="mentor-email">E-mail *</label>
+                                <input type="text" id="mentor-email" value="">
+                            </div>
+                        </div>
                     </div>
                     
                     <div class="form-section">
                         <h3 class="section-title">Omschrijving van de opdracht</h3>
-                        <!-- Velden komen hier -->
+                        <div class="form-group">
+                            <textarea id="opdracht-omschrijving" rows="4"></textarea>
+                        </div>
                     </div>
                     
                     <div class="form-section">
                         <h3 class="section-title">Periode van de stage</h3>
-                        <!-- Velden komen hier -->
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="periode-start">Startdatum *</label>
+                                <input type="text" id="periode-start" value="">
+                            </div>
+                            <div class="form-group">
+                                <label for="periode-eind">Einddatum *</label>
+                                <input type="text" id="periode-eind" value="">
+                            </div>
+                        </div>
                     </div>
                 </div>
                 
