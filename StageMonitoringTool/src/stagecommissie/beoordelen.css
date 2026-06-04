@@ -193,3 +193,80 @@
   background: #fee2e2;
   color: #991b1b;
 }
+
+/* Beoordeling */
+
+.bd-beoordeling {
+  padding: 24px 28px;
+}
+
+.bd-info-box {
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 8px;
+  padding: 14px 18px;
+  font-size: 14px;
+  color: #1e40af;
+  margin-bottom: 20px;
+  line-height: 1.6;
+}
+
+.bd-feedback-label {
+  display: block;
+  font-size: 14px;
+  color: #374151;
+  margin-bottom: 8px;
+}
+
+.bd-feedback-input {
+  width: 100%;
+  min-height: 120px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 12px 14px;
+  font-size: 14px;
+  font-family: inherit;
+  color: #111827;
+  resize: vertical;
+  margin-bottom: 20px;
+  box-sizing: border-box;
+}
+
+.bd-feedback-input:focus {
+  outline: none;
+  border-color: #2563eb;
+}
+
+.bd-acties {
+  display: flex;
+  gap: 12px;
+}
+
+.bd-btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.bd-btn:hover {
+  opacity: 0.85;
+}
+
+.bd-btn--goedkeuren {
+  background: #16a34a;
+  color: #ffffff;
+}
+
+.bd-btn--aanpassingen {
+  background: #ea580c;
+  color: #ffffff;
+}
+
+.bd-btn--afkeuren {
+  background: #dc2626;
+  color: #ffffff;
+}

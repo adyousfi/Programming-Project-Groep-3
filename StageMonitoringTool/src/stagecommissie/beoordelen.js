@@ -81,6 +81,26 @@ export function renderBeoordelen(aanvraag) {
           </div>
 
         </div>
+
+        <div class="bd-card">
+          <div class="bd-beoordeling">
+            <h4 class="bd-sectie-titel">Beoordeling</h4>
+            <div class="bd-info-box">
+              <strong>Let op:</strong> Controleer alle details zorgvuldig voordat je een beslissing neemt.
+              Bij afkeuring of verzoek tot aanpassingen is feedback verplicht.
+            </div>
+            <label class="bd-feedback-label">
+              Feedback (optioneel bij goedkeuring, verplicht bij afkeuring/aanpassingen)
+            </label>
+            <textarea class="bd-feedback-input" id="bd-feedback" placeholder="Geef feedback over de stage aanvraag..."></textarea>
+            <div class="bd-acties">
+              <button class="bd-btn bd-btn--goedkeuren" id="bd-goedkeuren">✓ Goedkeuren</button>
+              <button class="bd-btn bd-btn--aanpassingen" id="bd-aanpassingen">⚠ Aanpassingen Vragen</button>
+              <button class="bd-btn bd-btn--afkeuren" id="bd-afkeuren">✗ Afkeuren</button>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
   `;
