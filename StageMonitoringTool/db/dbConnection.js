@@ -19,17 +19,22 @@ const run = async () => {
     await sequelize.authenticate();
     console.log('Connection has been established successfully.');
 
-    await sequelize.sync({ force: true }); 
-    console.log('Tables have been reset and created successfully!');
+    //drops all the tables 
+    // await sequelize.sync({ force: false });
+    // console.log('Tables have been reset and created successfully!'); 
+    //doesn't drop the tables
+    await sequelize.sync();
 
   } catch (error) {
     console.error('Unable to connect to the database or create tables:', error);
-  } finally {
-    setTimeout(async () => {
-      await sequelize.close();
-      console.log('Database connection closed safely.');
-    }, 500);
-  }
+  } 
+  
+  // finally {
+  //   setTimeout(async () => {
+  //     await sequelize.close();
+  //     console.log('Database connection closed safely.');
+  //   }, 500);
+  // }
 };
 
 export {sequelize, run};

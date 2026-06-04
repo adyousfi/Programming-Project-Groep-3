@@ -1,9 +1,9 @@
-import { sequelize } from "../dbConnection.js";
+import { sequelize } from "../../dbConnection.js";
 import { DataTypes, Deferrable } from "sequelize"
 
-const User = sequelize.define("User", {
+const Student = sequelize.define("Student", {
     
-    user_id:{
+    student_id:{
       type: DataTypes.INTEGER,
       allowNull:true,
       primaryKey: true,
@@ -34,4 +34,4 @@ const User = sequelize.define("User", {
     
 )
 
-export default User;
+export default Student;
