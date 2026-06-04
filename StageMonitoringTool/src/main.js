@@ -2,6 +2,7 @@ import './style.css';
 import { renderAanvragen } from './stagecommissie/aanvragen.js';
 import { renderStudentDashboard } from './student/student.js';
 import { renderStageformulier } from './student/formulier.js';
+import { renderWachten } from './student/wachten.js';
 
 const app = document.querySelector('#app');
 const role = new URLSearchParams(window.location.search).get('role');
@@ -10,6 +11,8 @@ if (role === 'student') {
   renderStudentDashboard(app);
 } else if (role === 'stageformulier') {
   renderStageformulier(app);
+} else if (role === 'wachten') {
+  renderWachten(app);
 } else if (role === 'stagecommissie') {
   renderAanvragen();
 } else {
