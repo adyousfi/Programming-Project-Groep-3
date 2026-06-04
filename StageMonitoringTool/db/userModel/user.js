@@ -1,13 +1,13 @@
-import sequelize from "../dbConnection.js";
-import { DataTypes, Deferrable } from "sequelize";
-
+import { sequelize } from "../dbConnection.js";
+import { DataTypes, Deferrable } from "sequelize"
 
 export const ROLES = {
     STUDENT: 'student',
     TEACHER: 'teacher',
     ADMIN: 'admin'
 };
-// 2. Call .define() on your lowercase 'sequelize' instance variable
+
+
 const User = sequelize.define("User", {
     
     user_id:{

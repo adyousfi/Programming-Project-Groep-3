@@ -1,9 +1,5 @@
-import User from "./userModel/user";
-import sequelize from "./dbConnection";
+import { sequelize } from "sequelize";
+import dotenv from 'dotenv';
+dotenv.config();
 
 
-const sync_DB = async() => {
-   await sequelize.sync({force: true})
-}
-
-export default sync_DB;

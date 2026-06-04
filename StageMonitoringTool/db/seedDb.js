@@ -1,6 +1,6 @@
 // db/seed.js
 import { ENUM } from "sequelize";
-import sequelize from "./dbConnection.js";
+import {sequelize} from "./dbConnection.js";
 import User, { ROLES } from "./userModel/user.js";
 
 const user1 = ({
