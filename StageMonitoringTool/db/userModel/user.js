@@ -1,46 +1,30 @@
-const { Sequelize, DataTypes } = require('sequelize');
-const sequelize = new Sequelize('sqlite::memory:');
+import sequelize from "../dbConnection.js";
+import { DataTypes, Deferrable } from "sequelize";
 
-
-class User extends Model {}
-
-User.init({
-  // Shared attributes
-  id:{
-        type: DataTypes.INTEGER,
-        allowNull:false,
-        primaryKey: true,
-        autoIncrement: true,
+// 2. Call .define() on your lowercase 'sequelize' instance variable
+const User = sequelize.define("User", {
+    first_name: {
+        type: DataTypes.STRING,
+        allowNull: false,
     },
-    role: {
-        // You can pass values directly as arguments
-        type: DataTypes.ENUM('STUDENT', 'DOCENT', 'ADMIN','STAGEMENTOR','STAGECOMMISIE'),
-        defaultValue: 'user',
+    last_name: {
+        type: DataTypes.STRING,
+        allowNull: false,
+    },
+    email: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: true
+    },
+    password: {
+        type: DataTypes.STRING,
         allowNull: false
     },
-    // Model attributes are defined here
-    firstName: {
-      type: DataTypes.STRING,
-      allowNull: false,
     },
-    lastName: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-   
-  // Subclass attributes (must be optional/allowNull: true)
-  gpa: { type: DataTypes.FLOAT, allowNull: true },
-  salary: { type: DataTypes.INTEGER, allowNull: true }
-}, { 
-  sequelize, 
-  modelName: 'User',
-  scopes: {
-    student: { where: { role: 'STUDENT' } },
-    teacher: { where: { role: 'DOCENT' } },
-    admin: { where: { role: 'ADMIN' } },
-    stagementor: {where: {role: 'STAGEMENTOR'}},
-    stagecommisie: {where: {role:'STAGECOMMISIE'}},
-  }
-});
+    {
+        timestamps: true,
+    }
+    
+)
 
-module.exports = User;
+export default User;

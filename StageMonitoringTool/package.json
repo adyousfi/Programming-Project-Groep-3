@@ -6,6 +6,7 @@
   "scripts": {
     "testdbAzure": "node db/testConnection/testdbAzure",
     "testdbMysql": "node db/testConnection/testdbMysql",
+    "startdb": "node db/maindb.js",
     "start": "node testdbAzure.js",
     "dev": "vite",
     "build": "vite build",
