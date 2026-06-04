@@ -15,8 +15,64 @@ export function renderStudentDashboard(container, userName = '[Studentnaam place
                 </div>
             </header>
             
-            
             <main class="dashboard-content">
+                <!-- Stepper Section -->
+                <section class="stepper-section">
+                    <div class="stepper-container">
+                        <!-- Step 1 -->
+                        <div class="step active">
+                            <div class="step-circle">1</div>
+                            <div class="step-title">Aanvraag</div>
+                            <div class="step-status">Actief</div>
+                        </div>
+                        <div class="step-line"></div>
+                        <!-- Step 2 -->
+                        <div class="step">
+                            <div class="step-circle">2</div>
+                            <div class="step-title">In beoordeling</div>
+                            <div class="step-status">Gepland</div>
+                        </div>
+                        <div class="step-line"></div>
+                        <!-- Step 3 -->
+                        <div class="step">
+                            <div class="step-circle">3</div>
+                            <div class="step-title">Goedgekeurd</div>
+                            <div class="step-status">Gepland</div>
+                        </div>
+                        <div class="step-line"></div>
+                        <!-- Step 4 -->
+                        <div class="step">
+                            <div class="step-circle">4</div>
+                            <div class="step-title">Stage actief</div>
+                            <div class="step-status">Gepland</div>
+                        </div>
+                        <div class="step-line"></div>
+                        <!-- Step 5 -->
+                        <div class="step">
+                            <div class="step-circle">5</div>
+                            <div class="step-title">Evaluatie</div>
+                            <div class="step-status">Gepland</div>
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- Welcome Section -->
+                <section class="welcome-section">
+                    <h2 class="welcome-title">Welkom, <span class="welcome-name">${userName}</span></h2>
+                    <p class="welcome-subtitle">Je hebt nog geen stage aangevraagd</p>
+                </section>
+
+                <!-- Action Card Section -->
+                <section class="action-section">
+                    <div class="action-card">
+                        <div class="icon-circle">
+                            <span class="plus-icon">+</span>
+                        </div>
+                        <h3 class="card-title">Nieuwe Stage Aanvragen</h3>
+                        <p class="card-subtitle">Dien een stagevoorstel in om te beginnen</p>
+                        <button class="primary-button">Stagevoorstel Indienen</button>
+                    </div>
+                </section>
             </main>
         </div>
     `;
