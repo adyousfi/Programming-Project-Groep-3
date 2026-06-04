@@ -109,4 +109,66 @@ export function renderBeoordelen(aanvraag) {
     e.preventDefault();
     import('./aanvragen.js').then(function(m) { m.renderAanvragen(); });
   });
+
+  document.querySelector('#bd-goedkeuren').addEventListener('click', function() {
+    const feedback = document.querySelector('#bd-feedback').value.trim();
+    toonHistoriek(aanvraag, 'goedgekeurd', feedback);
+  });
+
+  document.querySelector('#bd-aanpassingen').addEventListener('click', function() {
+    const feedback = document.querySelector('#bd-feedback').value.trim();
+    if (!feedback) { toonFeedbackFout(); return; }
+    toonHistoriek(aanvraag, 'aanpassingen', feedback);
+  });
+
+  document.querySelector('#bd-afkeuren').addEventListener('click', function() {
+    const feedback = document.querySelector('#bd-feedback').value.trim();
+    if (!feedback) { toonFeedbackFout(); return; }
+    toonHistoriek(aanvraag, 'afgekeurd', feedback);
+  });
+}
+
+function toonFeedbackFout() {
+  const input = document.querySelector('#bd-feedback');
+  input.style.borderColor = '#dc2626';
+  input.placeholder = 'Feedback is verplicht bij afkeuring of aanpassingen.';
+  input.focus();
+}
+
+function historiekTekst(beslissing, feedback) {
+  const labels = { goedgekeurd: 'Goedgekeurd', aanpassingen: 'Aanpassingen vereist', afgekeurd: 'Afgekeurd' };
+  const label = labels[beslissing];
+  return feedback ? `${label}: ${feedback}` : `${label}`;
+}
+
+function toonHistoriek(aanvraag, beslissing, feedback) {
+  document.querySelector('#app').innerHTML = `
+    <div class="bd-page">
+      <header class="bd-header">
+        <h1 class="bd-header-title">Stage Monitoring Tool</h1>
+        <div class="bd-header-right">
+          <div class="bd-header-user">
+            <span class="bd-header-naam">Prof. De Vries</span>
+            <span class="bd-header-rol">Stagecommissie</span>
+          </div>
+          <button class="bd-header-btn">Uitloggen</button>
+        </div>
+      </header>
+      <div class="bd-content">
+        <a href="#" class="bd-terug" id="bd-terug2">← Terug naar dashboard</a>
+        <h2 class="bd-titel">Stage Aanvraag Details</h2>
+        <div class="bd-card">
+          <div class="bd-sectie">
+            <h4 class="bd-sectie-titel">Beoordelingshistoriek</h4>
+            <p class="bd-historiek-tekst">${historiekTekst(beslissing, feedback)}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  document.querySelector('#bd-terug2').addEventListener('click', function(e) {
+    e.preventDefault();
+    import('./aanvragen.js').then(function(m) { m.renderAanvragen(); });
+  });
 }
