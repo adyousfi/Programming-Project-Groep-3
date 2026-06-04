@@ -56,13 +56,13 @@ export function renderStudentDashboard(container, userName = '[Studentnaam place
                     </div>
                 </section>
                 
-                <!-- Welcome Section -->
+                
                 <section class="welcome-section">
                     <h2 class="welcome-title">Welkom, <span class="welcome-name">${userName}</span></h2>
                     <p class="welcome-subtitle">Je hebt nog geen stage aangevraagd</p>
                 </section>
 
-                <!-- Action Card Section -->
+                <!-- Actie Kaart Sectie -->
                 <section class="action-section">
                     <div class="action-card">
                         <div class="icon-circle">
