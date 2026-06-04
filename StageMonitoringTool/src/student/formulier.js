@@ -87,7 +87,35 @@ export function renderStageformulier(container) {
 
     const closeBtn = container.querySelector('.form-close-btn');
     const cancelBtn = container.querySelector('.btn-secondary');
+    const submitBtn = container.querySelector('.btn-primary');
     
     if (closeBtn) closeBtn.addEventListener('click', goBack);
     if (cancelBtn) cancelBtn.addEventListener('click', goBack);
+    
+    // Validatie bij indienen
+    if (submitBtn) {
+        submitBtn.addEventListener('click', () => {
+            const inputs = container.querySelectorAll('input[type="text"], textarea');
+            let hasEmptyFields = false;
+            
+            inputs.forEach(input => {
+                if (input.value.trim() === '') {
+                    hasEmptyFields = true;
+                    input.style.borderColor = '#dc3545'; // Maak de rand rood
+                } else {
+                    input.style.borderColor = '#ced4da'; // Herstel de originele randkleur
+                }
+            });
+
+            // Conditional check
+            if (hasEmptyFields) {
+                alert('Ho even! Je bent gestopt. Zorg ervoor dat alle verplichte velden zijn ingevuld voordat je kan indienen.');
+                return; // Stopt het indienen
+            }
+            
+            // Als alles is ingevuld
+            alert('Formulier succesvol ingediend!');
+            goBack();
+        });
+    }
 }
