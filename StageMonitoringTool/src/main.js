@@ -1,6 +1,4 @@
+import './style.css';
+import { renderAanvragen } from './stagecommissie/aanvragen.js';
 
-import { renderStudentDashboard } from '../student/student.js'
-
-const app = document.querySelector('#app')
-renderStudentDashboard(app)
-
+renderAanvragen();
