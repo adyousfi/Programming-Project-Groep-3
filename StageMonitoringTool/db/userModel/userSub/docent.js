@@ -3,17 +3,14 @@ const sequelize = new Sequelize('sqlite::memory:');
 
 class docent extends user {}
 
-User.init(
+docent.init(
   {
     
-    // Model attributes are defined here
-    firstName: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    lastName: {
-      type: DataTypes.STRING,
-      // allowNull defaults to true
+     docent_id:{
+        type: DataTypes.INTEGER,
+        allowNull:false,
+        primaryKey: true,
+        autoIncrement: true,
     },
   },
   {
