@@ -194,6 +194,11 @@
   color: #991b1b;
 }
 
+.bd-badge--aanpassingen {
+  background: #ffedd5;
+  color: #9a3412;
+}
+
 /* Beoordeling */
 
 .bd-beoordeling {
@@ -273,9 +278,22 @@
 
 /* Historiek */
 
-.bd-historiek-tekst {
+.bd-historiek-box {
+  border-radius: 8px;
+  padding: 14px 18px;
   font-size: 14px;
-  color: #6b7280;
-  font-style: italic;
-  margin: 0;
+  line-height: 1.7;
 }
+
+.bd-historiek-box--goedgekeurd  { background: #f0fdf4; border: 1px solid #bbf7d0; }
+.bd-historiek-box--aanpassingen { background: #fff7ed; border: 1px solid #fed7aa; }
+.bd-historiek-box--afgekeurd    { background: #fef2f2; border: 1px solid #fecaca; }
+
+.bd-historiek-beslissing { margin: 0 0 6px; }
+
+.bd-historiek-label--goedgekeurd  { color: #16a34a; }
+.bd-historiek-label--aanpassingen { color: #ea580c; }
+.bd-historiek-label--afgekeurd    { color: #dc2626; }
+
+.bd-historiek-feedback-titel { margin: 0 0 2px; }
+.bd-historiek-feedback       { margin: 0; color: #374151; }
