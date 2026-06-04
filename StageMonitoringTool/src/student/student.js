@@ -1,5 +1,6 @@
 import './student.css';
 
+
 export function renderStudentDashboard(container, userName = '[Studentnaam placeholder]') {
     container.innerHTML = `
         <div class="student-dashboard">
@@ -76,4 +77,12 @@ export function renderStudentDashboard(container, userName = '[Studentnaam place
             </main>
         </div>
     `;
+
+    // Event listener voor "Stagevoorstel Indienen" button (paginadirectie)
+    const indienenBtn = container.querySelector('.primary-button');
+    if (indienenBtn) {
+        indienenBtn.addEventListener('click', () => {
+            window.location.search = '?role=stageformulier';
+        });
+    }
 }
