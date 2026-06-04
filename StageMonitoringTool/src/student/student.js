@@ -12,7 +12,7 @@ export function renderStudentDashboard(container, userName = '[Studentnaam place
                 </div>
                 <div class="user-profile">
                     <span class="user-name" id="user-name-display">${userName}</span>
-                    <a href="#" class="logout-link">Uitloggen</a>
+                    <a href="/" class="logout-link">Uitloggen</a>
                 </div>
             </header>
 

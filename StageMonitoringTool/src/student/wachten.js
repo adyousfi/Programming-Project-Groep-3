@@ -17,7 +17,7 @@ export function renderWachten(container, userName = '[Studentnaam]') {
                 </div>
                 <div class="sidebar-bottom">
                     <span class="sidebar-user-name">${userName}</span>
-                    <a href="/?role=student" class="sidebar-logout">Uitloggen</a>
+                    <a href="/" class="sidebar-logout">Uitloggen</a>
                 </div>
             </aside>
 
@@ -59,8 +59,17 @@ export function renderWachten(container, userName = '[Studentnaam]') {
                     </div>
                 </div>
 
-                <!-- Volgende stappen komen hier -->
-                <p style="padding: 2rem;">Statusbalk en kaart komen hier...</p>
+                <div class="wachten-statusbar">
+                    <span class="status-pill">Ingediend, wachtend op goedkeuring</span>
+                    <p class="status-description">Je stagevoorstel wordt beoordeeld door de stagecommissie.</p>
+                </div>
+
+                <section class="wachten-card">
+                    <div class="wachten-card-icon">⏱</div>
+                    <h1>Je stagevoorstel is ingediend</h1>
+                    <p>De stagecommissie zal je aanvraag zo spoedig mogelijk beoordelen. Je ontvangt een melding zodra er een beslissing is genomen.</p>
+                    <p class="wachten-card-note">In afwachting van goedkeuring heb je nog geen toegang tot je stagedossier.</p>
+                </section>
 
             </main>
 
