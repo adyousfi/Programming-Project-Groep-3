@@ -14,7 +14,7 @@ export function renderStudentDashboard(container, userName = '[Studentnaam place
                     <a href="#" class="logout-link">Uitloggen</a>
                 </div>
             </header>
-            
+
             <main class="dashboard-content">
                 <!-- Stepper Section -->
                 <section class="stepper-section">
@@ -55,8 +55,8 @@ export function renderStudentDashboard(container, userName = '[Studentnaam place
                         </div>
                     </div>
                 </section>
-                
-                
+
+
                 <section class="welcome-section">
                     <h2 class="welcome-title">Welkom, <span class="welcome-name">${userName}</span></h2>
                     <p class="welcome-subtitle">Je hebt nog geen stage aangevraagd</p>
