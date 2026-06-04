@@ -45,7 +45,7 @@ export function renderStageformulier(container) {
                             </div>
                             <div class="form-group">
                                 <label for="mentor-email">E-mail *</label>
-                                <input type="text" id="mentor-email" value="">
+                                <input type="email" id="mentor-email" value="">
                             </div>
                         </div>
                     </div>
@@ -62,11 +62,11 @@ export function renderStageformulier(container) {
                         <div class="form-row">
                             <div class="form-group">
                                 <label for="periode-start">Startdatum *</label>
-                                <input type="text" id="periode-start" value="">
+                                <input type="date" id="periode-start" value="">
                             </div>
                             <div class="form-group">
                                 <label for="periode-eind">Einddatum *</label>
-                                <input type="text" id="periode-eind" value="">
+                                <input type="date" id="periode-eind" value="">
                             </div>
                         </div>
                     </div>
@@ -95,25 +95,56 @@ export function renderStageformulier(container) {
     // Validatie bij indienen
     if (submitBtn) {
         submitBtn.addEventListener('click', () => {
-            const inputs = container.querySelectorAll('input[type="text"], textarea');
+            const inputs = container.querySelectorAll('input, textarea');
             let hasEmptyFields = false;
+            let invalidEmail = false;
+            let invalidEmailMessage = '';
+            
+            // Lijst met bekende tijdelijke domeinen (blokkeerlijst)
+            const blockedDomains = ['tempmail.com', '10minutemail.com', 'guerrillamail.com', 'mailinator.com', 'yopmail.com'];
             
             inputs.forEach(input => {
-                if (input.value.trim() === '') {
+                const val = input.value.trim();
+                
+                if (val === '') {
                     hasEmptyFields = true;
                     input.style.borderColor = '#dc3545'; // Maak de rand rood
                 } else {
                     input.style.borderColor = '#ced4da'; // Herstel de originele randkleur
+                    
+                    // Specifieke E-mail Validatie
+                    if (input.id === 'mentor-email') {
+                        // 1. Basis Regex voor een correct email formaat (iets@iets.iets)
+                        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                        if (!emailRegex.test(val)) {
+                            invalidEmail = true;
+                            invalidEmailMessage = 'Ongeldig e-mailformaat.';
+                            input.style.borderColor = '#dc3545';
+                        } else {
+                            // 2. Blokkeer tijdelijke domeinen
+                            const domain = val.split('@')[1].toLowerCase();
+                            if (blockedDomains.includes(domain)) {
+                                invalidEmail = true;
+                                invalidEmailMessage = 'Tijdelijke e-mailadressen zijn niet toegestaan.';
+                                input.style.borderColor = '#dc3545';
+                            }
+                        }
+                    }
                 }
             });
 
-            // Conditional check
+            // Conditional checks
             if (hasEmptyFields) {
                 alert('Ho even! Je bent gestopt. Zorg ervoor dat alle verplichte velden zijn ingevuld voordat je kan indienen.');
                 return; // Stopt het indienen
             }
             
-            // Als alles is ingevuld
+            if (invalidEmail) {
+                alert(`Fout bij e-mail: ${invalidEmailMessage}`);
+                return; // Stopt het indienen vanwege de e-mail
+            }
+            
+            // Als alles is ingevuld en geldig is
             alert('Formulier succesvol ingediend!');
             goBack();
         });
