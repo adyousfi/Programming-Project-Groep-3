@@ -91,3 +91,105 @@
   color: #111827;
   margin: 0 0 24px;
 }
+
+/* Kaart */
+
+.bd-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+
+.bd-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 24px 28px;
+}
+
+.bd-card-functie {
+  font-size: 20px;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 4px;
+}
+
+.bd-card-bedrijfnaam {
+  font-size: 14px;
+  color: #6b7280;
+  margin: 0;
+}
+
+/* Secties */
+
+.bd-sectie {
+  padding: 20px 28px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.bd-sectie-titel {
+  font-size: 15px;
+  font-weight: 600;
+  color: #111827;
+  margin: 0 0 14px;
+}
+
+.bd-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 24px;
+}
+
+.bd-grid--3 {
+  grid-template-columns: 1fr 1fr 1fr;
+  margin-top: 12px;
+}
+
+.bd-veld {
+  font-size: 14px;
+  color: #374151;
+  margin: 0;
+}
+
+.bd-label {
+  color: #9ca3af;
+}
+
+.bd-omschrijving-label {
+  color: #9ca3af;
+  margin-bottom: 4px !important;
+}
+
+.bd-omschrijving {
+  font-size: 14px;
+  color: #2563eb;
+  margin: 0 0 12px;
+  line-height: 1.6;
+}
+
+/* Badge */
+
+.bd-badge {
+  font-size: 13px;
+  font-weight: 500;
+  padding: 4px 14px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.bd-badge--in_afwachting {
+  background: #fef9c3;
+  color: #854d0e;
+}
+
+.bd-badge--goedgekeurd {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.bd-badge--afgekeurd {
+  background: #fee2e2;
+  color: #991b1b;
+}
