@@ -99,3 +99,20 @@
   background: #f3f4f6;
   padding: 40px;
 }
+
+.sc-main-header {
+  margin-bottom: 28px;
+}
+
+.sc-main-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 6px;
+}
+
+.sc-main-sub {
+  font-size: 14px;
+  color: #6b7280;
+  margin: 0;
+}

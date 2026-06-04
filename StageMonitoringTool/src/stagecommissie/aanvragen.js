@@ -19,7 +19,12 @@ export function renderAanvragen() {
           <a href="#" class="sc-logout">Uitloggen</a>
         </div>
       </aside>
-      <main class="sc-main"></main>
+      <main class="sc-main">
+        <div class="sc-main-header">
+          <h1 class="sc-main-title">Stage Aanvragen</h1>
+          <p class="sc-main-sub">Beoordeel en keur stage voorstellen goed</p>
+        </div>
+      </main>
     </div>
   `;
 }
