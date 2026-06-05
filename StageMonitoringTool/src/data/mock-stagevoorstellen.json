@@ -1,0 +1,18 @@
+{
+  "proposals": [
+    {
+      "id": "proposal-001",
+      "studentNaam": "Jan Janssens",
+      "studentNummer": "20234567",
+      "bedrijfNaam": "Tech Solutions BV",
+      "bedrijfAdres": "Kerkstraat 12, 1000 Brussel",
+      "mentorNaam": "Els Peeters",
+      "mentorEmail": "els.peeters@techsolutions.be",
+      "opdrachtOmschrijving": "Een webapplicatie bouwen om stageaanvragen te beheren.",
+      "periodeStart": "2026-09-01",
+      "periodeEind": "2027-02-01",
+      "status": "wachten",
+      "ingediendOp": "2026-06-05T10:00:00.000Z"
+    }
+  ]
+}
