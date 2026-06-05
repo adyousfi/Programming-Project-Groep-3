@@ -37,10 +37,16 @@ const User = sequelize.define("User", {
         type: DataTypes.STRING,
         allowNull: false
     },
+    
     role: {
         type: DataTypes.ENUM,
         defaultValue: ROLES.STUDENT,
         values: ['student','docent','admin','stagecommisie','stagementor']
+    },
+    phone: {
+        type: DataTypes.STRING,
+        allowNull:true,
+        defaultValue: "no phone"
     },
     },
     {

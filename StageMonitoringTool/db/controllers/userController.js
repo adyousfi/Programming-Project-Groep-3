@@ -10,7 +10,7 @@ import Student from "../userModel/users/student.js";
 import Stagementor from "../userModel/users/stagementor.js";
 
 
-const createUser = async (first_name, last_name, email, password,role) =>
+const createUser = async (first_name, last_name, email, password ,role, phone) =>
 {
     
     const user = await User.create(
@@ -19,7 +19,8 @@ const createUser = async (first_name, last_name, email, password,role) =>
 		last_name: last_name,
 		email: email,
 		password: password,
-		role: role
+		role: role,
+		phone: phone,
 		
 	})
 	
