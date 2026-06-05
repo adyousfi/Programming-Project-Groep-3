@@ -2,7 +2,7 @@
 import { ENUM } from "sequelize";
 import {sequelize} from "./dbConnection.js";
 import User, { ROLES } from "./userModel/users/user.js";
-import createUser from "./controllers/userController.js";
+import {createUser} from "./controllers/userController.js";
 import createStage from "./controllers/stageController.js";
 import { status } from "./stage/stage.js";
 
