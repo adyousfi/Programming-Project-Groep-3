@@ -1,5 +1,6 @@
 import './formulier.css';
 import { saveProposal } from './dataService.js';
+import { renderWachten } from './wachten.js';
 
 export function renderStageformulier(container) {
     container.innerHTML = `
@@ -164,18 +165,17 @@ export function renderStageformulier(container) {
 
             submitBtn.disabled = true;
             try {
-                const result = await saveProposal(proposal);
-                if (result && result.source === 'local') {
-                    alert('Voorstel opgeslagen lokaal (server niet bereikbaar).');
-                }
+                await saveProposal(proposal);
             } catch (err) {
                 console.error('Error saving proposal:', err);
-                alert(`Er is een fout opgetreden: ${err.message}`);
+                alert(`Er is een fout opgetreden tijdens het opslaan: ${err.message}`);
                 submitBtn.disabled = false;
                 return;
             }
 
-            window.location.assign('/?role=wachten');
+            const redirectUrl = `${window.location.origin}${window.location.pathname}?role=wachten`;
+            window.history.replaceState(null, '', redirectUrl);
+            renderWachten(container);
         });
     }
 }
