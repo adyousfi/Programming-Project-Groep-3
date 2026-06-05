@@ -1,0 +1,102 @@
+/* Modal Overlay */
+.aanpassen-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 2rem;
+    box-sizing: border-box;
+    overflow-y: auto;
+}
+
+/* Modal */
+.aanpassen-modal {
+    background-color: #ffffff;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 750px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+    margin-top: 2rem;
+}
+
+/* Header */
+.aanpassen-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.aanpassen-title {
+    font-size: 1.35rem;
+    font-weight: 600;
+    color: #111;
+    margin: 0;
+}
+
+.aanpassen-close-btn {
+    background: none;
+    border: none;
+    font-size: 1.75rem;
+    color: #adb5bd;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+}
+
+.aanpassen-close-btn:hover {
+    color: #495057;
+    background-color: #f1f3f5;
+}
+
+/* Feedback Section */
+.aanpassen-feedback {
+    background-color: #fff8f0;
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid #ffe0b2;
+}
+
+.aanpassen-feedback-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #c0392b;
+    margin: 0 0 0.75rem 0;
+}
+
+.aanpassen-feedback-intro {
+    font-size: 0.95rem;
+    color: #c0392b;
+    margin: 0 0 0.75rem 0;
+    line-height: 1.6;
+}
+
+.aanpassen-feedback-list {
+    font-size: 0.95rem;
+    color: #c0392b;
+    margin: 0 0 0.75rem 0;
+    padding-left: 1.5rem;
+    line-height: 1.8;
+}
+
+.aanpassen-feedback-list li {
+    margin-bottom: 0.25rem;
+}
+
+.aanpassen-feedback-conclusie {
+    font-size: 0.95rem;
+    color: #c0392b;
+    margin: 0;
+    line-height: 1.6;
+}

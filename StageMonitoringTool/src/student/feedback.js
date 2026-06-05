@@ -109,7 +109,7 @@ export function renderFeedback(container, userName = '[Studentnaam]', feedback =
     const adjustBtn = container.querySelector('.action-button');
     if (adjustBtn) {
         adjustBtn.addEventListener('click', () => {
-            window.location.href = '/?role=stageformulier';
+            window.location.href = '/?role=aanpassen';
         });
     }
 }

@@ -4,6 +4,7 @@ import { renderStudentDashboard } from './student/student.js';
 import { renderStageformulier } from './student/formulier.js';
 import { renderWachten } from './student/wachten.js';
 import { renderFeedback } from './student/feedback.js';
+import { renderAanpassen } from './student/aanpassen.js';
 import { renderMijnStagiairs } from './stagementor/mijn-stagiairs.js';
 
 const app = document.querySelector('#app');
@@ -17,6 +18,8 @@ if (role === 'student') {
   renderWachten(app);
 } else if (role === 'feedback') {
   renderFeedback(app);
+} else if (role === 'aanpassen') {
+  renderAanpassen(app);
 } else if (role === 'stagecommissie') {
   renderAanvragen();
 } else if (role === 'stagementor') {
