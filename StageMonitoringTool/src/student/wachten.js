@@ -60,7 +60,7 @@ export function renderWachten(container, userName = '[Studentnaam]') {
                 </div>
 
                 <div class="wachten-statusbar">
-                    <span class="status-pill">Ingediend, wachtend op goedkeuring</span>
+                    <span class="wachten-status-pill">Ingediend, wachtend op goedkeuring</span>
                     <p class="status-description">Je stagevoorstel wordt beoordeeld door de stagecommissie.</p>
                 </div>
 

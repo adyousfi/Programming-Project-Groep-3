@@ -20,7 +20,9 @@ export function renderAanpassen(container, userName = '[Studentnaam]', feedback 
         bedrijfAdres: 'Innovation Street 42, 1050 Brussels',
         mentorNaam: 'Mieke Peeters',
         mentorEmail: 'mieke.peeters@techcorp.be',
-        opdrachtOmschrijving: 'De stagiair zal werken aan het ontwikkelen van frontend applicaties met React en TypeScript. Focus op moderne webontwikkeling en samenwerking in een professioneel team.'
+        opdrachtOmschrijving: 'De stagiair zal werken aan het ontwikkelen van frontend applicaties met React en TypeScript. Focus op moderne webontwikkeling en samenwerking in een professioneel team.',
+        periodeStart: '2026-03-02',
+        periodeEind: '2026-05-30'
     };
 
     const p = proposal || defaultProposal;
@@ -96,8 +98,46 @@ export function renderAanpassen(container, userName = '[Studentnaam]', feedback 
                             <textarea id="opdracht-omschrijving" rows="5">${p.opdrachtOmschrijving}</textarea>
                         </div>
                     </div>
+
+                    <!-- Periode van de stage -->
+                    <div class="aanpassen-form-section">
+                        <h3 class="aanpassen-section-title">Periode van de stage</h3>
+                        <div class="aanpassen-form-row">
+                            <div class="aanpassen-form-group">
+                                <label for="periode-start">Startdatum *</label>
+                                <input type="date" id="periode-start" value="${p.periodeStart}">
+                            </div>
+                            <div class="aanpassen-form-group">
+                                <label for="periode-eind">Einddatum *</label>
+                                <input type="date" id="periode-eind" value="${p.periodeEind}">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <div class="aanpassen-footer">
+                    <button type="button" class="aanpassen-btn-submit">Aangepaste Aanvraag Indienen</button>
+                    <button type="button" class="aanpassen-btn-cancel">Annuleren</button>
                 </div>
             </div>
         </div>
     `;
+
+    // Event Listeners
+    const closeBtn = container.querySelector('.aanpassen-close-btn');
+    const cancelBtn = container.querySelector('.aanpassen-btn-cancel');
+    const submitBtn = container.querySelector('.aanpassen-btn-submit');
+
+    const goToFeedback = () => {
+        window.location.href = '/?role=feedback';
+    };
+
+    const goToWachten = () => {
+        window.location.href = '/?role=wachten';
+    };
+
+    if (closeBtn) closeBtn.addEventListener('click', goToFeedback);
+    if (cancelBtn) cancelBtn.addEventListener('click', goToFeedback);
+    if (submitBtn) submitBtn.addEventListener('click', goToWachten);
 }

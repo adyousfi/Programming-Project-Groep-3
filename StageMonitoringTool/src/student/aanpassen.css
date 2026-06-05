@@ -184,3 +184,46 @@
     resize: vertical;
     min-height: 100px;
 }
+
+/* Footer */
+.aanpassen-footer {
+    display: flex;
+    gap: 1rem;
+    padding: 1.5rem 2rem;
+    border-top: 1px solid #e9ecef;
+    background-color: #ffffff;
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
+}
+
+.aanpassen-btn-submit {
+    background-color: #fd7e14;
+    color: #ffffff;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.aanpassen-btn-submit:hover {
+    background-color: #e8590c;
+}
+
+.aanpassen-btn-cancel {
+    background-color: #ffffff;
+    color: #212529;
+    border: 1px solid #ced4da;
+    padding: 0.75rem 1.5rem;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.aanpassen-btn-cancel:hover {
+    background-color: #f8f9fa;
+}
