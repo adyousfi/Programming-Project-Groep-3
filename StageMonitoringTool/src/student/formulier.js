@@ -74,8 +74,8 @@ export function renderStageformulier(container) {
                 </div>
                 
                 <div class="form-footer">
-                    <button class="btn-primary">Indienen</button>
-                    <button class="btn-secondary">Annuleren</button>
+                    <button type="button" class="btn-primary">Indienen</button>
+                    <button type="button" class="btn-secondary">Annuleren</button>
                 </div>
             </div>
         </div>
@@ -95,7 +95,8 @@ export function renderStageformulier(container) {
 
     // Validatie bij indienen
     if (submitBtn) {
-        submitBtn.addEventListener('click', async () => {
+        submitBtn.addEventListener('click', async (event) => {
+            event.preventDefault();
             const inputs = container.querySelectorAll('input, textarea');
             let hasEmptyFields = false;
             let invalidEmail = false;
@@ -173,7 +174,7 @@ export function renderStageformulier(container) {
                 return;
             }
 
-            window.location.href = '/?role=wachten';
+            window.location.assign('/?role=wachten');
         });
     }
 }
