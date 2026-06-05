@@ -1,9 +1,10 @@
-const cors = require('cors')
-const express = require('express')
-const userRouter = require('./user')
-const app = express()
+const cors = require('cors');
+const express = require('express');
+const userRouter = require('./user');
+const app = express();
 
-const { User } = require('../db/controllers/userController') // pas pad aan naar jouw models
+// 💡 FIX 1: Change your import to a require statement!
+const { selectUser, User } = require('../db/controllers/userController');
 const users = [
     
     
