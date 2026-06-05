@@ -12,7 +12,8 @@ function parseJson(value, fallback) {
 
 function getSavedProposalsFromStorage() {
   const saved = localStorage.getItem(STORAGE_KEY);
-  return parseJson(saved, []);
+  const result = parseJson(saved, []);
+  return Array.isArray(result) ? result : [];
 }
 
 export function loadMockProposals() {
