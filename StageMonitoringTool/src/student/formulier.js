@@ -169,7 +169,8 @@ export function renderStageformulier(container) {
                     alert('Voorstel opgeslagen lokaal (server niet bereikbaar).');
                 }
             } catch (err) {
-                alert('Er is een fout opgetreden bij het opslaan van je voorstel. Probeer het opnieuw.');
+                console.error('Error saving proposal:', err);
+                alert(`Er is een fout opgetreden: ${err.message}`);
                 submitBtn.disabled = false;
                 return;
             }
