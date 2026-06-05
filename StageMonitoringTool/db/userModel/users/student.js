@@ -4,16 +4,14 @@ import User from "./user.js";
 
 const Student = sequelize.define("Student", {
     
-    student_id:{
-      type: DataTypes.INTEGER,
-      allowNull:false,
-      primaryKey: true,
-      autoIncrement: true,
-    },
-
-    user_id:{
+    user_id: {
         type: DataTypes.INTEGER,
+        primaryKey: true, 
         allowNull: false,
+        references: {
+            model: User,
+            key: 'user_id' 
+        }
     }
     
     },
