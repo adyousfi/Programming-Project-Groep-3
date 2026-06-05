@@ -59,4 +59,24 @@ const createUser = async (first_name, last_name, email, password ,role, phone) =
 		break;
 	}
 }
-export default createUser;
+
+
+const selectUser = async (req, res, next) =>
+{
+  try {
+    const users = await User.findAll();
+	return res.status(200).json(
+	{
+		msg: "Users selected successfully",
+		data: users
+
+	});
+  } catch (error) {
+    return res.status(500).json(
+      {
+        msg: "something went wrong while selecting user"
+      })
+  } 
+}
+
+export {createUser,selectUser};
