@@ -34,6 +34,7 @@ build/
 out/
 *.min.js
 *.bundle.js
+StageMonitoringTool/.env
 
 # Logs
 logs/
