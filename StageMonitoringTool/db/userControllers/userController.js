@@ -1,13 +1,13 @@
-import { ROLES } from "../userModel/users/user.js";
+import { ROLES } from "../userModel/user.js";
 import { sequelize } from "../dbConnection.js";
 
-import User from "../userModel/users/user.js";
+import User from "../userModel/user.js";
 
-import Docent from "../userModel/users/docent.js";
-import Stagecommisie from "../userModel/users/stagecommisie.js";
-import Admin from "../userModel/users/admin.js";
-import Student from "../userModel/users/student.js";
-import Stagementor from "../userModel/users/stagementor.js";
+import Docent from "../userModel/docent.js";
+import Stagecommisie from "../userModel/stagecommisie.js";
+import Admin from "../userModel/admin.js";
+import Student from "../userModel/student.js";
+import Stagementor from "../userModel/stagementor.js";
 
 
 const createUser = async (first_name, last_name, email, password ,role, phone) =>

@@ -93,3 +93,4 @@ coverage/
 .nuxt/
 .vuepress/dist
 .serverless/
+StageMonitoringTool/.env

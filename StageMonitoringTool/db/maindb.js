@@ -1,6 +1,6 @@
 import seedDatabase from "./seedDb.js";
 import { run, sequelize } from "./dbConnection.js";
-import {createUser} from "./controllers/userController.js";
+import {createUser} from "./userControllers/userController.js";
 import stage from "./objectModel/stage.js";
 
 await run();
