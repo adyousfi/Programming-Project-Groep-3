@@ -41,6 +41,20 @@
       "periodeEind": "2026-06-26",
       "status": "wachten",
       "ingediendOp": "2026-06-05T08:59:48.496Z"
+    },
+    {
+      "id": "proposal-1780651608103",
+      "studentNaam": "ayadi",
+      "studentNummer": "45",
+      "bedrijfNaam": "sdsd",
+      "bedrijfAdres": "sdsd",
+      "mentorNaam": "ada",
+      "mentorEmail": "sfsf@student.ehb.be",
+      "opdrachtOmschrijving": "dzds",
+      "periodeStart": "2026-06-25",
+      "periodeEind": "2026-06-26",
+      "status": "wachten",
+      "ingediendOp": "2026-06-05T09:26:48.103Z"
     }
   ]
 }
