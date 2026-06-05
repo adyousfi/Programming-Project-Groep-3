@@ -55,6 +55,20 @@
       "periodeEind": "2026-06-26",
       "status": "wachten",
       "ingediendOp": "2026-06-05T09:26:48.103Z"
+    },
+    {
+      "id": "proposal-1780652411642",
+      "studentNaam": "mohammmmed",
+      "studentNummer": "45",
+      "bedrijfNaam": "dsdsdd",
+      "bedrijfAdres": "dssds",
+      "mentorNaam": "sds",
+      "mentorEmail": "sfsf@student.ehb.be",
+      "opdrachtOmschrijving": "dssd",
+      "periodeStart": "2026-06-09",
+      "periodeEind": "2026-06-20",
+      "status": "wachten",
+      "ingediendOp": "2026-06-05T09:40:11.642Z"
     }
   ]
 }

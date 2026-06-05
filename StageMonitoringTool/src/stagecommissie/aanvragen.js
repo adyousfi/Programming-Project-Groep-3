@@ -1,36 +1,13 @@
 import './aanvragen.css';
-
-const aanvragen = [
-  {
-    id: 1, naam: 'Lisa Peeters', functie: 'DevOps Engineer', datum: '28/4/2026', status: 'in_afwachting',
-    studentEmail: 'lisa.peeters@student.ehb.be',
-    bedrijf: { naam: 'CloudTech NV', adres: 'Technologielaan 45, 9000 Gent', contactpersoon: 'Mark Janssen', email: 'mark@cloudtech.be', telefoon: '+32 9 234 56 78' },
-    stagementor: { naam: 'Sophie De Smet', email: 'sophie.desmet@cloudtech.be', telefoon: '+32 9 234 56 79' },
-    docent: { naam: 'Prof. Sarah Claes', email: 'sarah.claes@ehb.be' },
-    stageDetails: { omschrijving: 'De stagiair zal helpen bij het opzetten van CI/CD pipelines, container orchestratie met Kubernetes, en infrastructure as code met Terraform. Werken in een Agile team.', start: '1/3/2026', einde: '30/6/2026', urenPerWeek: 40 },
-  },
-  {
-    id: 2, naam: 'Tom Claes', functie: 'Mobile Developer', datum: '1/5/2026', status: 'in_afwachting',
-    studentEmail: 'tom.claes@student.ehb.be',
-    bedrijf: { naam: 'Mobile Apps Inc', adres: 'Antwerpsesteenweg 12, 2000 Antwerpen', contactpersoon: 'Jan De Backer', email: 'jan@mobileapps.be', telefoon: '+32 3 123 45 67' },
-    stagementor: { naam: 'Lien Vermeersch', email: 'lien@mobileapps.be', telefoon: '+32 3 123 45 68' },
-    docent: { naam: 'Prof. Koen Martens', email: 'koen.martens@ehb.be' },
-    stageDetails: { omschrijving: 'Ontwikkeling van een cross-platform mobiele applicatie met React Native voor iOS en Android.', start: '1/3/2026', einde: '30/6/2026', urenPerWeek: 40 },
-  },
-  {
-    id: 3, naam: 'Sara Janssen', functie: 'Frontend Developer', datum: '3/5/2026', status: 'goedgekeurd',
-    studentEmail: 'sara.janssen@student.ehb.be',
-    bedrijf: { naam: 'WebStudio BVBA', adres: 'Brusselsestraat 88, 3000 Leuven', contactpersoon: 'Peter Wouters', email: 'peter@webstudio.be', telefoon: '+32 16 987 65 43' },
-    stagementor: { naam: 'Els Peeters', email: 'els@webstudio.be', telefoon: '+32 16 987 65 44' },
-    docent: { naam: 'Prof. An Vermeulen', email: 'an.vermeulen@ehb.be' },
-    stageDetails: { omschrijving: 'Bouwen van moderne webinterfaces met Vue.js en het optimaliseren van de gebruikerservaring voor bestaande klanten.', start: '1/3/2026', einde: '30/6/2026', urenPerWeek: 38 },
-  },
-];
-
-const aantalAfwachting = aanvragen.filter(function(a) { return a.status === 'in_afwachting'; }).length;
+import { getAllAanvragen } from '../services/aanvragenService.js';
 
 function statusLabel(status) {
-  const labels = { in_afwachting: 'In afwachting', goedgekeurd: 'Goedgekeurd', afgekeurd: 'Afgekeurd' };
+  const labels = {
+    in_afwachting: 'In afwachting',
+    goedgekeurd:   'Goedgekeurd',
+    afgekeurd:     'Afgekeurd',
+    aanpassingen:  'Aanpassingen nodig',
+  };
   return labels[status] || status;
 }
 
@@ -55,11 +32,12 @@ function renderKaarten(lijst) {
   }).join('');
 }
 
-function setupBeoordelen() {
+function setupBeoordelen(aanvragen) {
   document.querySelectorAll('.sc-card-btn').forEach(function(btn) {
     btn.addEventListener('click', function() {
-      const id = parseInt(btn.dataset.id);
-      const aanvraag = aanvragen.find(function(a) { return a.id === id; });
+      const id = btn.dataset.id;
+      const aanvraag = aanvragen.find(function(a) { return String(a.id) === id; });
+      if (!aanvraag) return;
       if (btn.dataset.actie === 'details') {
         import('./beoordelen.js').then(function(m) { m.renderDetails(aanvraag); });
       } else {
@@ -69,7 +47,7 @@ function setupBeoordelen() {
   });
 }
 
-function setupFilter() {
+function setupFilter(aanvragen) {
   const navItems = document.querySelectorAll('.sc-nav-item');
   const kaartenDiv = document.querySelector('.sc-kaarten');
 
@@ -85,12 +63,15 @@ function setupFilter() {
         : aanvragen;
 
       kaartenDiv.innerHTML = renderKaarten(gefilterd);
-      setupBeoordelen();
+      setupBeoordelen(aanvragen);
     });
   });
 }
 
-export function renderAanvragen() {
+export async function renderAanvragen() {
+  const aanvragen = await getAllAanvragen();
+  const aantalAfwachting = aanvragen.filter(function(a) { return a.status === 'in_afwachting'; }).length;
+
   document.querySelector('#app').innerHTML = `
     <div class="sc-layout">
       <aside class="sc-sidebar">
@@ -121,6 +102,6 @@ export function renderAanvragen() {
     </div>
   `;
 
-  setupFilter();
-  setupBeoordelen();
+  setupFilter(aanvragen);
+  setupBeoordelen(aanvragen);
 }

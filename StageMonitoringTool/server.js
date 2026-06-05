@@ -62,4 +62,12 @@ app.get('/', (req, res) => {
 
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
+}).on('error', (err) => {
+  if (err.code === 'EADDRINUSE') {
+    console.error(`\nFOUT: poort ${PORT} is al in gebruik.`);
+    console.error(`Voer dit uit en probeer opnieuw:\n  Stop-Process -Name node -Force\n`);
+  } else {
+    console.error('Server fout:', err.message);
+  }
+  process.exit(1);
 });
