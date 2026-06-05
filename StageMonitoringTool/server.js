@@ -10,6 +10,16 @@ const PORT = 3000;
 const DATA_FILE = join(__dirname, 'src', 'data', 'stagevoorstellen.json');
 
 app.use(express.json());
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,PATCH,DELETE,OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(204);
+  }
+  next();
+});
+
 // Serve project root (index.html + /src) so the SPA can load client modules
 app.use(express.static(join(__dirname)));
 app.use('/stagecommissie', express.static(join(__dirname, 'src', 'stagecommissie')));
