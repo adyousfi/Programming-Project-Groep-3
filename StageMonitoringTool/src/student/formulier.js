@@ -1,4 +1,5 @@
 import './formulier.css';
+import { saveProposal } from './dataService.js';
 
 export function renderStageformulier(container) {
     container.innerHTML = `
@@ -73,8 +74,8 @@ export function renderStageformulier(container) {
                 </div>
                 
                 <div class="form-footer">
-                    <button class="btn-primary">Indienen</button>
-                    <button class="btn-secondary">Annuleren</button>
+                    <button type="button" class="btn-primary">Indienen</button>
+                    <button type="button" class="btn-secondary">Annuleren</button>
                 </div>
             </div>
         </div>
@@ -94,7 +95,8 @@ export function renderStageformulier(container) {
 
     // Validatie bij indienen
     if (submitBtn) {
-        submitBtn.addEventListener('click', () => {
+        submitBtn.addEventListener('click', async (event) => {
+            event.preventDefault();
             const inputs = container.querySelectorAll('input, textarea');
             let hasEmptyFields = false;
             let invalidEmail = false;
@@ -144,8 +146,35 @@ export function renderStageformulier(container) {
                 return; // Stopt het indienen vanwege de e-mail
             }
 
-            // Als alles is ingevuld en geldig is → ga naar de wachtpagina
-            window.location.href = '/?role=wachten';
+            // Als alles is ingevuld en geldig is → bouw het proposal en sla het op
+            const proposal = {
+                id: `proposal-${Date.now()}`,
+                studentNaam: container.querySelector('#student-naam').value.trim(),
+                studentNummer: container.querySelector('#student-nummer').value.trim(),
+                bedrijfNaam: container.querySelector('#bedrijf-naam').value.trim(),
+                bedrijfAdres: container.querySelector('#bedrijf-adres').value.trim(),
+                mentorNaam: container.querySelector('#mentor-naam').value.trim(),
+                mentorEmail: container.querySelector('#mentor-email').value.trim(),
+                opdrachtOmschrijving: container.querySelector('#opdracht-omschrijving').value.trim(),
+                periodeStart: container.querySelector('#periode-start').value,
+                periodeEind: container.querySelector('#periode-eind').value,
+                status: 'wachten',
+                ingediendOp: new Date().toISOString()
+            };
+
+            submitBtn.disabled = true;
+            try {
+                const result = await saveProposal(proposal);
+                if (result && result.source === 'local') {
+                    alert('Voorstel opgeslagen lokaal (server niet bereikbaar).');
+                }
+            } catch (err) {
+                alert('Er is een fout opgetreden bij het opslaan van je voorstel. Probeer het opnieuw.');
+                submitBtn.disabled = false;
+                return;
+            }
+
+            window.location.assign('/?role=wachten');
         });
     }
 }
