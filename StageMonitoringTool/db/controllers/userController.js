@@ -79,4 +79,4 @@ const selectUser = async (req, res, next) =>
   } 
 }
 
-export {createUser,selectUser};
+export {createUser,selectUser}
