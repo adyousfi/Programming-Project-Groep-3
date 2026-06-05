@@ -14,8 +14,13 @@ export function renderAanpassen(container, userName = '[Studentnaam]', feedback 
     const fb = feedback || defaultFeedback;
 
     const defaultProposal = {
-        studentNaam: 'Student placeholder',
-        studentNummer: '12345678'
+        studentNaam: 'Jan Janssens',
+        studentNummer: '12345678',
+        bedrijfNaam: 'TechCorp Belgium',
+        bedrijfAdres: 'Innovation Street 42, 1050 Brussels',
+        mentorNaam: 'Mieke Peeters',
+        mentorEmail: 'mieke.peeters@techcorp.be',
+        opdrachtOmschrijving: 'De stagiair zal werken aan het ontwikkelen van frontend applicaties met React en TypeScript. Focus op moderne webontwikkeling en samenwerking in een professioneel team.'
     };
 
     const p = proposal || defaultProposal;
@@ -53,6 +58,42 @@ export function renderAanpassen(container, userName = '[Studentnaam]', feedback 
                                 <label for="student-nummer">Studentnummer *</label>
                                 <input type="number" id="student-nummer" value="${p.studentNummer}" readonly>
                             </div>
+                        </div>
+                    </div>
+
+                    <!-- Bedrijfsgegevens -->
+                    <div class="aanpassen-form-section">
+                        <h3 class="aanpassen-section-title">Bedrijfsgegevens</h3>
+                        <div class="aanpassen-form-group">
+                            <label for="bedrijf-naam">Bedrijfsnaam *</label>
+                            <input type="text" id="bedrijf-naam" value="${p.bedrijfNaam}" readonly>
+                        </div>
+                        <div class="aanpassen-form-group">
+                            <label for="bedrijf-adres">Adres *</label>
+                            <input type="text" id="bedrijf-adres" value="${p.bedrijfAdres}" readonly>
+                        </div>
+                    </div>
+
+                    <!-- Stagementor / Werkbegeleider -->
+                    <div class="aanpassen-form-section">
+                        <h3 class="aanpassen-section-title">Stagementor / Werkbegeleider</h3>
+                        <div class="aanpassen-form-row">
+                            <div class="aanpassen-form-group">
+                                <label for="mentor-naam">Naam *</label>
+                                <input type="text" id="mentor-naam" value="${p.mentorNaam}" readonly>
+                            </div>
+                            <div class="aanpassen-form-group">
+                                <label for="mentor-email">E-mail *</label>
+                                <input type="email" id="mentor-email" value="${p.mentorEmail}" readonly>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Omschrijving van de opdracht -->
+                    <div class="aanpassen-form-section">
+                        <h3 class="aanpassen-section-title">Omschrijving van de opdracht</h3>
+                        <div class="aanpassen-form-group">
+                            <textarea id="opdracht-omschrijving" rows="5">${p.opdrachtOmschrijving}</textarea>
                         </div>
                     </div>
                 </div>
