@@ -8,6 +8,62 @@
   </head>
   <body>
     <div id="app"></div>
-    <script type="module" src="/src/main.js"></script>
+    <h1>hallo world</h1>
+    <button>get user</button>
+    <script>
+      const headding= document.querySelector('h1')
+      const button= document.querySelector('button')
+button.addEventListener('click',()=>{
+  fetch('http://localhost:300/message')
+  .then(Response=>{
+    if(!Response.ok){
+      throw new Error(`server error: ${Response.status} ${Response.statusText}`);
+    }
+    return Response.json()
+  })
+  .then(data=>{
+    headding.textContent=data.message
+  })
+  .catch(err=>{
+    console.log(err)
+  })
+})
+    </script>
+    <form id="login">
+      <input type="email" id="email" placeholder="Email">
+      <input type="password" id="password" placeholder="Wachtwoord">
+      <button type="submit">Login</button>
+    </form>
+
+    <script>
+      const form= document.getElementById('login')
+      const emailInput =document.getElementById('email')
+      const passwordInput = document.getElementById('password')
+      form.addEventListener('submit', (e)=>{
+        e.preventDefault()
+        const email = emailInput.value
+        const password = passwordInput.value
+
+        fetch('http://localhost:300/login', {
+          method: 'POST',
+          headers: {
+            'content-type': 'application/json'
+          },
+          body: JSON.stringify({email: email, password: password})
+        })
+        .then(Response => Response.json())
+        .then(data => {
+          console.log('✓ Login Response:', data)
+          if(data.success) {
+            alert('Login succesvol! ' + data.user.first_name)
+          } else {
+            alert('Email of wachtwoord onjuist!')
+          }
+        })
+        .catch(err => {
+          console.error('✗ Error:', err)
+        })
+      })
+    </script>
   </body>
 </html>
