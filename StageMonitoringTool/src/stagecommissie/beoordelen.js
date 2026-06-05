@@ -86,7 +86,7 @@ export function renderBeoordelen(aanvraag) {
             <span class="bd-header-naam">Prof. De Vries</span>
             <span class="bd-header-rol">Stagecommissie</span>
           </div>
-          <button class="bd-header-btn">Uitloggen</button>
+          <button class="bd-header-btn" id="bd-uitloggen">Uitloggen</button>
         </div>
       </header>
       <div class="bd-content">
@@ -121,6 +121,10 @@ export function renderBeoordelen(aanvraag) {
   document.querySelector('#bd-terug').addEventListener('click', function(e) {
     e.preventDefault();
     import('./aanvragen.js').then(function(m) { m.renderAanvragen(); });
+  });
+
+  document.querySelector('#bd-uitloggen').addEventListener('click', function() {
+    window.location.href = '/';
   });
 
   document.querySelector('#bd-goedkeuren').addEventListener('click', function() {
@@ -158,7 +162,7 @@ function toonHistoriek(aanvraag, beslissing, feedback) {
             <span class="bd-header-naam">Prof. De Vries</span>
             <span class="bd-header-rol">Stagecommissie</span>
           </div>
-          <button class="bd-header-btn">Uitloggen</button>
+          <button class="bd-header-btn" id="bd-uitloggen">Uitloggen</button>
         </div>
       </header>
       <div class="bd-content">
@@ -188,6 +192,10 @@ function toonHistoriek(aanvraag, beslissing, feedback) {
     e.preventDefault();
     import('./aanvragen.js').then(function(m) { m.renderAanvragen(); });
   });
+
+  document.querySelector('#bd-uitloggen').addEventListener('click', function() {
+    window.location.href = '/';
+  });
 }
 
 export function renderDetails(aanvraag) {
@@ -200,7 +208,7 @@ export function renderDetails(aanvraag) {
             <span class="bd-header-naam">Prof. De Vries</span>
             <span class="bd-header-rol">Stagecommissie</span>
           </div>
-          <button class="bd-header-btn">Uitloggen</button>
+          <button class="bd-header-btn" id="bd-uitloggen">Uitloggen</button>
         </div>
       </header>
       <div class="bd-content">
@@ -223,5 +231,9 @@ export function renderDetails(aanvraag) {
   document.querySelector('#bd-terug3').addEventListener('click', function(e) {
     e.preventDefault();
     import('./aanvragen.js').then(function(m) { m.renderAanvragen(); });
+  });
+
+  document.querySelector('#bd-uitloggen').addEventListener('click', function() {
+    window.location.href = '/';
   });
 }

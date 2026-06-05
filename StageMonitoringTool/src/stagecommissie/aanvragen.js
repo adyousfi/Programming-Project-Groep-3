@@ -87,7 +87,7 @@ export async function renderAanvragen() {
         </div>
         <div class="sc-sidebar-bottom">
           <span class="sc-user-name">Prof. De Vries</span>
-          <a href="#" class="sc-logout">Uitloggen</a>
+          <a href="/" class="sc-logout">Uitloggen</a>
         </div>
       </aside>
       <main class="sc-main">
