@@ -45,15 +45,22 @@ export async function saveProposal(proposal) {
 
     if (response.ok) {
       return { proposal: await response.json(), source: 'server' };
+    } else {
+      console.warn('Server returned non-ok response:', response.status, response.statusText);
     }
   } catch (error) {
-    // ignore and fallback to localStorage
+    console.warn('Fetch error, falling back to localStorage:', error);
   }
 
-  const proposals = getSavedProposalsFromStorage();
-  const next = [...proposals, proposal];
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(next, null, 2));
-  return { proposal, source: 'local' };
+  try {
+    const proposals = getSavedProposalsFromStorage();
+    const next = [...proposals, proposal];
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(next, null, 2));
+    return { proposal, source: 'local' };
+  } catch (storageError) {
+    console.error('localStorage error:', storageError);
+    throw new Error('Kon voorstel niet opslaan: ' + storageError.message);
+  }
 }
 
 export async function getLatestProposal() {
