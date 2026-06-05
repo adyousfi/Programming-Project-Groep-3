@@ -94,6 +94,5 @@ coverage/
 .vuepress/dist
 .serverless/
 
-StageMonitoringTool/.env
-StageMonitoringTool/.env/*
-/StageMonitoringTool
+.env
+StageMonitoringTool/.env/
