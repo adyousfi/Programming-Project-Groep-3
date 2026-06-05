@@ -44,7 +44,7 @@ export async function saveProposal(proposal) {
     });
 
     if (response.ok) {
-      return await response.json();
+      return { proposal: await response.json(), source: 'server' };
     }
   } catch (error) {
     // ignore and fallback to localStorage
@@ -53,7 +53,7 @@ export async function saveProposal(proposal) {
   const proposals = getSavedProposalsFromStorage();
   const next = [...proposals, proposal];
   localStorage.setItem(STORAGE_KEY, JSON.stringify(next, null, 2));
-  return proposal;
+  return { proposal, source: 'local' };
 }
 
 export async function getLatestProposal() {

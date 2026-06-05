@@ -2,7 +2,7 @@ import express from 'express';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { promises as fs } from 'fs';
-import { renderAanvragenPage } from './stagecommissie/aanvragen.js';
+// The client-side stagecommissie renderer lives under src; serve index.html instead of server-side rendering
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -10,8 +10,9 @@ const PORT = 3000;
 const DATA_FILE = join(__dirname, 'src', 'data', 'stagevoorstellen.json');
 
 app.use(express.json());
-app.use(express.static(join(__dirname, 'public')));
-app.use('/stagecommissie', express.static(join(__dirname, 'stagecommissie')));
+// Serve project root (index.html + /src) so the SPA can load client modules
+app.use(express.static(join(__dirname)));
+app.use('/stagecommissie', express.static(join(__dirname, 'src', 'stagecommissie')));
 
 async function readProposalsFile() {
   try {
@@ -46,7 +47,7 @@ app.post('/api/proposals', async (req, res) => {
 });
 
 app.get('/', (req, res) => {
-  res.send(renderAanvragenPage());
+  res.sendFile(join(__dirname, 'index.html'));
 });
 
 app.listen(PORT, () => {
