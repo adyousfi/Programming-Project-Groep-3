@@ -196,3 +196,120 @@ body {
     font-size: 0.95rem;
     color: #495057;
 }
+
+/* Feedback Section */
+.feedback-section {
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+    max-width: 800px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+/* Feedback Card */
+.feedback-card {
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    padding: 2rem;
+    width: 100%;
+    border-left: 4px solid #fd7e14;
+}
+
+.feedback-card-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #111;
+    margin: 0 0 1.5rem 0;
+}
+
+.feedback-content {
+    background-color: #fff8f0;
+    border-radius: 6px;
+    padding: 1.5rem;
+}
+
+.feedback-intro {
+    font-size: 0.95rem;
+    color: #495057;
+    margin: 0 0 1rem 0;
+    line-height: 1.6;
+}
+
+.feedback-list {
+    font-size: 0.95rem;
+    color: #495057;
+    margin: 0 0 1rem 0;
+    padding-left: 1.5rem;
+    line-height: 1.8;
+}
+
+.feedback-list li {
+    margin-bottom: 0.5rem;
+}
+
+.feedback-conclusion {
+    font-size: 0.95rem;
+    color: #495057;
+    margin: 0;
+    line-height: 1.6;
+}
+
+/* Action Card */
+.action-card {
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    padding: 2.5rem;
+    text-align: center;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.action-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: #fff3e0;
+    color: #fd7e14;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+}
+
+.action-title {
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: #111;
+    margin: 0 0 0.5rem 0;
+}
+
+.action-subtitle {
+    font-size: 0.9rem;
+    color: #6c757d;
+    margin: 0 0 1.5rem 0;
+    max-width: 400px;
+    line-height: 1.5;
+}
+
+.action-button {
+    background-color: #fd7e14;
+    color: #ffffff;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.action-button:hover {
+    background-color: #e8590c;
+}

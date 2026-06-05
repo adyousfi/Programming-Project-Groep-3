@@ -83,6 +83,20 @@
       "periodeEind": "2026-06-06",
       "status": "wachten",
       "ingediendOp": "2026-06-05T12:27:41.037Z"
+    },
+    {
+      "id": "proposal-1780663732590",
+      "studentNaam": "dqzdzq",
+      "studentNummer": "232",
+      "bedrijfNaam": "zq",
+      "bedrijfAdres": "dqzd",
+      "mentorNaam": "zqdq",
+      "mentorEmail": "eee@student.ehb.be",
+      "opdrachtOmschrijving": "qdq",
+      "periodeStart": "2026-06-05",
+      "periodeEind": "2026-06-12",
+      "status": "wachten",
+      "ingediendOp": "2026-06-05T12:48:52.591Z"
     }
   ]
 }
