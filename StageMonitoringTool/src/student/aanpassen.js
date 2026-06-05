@@ -1,6 +1,6 @@
 import './aanpassen.css';
 
-export function renderAanpassen(container, userName = '[Studentnaam]', feedback = null) {
+export function renderAanpassen(container, userName = '[Studentnaam]', feedback = null, proposal = null) {
     const defaultFeedback = {
         intro: 'De stage opdracht is interessant, maar er zijn enkele punten die verduidelijking nodig hebben:',
         punten: [
@@ -12,6 +12,13 @@ export function renderAanpassen(container, userName = '[Studentnaam]', feedback 
     };
 
     const fb = feedback || defaultFeedback;
+
+    const defaultProposal = {
+        studentNaam: 'Student placeholder',
+        studentNummer: '12345678'
+    };
+
+    const p = proposal || defaultProposal;
 
     container.innerHTML = `
         <div class="aanpassen-modal-overlay">
@@ -30,6 +37,24 @@ export function renderAanpassen(container, userName = '[Studentnaam]', feedback 
                         ${fb.punten.map(punt => `<li>${punt}</li>`).join('')}
                     </ol>
                     <p class="aanpassen-feedback-conclusie">${fb.conclusie}</p>
+                </div>
+
+                <!-- Form Body -->
+                <div class="aanpassen-form-body">
+                    <!-- Studentgegevens -->
+                    <div class="aanpassen-form-section">
+                        <h3 class="aanpassen-section-title">Studentgegevens</h3>
+                        <div class="aanpassen-form-row">
+                            <div class="aanpassen-form-group">
+                                <label for="student-naam">Naam *</label>
+                                <input type="text" id="student-naam" value="${p.studentNaam}" readonly>
+                            </div>
+                            <div class="aanpassen-form-group">
+                                <label for="student-nummer">Studentnummer *</label>
+                                <input type="number" id="student-nummer" value="${p.studentNummer}" readonly>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

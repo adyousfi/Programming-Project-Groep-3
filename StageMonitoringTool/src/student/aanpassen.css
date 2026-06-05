@@ -100,3 +100,87 @@
     margin: 0;
     line-height: 1.6;
 }
+
+/* Form Body */
+.aanpassen-form-body {
+    padding: 1.5rem 2rem 2rem;
+}
+
+/* Form Section */
+.aanpassen-form-section {
+    padding-bottom: 1.5rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.aanpassen-form-section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.aanpassen-section-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #111;
+    margin: 0 0 1rem 0;
+}
+
+/* Form Row */
+.aanpassen-form-row {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.aanpassen-form-row > .aanpassen-form-group {
+    flex: 1;
+}
+
+/* Form Group */
+.aanpassen-form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1rem;
+}
+
+.aanpassen-form-group:last-child {
+    margin-bottom: 0;
+}
+
+.aanpassen-form-group label {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #111;
+    margin-bottom: 0.5rem;
+}
+
+.aanpassen-form-group input,
+.aanpassen-form-group textarea {
+    padding: 0.75rem;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    color: #212529;
+    font-family: inherit;
+    width: 100%;
+    box-sizing: border-box;
+    background-color: #ffffff;
+}
+
+.aanpassen-form-group input:focus,
+.aanpassen-form-group textarea:focus {
+    outline: none;
+    border-color: #86b7fe;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+.aanpassen-form-group input[readonly] {
+    background-color: #f1f3f5;
+    color: #495057;
+    cursor: not-allowed;
+}
+
+.aanpassen-form-group textarea {
+    resize: vertical;
+    min-height: 100px;
+}
