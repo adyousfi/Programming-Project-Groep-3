@@ -1,37 +1,34 @@
 import { sequelize } from "../../dbConnection.js";
 import { DataTypes, Deferrable } from "sequelize"
+import User from "./user.js";
 
 const Student = sequelize.define("Student", {
     
     student_id:{
       type: DataTypes.INTEGER,
-      allowNull:true,
+      allowNull:false,
       primaryKey: true,
       autoIncrement: true,
     },
 
-    first_name: {
-        type: DataTypes.STRING,
+    user_id:{
+        type: DataTypes.INTEGER,
         allowNull: false,
-    },
-    last_name: {
-        type: DataTypes.STRING,
-        allowNull: false,
-    },
-    email: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        unique: true
-    },
-    password: { 
-        type: DataTypes.STRING,
-        allowNull: false
-    },
+    }
+    
     },
     {
         timestamps: true,
     }
-    
+        
 )
+
+User.hasOne(Student, { 
+    foreignKey: 'user_id', 
+    onDelete: 'CASCADE' 
+});
+Student.belongsTo(User, { 
+    foreignKey: 'user_id' 
+});
 
 export default Student;

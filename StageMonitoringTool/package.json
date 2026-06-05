@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "testExpress": "node express/express.js",
     "testdbAzure": "node db/testConnection/testdbAzure",
     "testdbMysql": "node db/testConnection/testdbMysql",
     "startdb": "node db/maindb.js",

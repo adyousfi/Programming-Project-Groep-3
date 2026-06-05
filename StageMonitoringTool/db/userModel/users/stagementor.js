@@ -1,21 +1,32 @@
-const { Sequelize, DataTypes, Model } = require('sequelize');
-const sequelize = new Sequelize('sqlite::memory:');
+import { sequelize } from '../../dbConnection.js';
+import { DataTypes } from 'sequelize';
+import User from './user.js';
 
-class stagementor extends user {}
+const Stagementor = sequelize.define("Stagementor",{
 
-stagementor.init(
-  {
-    
-     stagementor_id:{
+  stagementor_id:{
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    primaryKey: true,
+    autoIncrement: true,
+  },
+  user_id:{
         type: DataTypes.INTEGER,
-        allowNull:false,
-        primaryKey: true,
-        autoIncrement: true,
+        allowNull: false,
+    }
+    
     },
-  },
-  {
-    // Other model options go here
-    sequelize, // We need to pass the connection instance
-    modelName: 'docent', // We need to choose the model name
-  },
-);
+    {
+        timestamps: true,
+    }
+)
+
+User.hasOne(Stagementor, { 
+    foreignKey: 'stagementor_id', 
+    onDelete: 'CASCADE' 
+});
+Stagementor.belongsTo(User, { 
+    foreignKey: 'user_id' 
+});
+
+export default Stagementor;

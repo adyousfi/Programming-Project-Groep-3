@@ -1,21 +1,32 @@
-const { Sequelize, DataTypes, Model } = require('sequelize');
-const sequelize = new Sequelize('sqlite::memory:');
+import { sequelize } from '../../dbConnection.js';
+import { DataTypes } from 'sequelize';
+import User from './user.js';
 
-class docent extends user {}
+const Docent = sequelize.define("Docent",{
 
-docent.init(
-  {
-    
-     docent_id:{
+  docent_id:{
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    primaryKey: true,
+    autoIncrement: true,
+  },
+  user_id:{
         type: DataTypes.INTEGER,
-        allowNull:false,
-        primaryKey: true,
-        autoIncrement: true,
+        allowNull: false,
+    }
+    
     },
-  },
-  {
-    // Other model options go here
-    sequelize, // We need to pass the connection instance
-    modelName: 'docent', // We need to choose the model name
-  },
-);
+    {
+        timestamps: true,
+    }
+)
+
+User.hasOne(Docent, { 
+    foreignKey: 'docent_id', 
+    onDelete: 'CASCADE' 
+});
+Docent.belongsTo(User, { 
+    foreignKey: 'user_id' 
+});
+
+export default Docent;

@@ -1,16 +1,22 @@
-import sequelize from "../dbConnection.js";
+
+import { sequelize } from "../dbConnection.js";
 import { DataTypes, Deferrable } from "sequelize";
+import Docent from "../userModel/users/docent.js";
+import Student from "../userModel/users/student.js";
+import Admin from "../userModel/users/admin.js";
+import Stagementor from "../userModel/users/stagementor.js";
+
 
 export const status = {
-    Aangevraagt: 'Aanvraag',
-    Goedgekeurd: 'Goedgekeurd',
-    Aanpassingen_vereist: 'Aanpassingen_vereist',
-    Documentgeupload: 'documentgeupload',
-    Klaar: 'klaar'
+    AANVRAAG: 'Aanvraag',
+    GOEDGEKEURD: 'Goedgekeurd',
+    AANPASSINGENVEREISD: 'Aanpassingen_vereist',
+    DOCUMENTGEUPLOADED: 'documentgeuploaded',
+    KLAAR: 'klaar'
 };
 
 // Stage model
-const stage = sequelize.define("stage", {
+const Stage = sequelize.define("stage", {
     stage_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
@@ -20,17 +26,17 @@ const stage = sequelize.define("stage", {
     },
     stageaanvraag_id: {
         type: DataTypes.INTEGER,
-        allowNull: false,
+        allowNull: true,
         comment: "FK - Reference to stageaanvraag"
     },
     student_id: {
         type: DataTypes.INTEGER,
-        allowNull: false,
+        allowNull: true,
         comment: "FK - Reference to student (admin)"
     },
     docent_id: {
         type: DataTypes.INTEGER,
-        allowNull: false,
+        allowNull: true,
         comment: "FK - Reference to docent (admin)"
     },
     admin_id: {
@@ -45,25 +51,25 @@ const stage = sequelize.define("stage", {
     },
     bedrijfs_id: {
         type: DataTypes.INTEGER,
-        allowNull: false,
+        allowNull: true,
         comment: "FK - Reference to bedrijf"
     },
     omschrijving_opdracht: {
         type: DataTypes.TEXT,
-        allowNull: false,
+        allowNull: true,
     },
     status: {
         type: DataTypes.ENUM(Object.values(status)),
-        allowNull: false,
+        allowNull: true,
         defaultValue: 'Aanvraag'
     },
     begin_datum: {
         type: DataTypes.DATE,
-        allowNull: false,
+        allowNull: true,
     },
     eind_datum: {
         type: DataTypes.DATE,
-        allowNull: false,
+        allowNull: true,
     },
     },
     {
@@ -72,16 +78,12 @@ const stage = sequelize.define("stage", {
 
 )
 
-// Import other models for associations
-import docent from "../userModel/userSub/docent.js";
-import student from "../userModel/userSub/student.js";
-import admin from "../userModel/userSub/admin.js";
-import mentor from "../userModel/userSub/stagementor.js";
+
 
 // Define associations
-stage.belongsTo(docent, { foreignKey: 'docent_id', as: 'docent' });
-stage.belongsTo(student, { foreignKey: 'student_id', as: 'student' });
-stage.belongsTo(admin, { foreignKey: 'admin_id', as: 'admin' });
-stage.belongsTo(mentor, { foreignKey: 'mentor_id', as: 'mentor' });
+Stage.belongsTo(Docent, { foreignKey: 'docent_id', as: 'docent' });
+Stage.belongsTo(Student, { foreignKey: 'student_id', as: 'student' });
+Stage.belongsTo(Admin, { foreignKey: 'admin_id', as: 'admin' });
+Stage.belongsTo(Stagementor, { foreignKey: 'mentor_id', as: 'mentor' });
 
-export default stage;
+export default Stage;

@@ -1,41 +1,10 @@
 // db/seed.js
 import { ENUM } from "sequelize";
 import {sequelize} from "./dbConnection.js";
-import User from "./userModel/user.js";
-
-const user1 = ({
-    first_name: "huh",
-    last_name: "hah",
-    email: "helnah@hotmail.com",
-    password: "hashpassword",
-})
-
-const dummyUsers = [
-  {
-    first_name: "John",
-    last_name: "Doe",
-    email: "john.doe@school.com",
-    password: "hashed_password_123", // Ideally hashed using bcrypt
-  },
-  {
-    first_name: "Jane",
-    last_name: "Smith",
-    email: "jane.smith@school.com",
-    password: "hashed_password_456",
-  },
-  {
-    first_name: "Alex",
-    last_name: "Jones",
-    email: "alex.jones@student.com",
-    password: "hashed_password_789",
-  },
-  {
-    first_name: "Emily",
-    last_name: "Brown",
-    email: "emily.brown@student.com",
-    password: "hashed_password_abc",
-  }
-];
+import User, { ROLES } from "./userModel/users/user.js";
+import createUser from "./controllers/userController.js";
+import createStage from "./controllers/stageController.js";
+import { status } from "./stage/stage.js";
 
 const seedDatabase = async () => {
   try {
@@ -49,8 +18,18 @@ const seedDatabase = async () => {
     console.log("Tables reset cleanly.");
 
     // 3. Bulk insert the dummy data
-    await User.bulkCreate(dummyUsers, { validate: true });
+    
+    await createUser("jon","hys","hys.jon@html.com","passwrd",ROLES.STUDENT,"0493998987");
+    await createUser("John","Doe","john.doe@school.com","hashed_password_123",ROLES.DOCENT);
+    await createUser("huh","hah","helnah@hotmail.com","hashpassword", ROLES.ADMIN);
+    await createUser("Jane","Smith","jane.smith@stagecommisie.com","hashedPasswordnotfound",ROLES.STAGECOMMISIE);
+    await createUser("Alex","Jones","alex.jones@school.com","notAPassword",ROLES.STUDENT);
+    await createUser("Emily","Brown","emily.brown@something.com","noPassword",ROLES.STAGEMENTOR)
+    await createUser("ariga","toe","arigatoe@html.com","IlikeToes",ROLES.STUDENT);
+
     console.log("Successfully seeded 5 users into the database!");
+    //                                                    year-month-day
+    await createStage("doe iets",status.DOCUMENTGEUPLOADED,"2020-1-20","2021-10-12")
 
   } catch (error) {
     console.error("Error seeding database:", error);
