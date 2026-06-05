@@ -4,15 +4,14 @@ import User from './user.js';
 
 const Stagecommisie = sequelize.define("Stagecommisie",{
 
-  stagecommisie_id:{
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    primaryKey: true,
-    autoIncrement: true,
-  },
-  user_id:{
+  user_id: {
         type: DataTypes.INTEGER,
+        primaryKey: true, 
         allowNull: false,
+        references: {
+            model: User,
+            key: 'user_id' 
+        }
     }
     
     },
