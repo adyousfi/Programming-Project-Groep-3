@@ -11,10 +11,14 @@
       "opdrachtOmschrijving": "THIS IS UPDATED",
       "periodeStart": "2026-09-01",
       "periodeEind": "2027-02-01",
-      "status": "wachten",
-      "feedback": null,
+      "status": "aanpassingen_vereist",
+      "feedback": {
+        "conclusie": "",
+        "intro": "test",
+        "punten": []
+      },
       "ingediendOp": "2026-06-05T10:00:00.000Z",
-      "laatstBewerktOp": "2026-06-08T08:44:05.873Z"
+      "laatstBewerktOp": "2026-06-08T09:55:32.534Z"
     },
     {
       "id": "proposal-1780649331012",
@@ -194,6 +198,38 @@
       "feedback": null,
       "ingediendOp": "2026-06-08T09:03:19.154Z",
       "laatstBewerktOp": "2026-06-08T09:05:02.184Z"
+    },
+    {
+      "id": "proposal-1780911691542",
+      "studentNaam": "adam test",
+      "studentNummer": "34",
+      "bedrijfNaam": "dsdsds",
+      "bedrijfAdres": "sdsd@gmail.com",
+      "mentorNaam": "dsdsd",
+      "mentorEmail": "dsd@gmail.com",
+      "opdrachtOmschrijving": "test2",
+      "periodeStart": "2026-06-15",
+      "periodeEind": "2026-06-29",
+      "status": "wachten",
+      "feedback": null,
+      "ingediendOp": "2026-06-08T09:41:31.542Z",
+      "laatstBewerktOp": "2026-06-08T10:00:50.324Z"
+    },
+    {
+      "id": "proposal-1780913884868",
+      "studentNaam": "test",
+      "studentNummer": "45",
+      "bedrijfNaam": "errer",
+      "bedrijfAdres": "erererr",
+      "mentorNaam": "Test",
+      "mentorEmail": "sfsf@student.ehb.be",
+      "opdrachtOmschrijving": "stest",
+      "periodeStart": "2026-06-15",
+      "periodeEind": "2026-06-29",
+      "status": "wachten",
+      "feedback": null,
+      "ingediendOp": "2026-06-08T10:18:04.868Z",
+      "laatstBewerktOp": "2026-06-08T10:19:02.447Z"
     }
   ]
 }
