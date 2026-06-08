@@ -310,6 +310,22 @@
       "feedback": null,
       "ingediendOp": "2026-06-08T12:05:24.117Z",
       "laatstBewerktOp": "2026-06-08T12:06:04.799Z"
+    },
+    {
+      "id": "proposal-1780920889429",
+      "studentNaam": "JON",
+      "studentNummer": "1",
+      "bedrijfNaam": "qdz",
+      "bedrijfAdres": "qzd",
+      "mentorNaam": "qzd",
+      "mentorEmail": "els.peeters@techsolutions.be",
+      "opdrachtOmschrijving": "JON IS SMART",
+      "periodeStart": "2026-06-08",
+      "periodeEind": "2026-06-18",
+      "status": "wachten",
+      "feedback": null,
+      "ingediendOp": "2026-06-08T12:14:49.429Z",
+      "laatstBewerktOp": "2026-06-08T12:16:20.857Z"
     }
   ]
 }

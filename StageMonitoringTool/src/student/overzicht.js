@@ -1,4 +1,4 @@
-
+import './overzicht.css';
 
 export function renderOverzicht(container, userName = 'Jan Janssens') {
     container.innerHTML = `
