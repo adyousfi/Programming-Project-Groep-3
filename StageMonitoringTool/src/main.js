@@ -105,23 +105,6 @@ function renderLoginForm() {
     const username = usernameInput.value.trim();
     const password = passwordInput.value;
 
-    // Simple authentication
-    if ((username === 'student' && password === 'password123') || 
-        (username === 'commissie' && password === 'password123')) {
-      
-      // Store user info in sessionStorage
-      sessionStorage.setItem('loggedInUser', username);
-      
-      // Redirect to portal selection
-      window.location.href = '/?authenticated=true';
-    } else {
-      errorDiv.style.display = 'block';
-      usernameInput.value = '';
-      passwordInput.value = '';
-      
-      setTimeout(() => {
-        errorDiv.style.display = 'none';
-      }, 3000);
-    }
+  
   });
 }
