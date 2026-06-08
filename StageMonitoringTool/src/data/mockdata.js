@@ -1,5 +1,5 @@
-// mockdata voor als de server niet bereikbaar is.
-// Wanneer de backend actief is, wordt deze data niet meer gebruikt.
+// Centrale mockdata voor alle persona's.
+// Wanneer de backend actief is, wordt elke export vervangen door een API-aanroep.
 
 export const aanvragenMockdata = [
   {
@@ -90,5 +90,92 @@ export const aanvragenMockdata = [
       datum: '10/5/2026',
       beoordeeldDoor: 'Prof. De Vries',
     },
+  },
+];
+
+export const studentenMockdata = [
+  {
+    id: 1,
+    naam: 'Jan Janssens',
+    functie: 'Frontend Developer',
+    bedrijf: 'TechCorp Belgium',
+    mentor: 'Mieke Peeters',
+    periodeStart: '09 mrt 2026',
+    periodeEind: '26 jun 2026',
+    status: 'lopend',
+    nieuwLogboek: 1,
+    voortgang: { weken: 12, totaal: 16, dagenOver: 23 },
+    logboek: { ingediend: 11, totaal: 16, goedgekeurd: 10 },
+    mijlpalen: [
+      { label: 'Voorstel goedgekeurd', gedaan: true },
+      { label: 'Overeenkomst ondertekend', gedaan: true },
+      { label: 'Stage gestart', gedaan: true },
+      { label: 'Tussentijdse evaluatie', gedaan: true },
+      { label: 'Finale evaluatie', gedaan: false },
+    ],
+    laasteLogboek: '29 mei 2026',
+  },
+  {
+    id: 2,
+    naam: 'Emma Willems',
+    functie: 'Data Analyst',
+    bedrijf: 'DataSoft Solutions',
+    mentor: 'Pieter Van Den Berg',
+    periodeStart: '02 mrt 2026',
+    periodeEind: '19 jun 2026',
+    status: 'lopend',
+    nieuwLogboek: 0,
+    voortgang: { weken: 13, totaal: 16, dagenOver: 10 },
+    logboek: { ingediend: 13, totaal: 16, goedgekeurd: 12 },
+    mijlpalen: [
+      { label: 'Voorstel goedgekeurd', gedaan: true },
+      { label: 'Overeenkomst ondertekend', gedaan: true },
+      { label: 'Stage gestart', gedaan: true },
+      { label: 'Tussentijdse evaluatie', gedaan: true },
+      { label: 'Finale evaluatie', gedaan: false },
+    ],
+    laasteLogboek: '2 jun 2026',
+  },
+  {
+    id: 3,
+    naam: 'Robbe Nijs',
+    functie: 'Backend Developer',
+    bedrijf: 'CloudSystems NV',
+    mentor: 'Sara Declercq',
+    periodeStart: '09 mrt 2026',
+    periodeEind: '26 jun 2026',
+    status: 'lopend',
+    nieuwLogboek: 2,
+    voortgang: { weken: 12, totaal: 16, dagenOver: 23 },
+    logboek: { ingediend: 9, totaal: 16, goedgekeurd: 8 },
+    mijlpalen: [
+      { label: 'Voorstel goedgekeurd', gedaan: true },
+      { label: 'Overeenkomst ondertekend', gedaan: true },
+      { label: 'Stage gestart', gedaan: true },
+      { label: 'Tussentijdse evaluatie', gedaan: false },
+      { label: 'Finale evaluatie', gedaan: false },
+    ],
+    laasteLogboek: '25 mei 2026',
+  },
+  {
+    id: 4,
+    naam: 'Amber Willems',
+    functie: 'UX Designer',
+    bedrijf: 'CreativeHub BV',
+    mentor: 'Antoine Leclerc',
+    periodeStart: '10 feb 2026',
+    periodeEind: '29 mei 2026',
+    status: 'afgelopen',
+    nieuwLogboek: 0,
+    voortgang: { weken: 16, totaal: 16, dagenOver: 0 },
+    logboek: { ingediend: 16, totaal: 16, goedgekeurd: 15 },
+    mijlpalen: [
+      { label: 'Voorstel goedgekeurd', gedaan: true },
+      { label: 'Overeenkomst ondertekend', gedaan: true },
+      { label: 'Stage gestart', gedaan: true },
+      { label: 'Tussentijdse evaluatie', gedaan: true },
+      { label: 'Finale evaluatie', gedaan: true },
+    ],
+    laasteLogboek: '29 mei 2026',
   },
 ];
