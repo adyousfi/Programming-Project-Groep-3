@@ -78,7 +78,7 @@
     text-decoration: underline;
 }
 
-/* Main Content */
+/* Main content */
 .overzicht-main {
     flex: 1;
     display: flex;
@@ -94,7 +94,7 @@
     margin: 0 0 1.5rem 0;
 }
 
-/* Stepper */
+/* Stappen */
 .stepper-wrapper {
     background-color: #ffffff;
     border: 1px solid #e9ecef;
