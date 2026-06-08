@@ -82,7 +82,7 @@ form.addEventListener('submit', async (e) => {
       sessionStorage.setItem('userRole', data.user.role);
 
       if (data.user.role === 'student') {
-        window.location.href = '/?role=student';
+        renderStudentDashboard(app);
       } else if (data.user.role === 'stagecommisie') {
         window.location.href = '/?role=stagecommissie';
       } else {
