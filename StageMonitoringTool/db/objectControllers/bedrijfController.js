@@ -1,4 +1,5 @@
 import Bedrijf from "../objectModel/bedrijf.js";
+import Stagementor from "../userModel/stagementor.js";
 
 const createBedrijf = async (name, address) =>{
 
@@ -14,6 +15,8 @@ const createBedrijf = async (name, address) =>{
     })
         
 }
+
+
 
 export {createBedrijf};
 

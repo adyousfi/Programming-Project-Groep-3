@@ -1,6 +1,7 @@
 import { sequelize } from '../dbConnection.js';
 import { DataTypes } from 'sequelize';
 import User from './user.js';
+import Bedrijf from '../objectModel/bedrijf.js';
 
 const Stagementor = sequelize.define("Stagementor",{
 
@@ -12,7 +13,16 @@ const Stagementor = sequelize.define("Stagementor",{
             model: User,
             key: 'user_id' 
         }
-    }
+    },
+
+    bedrijf_id: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        references: {
+            model: Bedrijf,
+            key: 'bedrijf_id'
+        }
+    },
     
     },
     {
@@ -20,8 +30,20 @@ const Stagementor = sequelize.define("Stagementor",{
     }
 )
 
+Bedrijf.hasMany(Stagementor, { 
+        foreignKey: 'bedrijf_id', 
+        onDelete: 'CASCADE' // Als een bedrijf wordt verwijderd, blijven de mentors bestaan (hun company_id wordt NULL)
+    });
+    
+    // Een mentor BEHOORT TOT een bedrijf
+    Stagementor.belongsTo(Bedrijf, { 
+        foreignKey: 'bedrijf_id' 
+    });
+
+
+
 User.hasOne(Stagementor, { 
-    foreignKey: 'stagementor_id', 
+    foreignKey: 'bedrijf_id', 
     onDelete: 'CASCADE' 
 });
 Stagementor.belongsTo(User, { 

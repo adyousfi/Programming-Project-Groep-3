@@ -1,4 +1,4 @@
-import Stagementor from "../userModel/users/stagementor.js";
+import Stagementor from "../userModel/stagementor.js";
 import { sequelize } from "../dbConnection.js";
 
 const createStagementor = async (stagementor_id, user_id) =>
@@ -12,4 +12,13 @@ const createStagementor = async (stagementor_id, user_id) =>
 	console.log(stagementor)
   
 }
-export default createStagementor;
+
+const linkStagementorToBedrijf = async (userId, bedrijfId) =>{
+    await Stagementor.update(
+    { bedrijf_id: bedrijfId }, 
+    { where: { user_id: userId } }
+);
+}
+
+
+export {createStagementor, linkStagementorToBedrijf};

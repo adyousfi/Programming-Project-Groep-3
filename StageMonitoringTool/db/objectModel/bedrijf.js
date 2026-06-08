@@ -24,7 +24,6 @@ const Bedrijf = sequelize.define("Bedrijf", {
     },
     {
         timestamps: true,
-        tableName: 'Bedrijf'
     }
 )
 
