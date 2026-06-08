@@ -14,7 +14,7 @@
       const headding= document.querySelector('h1')
       const button= document.querySelector('button')
 button.addEventListener('click',()=>{
-  fetch('http://localhost:300/message')
+  fetch('http://localhost:3000/message')
   .then(Response=>{
     if(!Response.ok){
       throw new Error(`server error: ${Response.status} ${Response.statusText}`);
@@ -34,6 +34,8 @@ button.addEventListener('click',()=>{
       <input type="password" id="password" placeholder="Wachtwoord">
       <button type="submit">Login</button>
     </form>
+    hashed_password_123
+    john.doe@school.com
 
     <script>
       const form= document.getElementById('login')
@@ -44,7 +46,7 @@ button.addEventListener('click',()=>{
         const email = emailInput.value
         const password = passwordInput.value
 
-        fetch('http://localhost:300/login', {
+        fetch('http://localhost:3000/login', {
           method: 'POST',
           headers: {
             'content-type': 'application/json'
@@ -57,7 +59,7 @@ button.addEventListener('click',()=>{
           if(data.success) {
             alert('Login succesvol! ' + data.user.first_name)
           } else {
-            alert('Email of wachtwoord onjuist!')
+            alert('Email of wachtwoord onjuist!' + JSON.stringify({email: email, password: password}))
           }
         })
         .catch(err => {

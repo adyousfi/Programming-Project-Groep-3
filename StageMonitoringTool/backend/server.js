@@ -1,83 +1,61 @@
-const cors = require('cors');
-const express = require('express');
-const userRouter = require('./user');
+
+import cors from 'cors';
+import express from 'express';
+import userRouter from './user.js';
+import User from '.../db/controllers/userController';
+
 const app = express();
 
-// 💡 FIX 1: Change your import to a require statement!
-const { selectUser, User } = require('../db/controllers/userController');
-const users = [
-    
-    
-]
+let users = []
 
-app.use(express.json())
+const loadUsers = async () => {
+    try {
+        users = await User.findAll()
+        console.log(`✓ ${users.length} users geladen`)
+    } catch (error) {
+        console.error('✗ Fout bij laden van users:', error)
+    }
+}
 
+    app.use(express.json())
 app.use(cors({
-    origin:['http://127.0.0.1:5500', 'http://localhost:5500']
+    origin: ['http://127.0.0.1:5500', 'http://localhost:5500']
 }))
+app.use('/user', userRouter)
 
-app.use('/user',userRouter)
-
-app.get('/',(req,res)=>{
-    res.send("hallo from experss")
-})
-
-app.get('/name',(req,res)=>{
-    res.json([
-       {id:1, naam:'jan', psw:'admin123'}
-    ])
-})
-app.get('/message',(req,res)=>{
-    res.json({message:"hi"})
-})
-
-app.post('/message',(req,res)=>{
-    const { name, message } = req.body
-    res.json({
-        success: true,
-        received: {
-            name: name,
-            message: message
-        },
-        status: "Message received!"
-    })
-})
-
-app.post('/login', async (req, res) => {
+            app.post('/login', (req, res) => {
     const { email, password } = req.body
+
+    const user = users.find(u => u.email === email && u.password === password)
+
+    if (user) {
+        res.json({
+            success: true,
+            user: {
+                user_id: user.user_id,
+                first_name: user.first_name,
+                last_name: user.last_name,
+                email: user.email
+            },
+            message: "Login succesvol!"
+        })
+    } else {
+        res.json({ success: false, message: "Email of wachtwoord onjuist!" })
+    }
+})
+
+app.get('/name/:id', (req, res) => {
+    const id = Number(req.params.id)
+    const user = users.find(u => u.user_id == id)
     
-    try {
-        const users = await User.findAll()
-        const user = users.find(u => u.email === email && u.password === password)
-        
-        if (user) {
-            res.json({
-                success: true,
-                user: {
-                    user_id: user.user_id,
-                    first_name: user.first_name,
-                    last_name: user.last_name,
-                    email: user.email
-                },
-                message: "Login succesvol!"
-            })
-        } else {
-            res.json({ success: false, message: "Email of wachtwoord onjuist!" })
-        }
-    } catch (error) {
-        res.status(500).json({ success: false, message: "Server error" })
-    }
-})
-
-app.get('/name/:id', async (req, res) => {
-    try {
-        const user = await User.findByPk(req.params.id) // directere aanpak
+    if (user) {
         res.json(user)
-    } catch (error) {
-        res.status(500).json({ message: "Server error" })
+    } else {
+        res.status(404).json({ message: "User niet gevonden" })
     }
 })
 
-app.listen(300,()=>{
-    console.log("✓ Server running on port 300")
+await loadUsers()
+app.listen(3000, () => {
+    console.log("✓ Server running on port 3000")
 })
