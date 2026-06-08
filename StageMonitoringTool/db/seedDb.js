@@ -6,7 +6,9 @@ import {createUser} from "./userControllers/userController.js";
 import createStage from "./userControllers/stageController.js";
 import { status } from "./objectModel/stage.js";
 import { createBedrijf } from "./objectControllers/bedrijfController.js";
-import { createStagementor, linkStagementorToBedrijf } from "./userControllers/stagementorController.js";
+import { createStagementor } from "./userControllers/stagementorController.js";
+import { linkBedrijfToStageMentor } from "./objectControllers/bedrijfController.js";
+import { linkStageToMoreUser } from "./objectControllers/stageController.js";
 
 
 const seedDatabase = async () => {
@@ -36,14 +38,18 @@ const seedDatabase = async () => {
     await createBedrijf("aqua","finland");
     await createBedrijf("kanker","kankerstraat");
     
-    await linkStagementorToBedrijf(6,1);
-    await linkStagementorToBedrijf(8,1);
-    linkStagementorToBedrijf(9,2)
+    await linkBedrijfToStageMentor(6,1);
+    await linkBedrijfToStageMentor(8,1);
+
+
+    await createStage("doe iets",status.DOCUMENTGEUPLOADED,"2020-1-20","2021-10-12")
+    
+    await linkStageToMoreUser(1,1,2,6,1);
 
 
     console.log("Successfully seeded 5 users into the database!");
     //                                                    year-month-day
-    await createStage("doe iets",status.DOCUMENTGEUPLOADED,"2020-1-20","2021-10-12")
+    
 
     
 
