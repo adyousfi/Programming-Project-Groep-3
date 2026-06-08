@@ -183,6 +183,11 @@
   color: #9a3412;
 }
 
+.dc-badge--afwachting {
+  background: #fef9c3;
+  color: #854d0e;
+}
+
 .dc-meta {
   display: flex;
   gap: 40px;
@@ -291,6 +296,12 @@
   max-width: 80px;
 }
 
+.dc-mijlpalen-label {
+  font-size: 13px;
+  color: #374151;
+  margin: 0 0 10px;
+}
+
 .dc-mijlpaal-lijn {
   flex: 1;
   height: 2px;
@@ -302,6 +313,8 @@
   background: #16a34a;
 }
 
+/* Card footer */
+
 .dc-card-footer {
   display: flex;
   justify-content: space-between;
@@ -311,6 +324,10 @@
 .dc-laatste-logboek {
   font-size: 13px;
   color: #9ca3af;
+}
+
+.dc-laatste-logboek--leeg {
+  font-style: italic;
 }
 
 .dc-btn {
@@ -327,4 +344,13 @@
 
 .dc-btn:hover {
   background: #1d4ed8;
+}
+
+.dc-btn--afwachting {
+  background: #9ca3af;
+  cursor: not-allowed;
+}
+
+.dc-btn--afwachting:hover {
+  background: #9ca3af;
 }

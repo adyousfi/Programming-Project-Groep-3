@@ -18,8 +18,36 @@ function renderMijlpalen(lijst) {
   }).join('');
 }
 
+function renderKaartAfwachting(s) {
+  return `
+    <div class="dc-card">
+      <div class="dc-card-top">
+        <div>
+          <h2 class="dc-card-naam">${s.naam}</h2>
+          <p class="dc-card-functie">${s.functie}</p>
+          <p class="dc-card-bedrijf">${s.bedrijf}</p>
+        </div>
+        <span class="dc-badge dc-badge--afwachting">In afwachting van commissie</span>
+      </div>
+      <div class="dc-meta">
+        <span><strong>Mentor:</strong> ${s.mentor}</span>
+        <span><strong>Periode:</strong> ${s.periodeStart} – ${s.periodeEind}</span>
+      </div>
+      <p class="dc-mijlpalen-label">Mijlpalen</p>
+      <div class="dc-mijlpalen">
+        ${renderMijlpalen(s.mijlpalen)}
+      </div>
+      <div class="dc-card-footer">
+        <span class="dc-laatste-logboek dc-laatste-logboek--leeg">Nog geen logboeken</span>
+        <button class="dc-btn dc-btn--afwachting" disabled>In afwachting van commissie</button>
+      </div>
+    </div>
+  `;
+}
+
 function renderKaarten(lijst) {
   return lijst.map(function(s) {
+    if (s.status === 'in_afwachting') return renderKaartAfwachting(s);
     const periodePercent = Math.round((s.voortgang.weken / s.voortgang.totaal) * 100);
     const logboekPercent = Math.round((s.logboek.ingediend / s.logboek.totaal) * 100);
 
@@ -32,7 +60,7 @@ function renderKaarten(lijst) {
             <p class="dc-card-bedrijf">${s.bedrijf}</p>
           </div>
           <div class="dc-badges">
-            <span class="dc-badge dc-badge--${s.status}">${s.status === 'lopend' ? 'Lopend' : 'Afgelopen'}</span>
+            <span class="dc-badge dc-badge--lopend">Lopend</span>
             ${s.nieuwLogboek > 0 ? `<span class="dc-badge dc-badge--logboek">${s.nieuwLogboek} nieuw logboek</span>` : ''}
           </div>
         </div>
@@ -68,8 +96,30 @@ function renderKaarten(lijst) {
   }).join('');
 }
 
+function setupFilter(studenten) {
+  document.querySelectorAll('.dc-nav-item').forEach(function(item) {
+    item.addEventListener('click', function(e) {
+      e.preventDefault();
+      document.querySelectorAll('.dc-nav-item').forEach(function(i) { i.classList.remove('active'); });
+      item.classList.add('active');
+
+      const filter = item.dataset.filter;
+      const gefilterd = filter === 'actief'
+        ? studenten.filter(function(s) { return s.status === 'lopend'; })
+        : filter === 'alle'
+          ? studenten
+              .filter(function(s) { return s.status === 'lopend' || s.status === 'in_afwachting'; })
+              .sort(function(a, b) { return a.status === 'in_afwachting' ? -1 : 1; })
+          : [];
+
+      document.querySelector('.dc-kaarten').innerHTML = renderKaarten(gefilterd);
+    });
+  });
+}
+
 export function renderMijnStudenten() {
-  const actief = studenten.filter(function(s) { return s.status === 'lopend'; });
+  const actief    = studenten.filter(function(s) { return s.status === 'lopend'; });
+  const afgelopen = studenten.filter(function(s) { return s.status === 'afgelopen'; });
 
   document.querySelector('#app').innerHTML = `
     <div class="dc-layout">
@@ -78,9 +128,9 @@ export function renderMijnStudenten() {
           <span class="dc-logo-title">EhB-docent</span>
           <span class="dc-logo-sub">Erasmushogeschool Brussel</span>
           <nav class="dc-nav">
-            <a href="#" class="dc-nav-item active" data-filter="actief">Actieve stages</a>
-            <a href="#" class="dc-nav-item" data-filter="alle">Alle studenten</a>
-            <a href="#" class="dc-nav-item" data-filter="afgelopen">Afgelopen stages</a>
+            <a href="#" class="dc-nav-item active" data-filter="actief">Actieve stages <span class="dc-nav-count">(${actief.length})</span></a>
+            <a href="#" class="dc-nav-item" data-filter="alle">Alle studenten <span class="dc-nav-count">(${studenten.length})</span></a>
+            <a href="#" class="dc-nav-item" data-filter="afgelopen">Afgelopen stages <span class="dc-nav-count">(${afgelopen.length})</span></a>
           </nav>
         </div>
         <div class="dc-sidebar-bottom">
@@ -97,4 +147,6 @@ export function renderMijnStudenten() {
       </main>
     </div>
   `;
+
+  setupFilter(studenten);
 }
