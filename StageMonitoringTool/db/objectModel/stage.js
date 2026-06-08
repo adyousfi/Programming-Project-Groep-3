@@ -1,11 +1,10 @@
 
 import { sequelize } from "../dbConnection.js";
 import { DataTypes, Deferrable } from "sequelize";
-import Docent from "../userModel/users/docent.js";
-import Student from "../userModel/users/student.js";
-import Admin from "../userModel/users/admin.js";
-import Stagementor from "../userModel/users/stagementor.js";
-
+import Docent from "../userModel/docent.js";
+import Student from "../userModel/student.js";
+import Admin from "../userModel/admin.js";
+import Stagementor from "../userModel/stagementor.js";
 
 export const status = {
     AANVRAAG: 'Aanvraag',

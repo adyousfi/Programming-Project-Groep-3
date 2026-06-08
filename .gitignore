@@ -34,6 +34,7 @@ build/
 out/
 *.min.js
 *.bundle.js
+StageMonitoringTool/.env
 
 # Logs
 logs/
@@ -92,3 +93,6 @@ coverage/
 .nuxt/
 .vuepress/dist
 .serverless/
+
+.env
+StageMonitoringTool/.env/
