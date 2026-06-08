@@ -110,7 +110,9 @@ function setupFilter(studenten) {
           ? studenten
               .filter(function(s) { return s.status === 'lopend' || s.status === 'in_afwachting'; })
               .sort(function(a, b) { return a.status === 'in_afwachting' ? -1 : 1; })
-          : [];
+          : filter === 'afgelopen'
+            ? studenten.filter(function(s) { return s.status === 'afgelopen'; })
+            : [];
 
       document.querySelector('.dc-kaarten').innerHTML = renderKaarten(gefilterd);
     });
