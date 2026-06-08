@@ -32,7 +32,7 @@ function renderKaarten(lijst) {
             <p class="dc-card-bedrijf">${s.bedrijf}</p>
           </div>
           <div class="dc-badges">
-            <span class="dc-badge dc-badge--${s.status}">${s.status === 'lopend' ? 'Lopend' : 'Afgelopen'}</span>
+            <span class="dc-badge dc-badge--lopend">Lopend</span>
             ${s.nieuwLogboek > 0 ? `<span class="dc-badge dc-badge--logboek">${s.nieuwLogboek} nieuw logboek</span>` : ''}
           </div>
         </div>
@@ -68,8 +68,26 @@ function renderKaarten(lijst) {
   }).join('');
 }
 
+function setupFilter(studenten) {
+  document.querySelectorAll('.dc-nav-item').forEach(function(item) {
+    item.addEventListener('click', function(e) {
+      e.preventDefault();
+      document.querySelectorAll('.dc-nav-item').forEach(function(i) { i.classList.remove('active'); });
+      item.classList.add('active');
+
+      const filter = item.dataset.filter;
+      const gefilterd = filter === 'actief'
+        ? studenten.filter(function(s) { return s.status === 'lopend'; })
+        : [];
+
+      document.querySelector('.dc-kaarten').innerHTML = renderKaarten(gefilterd);
+    });
+  });
+}
+
 export function renderMijnStudenten() {
-  const actief = studenten.filter(function(s) { return s.status === 'lopend'; });
+  const actief    = studenten.filter(function(s) { return s.status === 'lopend'; });
+  const afgelopen = studenten.filter(function(s) { return s.status === 'afgelopen'; });
 
   document.querySelector('#app').innerHTML = `
     <div class="dc-layout">
@@ -78,9 +96,9 @@ export function renderMijnStudenten() {
           <span class="dc-logo-title">EhB-docent</span>
           <span class="dc-logo-sub">Erasmushogeschool Brussel</span>
           <nav class="dc-nav">
-            <a href="#" class="dc-nav-item active" data-filter="actief">Actieve stages</a>
-            <a href="#" class="dc-nav-item" data-filter="alle">Alle studenten</a>
-            <a href="#" class="dc-nav-item" data-filter="afgelopen">Afgelopen stages</a>
+            <a href="#" class="dc-nav-item active" data-filter="actief">Actieve stages <span class="dc-nav-count">(${actief.length})</span></a>
+            <a href="#" class="dc-nav-item" data-filter="alle">Alle studenten <span class="dc-nav-count">(${studenten.length})</span></a>
+            <a href="#" class="dc-nav-item" data-filter="afgelopen">Afgelopen stages <span class="dc-nav-count">(${afgelopen.length})</span></a>
           </nav>
         </div>
         <div class="dc-sidebar-bottom">
@@ -97,4 +115,6 @@ export function renderMijnStudenten() {
       </main>
     </div>
   `;
+
+  setupFilter(studenten);
 }
