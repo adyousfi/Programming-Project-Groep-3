@@ -1,65 +1,60 @@
 import './feedback.css';
+import { getActiveProposalId, getProposalById } from './dataService.js';
 
-export function renderFeedback(container, userName = '[Studentnaam]', feedback = null) {
-    const defaultFeedback = {
-        intro: 'De stage opdracht is interessant, maar er zijn enkele punten die verduidelijking nodig hebben:',
-        punten: [
-            'De omschrijving moet specifieker zijn over welke concrete projecten de student gaat uitvoeren.',
-            'Geef meer details over de begeleiding: hoeveel tijd zal de mentor wekelijks beschikbaar zijn?',
-            'Vermeld welke voorkennis vereist is.'
-        ],
-        conclusie: 'Pas de aanvraag aan met deze verduidelijkingen en dien opnieuw in.'
-    };
+export async function renderFeedback(container, userName = '[Studentnaam]') {
+    container.innerHTML = `<div class="feedback-dashboard"><main class="dashboard-content"><p>Feedback laden...</p></main></div>`;
 
-    const fb = feedback || defaultFeedback;
+    const activeId = getActiveProposalId();
+    let proposal = null;
+    let feedback = null;
+
+    if (activeId) {
+        proposal = await getProposalById(activeId);
+        feedback = proposal?.feedback || null;
+    }
+
+    const hasFeedback = feedback && feedback.punten && feedback.punten.length > 0;
 
     container.innerHTML = `
         <div class="feedback-dashboard">
-            <!-- Header Sectie -->
             <header class="dashboard-header">
                 <div class="brand">
                     <h1 class="brand-title">Stage Monitoring</h1>
                     <span class="brand-subtitle">Erasmushogeschool Brussel</span>
                 </div>
                 <div class="user-profile">
-                    <span class="user-name" id="user-name-display">${userName}</span>
+                    <span class="user-name" id="user-name-display">${proposal?.studentNaam || userName}</span>
                     <a href="/" class="logout-link">Uitloggen</a>
                 </div>
             </header>
 
             <main class="dashboard-content">
-                <!-- Stappen sectie -->
                 <section class="stepper-section">
                     <div class="stepper-container">
-                        <!-- Step 1: Completed -->
                         <div class="step completed">
                             <div class="step-circle">&#10003;</div>
                             <div class="step-title">Aanvraag</div>
                             <div class="step-status">Voltooid</div>
                         </div>
                         <div class="step-line completed"></div>
-                        <!-- Step 2: Actie vereist -->
-                        <div class="step action-required">
-                            <div class="step-circle">!</div>
+                        <div class="step ${hasFeedback ? 'action-required' : ''}">
+                            <div class="step-circle">${hasFeedback ? '!' : '2'}</div>
                             <div class="step-title">In beoordeling</div>
-                            <div class="step-status">Actie vereist</div>
+                            <div class="step-status">${hasFeedback ? 'Actie vereist' : 'In afwachting'}</div>
                         </div>
                         <div class="step-line"></div>
-                        <!-- Step 3: Actie vereist -->
-                        <div class="step action-required">
-                            <div class="step-circle">!</div>
+                        <div class="step">
+                            <div class="step-circle">3</div>
                             <div class="step-title">Goedgekeurd</div>
-                            <div class="step-status">Actie vereist</div>
+                            <div class="step-status">Gepland</div>
                         </div>
                         <div class="step-line"></div>
-                        <!-- Step 4: Gepland -->
                         <div class="step">
                             <div class="step-circle">4</div>
                             <div class="step-title">Stage actief</div>
                             <div class="step-status">Gepland</div>
                         </div>
                         <div class="step-line"></div>
-                        <!-- Step 5: Gepland -->
                         <div class="step">
                             <div class="step-circle">5</div>
                             <div class="step-title">Evaluatie</div>
@@ -68,27 +63,24 @@ export function renderFeedback(container, userName = '[Studentnaam]', feedback =
                     </div>
                 </section>
 
-                <!-- Status Balk -->
+                ${hasFeedback ? `
                 <section class="status-bar">
                     <span class="status-pill">Aanpassingen vereist</span>
                     <p class="status-description">De stagecommissie heeft feedback gegeven op je stagevoorstel</p>
                 </section>
 
-                <!-- Feedback Sectie -->
                 <section class="feedback-section">
-                    <!-- Feedback Card -->
                     <div class="feedback-card">
                         <h2 class="feedback-card-title">Feedback van Stagecommissie</h2>
                         <div class="feedback-content">
-                            <p class="feedback-intro">${fb.intro}</p>
+                            <p class="feedback-intro">${feedback.intro}</p>
                             <ol class="feedback-list">
-                                ${fb.punten.map(punt => `<li>${punt}</li>`).join('')}
+                                ${feedback.punten.map(punt => `<li>${punt}</li>`).join('')}
                             </ol>
-                            <p class="feedback-conclusion">${fb.conclusie}</p>
+                            <p class="feedback-conclusion">${feedback.conclusie}</p>
                         </div>
                     </div>
 
-                    <!-- Actie Card -->
                     <div class="action-card">
                         <div class="action-icon">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -101,11 +93,16 @@ export function renderFeedback(container, userName = '[Studentnaam]', feedback =
                         <button class="action-button">Stage Aanvraag Aanpassen</button>
                     </div>
                 </section>
+                ` : `
+                <section class="status-bar">
+                    <span class="status-pill">In afwachting</span>
+                    <p class="status-description">Je aanvraag is ingediend en wordt beoordeeld door de stagecommissie.</p>
+                </section>
+                `}
             </main>
         </div>
     `;
 
-    // Event listener voor "Stage Aanvraag Aanpassen" button
     const adjustBtn = container.querySelector('.action-button');
     if (adjustBtn) {
         adjustBtn.addEventListener('click', () => {

@@ -1,5 +1,5 @@
 import './formulier.css';
-import { saveProposal } from './dataService.js';
+import { saveProposal, setActiveProposalId } from './dataService.js';
 import { renderWachten } from './wachten.js';
 
 export function renderStageformulier(container) {
@@ -166,6 +166,7 @@ export function renderStageformulier(container) {
             submitBtn.disabled = true;
             try {
                 await saveProposal(proposal);
+                setActiveProposalId(proposal.id);
             } catch (err) {
                 console.error('Error saving proposal:', err);
                 alert(`Er is een fout opgetreden tijdens het opslaan: ${err.message}`);

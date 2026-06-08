@@ -12,7 +12,9 @@
       "periodeStart": "2026-09-01",
       "periodeEind": "2027-02-01",
       "status": "wachten",
-      "ingediendOp": "2026-06-05T10:00:00.000Z"
+      "feedback": null,
+      "ingediendOp": "2026-06-05T10:00:00.000Z",
+      "laatstBewerktOp": "2026-06-05T10:00:00.000Z"
     },
     {
       "id": "proposal-1780649331012",
@@ -26,7 +28,9 @@
       "periodeStart": "2026-06-05",
       "periodeEind": "2026-06-06",
       "status": "wachten",
-      "ingediendOp": "2026-06-05T08:48:51.012Z"
+      "feedback": null,
+      "ingediendOp": "2026-06-05T08:48:51.012Z",
+      "laatstBewerktOp": "2026-06-05T08:48:51.012Z"
     },
     {
       "id": "proposal-1780649988496",
@@ -40,7 +44,9 @@
       "periodeStart": "2026-06-05",
       "periodeEind": "2026-06-26",
       "status": "wachten",
-      "ingediendOp": "2026-06-05T08:59:48.496Z"
+      "feedback": null,
+      "ingediendOp": "2026-06-05T08:59:48.496Z",
+      "laatstBewerktOp": "2026-06-05T08:59:48.496Z"
     },
     {
       "id": "proposal-1780651608103",
@@ -54,7 +60,9 @@
       "periodeStart": "2026-06-25",
       "periodeEind": "2026-06-26",
       "status": "wachten",
-      "ingediendOp": "2026-06-05T09:26:48.103Z"
+      "feedback": null,
+      "ingediendOp": "2026-06-05T09:26:48.103Z",
+      "laatstBewerktOp": "2026-06-05T09:26:48.103Z"
     },
     {
       "id": "proposal-1780652411642",
@@ -68,7 +76,9 @@
       "periodeStart": "2026-06-09",
       "periodeEind": "2026-06-20",
       "status": "wachten",
-      "ingediendOp": "2026-06-05T09:40:11.642Z"
+      "feedback": null,
+      "ingediendOp": "2026-06-05T09:40:11.642Z",
+      "laatstBewerktOp": "2026-06-05T09:40:11.642Z"
     },
     {
       "id": "proposal-1780662461037",
@@ -82,7 +92,9 @@
       "periodeStart": "2026-06-05",
       "periodeEind": "2026-06-06",
       "status": "wachten",
-      "ingediendOp": "2026-06-05T12:27:41.037Z"
+      "feedback": null,
+      "ingediendOp": "2026-06-05T12:27:41.037Z",
+      "laatstBewerktOp": "2026-06-05T12:27:41.037Z"
     },
     {
       "id": "proposal-1780663732590",
@@ -96,7 +108,9 @@
       "periodeStart": "2026-06-05",
       "periodeEind": "2026-06-12",
       "status": "wachten",
-      "ingediendOp": "2026-06-05T12:48:52.591Z"
+      "feedback": null,
+      "ingediendOp": "2026-06-05T12:48:52.591Z",
+      "laatstBewerktOp": "2026-06-05T12:48:52.591Z"
     }
   ]
 }
