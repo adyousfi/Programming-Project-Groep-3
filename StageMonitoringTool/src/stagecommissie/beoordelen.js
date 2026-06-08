@@ -132,9 +132,25 @@ export function renderBeoordelen(aanvraag) {
     toonHistoriek(aanvraag, 'goedgekeurd', feedback);
   });
 
-  document.querySelector('#bd-aanpassingen').addEventListener('click', function() {
+  document.querySelector('#bd-aanpassingen').addEventListener('click', async function() {
     const feedback = document.querySelector('#bd-feedback').value.trim();
     if (!feedback) { toonFeedbackFout(); return; }
+
+    try {
+      const response = await fetch(`/api/proposals/${aanvraag.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          status: 'aanpassingen_vereist',
+          feedback: { intro: feedback, punten: [], conclusie: '' },
+        }),
+      });
+      if (!response.ok) throw new Error('Server fout: ' + response.status);
+    } catch (err) {
+      alert('Kon aanpassingen niet opslaan: ' + err.message);
+      return;
+    }
+
     toonHistoriek(aanvraag, 'aanpassingen', feedback);
   });
 

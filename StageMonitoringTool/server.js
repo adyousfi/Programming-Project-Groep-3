@@ -56,8 +56,30 @@ app.post('/api/proposals', async (req, res) => {
   res.status(201).json(proposal);
 });
 
-app.get('/', (req, res) => {
-  res.sendFile(join(__dirname, 'index.html'));
+app.put('/api/proposals/:id', async (req, res) => {
+  const { id } = req.params;
+  const updates = req.body;
+  if (!updates || typeof updates !== 'object') {
+    return res.status(400).json({ error: 'Ongeldige update data ontvangen.' });
+  }
+
+  const data = await readProposalsFile();
+  data.proposals = Array.isArray(data.proposals) ? data.proposals : [];
+  const index = data.proposals.findIndex(p => p.id === id);
+
+  if (index === -1) {
+    return res.status(404).json({ error: `Voorstel met id '${id}' niet gevonden.` });
+  }
+
+  data.proposals[index] = {
+    ...data.proposals[index],
+    ...updates,
+    id,
+    laatstBewerktOp: new Date().toISOString()
+  };
+
+  await writeProposalsFile(data);
+  res.json(data.proposals[index]);
 });
 
 app.listen(PORT, () => {

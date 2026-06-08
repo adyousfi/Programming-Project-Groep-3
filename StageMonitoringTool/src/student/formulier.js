@@ -1,6 +1,5 @@
 import './formulier.css';
-import { saveProposal } from './dataService.js';
-import { renderWachten } from './wachten.js';
+import { setActiveProposalId } from './dataService.js';
 
 export function renderStageformulier(container) {
     container.innerHTML = `
@@ -96,7 +95,7 @@ export function renderStageformulier(container) {
 
     // Validatie bij indienen
     if (submitBtn) {
-        submitBtn.addEventListener('click', async (event) => {
+        submitBtn.addEventListener('click', (event) => {
             event.preventDefault();
             const inputs = container.querySelectorAll('input, textarea');
             let hasEmptyFields = false;
@@ -160,22 +159,28 @@ export function renderStageformulier(container) {
                 periodeStart: container.querySelector('#periode-start').value,
                 periodeEind: container.querySelector('#periode-eind').value,
                 status: 'wachten',
-                ingediendOp: new Date().toISOString()
+                feedback: null,
+                ingediendOp: new Date().toISOString(),
+                laatstBewerktOp: new Date().toISOString()
             };
 
             submitBtn.disabled = true;
+            setActiveProposalId(proposal.id);
             try {
-                await saveProposal(proposal);
-            } catch (err) {
-                console.error('Error saving proposal:', err);
-                alert(`Er is een fout opgetreden tijdens het opslaan: ${err.message}`);
-                submitBtn.disabled = false;
-                return;
+                const raw = localStorage.getItem('stagevoorstellen_mock');
+                const proposals = raw ? JSON.parse(raw) : [];
+                proposals.push(proposal);
+                localStorage.setItem('stagevoorstellen_mock', JSON.stringify(proposals, null, 2));
+            } catch (e) {
+                // ignore localStorage errors
             }
-
-            const redirectUrl = `${window.location.origin}${window.location.pathname}?role=wachten`;
-            window.history.replaceState(null, '', redirectUrl);
-            renderWachten(container);
+            window.location.href = '/?role=wachten';
+            // Save to server in background (non-blocking)
+            fetch('/api/proposals', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(proposal),
+            }).catch(() => {});
         });
     }
 }
