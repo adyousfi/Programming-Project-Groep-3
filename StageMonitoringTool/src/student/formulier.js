@@ -1,6 +1,5 @@
 import './formulier.css';
-import { saveProposal } from './dataService.js';
-import { renderWachten } from './wachten.js';
+import { saveProposal, setActiveProposalId } from './dataService.js';
 
 export function renderStageformulier(container) {
     container.innerHTML = `
@@ -160,12 +159,15 @@ export function renderStageformulier(container) {
                 periodeStart: container.querySelector('#periode-start').value,
                 periodeEind: container.querySelector('#periode-eind').value,
                 status: 'wachten',
-                ingediendOp: new Date().toISOString()
+                feedback: null,
+                ingediendOp: new Date().toISOString(),
+                laatstBewerktOp: new Date().toISOString()
             };
 
             submitBtn.disabled = true;
             try {
                 await saveProposal(proposal);
+                setActiveProposalId(proposal.id);
             } catch (err) {
                 console.error('Error saving proposal:', err);
                 alert(`Er is een fout opgetreden tijdens het opslaan: ${err.message}`);
@@ -174,8 +176,7 @@ export function renderStageformulier(container) {
             }
 
             const redirectUrl = `${window.location.origin}${window.location.pathname}?role=wachten`;
-            window.history.replaceState(null, '', redirectUrl);
-            renderWachten(container);
+            window.location.href = redirectUrl;
         });
     }
 }

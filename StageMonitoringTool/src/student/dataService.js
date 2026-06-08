@@ -72,3 +72,42 @@ export async function getLatestProposal() {
   const mock = loadMockProposals();
   return mock[mock.length - 1] || null;
 }
+
+const ACTIVE_PROPOSAL_KEY = 'activeProposalId';
+
+export function setActiveProposalId(id) {
+  localStorage.setItem(ACTIVE_PROPOSAL_KEY, id);
+}
+
+export function getActiveProposalId() {
+  return localStorage.getItem(ACTIVE_PROPOSAL_KEY);
+}
+
+export async function getProposalById(id) {
+  const proposals = await getSavedProposals();
+  return proposals.find(p => p.id === id) || null;
+}
+
+export async function updateProposal(id, updates) {
+  try {
+    const response = await fetch(`/api/proposals/${encodeURIComponent(id)}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updates),
+    });
+    if (response.ok) {
+      return { proposal: await response.json(), source: 'server' };
+    }
+  } catch (error) {
+    console.warn('PUT failed, falling back to localStorage:', error);
+  }
+
+  const proposals = getSavedProposalsFromStorage();
+  const index = proposals.findIndex(p => p.id === id);
+  if (index !== -1) {
+    proposals[index] = { ...proposals[index], ...updates, id, laatstBewerktOp: new Date().toISOString() };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(proposals, null, 2));
+    return { proposal: proposals[index], source: 'local' };
+  }
+  throw new Error(`Voorstel met id '${id}' niet gevonden.`);
+}

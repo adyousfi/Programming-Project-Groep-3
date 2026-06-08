@@ -6,7 +6,7 @@ function mapProposalToAanvraag(proposal) {
     ? new Date(proposal.ingediendOp).toLocaleDateString('nl-BE')
     : '';
 
-  const statusMap = { wachten: 'in_afwachting' };
+  const statusMap = { wachten: 'in_afwachting', aanpassingen_vereist: 'aanpassingen' };
 
   return {
     id: proposal.id,
