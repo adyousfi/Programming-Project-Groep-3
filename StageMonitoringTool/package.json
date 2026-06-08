@@ -4,21 +4,28 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "testServer": "node backend/server.js",
+    "testExpress": "node express/express.js",
+    "testdbAzure": "node db/testConnection/testdbAzure",
+    "testdbMysql": "node db/testConnection/testdbMysql",
+    "startdb": "node db/maindb.js",
+    "start": "node testdbAzure.js",
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview",
-    "server": "node server.js",
-    "start": "concurrently \"npm run server\" \"npm run dev\""
+    "preview": "vite preview"
   },
   "devDependencies": {
-    "concurrently": "^10.0.3",
     "vite": "^8.0.12"
   },
   "dependencies": {
     "@sequelize/core": "^7.0.0-alpha.48",
     "@sequelize/mssql": "^7.0.0-alpha.48",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "mssql": "^12.5.5",
+    "mysql": "^2.18.1",
+    "mysql2": "^3.22.4",
     "sequelize": "^6.37.8",
     "tedious": "^19.2.1"
   }
