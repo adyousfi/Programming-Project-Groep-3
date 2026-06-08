@@ -7,6 +7,7 @@ import { renderFeedback } from './student/feedback.js';
 import { renderAanpassen } from './student/aanpassen.js';
 import { renderMijnStagiairs } from './stagementor/mijn-stagiairs.js';
 import { renderMijnStudenten } from './docent/mijn-studenten.js';
+import { renderOverzicht } from './student/overzicht.js';
 
 const app = document.querySelector('#app');
 const role = new URLSearchParams(window.location.search).get('role');
@@ -27,6 +28,8 @@ if (role === 'student') {
   renderMijnStagiairs(app);
 } else if (role === 'docent') {
   renderMijnStudenten();
+} else if (role === 'overzicht') {
+  renderOverzicht(app);
 } else {
   // Portaalpagina om te kiezen welke rol paginas te bekijken
   app.innerHTML = `
