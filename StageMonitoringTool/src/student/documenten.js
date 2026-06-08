@@ -12,7 +12,7 @@ export function renderDocumenten(container, userName = 'Jan Janssens') {
                         <span class="sidebar-logo-sub">Erasmushogeschool Brussel</span>
                     </div>
                     <nav class="sidebar-nav">
-                        <a href="?role=overzicht" class="sidebar-nav-item">Overzicht</a>
+                        <a href="?role=goedgekeurd_student" class="sidebar-nav-item">Overzicht</a>
                         <a href="#" class="sidebar-nav-item">Stagedetails</a>
                         <a href="?role=documenten" class="sidebar-nav-item active">Documenten</a>
                         <a href="#" class="sidebar-nav-item">Logboek</a>

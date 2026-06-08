@@ -7,7 +7,7 @@ import { renderFeedback } from './student/feedback.js';
 import { renderAanpassen } from './student/aanpassen.js';
 import { renderMijnStagiairs } from './stagementor/mijn-stagiairs.js';
 import { renderMijnStudenten } from './docent/mijn-studenten.js';
-import { renderOverzicht } from './student/overzicht.js';
+import { renderGoedgekeurdStudent } from './student/goedgekeurd_student.js';
 import { renderDocumenten } from './student/documenten.js';
 
 const app = document.querySelector('#app');
@@ -29,8 +29,8 @@ if (role === 'student') {
   renderMijnStagiairs(app);
 } else if (role === 'docent') {
   renderMijnStudenten();
-} else if (role === 'overzicht') {
-  renderOverzicht(app);
+} else if (role === 'goedgekeurd_student') {
+  renderGoedgekeurdStudent(app);
 } else if (role === 'documenten') {
   renderDocumenten(app);
 } else if (role === 'frontend') {
@@ -45,7 +45,7 @@ if (role === 'student') {
         <a href="?role=stagecommissie" style="padding: 1rem 2rem; background-color: #198754; color: white; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 1.1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">Stagecommissie Portaal</a>
         <a href="?role=stagementor" style="padding: 1rem 2rem; background-color: #0f766e; color: white; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 1.1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">Stagementor Portaal</a>
         <a href="?role=docent" style="padding: 1rem 2rem; background-color: #7c3aed; color: white; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 1.1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">Docent Portaal</a>
-        <a href="?role=overzicht" style="padding: 1rem 2rem; background-color: #dc3545; color: white; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 1.1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">Overzicht Portaal</a>
+        <a href="?role=goedgekeurd_student" style="padding: 1rem 2rem; background-color: #dc3545; color: white; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 1.1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">Goedgekeurd Student</a>
       </div>
     </div>
   `;
