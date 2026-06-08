@@ -13,7 +13,7 @@ export async function renderFeedback(container, userName = '[Studentnaam]') {
         feedback = proposal?.feedback || null;
     }
 
-    const hasFeedback = feedback && feedback.punten && feedback.punten.length > 0;
+    const hasFeedback = !!(feedback && feedback.intro);
 
     container.innerHTML = `
         <div class="feedback-dashboard">
