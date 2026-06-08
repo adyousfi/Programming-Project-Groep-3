@@ -8,13 +8,13 @@
       "bedrijfAdres": "Kerkstraat 12, 1000 Brussel",
       "mentorNaam": "Els Peeters",
       "mentorEmail": "els.peeters@techsolutions.be",
-      "opdrachtOmschrijving": "Een webapplicatie bouwen om stageaanvragen te beheren.",
+      "opdrachtOmschrijving": "THIS IS UPDATED",
       "periodeStart": "2026-09-01",
       "periodeEind": "2027-02-01",
       "status": "wachten",
       "feedback": null,
       "ingediendOp": "2026-06-05T10:00:00.000Z",
-      "laatstBewerktOp": "2026-06-05T10:00:00.000Z"
+      "laatstBewerktOp": "2026-06-08T08:44:05.873Z"
     },
     {
       "id": "proposal-1780649331012",
@@ -125,6 +125,75 @@
       "periodeEind": "2026-06-17",
       "status": "wachten",
       "ingediendOp": "2026-06-08T08:37:42.793Z"
+    },
+    {
+      "id": "proposal-1780908488993",
+      "studentNaam": "AdamTest",
+      "studentNummer": "22",
+      "bedrijfNaam": "dqd",
+      "bedrijfAdres": "zqdzq",
+      "mentorNaam": "qzd",
+      "mentorEmail": "2@gmaiL.com",
+      "opdrachtOmschrijving": "qzq",
+      "periodeStart": "2026-06-08",
+      "periodeEind": "2026-06-24",
+      "status": "wachten",
+      "feedback": null,
+      "ingediendOp": "2026-06-08T08:48:08.993Z",
+      "laatstBewerktOp": "2026-06-08T08:48:08.993Z"
+    },
+    {
+      "id": "proposal-1780908519295",
+      "studentNaam": "ADAMTEST",
+      "studentNummer": "1",
+      "bedrijfNaam": "qdz",
+      "bedrijfAdres": "qdz",
+      "mentorNaam": "qdzq",
+      "mentorEmail": "eee@student.ehb.be",
+      "opdrachtOmschrijving": "UPDATED",
+      "periodeStart": "2026-06-08",
+      "periodeEind": "2026-06-09",
+      "status": "wachten",
+      "feedback": null,
+      "ingediendOp": "2026-06-08T08:48:39.295Z",
+      "laatstBewerktOp": "2026-06-08T08:51:37.628Z"
+    },
+    {
+      "id": "test-proposal",
+      "studentNaam": "test",
+      "status": "wachten"
+    },
+    {
+      "id": "proposal-1780909073458",
+      "studentNaam": "TESTADAM",
+      "studentNummer": "2",
+      "bedrijfNaam": "qd",
+      "bedrijfAdres": "dzq",
+      "mentorNaam": "q",
+      "mentorEmail": "eee@student.ehb.be",
+      "opdrachtOmschrijving": "UPDATE IT",
+      "periodeStart": "2026-06-09",
+      "periodeEind": "2026-06-17",
+      "status": "wachten",
+      "feedback": null,
+      "ingediendOp": "2026-06-08T08:57:53.458Z",
+      "laatstBewerktOp": "2026-06-08T09:00:13.376Z"
+    },
+    {
+      "id": "proposal-1780909399154",
+      "studentNaam": "mohamed ayyyyyadi",
+      "studentNummer": "34",
+      "bedrijfNaam": "jkqjkqjdd",
+      "bedrijfAdres": "ddsds",
+      "mentorNaam": "dsdsd",
+      "mentorEmail": "dsdd@gmail.com",
+      "opdrachtOmschrijving": "test",
+      "periodeStart": "2026-06-14",
+      "periodeEind": "2026-06-22",
+      "status": "wachten",
+      "feedback": null,
+      "ingediendOp": "2026-06-08T09:03:19.154Z",
+      "laatstBewerktOp": "2026-06-08T09:05:02.184Z"
     }
   ]
 }

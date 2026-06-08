@@ -1,6 +1,5 @@
 import './formulier.css';
 import { saveProposal, setActiveProposalId } from './dataService.js';
-import { renderWachten } from './wachten.js';
 
 export function renderStageformulier(container) {
     container.innerHTML = `
@@ -177,8 +176,7 @@ export function renderStageformulier(container) {
             }
 
             const redirectUrl = `${window.location.origin}${window.location.pathname}?role=wachten`;
-            window.history.replaceState(null, '', redirectUrl);
-            renderWachten(container);
+            window.location.href = redirectUrl;
         });
     }
 }

@@ -97,6 +97,7 @@ export async function renderFeedback(container, userName = '[Studentnaam]') {
                 <section class="status-bar">
                     <span class="status-pill">In afwachting</span>
                     <p class="status-description">Je aanvraag is ingediend en wordt beoordeeld door de stagecommissie.</p>
+                    <p style="margin-top:0.5rem;font-size:0.85rem;color:#888;">Voorstel ID: <code>${activeId}</code></p>
                 </section>
                 `}
             </main>
