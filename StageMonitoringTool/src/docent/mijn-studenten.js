@@ -106,7 +106,9 @@ function setupFilter(studenten) {
       const filter = item.dataset.filter;
       const gefilterd = filter === 'actief'
         ? studenten.filter(function(s) { return s.status === 'lopend'; })
-        : studenten.filter(function(s) { return s.status === 'in_afwachting'; });
+        : filter === 'alle'
+          ? studenten.filter(function(s) { return s.status === 'in_afwachting'; })
+          : [];
 
       document.querySelector('.dc-kaarten').innerHTML = renderKaarten(gefilterd);
     });
