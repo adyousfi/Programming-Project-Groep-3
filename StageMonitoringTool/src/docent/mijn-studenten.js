@@ -1,6 +1,23 @@
 import './mijn-studenten.css';
 import { studentenMockdata as studenten } from '../data/mockdata.js';
 
+function renderMijlpalen(lijst) {
+  return lijst.map(function(m, i) {
+    const lijn = i < lijst.length - 1
+      ? `<div class="dc-mijlpaal-lijn${m.gedaan && lijst[i + 1].gedaan ? ' dc-mijlpaal-lijn--gedaan' : ''}"></div>`
+      : '';
+    return `
+      <div class="dc-mijlpaal">
+        <div class="dc-mijlpaal-cirkel dc-mijlpaal-cirkel--${m.gedaan ? 'gedaan' : 'open'}">
+          ${m.gedaan ? '✓' : i + 1}
+        </div>
+        <span class="dc-mijlpaal-label">${m.label}</span>
+      </div>
+      ${lijn}
+    `;
+  }).join('');
+}
+
 function renderKaarten(lijst) {
   return lijst.map(function(s) {
     const periodePercent = Math.round((s.voortgang.weken / s.voortgang.totaal) * 100);
@@ -38,6 +55,9 @@ function renderKaarten(lijst) {
             </div>
             <span class="dc-voortgang-info">${s.logboek.ingediend} / ${s.logboek.totaal} weken ingediend · ${s.logboek.goedgekeurd} goedgekeurd</span>
           </div>
+        </div>
+        <div class="dc-mijlpalen">
+          ${renderMijlpalen(s.mijlpalen)}
         </div>
         <div class="dc-card-footer">
           <span class="dc-laatste-logboek">Laatste logboek: ${s.laasteLogboek}</span>
