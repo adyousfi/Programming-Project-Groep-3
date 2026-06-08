@@ -1,8 +1,8 @@
-import { sequelize } from '../dbConnection.js';
+import { sequelize } from '../../dbConnection.js';
 import { DataTypes } from 'sequelize';
 import User from './user.js';
 
-const Admin = sequelize.define("Admin",{
+const Stagecommisie = sequelize.define("Stagecommisie",{
 
   user_id: {
         type: DataTypes.INTEGER,
@@ -20,12 +20,12 @@ const Admin = sequelize.define("Admin",{
     }
 )
 
-User.hasOne(Admin, { 
-    foreignKey: 'admin_id', 
+User.hasOne(Stagecommisie, { 
+    foreignKey: 'stagecommisie_id', 
     onDelete: 'CASCADE' 
 });
-Admin.belongsTo(User, { 
+Stagecommisie.belongsTo(User, { 
     foreignKey: 'user_id' 
 });
 
-export default Admin;
+export default Stagecommisie;
