@@ -1,5 +1,5 @@
 /* Layout */
-.overzicht-layout {
+.goedgekeurd-layout {
     display: flex;
     min-height: 100vh;
     font-family: 'Inter', sans-serif;
@@ -7,7 +7,7 @@
 }
 
 /* Sidebar */
-.overzicht-sidebar {
+.goedgekeurd-sidebar {
     width: 200px;
     min-width: 200px;
     background-color: #ffffff;
@@ -78,8 +78,8 @@
     text-decoration: underline;
 }
 
-/* Main Content */
-.overzicht-main {
+/* Main content */
+.goedgekeurd-main {
     flex: 1;
     display: flex;
     flex-direction: column;

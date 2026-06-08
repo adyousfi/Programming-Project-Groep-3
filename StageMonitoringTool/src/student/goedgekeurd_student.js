@@ -1,19 +1,19 @@
-import './overzicht.css';
+import './goedgekeurd_student.css';
 
-export function renderOverzicht(container, userName = 'Jan Janssens') {
+export function renderGoedgekeurdStudent(container, userName = 'Jan Janssens') {
     container.innerHTML = `
-        <div class="overzicht-layout">
+        <div class="goedgekeurd-layout">
             <!-- Linkerzijbalk -->
-            <aside class="overzicht-sidebar">
+            <aside class="goedgekeurd-sidebar">
                 <div class="sidebar-top">
                     <div class="sidebar-logo">
                         <span class="sidebar-logo-title">Stage Monitoring</span>
                         <span class="sidebar-logo-sub">Erasmushogeschool Brussel</span>
                     </div>
                     <nav class="sidebar-nav">
-                        <a href="#" class="sidebar-nav-item active">Overzicht</a>
+                        <a href="?role=goedgekeurd_student" class="sidebar-nav-item active">Overzicht</a>
                         <a href="#" class="sidebar-nav-item">Stagedetails</a>
-                        <a href="#" class="sidebar-nav-item">Documenten</a>
+                        <a href="?role=documenten" class="sidebar-nav-item">Documenten</a>
                         <a href="#" class="sidebar-nav-item">Logboek</a>
                         <a href="#" class="sidebar-nav-item">Evaluatie</a>
                     </nav>
@@ -25,7 +25,7 @@ export function renderOverzicht(container, userName = 'Jan Janssens') {
             </aside>
 
             <!-- Hoofdinhoud -->
-            <main class="overzicht-main">
+            <main class="goedgekeurd-main">
                 <h1 class="page-title">Stage Voortgang</h1>
 
                 <!-- Voortgangsbalk (Stepper) -->
