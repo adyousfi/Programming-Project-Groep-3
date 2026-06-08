@@ -1,5 +1,5 @@
 import './aanpassen.css';
-import { getActiveProposalId, getProposalById, updateProposal } from './dataService.js';
+import { getActiveProposalId, getProposalById } from './dataService.js';
 
 export async function renderAanpassen(container, userName = '[Studentnaam]') {
     container.innerHTML = `<div class="aanpassen-modal-overlay"><div class="aanpassen-modal"><p>Gegevens laden...</p></div></div>`;
@@ -128,7 +128,7 @@ export async function renderAanpassen(container, userName = '[Studentnaam]') {
     if (cancelBtn) cancelBtn.addEventListener('click', goToFeedback);
 
     if (submitBtn) {
-        submitBtn.addEventListener('click', async () => {
+        submitBtn.addEventListener('click', () => {
             const omschrijving = container.querySelector('#opdracht-omschrijving').value.trim();
             const start = container.querySelector('#periode-start').value;
             const eind = container.querySelector('#periode-eind').value;
@@ -139,20 +139,25 @@ export async function renderAanpassen(container, userName = '[Studentnaam]') {
             }
 
             submitBtn.disabled = true;
+            // Update localStorage immediately
             try {
-                await updateProposal(activeId, {
-                    opdrachtOmschrijving: omschrijving,
-                    periodeStart: start,
-                    periodeEind: eind,
-                    status: 'wachten',
-                    feedback: null
-                });
-                window.location.href = '/?role=wachten';
-            } catch (err) {
-                console.error('Fout bij bijwerken voorstel:', err);
-                alert('Er is een fout opgetreden: ' + err.message);
-                submitBtn.disabled = false;
+                const raw = localStorage.getItem('stagevoorstellen_mock');
+                const proposals = raw ? JSON.parse(raw) : [];
+                const index = proposals.findIndex(p => p.id === activeId);
+                if (index !== -1) {
+                    proposals[index] = { ...proposals[index], opdrachtOmschrijving: omschrijving, periodeStart: start, periodeEind: eind, status: 'wachten', feedback: null, laatstBewerktOp: new Date().toISOString() };
+                    localStorage.setItem('stagevoorstellen_mock', JSON.stringify(proposals, null, 2));
+                }
+            } catch (e) {
+                // ignore localStorage errors
             }
+            window.location.href = '/?role=wachten';
+            // Update server in background (non-blocking)
+            fetch(`/api/proposals/${encodeURIComponent(activeId)}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ opdrachtOmschrijving: omschrijving, periodeStart: start, periodeEind: eind, status: 'wachten', feedback: null }),
+            }).catch(() => {});
         });
     }
 }
