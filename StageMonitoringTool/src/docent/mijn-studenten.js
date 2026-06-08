@@ -3,6 +3,9 @@ import { studentenMockdata as studenten } from '../data/mockdata.js';
 
 function renderKaarten(lijst) {
   return lijst.map(function(s) {
+    const periodePercent = Math.round((s.voortgang.weken / s.voortgang.totaal) * 100);
+    const logboekPercent = Math.round((s.logboek.ingediend / s.logboek.totaal) * 100);
+
     return `
       <div class="dc-card">
         <div class="dc-card-top">
@@ -19,6 +22,22 @@ function renderKaarten(lijst) {
         <div class="dc-meta">
           <span><strong>Mentor:</strong> ${s.mentor}</span>
           <span><strong>Periode:</strong> ${s.periodeStart} – ${s.periodeEind}</span>
+        </div>
+        <div class="dc-voortgang">
+          <div class="dc-voortgang-rij">
+            <span class="dc-voortgang-label">Voortgang stageperiode</span>
+            <div class="dc-voortgang-bar-wrap">
+              <div class="dc-voortgang-bar dc-voortgang-bar--periode" style="width: ${periodePercent}%"></div>
+            </div>
+            <span class="dc-voortgang-info">${s.voortgang.weken} / ${s.voortgang.totaal} weken${s.voortgang.dagenOver > 0 ? ` · nog ${s.voortgang.dagenOver} dagen` : ''}</span>
+          </div>
+          <div class="dc-voortgang-rij">
+            <span class="dc-voortgang-label">Logboek</span>
+            <div class="dc-voortgang-bar-wrap">
+              <div class="dc-voortgang-bar dc-voortgang-bar--logboek" style="width: ${logboekPercent}%"></div>
+            </div>
+            <span class="dc-voortgang-info">${s.logboek.ingediend} / ${s.logboek.totaal} weken ingediend · ${s.logboek.goedgekeurd} goedgekeurd</span>
+          </div>
         </div>
         <div class="dc-card-footer">
           <span class="dc-laatste-logboek">Laatste logboek: ${s.laasteLogboek}</span>
