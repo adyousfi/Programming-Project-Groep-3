@@ -111,6 +111,20 @@
       "feedback": null,
       "ingediendOp": "2026-06-05T12:48:52.591Z",
       "laatstBewerktOp": "2026-06-05T12:48:52.591Z"
+    },
+    {
+      "id": "proposal-1780907862793",
+      "studentNaam": "TestID",
+      "studentNummer": "2",
+      "bedrijfNaam": "qdz",
+      "bedrijfAdres": "qd",
+      "mentorNaam": "qdz",
+      "mentorEmail": "z@gmail.com",
+      "opdrachtOmschrijving": "dq",
+      "periodeStart": "2026-06-08",
+      "periodeEind": "2026-06-17",
+      "status": "wachten",
+      "ingediendOp": "2026-06-08T08:37:42.793Z"
     }
   ]
 }

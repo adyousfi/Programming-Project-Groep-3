@@ -160,7 +160,9 @@ export function renderStageformulier(container) {
                 periodeStart: container.querySelector('#periode-start').value,
                 periodeEind: container.querySelector('#periode-eind').value,
                 status: 'wachten',
-                ingediendOp: new Date().toISOString()
+                feedback: null,
+                ingediendOp: new Date().toISOString(),
+                laatstBewerktOp: new Date().toISOString()
             };
 
             submitBtn.disabled = true;
