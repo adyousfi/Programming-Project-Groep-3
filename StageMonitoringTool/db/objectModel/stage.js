@@ -74,7 +74,7 @@ Stage.belongsTo(Student, { foreignKey: 'student_id'});
 Stage.belongsTo(Bedrijf, { foreignKey: 'bedrijf_id'});
 Stage.belongsTo(Stagementor, { foreignKey: 'mentor_id'});
 
-export default Stage;
+
 
 
 const linkStagementorToBedrijf = async (userId, bedrijfId) =>{
@@ -83,3 +83,6 @@ const linkStagementorToBedrijf = async (userId, bedrijfId) =>{
     { where: { user_id: userId } }
 );
 }
+
+
+export default Stage;
