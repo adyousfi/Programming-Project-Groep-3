@@ -4,12 +4,11 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "testdbAzure": "node db/testConnection/testdbAzure",
-    "testdbMysql": "node db/testConnection/testdbMysql",
-    "start": "node testdbAzure.js",
+    "start":"node testdbAzure.js",
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "server": "node server.js"
   },
   "devDependencies": {
     "vite": "^8.0.12"
@@ -17,7 +16,6 @@
   "dependencies": {
     "@sequelize/core": "^7.0.0-alpha.48",
     "@sequelize/mssql": "^7.0.0-alpha.48",
-    "dotenv": "^17.4.2",
     "mssql": "^12.5.5",
     "mysql2": "^3.22.4",
     "sequelize": "^6.37.8",
