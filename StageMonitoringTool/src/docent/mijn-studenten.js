@@ -18,8 +18,36 @@ function renderMijlpalen(lijst) {
   }).join('');
 }
 
+function renderKaartAfwachting(s) {
+  return `
+    <div class="dc-card">
+      <div class="dc-card-top">
+        <div>
+          <h2 class="dc-card-naam">${s.naam}</h2>
+          <p class="dc-card-functie">${s.functie}</p>
+          <p class="dc-card-bedrijf">${s.bedrijf}</p>
+        </div>
+        <span class="dc-badge dc-badge--afwachting">In afwachting van commissie</span>
+      </div>
+      <div class="dc-meta">
+        <span><strong>Mentor:</strong> ${s.mentor}</span>
+        <span><strong>Periode:</strong> ${s.periodeStart} – ${s.periodeEind}</span>
+      </div>
+      <p class="dc-mijlpalen-label">Mijlpalen</p>
+      <div class="dc-mijlpalen">
+        ${renderMijlpalen(s.mijlpalen)}
+      </div>
+      <div class="dc-card-footer">
+        <span class="dc-laatste-logboek dc-laatste-logboek--leeg">Nog geen logboeken</span>
+        <button class="dc-btn dc-btn--afwachting" disabled>In afwachting van commissie</button>
+      </div>
+    </div>
+  `;
+}
+
 function renderKaarten(lijst) {
   return lijst.map(function(s) {
+    if (s.status === 'in_afwachting') return renderKaartAfwachting(s);
     const periodePercent = Math.round((s.voortgang.weken / s.voortgang.totaal) * 100);
     const logboekPercent = Math.round((s.logboek.ingediend / s.logboek.totaal) * 100);
 
@@ -78,7 +106,7 @@ function setupFilter(studenten) {
       const filter = item.dataset.filter;
       const gefilterd = filter === 'actief'
         ? studenten.filter(function(s) { return s.status === 'lopend'; })
-        : [];
+        : studenten.filter(function(s) { return s.status === 'in_afwachting'; });
 
       document.querySelector('.dc-kaarten').innerHTML = renderKaarten(gefilterd);
     });

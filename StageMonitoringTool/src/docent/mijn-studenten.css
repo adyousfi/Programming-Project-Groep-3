@@ -201,6 +201,26 @@
 .dc-btn--afwachting {
   background: #6b7280;
   cursor: not-allowed;
+}
+
+.dc-badge--afwachting {
+  background: #fef9c3;
+  color: #854d0e;
+}
+
+.dc-mijlpalen-label {
+  font-size: 13px;
+  color: #374151;
+  margin: 0 0 10px;
+}
+
+.dc-laatste-logboek--leeg {
+  font-style: italic;
+}
+
+.dc-btn--afwachting {
+  background: #6b7280;
+  cursor: not-allowed;
   opacity: 0.85;
 }
 
