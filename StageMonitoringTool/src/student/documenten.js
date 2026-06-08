@@ -28,16 +28,6 @@ export function renderDocumenten(container, userName = 'Jan Janssens') {
             <!-- Hoofdinhoud -->
             <main class="documenten-main">
 
-                <!-- Preview Modus Bar -->
-                <div class="preview-bar">
-                    <span class="preview-bar-label">Preview Modus:</span>
-                    <div class="preview-bar-buttons">
-                        <a href="#" class="preview-bar-btn">Stagevoorstel indienen</a>
-                        <a href="#" class="preview-bar-btn">Aanpassingen vereist</a>
-                        <a href="#" class="preview-bar-btn active">Goedgekeurd</a>
-                    </div>
-                </div>
-
                 <h1 class="page-title">Documenten</h1>
 
                 <!-- Stageovereenkomst Card -->
