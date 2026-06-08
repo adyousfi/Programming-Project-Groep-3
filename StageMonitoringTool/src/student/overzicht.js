@@ -13,7 +13,7 @@ export function renderOverzicht(container, userName = 'Jan Janssens') {
                     <nav class="sidebar-nav">
                         <a href="#" class="sidebar-nav-item active">Overzicht</a>
                         <a href="#" class="sidebar-nav-item">Stagedetails</a>
-                        <a href="#" class="sidebar-nav-item">Documenten</a>
+                        <a href="?role=documenten" class="sidebar-nav-item">Documenten</a>
                         <a href="#" class="sidebar-nav-item">Logboek</a>
                         <a href="#" class="sidebar-nav-item">Evaluatie</a>
                     </nav>
