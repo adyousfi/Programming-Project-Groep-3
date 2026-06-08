@@ -82,10 +82,6 @@ app.put('/api/proposals/:id', async (req, res) => {
   res.json(data.proposals[index]);
 });
 
-app.get('/', (req, res) => {
-  res.sendFile(join(__dirname, 'index.html'));
-});
-
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
 }).on('error', (err) => {
