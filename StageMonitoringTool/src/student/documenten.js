@@ -38,6 +38,20 @@ export function renderDocumenten(container, userName = 'Jan Janssens') {
                     </div>
                 </div>
 
+                <h1 class="page-title">Documenten</h1>
+
+                <!-- Stageovereenkomst Card -->
+                <div class="document-card">
+                    <div class="document-card-header">
+                        <h2 class="document-card-title">Stageovereenkomst</h2>
+                        <span class="document-status-badge">Ondertekend</span>
+                    </div>
+                    <p class="document-card-subtitle">Officieel document tussen student, bedrijf en school</p>
+                    <hr class="document-card-divider">
+                    <p class="document-card-description">De stageovereenkomst is opgesteld en ondertekend door alle partijen. Dit document wordt beheerd door de stageco&ouml;rdinator.</p>
+                    <button class="document-download-btn">Download Overeenkomst</button>
+                </div>
+
             </main>
 
         </div>
