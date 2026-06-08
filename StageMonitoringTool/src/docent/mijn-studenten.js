@@ -60,7 +60,7 @@ function renderKaarten(lijst) {
             <p class="dc-card-bedrijf">${s.bedrijf}</p>
           </div>
           <div class="dc-badges">
-            <span class="dc-badge dc-badge--lopend">Lopend</span>
+            <span class="dc-badge dc-badge--${s.status === 'afgelopen' ? 'afgerond' : 'lopend'}">${s.status === 'afgelopen' ? 'Afgerond' : 'Lopend'}</span>
             ${s.nieuwLogboek > 0 ? `<span class="dc-badge dc-badge--logboek">${s.nieuwLogboek} nieuw logboek</span>` : ''}
           </div>
         </div>
@@ -89,6 +89,7 @@ function renderKaarten(lijst) {
         </div>
         <div class="dc-card-footer">
           <span class="dc-laatste-logboek">Laatste logboek: ${s.laasteLogboek}</span>
+          ${s.eindpunt ? `<span class="dc-badge dc-badge--eindpunt">Eindpunt: ${s.eindpunt}</span>` : ''}
           <button class="dc-btn" data-id="${s.id}">Student Bekijken</button>
         </div>
       </div>
