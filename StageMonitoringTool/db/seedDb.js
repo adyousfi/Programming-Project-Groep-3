@@ -1,10 +1,13 @@
 // db/seed.js
 import { ENUM } from "sequelize";
 import {sequelize} from "./dbConnection.js";
-import User, { ROLES } from "./userModel/users/user.js";
-import {createUser} from "./controllers/userController.js";
-import createStage from "./controllers/stageController.js";
-import { status } from "./stage/stage.js";
+import User, { ROLES } from "./userModel/user.js";
+import {createUser} from "./userControllers/userController.js";
+import createStage from "./userControllers/stageController.js";
+import { status } from "./objectModel/stage.js";
+import { createBedrijf } from "./objectControllers/bedrijfController.js";
+import { createStagementor, linkStagementorToBedrijf } from "./userControllers/stagementorController.js";
+
 
 const seedDatabase = async () => {
   try {
@@ -26,10 +29,23 @@ const seedDatabase = async () => {
     await createUser("Alex","Jones","alex.jones@school.com","notAPassword",ROLES.STUDENT);
     await createUser("Emily","Brown","emily.brown@something.com","noPassword",ROLES.STAGEMENTOR)
     await createUser("ariga","toe","arigatoe@html.com","IlikeToes",ROLES.STUDENT);
+    
+    await createUser("some","dude","some.dude@something.com","whatisdas",ROLES.STAGEMENTOR)
+    await createUser("some","other","some.other@something.com","whatisdas",ROLES.STAGEMENTOR)
+
+    await createBedrijf("aqua","finland");
+    await createBedrijf("kanker","kankerstraat");
+    
+    await linkStagementorToBedrijf(6,1);
+    await linkStagementorToBedrijf(8,1);
+    linkStagementorToBedrijf(9,2)
+
 
     console.log("Successfully seeded 5 users into the database!");
     //                                                    year-month-day
     await createStage("doe iets",status.DOCUMENTGEUPLOADED,"2020-1-20","2021-10-12")
+
+    
 
   } catch (error) {
     console.error("Error seeding database:", error);
