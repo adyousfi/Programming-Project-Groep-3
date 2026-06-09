@@ -97,6 +97,7 @@ export const studentenMockdata = [
   {
     id: 1,
     naam: 'Jan Janssens',
+    email: 'jan.janssens@student.ehb.be',
     functie: 'Frontend Developer',
     bedrijf: 'TechCorp Belgium',
     mentor: 'Mieke Peeters',
@@ -118,6 +119,7 @@ export const studentenMockdata = [
   {
     id: 2,
     naam: 'Emma Willems',
+    email: 'emma.willems@student.ehb.be',
     functie: 'Data Analyst',
     bedrijf: 'DataSoft Solutions',
     mentor: 'Pieter Van Den Berg',
@@ -139,6 +141,7 @@ export const studentenMockdata = [
   {
     id: 3,
     naam: 'Anna De Vries',
+    email: 'anna.devries@student.ehb.be',
     functie: 'UX Designer',
     bedrijf: 'Digital Solutions BV',
     mentor: 'Tom Jacobs',
@@ -160,6 +163,7 @@ export const studentenMockdata = [
   {
     id: 5,
     naam: 'Robbe Nijs',
+    email: 'robbe.nijs@student.ehb.be',
     functie: 'Backend Developer',
     bedrijf: 'CloudSystems NV',
     mentor: 'Sara Declercq',
@@ -181,6 +185,7 @@ export const studentenMockdata = [
   {
     id: 4,
     naam: 'Sophie Martens',
+    email: 'sophie.martens@student.ehb.be',
     functie: 'Full Stack Developer',
     bedrijf: 'Innovation Labs',
     mentor: 'Lien Verhaegen',
