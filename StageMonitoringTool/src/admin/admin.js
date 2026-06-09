@@ -347,6 +347,43 @@ export function renderAdmin(app) {
     }
   });
 
+  // Update user
+  editForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const userId = document.getElementById('edit-user-id').value;
+    const userData = {
+      first_name: document.getElementById('edit-voornaam').value,
+      last_name: document.getElementById('edit-achternaam').value,
+      email: document.getElementById('edit-email').value,
+      phone: document.getElementById('edit-telefoon').value || 'no phone',
+      password: document.getElementById('edit-wachtwoord').value,
+      role: document.getElementById('edit-rol').value
+    };
+
+    try {
+      const response = await fetch(`${API_URL}/update-user/${userId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(userData)
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        editModal.classList.remove('active');
+        editForm.reset();
+        alert('Gebruiker succesvol bijgewerkt!');
+        loadUsers();
+      } else {
+        alert('Fout bij het bijwerken: ' + (result.msg || 'Onbekende fout'));
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Kan geen verbinding maken met de server.');
+    }
+  });
+
   // Load users on page load
   loadUsers();
 }
