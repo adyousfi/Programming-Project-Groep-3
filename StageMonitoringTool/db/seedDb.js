@@ -2,7 +2,7 @@
 import { ENUM } from "sequelize";
 import {sequelize} from "./dbConnection.js";
 import User, { ROLES } from "./userModel/user.js";
-import {createUser} from "./userControllers/userController.js";
+import userController from "./userControllers/userController.js";
 import createStage from "./userControllers/stageController.js";
 import { status } from "./objectModel/stage.js";
 import { createBedrijf } from "./objectControllers/bedrijfController.js";
@@ -24,16 +24,16 @@ const seedDatabase = async () => {
 
     // 3. Bulk insert the dummy data
     
-    await createUser("jon","hys","hys.jon@html.com","passwrd",ROLES.STUDENT,"0493998987");
-    await createUser("John","Doe","john.doe@school.com","hashed_password_123",ROLES.DOCENT);
-    await createUser("huh","hah","helnah@hotmail.com","hashpassword", ROLES.ADMIN);
-    await createUser("Jane","Smith","jane.smith@stagecommisie.com","hashedPasswordnotfound",ROLES.STAGECOMMISIE);
-    await createUser("Alex","Jones","alex.jones@school.com","notAPassword",ROLES.STUDENT);
-    await createUser("Emily","Brown","emily.brown@something.com","noPassword",ROLES.STAGEMENTOR)
-    await createUser("ariga","toe","arigatoe@html.com","IlikeToes",ROLES.STUDENT);
-    
-    await createUser("some","dude","some.dude@something.com","whatisdas",ROLES.STAGEMENTOR)
-    await createUser("some","other","some.other@something.com","whatisdas",ROLES.STAGEMENTOR)
+    await User.create("jon","hys","hys.jon@html.com","passwrd",ROLES.STUDENT,"0493998987");
+    await User.create("John","Doe","john.doe@school.com","hashed_password_123",ROLES.DOCENT);
+    await User.create("huh","hah","helnah@hotmail.com","hashpassword", ROLES.ADMIN);
+    await User.create("Jane","Smith","jane.smith@stagecommisie.com","hashedPasswordnotfound",ROLES.STAGECOMMISIE);
+    await User.create("Alex","Jones","alex.jones@school.com","notAPassword",ROLES.STUDENT);
+    await User.create("Emily","Brown","emily.brown@something.com","noPassword",ROLES.STAGEMENTOR)
+    await User.create("ariga","toe","arigatoe@html.com","IlikeToes",ROLES.STUDENT);
+    await User.create()
+    await User.create("some","dude","some.dude@something.com","whatisdas",ROLES.STAGEMENTOR)
+    await User.create("some","other","some.other@something.com","whatisdas",ROLES.STAGEMENTOR)
 
     await createBedrijf("aqua","finland");
     await createBedrijf("kanker","kankerstraat");

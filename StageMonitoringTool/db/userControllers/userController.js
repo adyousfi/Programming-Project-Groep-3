@@ -9,24 +9,30 @@ import Admin from "../userModel/admin.js";
 import Student from "../userModel/student.js";
 import Stagementor from "../userModel/stagementor.js";
 
-
-const createUser = async (first_name, last_name, email, password ,role, phone) =>
+const createUser = async (req, res, next) =>
 {
-    
-    const user = await User.create(
+
+	const
+	{
+		first_name,
+		last_name,
+		email,
+		password,
+		role,
+		phone
+	} = await req.body;
+
+    try {
+        await User.create(
 	{
 		first_name: first_name,
 		last_name: last_name,
 		email: email,
 		password: password,
 		role: role,
-		phone: phone,
+		phone: phone
 		
 	})
-	
-	console.log(user)
-
-
 	switch (role){
 		case ROLES.STUDENT:
 		await Student.create({
@@ -58,7 +64,54 @@ const createUser = async (first_name, last_name, email, password ,role, phone) =
 			})
 		break;
 	}
+	return res.status(200).json(
+	{
+		msg: "User created successfully"
+	})
+    } catch (error) {
+        return res.status(500).json(
+            {
+              msg: "something went wrong while creating user"
+            })
+    }
+	
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// const createUser = async (req, res, next ) =>
+// {
+    
+    
+// 	const user = await User.create(
+// 	{
+// 		first_name: req.body.first_name,
+//     	last_name: req.body.last_name,
+//     	email: req.body.email,
+//     	password: req.body.password,
+//     	role: req.body.role,
+// 		phone: req.body.phone
+// 	})
+// 	console.log(user)
+	
+// }
 
 
 const selectUser = async (req, res, next) =>
@@ -79,4 +132,4 @@ const selectUser = async (req, res, next) =>
   } 
 }
 
-export {createUser,selectUser};
+export default {createUser,selectUser};
