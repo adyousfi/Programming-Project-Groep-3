@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import { run } from '../db/dbConnection.js';
-import User from '../db/userModel/users/user.js';
+import User from '../db/userModel/user.js';
 
 const app = express();
 
@@ -11,8 +11,20 @@ app.use(cookieParser());
 
 // ✅ CORS met cookies
 app.use(cors({
-  origin: ['http://localhost:5173', 'http://127.0.0.1:5500','http://localhost:5173/'],
-  credentials: true
+  origin: (origin, cb) => {
+    const allowed = [
+      'http://localhost:5173',
+      'http://127.0.0.1:5500'
+    ];
+
+    // allow requests without Origin (e.g. curl / same-origin)
+    if (!origin) return cb(null, true);
+    if (allowed.includes(origin)) return cb(null, true);
+    return cb(new Error('Not allowed by CORS'));
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 
 // ✅ start DB
