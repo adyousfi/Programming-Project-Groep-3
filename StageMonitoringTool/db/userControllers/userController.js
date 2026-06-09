@@ -122,4 +122,26 @@ const updateUser = async (req, res, next) => {
     }
 };
 
-export default { createUser, selectUser, updateUser };
+const deleteUser = async (req, res, next) => {
+    const { id } = req.params;
+
+    try {
+        const user = await User.findByPk(id);
+        if (!user) {
+            return res.status(404).json({ msg: "Gebruiker niet gevonden" });
+        }
+
+        await user.destroy();
+
+        return res.status(200).json({
+            msg: "Gebruiker succesvol verwijderd"
+        });
+    } catch (error) {
+        console.error("Error deleting user: ", error);
+        return res.status(500).json({
+            msg: "Er is iets misgegaan bij het verwijderen van de gebruiker"
+        });
+    }
+};
+
+export default { createUser, selectUser, updateUser, deleteUser };

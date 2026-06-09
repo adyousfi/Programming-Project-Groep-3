@@ -220,7 +220,7 @@ export function renderAdmin(app) {
         <td><span class="status-badge active">Actief</span></td>
         <td class="actions">
           <button class="btn-edit" data-id="${user.user_id}">Bewerken</button>
-          <button class="btn-deactivate">Deactiveren</button>
+          <button class="btn-deactivate" data-id="${user.user_id}">Deactiveren</button>
         </td>
       </tr>
     `).join('');
@@ -229,6 +229,34 @@ export function renderAdmin(app) {
     document.querySelectorAll('.btn-edit').forEach(btn => {
       btn.addEventListener('click', () => openEditModal(btn.dataset.id));
     });
+
+    // Add delete button listeners
+    document.querySelectorAll('.btn-deactivate').forEach(btn => {
+      btn.addEventListener('click', () => deleteUser(btn.dataset.id));
+    });
+  }
+
+  // Delete user
+  async function deleteUser(userId) {
+    if (!confirm('Weet je zeker dat je deze gebruiker wilt verwijderen?')) return;
+
+    try {
+      const response = await fetch(`${API_URL}/delete-user/${userId}`, {
+        method: 'DELETE'
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        alert('Gebruiker succesvol verwijderd!');
+        loadUsers();
+      } else {
+        alert('Fout bij het verwijderen: ' + (result.msg || 'Onbekende fout'));
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Kan geen verbinding maken met de server.');
+    }
   }
 
   // Filter users
