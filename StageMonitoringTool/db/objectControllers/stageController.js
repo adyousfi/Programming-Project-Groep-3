@@ -32,18 +32,32 @@ const createStage = async (req,res,next) =>{
     }
 }
 
-const linkStageToMoreUser = async (stageId,studentId,docentId,mentorId,bedrijfId,) =>{
+const updateStage = async (req, res ,next) =>{
+    try {
+
+    
+    const {
+        stage_id,
+        student_id,
+        docent_id,
+        mentor_id,
+        bedrijf_id
+    } = req.body;
+    
     await Stage.update(
     { 
-        student_id: studentId,
-        docent_id: docentId,
-        mentor_id: mentorId,
-        bedrijf_id: bedrijfId
+        student_id: student_id,
+        docent_id: docent_id,
+        mentor_id: mentor_id,
+        bedrijf_id: bedrijf_id
     },
-    {where: { stage_id: stageId }}
-);
+    {where: { stage_id: stage_id }});
+    }
+    catch(error){
+        
+    }
 }
-export default {createStage, linkStageToMoreUser};
+export default {createStage, updateStage};
 
 
 

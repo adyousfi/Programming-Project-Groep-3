@@ -5,6 +5,8 @@ import userController from "./userControllers/userController.js";
 import express from 'express';
 import User from '../db/userModel/user.js';
 import stageController from "./objectControllers/stageController.js";
+import bedrijfController from "./objectControllers/bedrijfController.js";
+import Bedrijf from "./objectModel/bedrijf.js";
 
 await run();
 
@@ -28,7 +30,10 @@ router.post("/create-user", userController.createUser)
 router.get("/select-user", userController.selectUser)
 
 router.post("/create-stage",stageController.createStage)
+router.post("/update-stage",stageController.updateStage)
 
+router.post("/assign-bedrijftomentor",bedrijfController.linkBedrijfToStageMentor)
+router.post("/create-bedrijf",bedrijfController.createBedrijf)
 const PORT = 3000;
 app.listen(PORT, () => {
     console.log(`Server is successfully running on http://localhost:${PORT}`);
