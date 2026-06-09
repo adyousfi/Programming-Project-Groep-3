@@ -1,99 +1,75 @@
-import cors from 'cors';
 import express from 'express';
+import cors from 'cors';
+import cookieParser from 'cookie-parser';
 import { run } from '../db/dbConnection.js';
 import User from '../db/userModel/users/user.js';
 
 const app = express();
 
 app.use(express.json());
+app.use(cookieParser());
+
+// ✅ CORS met cookies
 app.use(cors({
-    origin: ['http://127.0.0.1:5500', 'http://localhost:5500', 'http://localhost:5173']
+  origin: ['http://localhost:5173', 'http://127.0.0.1:5500','http://localhost:5173/'],
+  credentials: true
 }));
 
-// Connect to DB
+// ✅ start DB
 await run();
 
-// GET all users
-app.get('/users', async (req, res) => {
-    try {
-        const users = await User.findAll();
-        res.json({ success: true, data: users });
-    } catch (error) {
-        res.status(500).json({ success: false, message: 'Server error' });
-    }
-});
-
-// GET user by id
-app.get('/users/:id', async (req, res) => {
-    try {
-        const user = await User.findByPk(req.params.id);
-        if (!user) return res.status(404).json({ success: false, message: 'User niet gevonden' });
-        res.json({ success: true, data: user });
-    } catch (error) {
-        res.status(500).json({ success: false, message: 'Server error' });
-    }
-});
-
-// POST login
+// ✅ LOGIN + COOKIE
 app.post('/login', async (req, res) => {
-    const { email, password } = req.body;
-    try {
-        const user = await User.findOne({ where: { email, password } });
-        if (user) {
-            res.json({
-                success: true,
-                user: {
-                    user_id:    user.user_id,
-                    first_name: user.first_name,
-                    last_name:  user.last_name,
-                    email:      user.email,
-                    role:       user.role
-                },
-                message: 'Login succesvol!'
-            });
-        } else {
-            res.json({ success: false, message: 'Email of wachtwoord onjuist!' });
-        }
-    } catch (error) {
-        res.status(500).json({ success: false, message: 'Server error' });
+  const { email, password } = req.body;
+
+  try {
+    const user = await User.findOne({ where: { email } });
+
+    if (!user || user.password !== password) {
+      return res.json({ success: false, message: 'Foute login' });
     }
+
+    // 🔥 COOKIE zetten
+    res.cookie('user', {
+      user_id: user.user_id,
+      email: user.email,
+      first_name: user.first_name,
+      role: user.role
+    }, {
+      httpOnly: true,          // 🔒 veiliger
+      maxAge: 1000 * 60 * 60,  // 1 uur
+      sameSite: 'lax'
+    });
+
+    res.json({
+      success: true,
+      message: 'Login succesvol',
+      user: {
+        first_name: user.first_name
+      }
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false });
+  }
+});
+
+// ✅ CHECK login via cookie
+app.get('/me', (req, res) => {
+  if (req.cookies.user) {
+    res.json({ loggedIn: true, user: req.cookies.user });
+  } else {
+    res.json({ loggedIn: false });
+  }
+});
+
+// ✅ LOGOUT
+app.post('/logout', (req, res) => {
+  res.clearCookie('user');
+  res.json({ success: true });
 });
 
 app.listen(3000, () => {
-    console.log('✓ Server running on port 3000');
-});
-form.addEventListener('submit', async (e) => {
-  e.preventDefault();
-
-  const email = usernameInput.value.trim();
-  const password = passwordInput.value;
-
-  try {
-    const response = await fetch('http://localhost:3000/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password })
-    });
-
-    const data = await response.json();
-
-    if (data.success) {
-      sessionStorage.setItem('loggedInUser', data.user.first_name + ' ' + data.user.last_name);
-      sessionStorage.setItem('userRole', data.user.role);
-
-      if (data.user.role === 'student') {
-        renderStudentDashboard(app);
-      } else if (data.user.role === 'stagecommisie') {
-        window.location.href = '/?role=stagecommissie';
-      } else {
-        window.location.href = '/';
-      }
-    } else {
-      errorDiv.style.display = 'block';
-      errorDiv.textContent = data.message;
-    }
-  } catch (err) {
-    errorDiv.style.display = 'block';
-    errorDiv.textContent = 'Kan geen verbinding maken met de server.';
-  }
+  console.log('✅ Server running on 3000');
 });
