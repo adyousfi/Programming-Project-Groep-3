@@ -2,10 +2,10 @@
 import { ENUM } from "sequelize";
 import {sequelize} from "./dbConnection.js";
 import User, { ROLES } from "./userModel/user.js";
-import {createUser} from "./userControllers/userController.js";
-import createStage from "./userControllers/stageController.js";
+import { createUserCore } from "./userControllers/userController.js";
+import { createStageCore } from "./objectControllers/stageController.js";
 import { status } from "./objectModel/stage.js";
-import { createBedrijf } from "./objectControllers/bedrijfController.js";
+import { createBedrijfCore } from "./objectControllers/bedrijfController.js";
 import { createStagementor, linkStagementorToBedrijf } from "./userControllers/stagementorController.js";
 
 
@@ -22,19 +22,19 @@ const seedDatabase = async () => {
 
     // 3. Bulk insert the dummy data
     
-    await createUser("jon","hys","hys.jon@html.com","passwrd",ROLES.STUDENT,"0493998987");
-    await createUser("John","Doe","john.doe@school.com","hashed_password_123",ROLES.DOCENT);
-    await createUser("huh","hah","helnah@hotmail.com","hashpassword", ROLES.ADMIN);
-    await createUser("Jane","Smith","jane.smith@stagecommisie.com","hashedPasswordnotfound",ROLES.STAGECOMMISIE);
-    await createUser("Alex","Jones","alex.jones@school.com","notAPassword",ROLES.STUDENT);
-    await createUser("Emily","Brown","emily.brown@something.com","noPassword",ROLES.STAGEMENTOR)
-    await createUser("ariga","toe","arigatoe@html.com","IlikeToes",ROLES.STUDENT);
+    await createUserCore("jon","hys","hys.jon@html.com","passwrd",ROLES.STUDENT,"0493998987");
+    await createUserCore("John","Doe","john.doe@school.com","hashed_password_123",ROLES.DOCENT);
+    await createUserCore("huh","hah","helnah@hotmail.com","hashpassword", ROLES.ADMIN);
+    await createUserCore("Jane","Smith","jane.smith@stagecommisie.com","hashedPasswordnotfound",ROLES.STAGECOMMISIE);
+    await createUserCore("Alex","Jones","alex.jones@school.com","notAPassword",ROLES.STUDENT);
+    await createUserCore("Emily","Brown","emily.brown@something.com","noPassword",ROLES.STAGEMENTOR)
+    await createUserCore("ariga","toe","arigatoe@html.com","IlikeToes",ROLES.STUDENT);
     
-    await createUser("some","dude","some.dude@something.com","whatisdas",ROLES.STAGEMENTOR)
-    await createUser("some","other","some.other@something.com","whatisdas",ROLES.STAGEMENTOR)
+    await createUserCore("some","dude","some.dude@something.com","whatisdas",ROLES.STAGEMENTOR)
+    await createUserCore("some","other","some.other@something.com","whatisdas",ROLES.STAGEMENTOR)
 
-    await createBedrijf("aqua","finland");
-    await createBedrijf("kanker","kankerstraat");
+    await createBedrijfCore("aqua","finland");
+    await createBedrijfCore("kanker","kankerstraat");
     
     await linkStagementorToBedrijf(6,1);
     await linkStagementorToBedrijf(8,1);
@@ -43,7 +43,7 @@ const seedDatabase = async () => {
 
     console.log("Successfully seeded 5 users into the database!");
     //                                                    year-month-day
-    await createStage("doe iets",status.DOCUMENTGEUPLOADED,"2020-1-20","2021-10-12")
+    await createStageCore("doe iets",status.DOCUMENTGEUPLOADED,"2020-1-20","2021-10-12")
 
     
 

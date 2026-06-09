@@ -1,6 +1,5 @@
-import stage from "../stage/stage.js";
+import Stage from "../objectModel/stage.js";
 import { sequelize } from "../dbConnection.js";
-import Stage from "../stage/stage.js";
 
 const createStage = async (omschrijving_opdracht, status, begin_datum, eind_datum) =>{
     
