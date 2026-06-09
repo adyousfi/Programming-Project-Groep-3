@@ -99,24 +99,23 @@ export function renderGoedgekeurdStudent(container, userName = 'Jan Janssens') {
                     </div>
                 </section>
 
-                <!-- Actie Kaarten Sectie -->
-                <section class="action-cards-section">
-                    <div class="action-card">
-                        <div class="action-card-icon blue">
-                            <span>&#128203;</span>
+                <!-- Actie Kaarten Sectie (Binnenkort) -->
+                <section class="coming-soon-section">
+                    <p class="coming-soon-label">Binnenkort beschikbaar</p>
+                    <div class="coming-soon-cards">
+                        <div class="coming-soon-card">
+                            <div class="coming-soon-icon">&#128203;</div>
+                            <div class="coming-soon-content">
+                                <h3 class="coming-soon-title">Logboek Invullen</h3>
+                                <p class="coming-soon-sub">Vul je dagelijkse activiteiten in</p>
+                            </div>
                         </div>
-                        <div class="action-card-content">
-                            <h3 class="action-card-title">Logboek Invullen</h3>
-                            <p class="action-card-subtitle">Vul je dagelijkse activiteiten in</p>
-                        </div>
-                    </div>
-                    <div class="action-card">
-                        <div class="action-card-icon purple">
-                            <span>&#128202;</span>
-                        </div>
-                        <div class="action-card-content">
-                            <h3 class="action-card-title">Evaluaties</h3>
-                            <p class="action-card-subtitle">Bekijk je voortgang en feedback</p>
+                        <div class="coming-soon-card">
+                            <div class="coming-soon-icon">&#128202;</div>
+                            <div class="coming-soon-content">
+                                <h3 class="coming-soon-title">Evaluaties</h3>
+                                <p class="coming-soon-sub">Bekijk je voortgang en feedback</p>
+                            </div>
                         </div>
                     </div>
                 </section>
