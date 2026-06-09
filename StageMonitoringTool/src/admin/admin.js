@@ -22,7 +22,17 @@ export function renderAdmin(app) {
       <main class="main-content">
         <header class="page-header">
           <h1 class="page-title">Gebruikersbeheer</h1>
+          <button class="btn-primary">+ Nieuw account aanmaken</button>
         </header>
+        <div class="filters">
+          <input type="text" class="search-input" placeholder="Zoek op naam of e-mail...">
+          <select class="role-filter">
+            <option>Alle rollen</option>
+            <option>Student</option>
+            <option>Ehb-docent</option>
+            <option>Stagementor</option>
+          </select>
+        </div>
       </main>
     </div>
   `;
