@@ -1,10 +1,10 @@
-import { sequelize } from "../../dbConnection.js";
-import { DataTypes, Deferrable } from "sequelize"
-import User from "./user.js";
+import { sequelize } from '../dbConnection.js';
+import { DataTypes } from 'sequelize';
+import User from './user.js';
 
-const Student = sequelize.define("Student", {
-    
-    user_id: {
+const Docent = sequelize.define("Docent",{
+
+  user_id: {
         type: DataTypes.INTEGER,
         primaryKey: true, 
         allowNull: false,
@@ -18,15 +18,14 @@ const Student = sequelize.define("Student", {
     {
         timestamps: true,
     }
-        
 )
 
-User.hasOne(Student, { 
+User.hasOne(Docent, { 
     foreignKey: 'user_id', 
     onDelete: 'CASCADE' 
 });
-Student.belongsTo(User, { 
+Docent.belongsTo(User, { 
     foreignKey: 'user_id' 
 });
 
-export default Student;
+export default Docent;
