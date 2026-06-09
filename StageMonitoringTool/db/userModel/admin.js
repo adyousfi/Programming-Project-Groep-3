@@ -21,7 +21,7 @@ const Admin = sequelize.define("Admin",{
 )
 
 User.hasOne(Admin, { 
-    foreignKey: 'admin_id', 
+    foreignKey: 'user_id', 
     onDelete: 'CASCADE' 
 });
 Admin.belongsTo(User, { 

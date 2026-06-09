@@ -21,7 +21,7 @@ const Docent = sequelize.define("Docent",{
 )
 
 User.hasOne(Docent, { 
-    foreignKey: 'docent_id', 
+    foreignKey: 'user_id', 
     onDelete: 'CASCADE' 
 });
 Docent.belongsTo(User, { 

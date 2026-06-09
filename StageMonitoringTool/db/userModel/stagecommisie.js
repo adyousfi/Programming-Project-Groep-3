@@ -21,7 +21,7 @@ const Stagecommisie = sequelize.define("Stagecommisie",{
 )
 
 User.hasOne(Stagecommisie, { 
-    foreignKey: 'stagecommisie_id', 
+    foreignKey: 'user_id', 
     onDelete: 'CASCADE' 
 });
 Stagecommisie.belongsTo(User, { 
