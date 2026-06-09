@@ -116,6 +116,18 @@ function setupFilter(studenten) {
             : [];
 
       document.querySelector('.dc-kaarten').innerHTML = renderKaarten(gefilterd);
+      setupStudentButtons(studenten);
+    });
+  });
+}
+
+function setupStudentButtons(studenten) {
+  document.querySelectorAll('.dc-btn[data-id]').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      const id = parseInt(btn.dataset.id);
+      const student = studenten.find(function(s) { return s.id === id; });
+      if (!student) return;
+      import('./student-detail.js').then(function(m) { m.renderStudentDetail(student); });
     });
   });
 }
@@ -152,4 +164,5 @@ export function renderMijnStudenten() {
   `;
 
   setupFilter(studenten);
+  setupStudentButtons(studenten);
 }
