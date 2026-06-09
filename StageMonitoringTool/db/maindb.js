@@ -37,6 +37,7 @@ await seedDatabase();
 
 router.post("/create-user", userController.createUser)
 router.get("/select-user", userController.selectUser)
+router.put("/update-user/:id", userController.updateUser)
 
 router.post("/create-stage",stageController.createStage)
 

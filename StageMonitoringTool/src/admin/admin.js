@@ -117,6 +117,60 @@ export function renderAdmin(app) {
         </form>
       </div>
     </div>
+
+    <!-- Edit Modal -->
+    <div class="modal-overlay" id="editModal">
+      <div class="modal">
+        <h2 class="modal-title">Gebruiker bewerken</h2>
+        <form id="editForm">
+          <input type="hidden" id="edit-user-id">
+          <div class="form-group">
+            <label for="edit-voornaam">Voornaam <span class="required">*</span></label>
+            <input type="text" id="edit-voornaam" required>
+          </div>
+          <div class="form-group">
+            <label for="edit-achternaam">Achternaam <span class="required">*</span></label>
+            <input type="text" id="edit-achternaam" required>
+          </div>
+          <div class="form-group">
+            <label for="edit-email">E-mailadres <span class="required">*</span></label>
+            <input type="email" id="edit-email" required>
+          </div>
+          <div class="form-group">
+            <label for="edit-telefoon">Telefoonnummer</label>
+            <input type="tel" id="edit-telefoon">
+          </div>
+          <div class="form-group">
+            <label for="edit-wachtwoord">Wachtwoord</label>
+            <div class="password-field">
+              <input type="text" id="edit-wachtwoord" placeholder="Laat leeg om niet te wijzigen">
+              <button type="button" class="btn-generate" id="editGeneratePassword">Genereer</button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="edit-rol">Rol <span class="required">*</span></label>
+            <select id="edit-rol" required>
+              <option value="student">Student</option>
+              <option value="stagecommisie">Stagecommissie</option>
+              <option value="docent">EhB-docent</option>
+              <option value="stagementor">Stagementor</option>
+              <option value="admin">Administratie</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="edit-status">Status <span class="required">*</span></label>
+            <select id="edit-status" required>
+              <option value="actief">Actief</option>
+              <option value="inactief">Inactief</option>
+            </select>
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="btn-submit">Bijwerken</button>
+            <button type="button" class="btn-cancel" id="closeEditModal">Annuleren</button>
+          </div>
+        </form>
+      </div>
+    </div>
   `;
 
   // Elements
