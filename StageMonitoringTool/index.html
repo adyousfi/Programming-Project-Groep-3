@@ -25,6 +25,7 @@
 const btn = document.getElementById('btn');
 const msg = document.getElementById('msg');
 
+// ✅ LOGIN
 btn.addEventListener('click', async () => {
   const email = document.getElementById('email').value;
   const password = document.getElementById('password').value;
@@ -33,7 +34,7 @@ btn.addEventListener('click', async () => {
     const res = await fetch('http://localhost:3000/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      credentials: 'include', // ✅ nodig voor cookies
+      credentials: 'include',
       body: JSON.stringify({ email, password })
     });
 
@@ -43,7 +44,7 @@ btn.addEventListener('click', async () => {
       msg.style.color = 'green';
       msg.textContent = "Welkom " + data.user.first_name;
 
-      // ✅ test cookie direct
+      // ✅ check cookie na login
       checkLogin();
 
     } else {
@@ -57,16 +58,27 @@ btn.addEventListener('click', async () => {
   }
 });
 
-// ✅ check of cookie werkt
+// ✅ CHECK LOGIN (cookie)
 async function checkLogin() {
-  const res = await fetch('http://localhost:3000/login', {
-    credentials: 'include'
-  });
+  try {
+    const res = await fetch('http://localhost:3000/me', {
+      credentials: 'include'
+    });
 
-  const data = await res.json();
+    const data = await res.json();
 
-  console.log("LOGIN CHECK:", data);
+    if (data.loggedIn) {
+      console.log("✅ Ingelogd:", data.user.first_name);
+    } else {
+      console.log("❌ Niet ingelogd");
+    }
+  } catch (err) {
+    console.log("Fout bij checkLogin");
+  }
 }
+
+// ✅ check bij page load
+checkLogin();
 </script>
 
 </body>
