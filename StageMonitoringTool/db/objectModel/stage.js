@@ -8,11 +8,11 @@ import Stagementor from "../userModel/stagementor.js";
 import Bedrijf from "./bedrijf.js";
 
 export const status = {
-    AANVRAAG: 'Aanvraag',
-    GOEDGEKEURD: 'Goedgekeurd',
-    AANPASSINGENVEREISD: 'Aanpassingen_vereist',
-    DOCUMENTGEUPLOADED: 'documentgeuploaded',
-    KLAAR: 'klaar'
+    AANVRAAG: 'AANVRAAG',
+    GOEDGEKEURD: 'GOEDGEKEURD',
+    AANPASSINGENVEREISD: 'AANPASSINGENVEREISD',
+    DOCUMENTGEUPLOADED: 'DOCUMENTGEUPLOADED',
+    KLAAR: 'KLAAR'
 };
 
 // Stage model
@@ -22,27 +22,22 @@ const Stage = sequelize.define("Stage", {
         allowNull: false,
         primaryKey: true,
         autoIncrement: true,
-        comment: "PK - Stage primary key"
     },
     student_id: {
         type: DataTypes.INTEGER,
         allowNull: true,
-        comment: "FK - Reference to student (admin)"
     },
     docent_id: {
         type: DataTypes.INTEGER,
         allowNull: true,
-        comment: "FK - Reference to docent (admin)"
     },
     mentor_id: {
         type: DataTypes.INTEGER,
         allowNull: true,
-        comment: "FK - Reference to mentor"
     },
     bedrijf_id: {
         type: DataTypes.INTEGER,
         allowNull: true,
-        comment: "FK - Reference to bedrijf"
     },
     omschrijving_opdracht: {
         type: DataTypes.TEXT,
@@ -51,7 +46,8 @@ const Stage = sequelize.define("Stage", {
     status: {
         type: DataTypes.ENUM(Object.values(status)),
         allowNull: true,
-        defaultValue: 'Aanvraag'
+        defaultValue: 'Aanvraag',
+        values: ['AANVRAAG','GOEDGEKEURD','AANPASSINGENVEREISD','DOCUMENTGEUPLOADED','KLAAR']
     },
     begin_datum: {
         type: DataTypes.DATE,

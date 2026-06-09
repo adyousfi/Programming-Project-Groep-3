@@ -3,11 +3,11 @@ import { DataTypes, Deferrable } from "sequelize"
 
 
 export const ROLES = {
-    STUDENT: 'student',
-    DOCENT: 'docent',
-    ADMIN: 'admin',
-    STAGECOMMISIE: 'stagecommisie',
-    STAGEMENTOR: 'stagementor'
+    STUDENT: 'STUDENT',
+    DOCENT: 'DOCENT',
+    ADMIN: 'ADMIN',
+    STAGECOMMISIE: 'STAGECOMMISIE',
+    STAGEMENTOR: 'STAGEMENTOR'
 };
 
 const User = sequelize.define("User", {
