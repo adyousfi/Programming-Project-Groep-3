@@ -1,17 +1,13 @@
 import cors from 'cors';
 import express from 'express';
-import jwt from 'jsonwebtoken';
-import cookieParser from 'cookie-parser';
 import { run } from '../db/dbConnection.js';
 import User from '../db/userModel/users/user.js';
 
-const app = express();  // ← eerst app aanmaken
+const app = express();
 
 app.use(express.json());
-app.use(cookieParser());  // ← dan pas gebruiken
 app.use(cors({
-    origin: ['http://127.0.0.1:5500', 'http://localhost:5500', 'http://localhost:5173'],
-    credentials: true
+    origin: ['http://127.0.0.1:5500', 'http://localhost:5500', 'http://localhost:5173']
 }));
 
 // Connect to DB
@@ -38,27 +34,12 @@ app.get('/users/:id', async (req, res) => {
     }
 });
 
-const SECRET = process.env.JWT_SECRET || 'geheim123';
 // POST login
-
-
 app.post('/login', async (req, res) => {
     const { email, password } = req.body;
     try {
         const user = await User.findOne({ where: { email, password } });
         if (user) {
-            const token = jwt.sign(
-                { user_id: user.user_id, role: user.role },
-                SECRET,
-                { expiresIn: '8h' }
-            );
-
-            res.cookie('token', token, {
-                httpOnly: true,
-                sameSite: 'strict',
-                maxAge: 8 * 60 * 60 * 1000
-            });
-
             res.json({
                 success: true,
                 user: {
@@ -78,21 +59,6 @@ app.post('/login', async (req, res) => {
     }
 });
 
-// Middleware om token te checken op beveiligde routes
-function checkToken(req, res, next) {
-    const token = req.cookies.token;
-    if (!token) return res.status(401).json({ message: 'Geen token' });
-    try {
-        req.user = jwt.verify(token, SECRET);
-        next();
-    } catch {
-        res.status(401).json({ message: 'Ongeldig token' });
-    }
-}
-
-/// Uitloggen
-app.post('/logout', (req, res) => {
-    res.clearCookie('token');
-    res.json({ success: true });
+app.listen(3000, () => {
+    console.log('✓ Server running on port 3000');
 });
-
