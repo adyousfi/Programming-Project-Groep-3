@@ -1,60 +1,74 @@
-import cors from 'cors';
 import express from 'express';
+import cors from 'cors';
+import cookieParser from 'cookie-parser';
 import { run } from '../db/dbConnection.js';
 import User from '../db/userModel/users/user.js';
 
 const app = express();
 
 app.use(express.json());
+app.use(cookieParser());
+
 app.use(cors({
-    origin: ['http://127.0.0.1:5500', 'http://localhost:5500', 'http://localhost:5173','http://localhost:3000']
+  origin: [
+    'http://127.0.0.1:5500',
+    'http://localhost:5500',
+    'http://localhost:5173',
+    'http://localhost:3000'
+  ],
+  credentials: true
 }));
 
+// start DB
 await run();
 
-app.get('/users', async (req, res) => {
-    try {
-        const users = await User.findAll();
-        res.json({ success: true, data: users });
-    } catch (error) {
-        res.status(500).json({ success: false, message: 'Server error' });
-    }
-});
-
-app.get('/users/:id', async (req, res) => {
-    try {
-        const user = await User.findByPk(req.params.id);
-        if (!user) return res.status(404).json({ success: false, message: 'User niet gevonden' });
-        res.json({ success: true, data: user });
-    } catch (error) {
-        res.status(500).json({ success: false, message: 'Server error' });
-    }
-});
+// ✅ LOGIN + COOKIE
 
 app.post('/login', async (req, res) => {
-    const { email, password } = req.body;
-    try {
-        const user = await User.findOne({ where: { email, password } });
-        if (user) {
-            res.json({
-                success: true,
-                user: {
-                    user_id:    user.user_id,
-                    first_name: user.first_name,
-                    last_name:  user.last_name,
-                    email:      user.email,
-                    role:       user.role
-                },
-                message: 'Login succesvol!'
-            });
-        } else {
-            res.json({ success: false, message: 'Email of wachtwoord onjuist!' });
-        }
-    } catch (error) {
-        res.status(500).json({ success: false, message: 'Server error' });
+  console.log("BODY:", req.body);
+
+  const { email, password } = req.body;
+
+  try {
+    // 🔥 test zonder password eerst
+    const user = await User.findOne({
+      where: { email }
+    });
+
+    console.log("USER:", user);
+
+    if (!user) {
+      return res.json({ success: false, message: 'User niet gevonden' });
     }
+
+    if (user.password !== password) {
+      return res.json({ success: false, message: 'Fout wachtwoord' });
+    }
+
+    res.json({ success: true, user });
+
+  } catch (error) {
+    console.error("LOGIN ERROR:", error); // 🔥 HIER STAAT JE FOUT
+    res.status(500).json({ success: false });
+  }
+});
+
+
+// ✅ CHECK COOKIE
+app.get('/me', (req, res) => {
+  if (req.cookies.user) {
+    res.json({ loggedIn: true, user: req.cookies.user });
+  } else {
+    res.json({ loggedIn: false });
+  }
+});
+
+// ✅ LOGOUT
+app.post('/logout', (req, res) => {
+  res.clearCookie('user');
+  res.json({ success: true });
 });
 
 app.listen(3000, () => {
-    console.log('✓ Server running on port 3000');
+  console.log('✅ Server running on 3000');
 });
