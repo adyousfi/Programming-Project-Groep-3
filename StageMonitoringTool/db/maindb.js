@@ -25,6 +25,7 @@ app.use(router);
 await seedDatabase();
 
 router.post("/create-user", userController.createUser)
+router.get("/select-user", userController.selectUser)
 
 const PORT = 3000;
 app.listen(PORT, () => {
