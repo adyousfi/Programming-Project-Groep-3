@@ -45,20 +45,20 @@ export function renderDocumenten(container, userName = 'Jan Janssens') {
                         <p class="upload-text">Sleep je bestand hierheen of klik om te selecteren</p>
                         <p class="upload-subtext">PDF, JPG of PNG — max. 10MB</p>
                         <input type="file" id="file-input" class="upload-file-input" accept=".pdf,.jpg,.jpeg,.png">
-                        <button class="upload-btn" id="upload-btn">Bestand Selecteren</button>
-                    </div>
-
-                    <div class="download-template">
-                        <p class="download-template-text">Nog geen stageovereenkomst? Download eerst het template, vul het in, en upload het hier terug.</p>
-                        <a href="/templates/stageovereenkomst.pdf" download class="download-template-btn">Download Template</a>
+                        <button type="button" class="upload-btn" id="upload-btn">Bestand Selecteren</button>
                     </div>
 
                     <div class="upload-selected" id="upload-selected" style="display: none;">
                         <span class="upload-filename" id="upload-filename"></span>
-                        <button class="upload-remove-btn" id="upload-remove-btn">Verwijderen</button>
+                        <button type="button" class="upload-remove-btn" id="upload-remove-btn">Verwijderen</button>
                     </div>
 
-                    <button class="upload-submit-btn" id="upload-submit-btn" style="display: none;">Document Indienen</button>
+                    <button type="button" class="upload-submit-btn" id="upload-submit-btn" style="display: none;">Document Indienen</button>
+                </div>
+
+                <div class="download-template">
+                    <p class="download-template-text">Nog geen stageovereenkomst? Download eerst het template, vul het in, en upload het hier terug.</p>
+                    <a href="/templates/stageovereenkomst.pdf" download class="download-template-btn">Download Template</a>
                 </div>
 
             </main>
