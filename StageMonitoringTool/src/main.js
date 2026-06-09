@@ -9,6 +9,7 @@ import { renderMijnStagiairs } from './stagementor/mijn-stagiairs.js';
 import { renderMijnStudenten } from './docent/mijn-studenten.js';
 import { renderGoedgekeurdStudent } from './student/goedgekeurd_student.js';
 import { renderDocumenten } from './student/documenten.js';
+import { renderDocumentenIngedient } from './student/documenten-ingedient.js';
 
 const app = document.querySelector('#app');
 const role = new URLSearchParams(window.location.search).get('role');
@@ -33,6 +34,8 @@ if (role === 'student') {
   renderGoedgekeurdStudent(app);
 } else if (role === 'documenten') {
   renderDocumenten(app);
+} else if (role === 'documenten_ingedient') {
+  renderDocumentenIngedient(app);
 } else if (role === 'frontend') {
   // Front-end portaal: kies welke rol paginas te bekijken
   app.innerHTML = `

@@ -250,14 +250,27 @@
     border-radius: 3px;
 }
 
-/* Action Cards Section */
-.action-cards-section {
+/* Coming Soon Section */
+.coming-soon-section {
+    margin-top: 1.5rem;
+}
+
+.coming-soon-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 0 0 0.75rem 0;
+}
+
+.coming-soon-cards {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 1rem;
 }
 
-.action-card {
+.coming-soon-card {
     background-color: #ffffff;
     border: 1px solid #e9ecef;
     border-radius: 8px;
@@ -265,15 +278,11 @@
     display: flex;
     align-items: center;
     gap: 1rem;
-    cursor: pointer;
-    transition: box-shadow 0.2s;
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 
-.action-card:hover {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-}
-
-.action-card-icon {
+.coming-soon-icon {
     width: 40px;
     height: 40px;
     border-radius: 8px;
@@ -282,33 +291,25 @@
     justify-content: center;
     font-size: 1.1rem;
     flex-shrink: 0;
+    background-color: #e9ecef;
+    color: #6c757d;
 }
 
-.action-card-icon.blue {
-    background-color: #e0e7ff;
-    color: #3b82f6;
-}
-
-.action-card-icon.purple {
-    background-color: #ede9fe;
-    color: #8b5cf6;
-}
-
-.action-card-content {
+.coming-soon-content {
     display: flex;
     flex-direction: column;
     gap: 0.15rem;
 }
 
-.action-card-title {
+.coming-soon-title {
     font-size: 0.9rem;
     font-weight: 600;
-    color: #111;
+    color: #6c757d;
     margin: 0;
 }
 
-.action-card-subtitle {
+.coming-soon-sub {
     font-size: 0.8rem;
-    color: #6c757d;
+    color: #adb5bd;
     margin: 0;
 }
