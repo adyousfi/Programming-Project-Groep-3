@@ -1,6 +1,6 @@
 import seedDatabase from "./seedDb.js";
 import { run, sequelize } from "./dbConnection.js";
-import Stage from "./stage/stage.js";
+import Stage from "./objectModel/stage.js";
 import userController from "./userControllers/userController.js";
 import express from 'express';
 import User from '../db/userModel/user.js';
@@ -13,6 +13,17 @@ const router = express.Router();
 
 // Middleware to parse JSON bodies (Crucial for POST requests)
 router.use(express.json());
+
+// CORS middleware
+router.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,PATCH,DELETE,OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(204);
+  }
+  next();
+});
 
 
 // Create a main app instance to actually run the server
