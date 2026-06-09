@@ -1,7 +1,7 @@
 // db/seed.js
 import { ENUM } from "sequelize";
 import {sequelize} from "./dbConnection.js";
-import User from "./userModel/user.js";
+import User, {ROLES} from "./userModel/user.js";
 import Admin from "./userModel/admin.js";
 import Docent from "./userModel/docent.js";
 import userController from "./userControllers/userController.js";
