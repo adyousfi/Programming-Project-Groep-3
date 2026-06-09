@@ -9,15 +9,14 @@ const createBedrijf = async (name, address) =>{
     })
 
     console.log(bedrijf);
+
+    await Bedrijf.create({
+        bedrijf_id: Bedrijf.bedrijf_id
+    })
         
 }
 
-const linkBedrijfToStageMentor = async (userId, bedrijfId) =>{
-    await Stagementor.update(
-    { bedrijf_id: bedrijfId }, 
-    { where: { user_id: userId } }
-);
-}
 
 
-export {createBedrijf, linkBedrijfToStageMentor};
+export {createBedrijf};
+

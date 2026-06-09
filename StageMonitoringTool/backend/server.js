@@ -62,38 +62,3 @@ app.post('/login', async (req, res) => {
 app.listen(3000, () => {
     console.log('✓ Server running on port 3000');
 });
-form.addEventListener('submit', async (e) => {
-  e.preventDefault();
-
-  const email = usernameInput.value.trim();
-  const password = passwordInput.value;
-
-  try {
-    const response = await fetch('http://localhost:3000/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password })
-    });
-
-    const data = await response.json();
-
-    if (data.success) {
-      sessionStorage.setItem('loggedInUser', data.user.first_name + ' ' + data.user.last_name);
-      sessionStorage.setItem('userRole', data.user.role);
-
-      if (data.user.role === 'student') {
-        window.location.href = '/?role=student';
-      } else if (data.user.role === 'stagecommisie') {
-        window.location.href = '/?role=stagecommissie';
-      } else {
-        window.location.href = '/';
-      }
-    } else {
-      errorDiv.style.display = 'block';
-      errorDiv.textContent = data.message;
-    }
-  } catch (err) {
-    errorDiv.style.display = 'block';
-    errorDiv.textContent = 'Kan geen verbinding maken met de server.';
-  }
-});

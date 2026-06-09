@@ -1,11 +1,11 @@
 
 import { sequelize } from "../dbConnection.js";
 import { DataTypes, Deferrable } from "sequelize";
-import Docent from "../userModel/docent.js";
-import Student from "../userModel/student.js";
-import Admin from "../userModel/admin.js";
-import Stagementor from "../userModel/stagementor.js";
-import Bedrijf from "./bedrijf.js";
+import Docent from "../userModel/users/docent.js";
+import Student from "../userModel/users/student.js";
+import Admin from "../userModel/users/admin.js";
+import Stagementor from "../userModel/users/stagementor.js";
+
 
 export const status = {
     AANVRAAG: 'Aanvraag',
@@ -16,13 +16,18 @@ export const status = {
 };
 
 // Stage model
-const Stage = sequelize.define("Stage", {
+const Stage = sequelize.define("stage", {
     stage_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
         primaryKey: true,
         autoIncrement: true,
         comment: "PK - Stage primary key"
+    },
+    stageaanvraag_id: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        comment: "FK - Reference to stageaanvraag"
     },
     student_id: {
         type: DataTypes.INTEGER,
@@ -34,12 +39,17 @@ const Stage = sequelize.define("Stage", {
         allowNull: true,
         comment: "FK - Reference to docent (admin)"
     },
+    admin_id: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        comment: "FK - Reference to admin"
+    },
     mentor_id: {
         type: DataTypes.INTEGER,
         allowNull: true,
         comment: "FK - Reference to mentor"
     },
-    bedrijf_id: {
+    bedrijfs_id: {
         type: DataTypes.INTEGER,
         allowNull: true,
         comment: "FK - Reference to bedrijf"
@@ -68,18 +78,12 @@ const Stage = sequelize.define("Stage", {
 
 )
 
+
+
 // Define associations
-Stage.belongsTo(Docent, { foreignKey: 'docent_id'});
-Stage.belongsTo(Student, { foreignKey: 'student_id'});
-Stage.belongsTo(Bedrijf, { foreignKey: 'bedrijf_id'});
-Stage.belongsTo(Stagementor, { foreignKey: 'mentor_id'});
+Stage.belongsTo(Docent, { foreignKey: 'docent_id', as: 'docent' });
+Stage.belongsTo(Student, { foreignKey: 'student_id', as: 'student' });
+Stage.belongsTo(Admin, { foreignKey: 'admin_id', as: 'admin' });
+Stage.belongsTo(Stagementor, { foreignKey: 'mentor_id', as: 'mentor' });
 
 export default Stage;
-
-
-const linkStagementorToBedrijf = async (userId, bedrijfId) =>{
-    await Stagementor.update(
-    { bedrijf_id: bedrijfId }, 
-    { where: { user_id: userId } }
-);
-}
