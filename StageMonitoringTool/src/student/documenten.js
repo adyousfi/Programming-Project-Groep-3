@@ -128,15 +128,6 @@ export function renderDocumenten(container, userName = 'Jan Janssens') {
 
     // Document indienen
     uploadSubmitBtn.addEventListener('click', () => {
-        badge.textContent = 'Geuploadd';
-        badge.classList.remove('badge-wachtend');
-        badge.classList.add('badge-goedgekeurd');
-        uploadSelected.style.display = 'none';
-        uploadSubmitBtn.style.display = 'none';
-        uploadZone.innerHTML = `
-            <div class="upload-icon">&#10003;</div>
-            <p class="upload-text">Document succesvol geuploadd!</p>
-            <p class="upload-subtext">Je stageovereenkomst is ingediend ter goedkeuring.</p>
-        `;
+        window.location.href = '/?role=documenten_ingedient';
     });
 }
