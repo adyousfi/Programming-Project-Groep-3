@@ -48,6 +48,11 @@ export function renderDocumenten(container, userName = 'Jan Janssens') {
                         <button class="upload-btn" id="upload-btn">Bestand Selecteren</button>
                     </div>
 
+                    <div class="download-template">
+                        <p class="download-template-text">Nog geen stageovereenkomst? Download eerst het template, vul het in, en upload het hier terug.</p>
+                        <a href="/templates/stageovereenkomst.pdf" download class="download-template-btn">Download Template</a>
+                    </div>
+
                     <div class="upload-selected" id="upload-selected" style="display: none;">
                         <span class="upload-filename" id="upload-filename"></span>
                         <button class="upload-remove-btn" id="upload-remove-btn">Verwijderen</button>
