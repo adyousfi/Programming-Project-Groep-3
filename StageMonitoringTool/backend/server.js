@@ -2,13 +2,17 @@ import cors from 'cors';
 import express from 'express';
 import { run } from '../db/dbConnection.js';
 import User from '../db/userModel/users/user.js';
-
+import cookieParser from 'cookie-parser';
 const app = express();
 
+
 app.use(express.json());
+
 app.use(cors({
-    origin: ['http://127.0.0.1:5500', 'http://localhost:5500', 'http://localhost:5173']
+    origin: ['http://127.0.0.1:5500', 'http://localhost:5500', 'http://localhost:5173'],
+    credentials: true
 }));
+
 
 // Connect to DB
 await run();
@@ -34,26 +38,54 @@ app.get('/users/:id', async (req, res) => {
     }
 });
 
+app.get('/me', (req, res) => {
+    const user = req.cookies.user;
+
+    if (user) {
+        res.json({ loggedIn: true, user });
+    } else {
+        res.json({ loggedIn: false });
+    }
+})
+app.post('/logout', (req, res) => {
+    res.clearCookie('user');
+    res.json({ success: true });
+});
+
+
 // POST login
 app.post('/login', async (req, res) => {
     const { email, password } = req.body;
+
     try {
         const user = await User.findOne({ where: { email, password } });
+
         if (user) {
+
+            // ✅ Cookie zetten (1 uur geldig)
+            res.cookie('user', {
+                user_id: user.user_id,
+                email: user.email,
+                role: user.role
+            }, {
+                httpOnly: true,           // niet via JS uitleesbaar (veiliger)
+                maxAge: 1000 * 60 * 60,   // 1 uur
+                sameSite: 'lax'
+            });
+
             res.json({
                 success: true,
                 user: {
-                    user_id:    user.user_id,
+                    user_id: user.user_id,
                     first_name: user.first_name,
-                    last_name:  user.last_name,
-                    email:      user.email,
-                    role:       user.role
                 },
                 message: 'Login succesvol!'
             });
+
         } else {
             res.json({ success: false, message: 'Email of wachtwoord onjuist!' });
         }
+
     } catch (error) {
         res.status(500).json({ success: false, message: 'Server error' });
     }
