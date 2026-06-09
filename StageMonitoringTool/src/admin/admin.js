@@ -1,5 +1,15 @@
 import './admin.css';
 
+const API_URL = 'http://localhost:3000';
+
+const roleDisplayMap = {
+  'student': 'Student',
+  'docent': 'EhB-docent',
+  'stagementor': 'Stagementor',
+  'stagecommisie': 'Stagecommissie',
+  'admin': 'Administratie'
+};
+
 export function renderAdmin(app) {
   app.innerHTML = `
     <div class="admin-layout">
@@ -25,15 +35,31 @@ export function renderAdmin(app) {
           <button class="btn-primary" id="openModal">+ Nieuw account aanmaken</button>
         </header>
         <div class="filters">
-          <input type="text" class="search-input" placeholder="Zoek op naam of e-mail...">
-          <select class="role-filter">
-            <option>Alle rollen</option>
-            <option>Student</option>
-            <option>Stagecommissie</option>
-            <option>EhB-docent</option>
-            <option>Stagementor</option>
-            <option>Administratie</option>
+          <input type="text" class="search-input" id="searchInput" placeholder="Zoek op naam of e-mail...">
+          <select class="role-filter" id="roleFilter">
+            <option value="">Alle rollen</option>
+            <option value="student">Student</option>
+            <option value="stagecommisie">Stagecommissie</option>
+            <option value="docent">EhB-docent</option>
+            <option value="stagementor">Stagementor</option>
+            <option value="admin">Administratie</option>
           </select>
+        </div>
+        <div class="table-container">
+          <table class="user-table">
+            <thead>
+              <tr>
+                <th>Naam</th>
+                <th>E-mailadres</th>
+                <th>Rol</th>
+                <th>Status</th>
+                <th>Acties</th>
+              </tr>
+            </thead>
+            <tbody id="userTableBody">
+              <tr><td colspan="5" class="loading">Laden...</td></tr>
+            </tbody>
+          </table>
         </div>
       </main>
     </div>
@@ -65,18 +91,18 @@ export function renderAdmin(app) {
           <div class="form-group">
             <label for="rol">Rol <span class="required">*</span></label>
             <select id="rol" required>
-              <option>Student</option>
-              <option>Stagecommissie</option>
-              <option>EhB-docent</option>
-              <option>Stagementor</option>
-              <option>Administratie</option>
+              <option value="student">Student</option>
+              <option value="stagecommisie">Stagecommissie</option>
+              <option value="docent">EhB-docent</option>
+              <option value="stagementor">Stagementor</option>
+              <option value="admin">Administratie</option>
             </select>
           </div>
           <div class="form-group">
             <label for="status">Status <span class="required">*</span></label>
             <select id="status" required>
-              <option>Actief</option>
-              <option>Inactief</option>
+              <option value="actief">Actief</option>
+              <option value="inactief">Inactief</option>
             </select>
           </div>
           <div class="form-actions">
@@ -88,13 +114,73 @@ export function renderAdmin(app) {
     </div>
   `;
 
-  // Modal functionality
+  // Elements
   const modal = document.getElementById('modalOverlay');
   const openBtn = document.getElementById('openModal');
   const closeBtn = document.getElementById('closeModal');
   const form = document.getElementById('accountForm');
   const generateBtn = document.getElementById('generatePassword');
+  const searchInput = document.getElementById('searchInput');
+  const roleFilter = document.getElementById('roleFilter');
+  const tableBody = document.getElementById('userTableBody');
 
+  let allUsers = [];
+
+  // Load users from database
+  async function loadUsers() {
+    try {
+      const response = await fetch(`${API_URL}/select-user`);
+      const result = await response.json();
+      if (response.ok) {
+        allUsers = result.data || [];
+        renderUsers(allUsers);
+      }
+    } catch (error) {
+      console.error('Error loading users:', error);
+      tableBody.innerHTML = '<tr><td colspan="5" class="loading">Kan gebruikers niet laden</td></tr>';
+    }
+  }
+
+  // Render users to table
+  function renderUsers(users) {
+    if (users.length === 0) {
+      tableBody.innerHTML = '<tr><td colspan="5" class="loading">Geen gebruikers gevonden</td></tr>';
+      return;
+    }
+
+    tableBody.innerHTML = users.map(user => `
+      <tr>
+        <td>${user.first_name} ${user.last_name}</td>
+        <td>${user.email}</td>
+        <td><span class="role-badge">${roleDisplayMap[user.role] || user.role}</span></td>
+        <td><span class="status-badge active">Actief</span></td>
+        <td class="actions">
+          <button class="btn-edit">Bewerken</button>
+          <button class="btn-deactivate">Deactiveren</button>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  // Filter users
+  function filterUsers() {
+    const search = searchInput.value.toLowerCase();
+    const role = roleFilter.value;
+
+    const filtered = allUsers.filter(user => {
+      const matchesSearch = `${user.first_name} ${user.last_name}`.toLowerCase().includes(search) ||
+                           user.email.toLowerCase().includes(search);
+      const matchesRole = !role || user.role === role;
+      return matchesSearch && matchesRole;
+    });
+
+    renderUsers(filtered);
+  }
+
+  searchInput.addEventListener('input', filterUsers);
+  roleFilter.addEventListener('change', filterUsers);
+
+  // Modal functionality
   openBtn.addEventListener('click', () => {
     modal.classList.add('active');
   });
@@ -120,10 +206,40 @@ export function renderAdmin(app) {
     document.getElementById('wachtwoord').value = password;
   });
 
-  form.addEventListener('submit', (e) => {
+  form.addEventListener('submit', async (e) => {
     e.preventDefault();
-    //  Behandelt form submission hier
-    modal.classList.remove('active');
-    form.reset();
+
+    const userData = {
+      first_name: document.getElementById('voornaam').value,
+      last_name: document.getElementById('achternaam').value,
+      email: document.getElementById('email').value,
+      password: document.getElementById('wachtwoord').value,
+      role: document.getElementById('rol').value
+    };
+
+    try {
+      const response = await fetch(`${API_URL}/create-user`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(userData)
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        modal.classList.remove('active');
+        form.reset();
+        alert('Gebruiker succesvol aangemaakt!');
+        loadUsers();
+      } else {
+        alert('Fout bij het aanmaken: ' + (result.msg || 'Onbekende fout'));
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Kan geen verbinding maken met de server.');
+    }
   });
+
+  // Load users on page load
+  loadUsers();
 }

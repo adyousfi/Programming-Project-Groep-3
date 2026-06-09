@@ -5,7 +5,7 @@ import Docent from "../userModel/docent.js";
 import Student from "../userModel/student.js";
 import Admin from "../userModel/admin.js";
 import Stagementor from "../userModel/stagementor.js";
-import Bedrijf from "../objectModel/bedrijf.js";
+import Bedrijf from "./bedrijf.js";
 
 export const status = {
     AANVRAAG: 'AANVRAAG',
