@@ -207,7 +207,7 @@ function renderStudentDetail(app, stagiair) {
 
   document.querySelector('#sm-back').addEventListener('click', function(event) {
     event.preventDefault();
-    renderStagementorPage(app);
+    renderMijnStagiairs(app);
   });
 
   document.querySelectorAll('.sm-nav-item').forEach(function(item) {
@@ -403,10 +403,10 @@ function renderStudentDetail(app, stagiair) {
                   <span class="sm-logo-sub">Erasmushogeschool Brussel</span>
                 </div>
                 <nav class="sm-nav sm-nav--detail">
-                  <a href="#" class="sm-nav-item">Overzicht</a>
-                  <a href="#" class="sm-nav-item">Stagedetails</a>
-                  <a href="#" class="sm-nav-item active">Logboek</a>
-                  <a href="#" class="sm-nav-item">Evaluatie</a>
+                  <a href="#" class="sm-nav-item" data-page="overzicht">Overzicht</a>
+                  <a href="#" class="sm-nav-item" data-page="stagedetails">Stagedetails</a>
+                  <a href="#" class="sm-nav-item active" data-page="logboek">Logboek</a>
+                  <a href="#" class="sm-nav-item" data-page="evaluatie">Evaluatie</a>
                 </nav>
               </div>
               <div class="sm-sidebar-bottom">
@@ -473,6 +473,70 @@ function renderStudentDetail(app, stagiair) {
         });
       }
 
+      function renderWeekDetail(app, stagiair, week) {
+        const comment = smGetWeekComment(stagiair.email, week);
+        const afgevinkt = smIsWeekAfgevinkt(stagiair.email, week);
+
+        app.innerHTML = `
+          <div class="sm-layout">
+            <aside class="sm-sidebar sm-sidebar--detail">
+              <div class="sm-sidebar-top">
+                <div class="sm-logo">
+                  <span class="sm-logo-title">Stage Monitoring</span>
+                  <span class="sm-logo-sub">Erasmushogeschool Brussel</span>
+                </div>
+                <nav class="sm-nav sm-nav--detail">
+                  <a href="#" class="sm-nav-item" data-page="overzicht">Overzicht</a>
+                  <a href="#" class="sm-nav-item" data-page="stagedetails">Stagedetails</a>
+                  <a href="#" class="sm-nav-item" data-page="logboek">Logboek</a>
+                  <a href="#" class="sm-nav-item" data-page="evaluatie">Evaluatie</a>
+                </nav>
+              </div>
+              <div class="sm-sidebar-bottom">
+                <span class="sm-user-name">Mieke Peeters</span>
+                <a href="#" class="sm-logout">Uitloggen</a>
+              </div>
+            </aside>
+            <main class="sm-main sm-main--detail">
+              <div class="sm-detail-top">
+                <a href="#" class="sm-detail-back" id="sm-back-week">← Terug naar logboek</a>
+                <div>
+                  <h1 class="sm-detail-title">Logboek - Week ${week}</h1>
+                  <p class="sm-detail-email">Bekijk het detail van week ${week} voor ${stagiair.naam}</p>
+                </div>
+              </div>
+              <div class="sm-week-detail-card">
+                <p class="sm-week-detail-label">Status</p>
+                <p class="sm-week-detail-value">${afgevinkt ? 'Afgevinkt' : 'Open'}</p>
+                <button class="sm-button sm-week-check" id="sm-week-toggle">${afgevinkt ? 'Markeer als niet afgevinkt' : 'Markeer als afgevinkt'}</button>
+              </div>
+              <div class="sm-week-comment-card">
+                <label class="sm-week-comment-label" for="sm-week-comment">Reactie / Opmerking</label>
+                <textarea id="sm-week-comment" class="sm-week-comment" placeholder="Voeg een korte opmerking toe...">${comment}</textarea>
+              </div>
+              <div class="sm-eval-actions">
+                <button class="sm-button" id="sm-week-save">Wijzigingen opslaan</button>
+              </div>
+            </main>
+          </div>
+        `;
+
+        document.querySelector('#sm-back-week').addEventListener('click', function(event) {
+          event.preventDefault();
+          renderLogboekOverview(app, stagiair);
+        });
+
+        document.querySelector('#sm-week-toggle').addEventListener('click', function() {
+          smSetWeekAfgevinkt(stagiair.email, week);
+          renderWeekDetail(app, stagiair, week);
+        });
+
+        document.querySelector('#sm-week-save').addEventListener('click', function() {
+          const text = document.querySelector('#sm-week-comment').value.trim();
+          smSaveWeekComment(stagiair.email, week, text);
+        });
+      }
+
   // attach click handlers on the stagiairs list
   function setupStudentLinks(app) {
     document.querySelectorAll('.sm-button[data-index]').forEach(function(btn) {
@@ -486,10 +550,10 @@ function renderStudentDetail(app, stagiair) {
     });
   }
 
+
   // exported entrypoint used by src/main.js
   export function renderMijnStagiairs(app) {
     // render the simple list view and wire up student links
     app.innerHTML = renderSectionContent();
     setupStudentLinks(app);
   }
-
