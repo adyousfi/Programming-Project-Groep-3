@@ -51,13 +51,14 @@ export function renderAdmin(app) {
               <tr>
                 <th>Naam</th>
                 <th>E-mailadres</th>
+                <th>Telefoon</th>
                 <th>Rol</th>
                 <th>Status</th>
                 <th>Acties</th>
               </tr>
             </thead>
             <tbody id="userTableBody">
-              <tr><td colspan="5" class="loading">Laden...</td></tr>
+              <tr><td colspan="6" class="loading">Laden...</td></tr>
             </tbody>
           </table>
         </div>
@@ -80,6 +81,10 @@ export function renderAdmin(app) {
           <div class="form-group">
             <label for="email">E-mailadres <span class="required">*</span></label>
             <input type="email" id="email" required>
+          </div>
+          <div class="form-group">
+            <label for="telefoon">Telefoonnummer</label>
+            <input type="tel" id="telefoon">
           </div>
           <div class="form-group">
             <label for="wachtwoord">Wachtwoord <span class="required">*</span></label>
@@ -137,14 +142,14 @@ export function renderAdmin(app) {
       }
     } catch (error) {
       console.error('Error loading users:', error);
-      tableBody.innerHTML = '<tr><td colspan="5" class="loading">Kan gebruikers niet laden</td></tr>';
+      tableBody.innerHTML = '<tr><td colspan="6" class="loading">Kan gebruikers niet laden</td></tr>';
     }
   }
 
   // Render users to table
   function renderUsers(users) {
     if (users.length === 0) {
-      tableBody.innerHTML = '<tr><td colspan="5" class="loading">Geen gebruikers gevonden</td></tr>';
+      tableBody.innerHTML = '<tr><td colspan="6" class="loading">Geen gebruikers gevonden</td></tr>';
       return;
     }
 
@@ -152,6 +157,7 @@ export function renderAdmin(app) {
       <tr>
         <td>${user.first_name} ${user.last_name}</td>
         <td>${user.email}</td>
+        <td>${user.phone || '-'}</td>
         <td><span class="role-badge">${roleDisplayMap[user.role] || user.role}</span></td>
         <td><span class="status-badge active">Actief</span></td>
         <td class="actions">
@@ -213,6 +219,7 @@ export function renderAdmin(app) {
       first_name: document.getElementById('voornaam').value,
       last_name: document.getElementById('achternaam').value,
       email: document.getElementById('email').value,
+      phone: document.getElementById('telefoon').value || 'no phone',
       password: document.getElementById('wachtwoord').value,
       role: document.getElementById('rol').value
     };

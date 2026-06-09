@@ -93,4 +93,33 @@ const selectUser = async (req, res, next) => {
     } 
 };
 
-export default { createUser, selectUser };
+const updateUser = async (req, res, next) => {
+    const { id } = req.params;
+    const { first_name, last_name, email, password, role, phone } = req.body;
+
+    try {
+        const user = await User.findByPk(id);
+        if (!user) {
+            return res.status(404).json({ msg: "Gebruiker niet gevonden" });
+        }
+
+        const updateData = { first_name, last_name, email, role, phone };
+        if (password && password.trim() !== '') {
+            updateData.password = password;
+        }
+
+        await user.update(updateData);
+
+        return res.status(200).json({
+            msg: "Gebruiker succesvol bijgewerkt",
+            data: user
+        });
+    } catch (error) {
+        console.error("Error updating user: ", error);
+        return res.status(500).json({
+            msg: "Er is iets misgegaan bij het bijwerken van de gebruiker"
+        });
+    }
+};
+
+export default { createUser, selectUser, updateUser };
