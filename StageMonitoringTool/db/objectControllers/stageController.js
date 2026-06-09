@@ -5,6 +5,10 @@ import { sequelize } from "../dbConnection.js";
 const createStage = async (req,res,next) =>{
 
     const {
+        student_id,
+        docent_id,
+        stagementor_id,
+        bedrijf_id,
         omschrijving_opdracht,
         status,
         begin_datum,
@@ -12,7 +16,11 @@ const createStage = async (req,res,next) =>{
     } = req.body;
         
     try{
-        const user = await Stage.create({
+        const stage = await Stage.create({
+            student_id: student_id,
+            docent_id: docent_id,
+            stagementor_id: stagementor_id,
+            bedrijf_id: bedrijf_id,
             omschrijving_opdracht: omschrijving_opdracht,
             status: status,
             begin_datum: begin_datum,
@@ -20,7 +28,7 @@ const createStage = async (req,res,next) =>{
         });
         return res.status(200).json({
             msg: "Stage created successfully",
-            data: Stage
+            data: stage
         })
     }
     catch(error){
@@ -40,7 +48,7 @@ const updateStage = async (req, res ,next) =>{
         stage_id,
         student_id,
         docent_id,
-        mentor_id,
+        stagementor_id,
         bedrijf_id
     } = req.body;
     
@@ -48,7 +56,7 @@ const updateStage = async (req, res ,next) =>{
     { 
         student_id: student_id,
         docent_id: docent_id,
-        mentor_id: mentor_id,
+        stagementor_id: stagementor_id,
         bedrijf_id: bedrijf_id
     },
     {where: { stage_id: stage_id }});

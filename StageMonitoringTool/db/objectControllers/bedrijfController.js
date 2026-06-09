@@ -46,9 +46,9 @@ const linkBedrijfToStageMentor = async (req,res,next) =>{
         })
     }
     catch(error){
-        console.error("Error updating mentor: ", error); 
+        console.error("Error updating stagementor: ", error); 
         return res.status(500).json({
-            msg: "something went wrong while updating mentor"
+            msg: "something went wrong while updating stagementor"
         })
     }
 }

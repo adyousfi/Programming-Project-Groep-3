@@ -1,11 +1,13 @@
-import { sequelize } from "../dbConnection";
-import { DataTypes } from "sequelize";
+import { sequelize } from "../dbConnection.js";
+import { DataTypes, Deferrable } from "sequelize";
 
 export const status = {
-    //Status van logboek?
+    NIETINGEVULD: "NIETINGEVULD",
+    DEELSINGEVULD: "DEELSINGEVULD",
+    INGEVULD: "INGEVULD"
 };
 
-const Bedrijf = sequelize.define("Bedrijf", {
+const Logboek = sequelize.define("Logboek", {
 
     logboek_id:{
         type: DataTypes.INTEGER,
@@ -22,13 +24,13 @@ const Bedrijf = sequelize.define("Bedrijf", {
     uitgevoerdeTaken:{
         type:DataTypes.STRING,
     },
-    date:{
+    datum:{
         type: DataTypes.DATE,
     },
     leerpunten:{
         type: DataTypes.STRING
     },
-    chechmark:{
+    checkmark:{
         type: DataTypes.BOOLEAN,
     },
     reflectie:{
@@ -36,7 +38,9 @@ const Bedrijf = sequelize.define("Bedrijf", {
     },
     status:{
         type: DataTypes.ENUM(Object.values(status)),
-        allowNull:false
+        allowNull:false,
+        defaultValue: "NIETINGEVULD",
+        values: ["NIETINGEVULD","DEELSINGEVULD","INGEVULD"]
     }
 
 
@@ -46,4 +50,4 @@ const Bedrijf = sequelize.define("Bedrijf", {
     }
 )
 
-export default Bedrijf;
+export default Logboek;

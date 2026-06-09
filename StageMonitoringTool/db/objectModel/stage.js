@@ -31,7 +31,7 @@ const Stage = sequelize.define("Stage", {
         type: DataTypes.INTEGER,
         allowNull: true,
     },
-    mentor_id: {
+    stagementor_id: {
         type: DataTypes.INTEGER,
         allowNull: true,
     },
@@ -46,7 +46,7 @@ const Stage = sequelize.define("Stage", {
     status: {
         type: DataTypes.ENUM(Object.values(status)),
         allowNull: true,
-        defaultValue: 'Aanvraag',
+        defaultValue: 'AANVRAAG',
         values: ['AANVRAAG','GOEDGEKEURD','AANPASSINGENVEREISD','DOCUMENTGEUPLOADED','KLAAR']
     },
     begin_datum: {
@@ -65,13 +65,11 @@ const Stage = sequelize.define("Stage", {
 )
 
 // Define associations
-Stage.belongsTo(Docent, { foreignKey: 'docent_id'});
-Stage.belongsTo(Student, { foreignKey: 'student_id'});
-Stage.belongsTo(Bedrijf, { foreignKey: 'bedrijf_id'});
-Stage.belongsTo(Stagementor, { foreignKey: 'mentor_id'});
-
-
-
+// Define associations
+Stage.belongsTo(Docent, { foreignKey: 'docent_id', onDelete: 'NO ACTION' });
+Stage.belongsTo(Student, { foreignKey: 'student_id', onDelete: 'NO ACTION' });
+Stage.belongsTo(Bedrijf, { foreignKey: 'bedrijf_id', onDelete: 'NO ACTION' });
+Stage.belongsTo(Stagementor, { foreignKey: 'stagementor_id', onDelete: 'NO ACTION' });
 
 const linkStagementorToBedrijf = async (userId, bedrijfId) =>{
     await Stagementor.update(

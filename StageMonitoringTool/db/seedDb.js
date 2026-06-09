@@ -1,12 +1,14 @@
 // db/seed.js
 import {sequelize} from "./dbConnection.js";
 import User, { ROLES } from "./userModel/user.js";
-import stage from "./objectModel/stage.js";
+import Stage from "./objectModel/stage.js";
 import Student from "./userModel/student.js";
 import Stagementor from "./userModel/stagementor.js";
 import Stagecommisie from "./userModel/stagecommisie.js";
 import Admin from "./userModel/admin.js";
 import Docent from "./userModel/docent.js";
+import Bedrijf from "./objectModel/bedrijf.js";
+import bedrijfController from "./objectControllers/bedrijfController.js";
 
 const dummyUsers = [
     // --- STUDENTS ---
@@ -34,6 +36,7 @@ const dummyUsers = [
     { first_name: "Prof. Elena", last_name: "Dumont", email: "elena.docent@school.com", password: "hashedpassword123", role: ROLES.DOCENT, phone: "0460222222" },
     { first_name: "Prof. Bram", last_name: "Vermeulen", email: "bram.docent@school.com", password: "hashedpassword123", role: ROLES.DOCENT, phone: "0460333333" }
 ];
+
 
 const seedDatabase = async () => {
   try {
@@ -76,33 +79,52 @@ const seedDatabase = async () => {
             break;
             }
       }
-    // await createBedrijf("aqua","finland");
-    // await createBedrijf("kanker","kankerstraat");
+      
+      console.log("Seeding companies (bedrijven)...");
+      await Bedrijf.bulkCreate([
+          { naam: "Aqua", address: "Finland" },
+          { naam: "Horeca Partner", address: "Brussel" }
+      ]);
+
+      console.log("Seeding stages...");
+      await Stage.bulkCreate([
+    {
+        student_id: 1,       // Alex (Student)
+        docent_id: 13,      // Prof. Arthur (Docent)
+        stagementor_id: 4,       // Mark (Stagementor)
+        bedrijf_id: 1,      // Aqua
+        omschrijving_opdracht: "Ontwikkelen van een full-stack monitoring tool met React en Node.js.",
+        status: "DOCUMENTGEUPLOADED", // Komt exact overeen met de status object waarden
+        begin_datum: new Date("2026-09-01"),
+        eind_datum: new Date("2027-01-31")
+    },
+    {
+        student_id: 2,       // Emma (Student)
+        docent_id: 14,      // Prof. Elena (Docent)
+        stagementor_id: 5,       // Sophie (Stagementor)
+        bedrijf_id: 2,      // Horeca Partner
+        omschrijving_opdracht: "Optimaliseren van de database structuren en SQL queries voor grootschalige data-analyse.",
+        status: "GOEDGEKEURD",
+        begin_datum: new Date("2026-09-15"),
+        eind_datum: new Date("2027-02-15")
+    },
+    {
+        student_id: 3,       // Lucas (Student)
+        docent_id: 13,      // Prof. Arthur (Docent)
+        stagementor_id: 6,       // Thomas (Stagementor)
+        bedrijf_id: 1,      // Aqua
+        omschrijving_opdracht: "Onderzoek doen naar cloud migratie en het opzetten van CI/CD pipelines in Azure.",
+        status: "AANVRAAG",
+        begin_datum: new Date("2026-10-01"),
+        eind_datum: new Date("2027-03-01")
+    }
+]);
     
-    // await linkBedrijfToStageMentor(6,1);
-    // await linkBedrijfToStageMentor(8,1);
-
-
-    // await createStage("doe iets",status.DOCUMENTGEUPLOADED,"2020-1-20","2021-10-12")
-    
-    // await linkStageToMoreUser(1,1,2,6,1);
-
-
     console.log("Successfully seeded 5 users into the database!");
-    //                                                    year-month-day
     
-
-    
-
   } catch (error) {
     console.error("Error seeding database:", error);
   }
-  //closes the connection for some reason...
-  //finally {
-  //   // 4. Safely shut down connection
-  //   await sequelize.close();
-  //   console.log("Database connection closed.");
-  // }
 };
 
 export default seedDatabase;

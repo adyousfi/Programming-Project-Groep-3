@@ -7,6 +7,8 @@ import User from '../db/userModel/user.js';
 import stageController from "./objectControllers/stageController.js";
 import bedrijfController from "./objectControllers/bedrijfController.js";
 import Bedrijf from "./objectModel/bedrijf.js";
+import logboekController from "./objectControllers/logboekController.js";
+import opmerkingLogboekController from "./objectControllers/opmerkingLogboekController.js";
 
 await run();
 
@@ -26,14 +28,25 @@ app.use(router);
 //needs to be runned first because it drops all tables to not make any duplicates
 await seedDatabase();
 
+//Users
 router.post("/create-user", userController.createUser)
 router.get("/select-user", userController.selectUser)
 
+//Stages
 router.post("/create-stage",stageController.createStage)
 router.post("/update-stage",stageController.updateStage)
 
+//Bedrijven
 router.post("/assign-bedrijftomentor",bedrijfController.linkBedrijfToStageMentor)
 router.post("/create-bedrijf",bedrijfController.createBedrijf)
+
+//Logboeken
+router.post("/create-logboek",logboekController.createLogboek)
+
+//Opmerking Logboeken
+router.post("/create-opmerkinglogboek",opmerkingLogboekController.createOpmerkinglogboek)
+
+
 const PORT = 3000;
 app.listen(PORT, () => {
     console.log(`Server is successfully running on http://localhost:${PORT}`);
