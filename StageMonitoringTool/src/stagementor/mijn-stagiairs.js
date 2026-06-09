@@ -67,6 +67,113 @@ function smSetWeekAfgevinkt(email, week) {
   try { localStorage.setItem(`sm_afgevinkt_${email}_${week}`, '1'); } catch (e) {}
 }
 
+function smRemoveWeekAfgevinkt(email, week) {
+  try { localStorage.removeItem(`sm_afgevinkt_${email}_${week}`); } catch (e) {}
+}
+
+function smToggleWeekAfgevinkt(email, week) {
+  if (smIsWeekAfgevinkt(email, week)) {
+    smRemoveWeekAfgevinkt(email, week);
+  } else {
+    smSetWeekAfgevinkt(email, week);
+  }
+}
+
+function parseStageDate(text) {
+  const monthMap = {
+    jan: 0, feb: 1, mrt: 2, apr: 3, mei: 4, jun: 5,
+    jul: 6, aug: 7, sep: 8, okt: 9, nov: 10, dec: 11,
+  };
+  const parts = String(text).trim().toLowerCase().split(/\s+/);
+  if (parts.length < 2) return null;
+  const day = Number(parts[0].replace(/[^0-9]/g, ''));
+  const month = monthMap[parts[1]];
+  if (!Number.isFinite(day) || month === undefined) return null;
+  return new Date(2026, month, day);
+}
+
+function formatShortDate(date) {
+  const monthNames = ['jan', 'feb', 'mrt', 'apr', 'mei', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'dec'];
+  return `${date.getDate()} ${monthNames[date.getMonth()]}`;
+}
+
+function getWeekRange(stagiair, weekNum) {
+  const start = parseStageDate(stagiair.start);
+  if (!start) {
+    return stagiair.start + ' - ' + stagiair.einde;
+  }
+  const weekStart = new Date(start.getTime());
+  weekStart.setDate(weekStart.getDate() + (weekNum - 1) * 7);
+  const weekEnd = new Date(weekStart.getTime());
+  weekEnd.setDate(weekStart.getDate() + 4);
+  return `${formatShortDate(weekStart)} t/m ${formatShortDate(weekEnd)}`;
+}
+
+function getWeekLogEntries(weekNum) {
+  const sampleWeek1 = [
+    {
+      name: 'Maandag',
+      date: '3 feb',
+      submitted: true,
+      sections: [
+        { title: 'Beschrijving van uitgevoerde taken', text: 'Vandaag heb ik gewerkt aan het opzetten van de ontwikkelomgeving en kennismaking met het team. We hebben een kickoff meeting gehad waar de projectdoelen werden toegelicht.' },
+        { title: 'Reflectie', text: 'Ik heb geleerd hoe belangrijk goede communicatie is binnen een team. Het was interessant om te zien hoe professionele projecten worden opgezet.' },
+        { title: 'Problemen of leerpunten', text: 'Geen bijzondere problemen. Wel veel nieuwe informatie in korte tijd.' },
+      ],
+    },
+    {
+      name: 'Dinsdag',
+      date: '4 feb',
+      submitted: true,
+      sections: [
+        { title: 'Beschrijving van uitgevoerde taken', text: 'Verder gewerkt aan het installeren van dependencies en het bestuderen van de bestaande codebase. Paired programming sessie met een senior developer.' },
+        { title: 'Reflectie', text: 'Agile werkwijze is nieuw voor me maar werkt goed. Korte meetings houden iedereen op de hoogte.' },
+        { title: 'Problemen of leerpunten', text: 'Bug was lastiger dan verwacht, moest debugging tools beter leren gebruiken.' },
+      ],
+    },
+    {
+      name: 'Woensdag',
+      date: '5 feb',
+      submitted: false,
+      sections: [
+        { title: 'Beschrijving van uitgevoerde taken', text: 'Deze dag is nog niet ingevuld door de student.' },
+      ],
+    },
+    {
+      name: 'Donderdag',
+      date: '6 feb',
+      submitted: true,
+      sections: [
+        { title: 'Beschrijving van uitgevoerde taken', text: 'Gewerkt aan een bugfix in de user interface. Deelgenomen aan daily standup en sprint planning meeting.' },
+        { title: 'Reflectie', text: 'Agile werkwijze is nieuw voor me maar werkt goed. Korte meetings houden iedereen op de hoogte.' },
+        { title: 'Problemen of leerpunten', text: 'Bug was lastiger dan verwacht, moest debugging tools beter leren gebruiken.' },
+      ],
+    },
+    {
+      name: 'Vrijdag',
+      date: '7 feb',
+      submitted: true,
+      sections: [
+        { title: 'Beschrijving van uitgevoerde taken', text: 'Afronding van de bugfix en deployment naar testomgeving. Retrospective meeting met het team over de afgelopen sprint.' },
+        { title: 'Reflectie', text: 'Eerste week succesvol afgerond. Ik voel me meer onderdeel van het team en begrijp de workflow beter.' },
+        { title: 'Problemen of leerpunten', text: 'Geen bijzondere problemen meer. Goede eerste week gehad.' },
+      ],
+    },
+  ];
+
+  if (weekNum === 1) {
+    return sampleWeek1;
+  }
+
+  return [
+    { name: 'Maandag', date: 'N.v.t.', submitted: false, sections: [{ title: 'Beschrijving van uitgevoerde taken', text: 'Deze dag is nog niet ingevuld door de student.' }] },
+    { name: 'Dinsdag', date: 'N.v.t.', submitted: false, sections: [{ title: 'Beschrijving van uitgevoerde taken', text: 'Deze dag is nog niet ingevuld door de student.' }] },
+    { name: 'Woensdag', date: 'N.v.t.', submitted: false, sections: [{ title: 'Beschrijving van uitgevoerde taken', text: 'Deze dag is nog niet ingevuld door de student.' }] },
+    { name: 'Donderdag', date: 'N.v.t.', submitted: false, sections: [{ title: 'Beschrijving van uitgevoerde taken', text: 'Deze dag is nog niet ingevuld door de student.' }] },
+    { name: 'Vrijdag', date: 'N.v.t.', submitted: false, sections: [{ title: 'Beschrijving van uitgevoerde taken', text: 'Deze dag is nog niet ingevuld door de student.' }] },
+  ];
+}
+
 function smGetWeekComment(email, week) {
   try { return localStorage.getItem(`sm_comment_${email}_${week}`) || ''; } catch (e) { return ''; }
 }
@@ -387,11 +494,10 @@ function renderStudentDetail(app, stagiair) {
         // generate week items
         const weeks = Array.from({length: stagiair.totalWeeks}, (_, i) => {
           const weekNum = i + 1;
-          // if week already afgevinkt in storage, mark as filled
           const afgevinkt = smIsWeekAfgevinkt(stagiair.email, weekNum);
           const filled = afgevinkt ? 5 : (weekNum <= stagiair.currentWeek ? 5 : 0);
           const status = afgevinkt ? 'Afgevinkt' : (filled === 5 ? 'Ingevuld' : 'Nog niet afgevinkt');
-          return {weekNum, dateRange: `${stagiair.start} t/m ${stagiair.einde}`, filled, total: 5, status};
+          return {weekNum, dateRange: getWeekRange(stagiair, weekNum), filled, total: 5, status};
         });
   
         app.innerHTML = `
@@ -476,6 +582,8 @@ function renderStudentDetail(app, stagiair) {
       function renderWeekDetail(app, stagiair, week) {
         const comment = smGetWeekComment(stagiair.email, week);
         const afgevinkt = smIsWeekAfgevinkt(stagiair.email, week);
+        const weekRange = getWeekRange(stagiair, week);
+        const dayEntries = getWeekLogEntries(week);
 
         app.innerHTML = `
           <div class="sm-layout">
@@ -501,21 +609,40 @@ function renderStudentDetail(app, stagiair) {
               <div class="sm-detail-top">
                 <a href="#" class="sm-detail-back" id="sm-back-week">← Terug naar logboek</a>
                 <div>
-                  <h1 class="sm-detail-title">Logboek - Week ${week}</h1>
-                  <p class="sm-detail-email">Bekijk het detail van week ${week} voor ${stagiair.naam}</p>
+                  <h1 class="sm-detail-title">Week ${week}</h1>
+                  <p class="sm-detail-subtitle">${weekRange}</p>
+                  <div class="sm-week-summary-row">
+                    <span class="sm-status-pill ${afgevinkt ? 'sm-status--ok' : 'sm-status--pending'}">${afgevinkt ? 'Afgevinkt' : 'Open'}</span>
+                    <button class="sm-button sm-week-check" id="sm-week-toggle">${afgevinkt ? 'Markeer als niet afgevinkt' : 'Week afvinken'}</button>
+                  </div>
+                  <p class="sm-detail-email">Bekijk het logboek van ${stagiair.naam}</p>
                 </div>
               </div>
-              <div class="sm-week-detail-card">
-                <p class="sm-week-detail-label">Status</p>
-                <p class="sm-week-detail-value">${afgevinkt ? 'Afgevinkt' : 'Open'}</p>
-                <button class="sm-button sm-week-check" id="sm-week-toggle">${afgevinkt ? 'Markeer als niet afgevinkt' : 'Markeer als afgevinkt'}</button>
+              <div class="sm-week-day-list">
+                ${dayEntries.map(day => `
+                  <div class="sm-week-day-card">
+                    <div class="sm-week-day-header">
+                      <div>
+                        <h2 class="sm-week-day-name">${day.name}</h2>
+                        <p class="sm-week-day-date">${day.date}</p>
+                      </div>
+                      <span class="sm-status-pill ${day.submitted ? 'sm-status--ok' : 'sm-status--pending'}">${day.submitted ? 'Ingediend' : 'Nog niet ingevuld'}</span>
+                    </div>
+                    ${day.sections.map(section => `
+                      <div class="sm-week-section">
+                        <p class="sm-week-section-title">${section.title}</p>
+                        <div class="sm-week-section-body">${section.text}</div>
+                      </div>
+                    `).join('')}
+                  </div>
+                `).join('')}
               </div>
               <div class="sm-week-comment-card">
-                <label class="sm-week-comment-label" for="sm-week-comment">Reactie / Opmerking</label>
-                <textarea id="sm-week-comment" class="sm-week-comment" placeholder="Voeg een korte opmerking toe...">${comment}</textarea>
+                <label class="sm-week-comment-label" for="sm-week-comment">Opmerking bij Week ${week}</label>
+                <textarea id="sm-week-comment" class="sm-week-comment" placeholder="Laat hier een opmerking of reactie achter bij het logboek van deze week...">${comment}</textarea>
               </div>
               <div class="sm-eval-actions">
-                <button class="sm-button" id="sm-week-save">Wijzigingen opslaan</button>
+                <button class="sm-button" id="sm-week-save">Opmerking Opslaan</button>
               </div>
             </main>
           </div>
@@ -527,7 +654,7 @@ function renderStudentDetail(app, stagiair) {
         });
 
         document.querySelector('#sm-week-toggle').addEventListener('click', function() {
-          smSetWeekAfgevinkt(stagiair.email, week);
+          smToggleWeekAfgevinkt(stagiair.email, week);
           renderWeekDetail(app, stagiair, week);
         });
 
