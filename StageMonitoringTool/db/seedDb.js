@@ -1,10 +1,12 @@
 // db/seed.js
 import { ENUM } from "sequelize";
 import {sequelize} from "./dbConnection.js";
-import User, { ROLES } from "./userModel/user.js";
+import User from "./userModel/user.js";
+import Admin from "./userModel/admin.js";
+import Docent from "./userModel/docent.js";
 import userController from "./userControllers/userController.js";
 import createStage from "./userControllers/stageController.js";
-import { status } from "./objectModel/stage.js";
+import { status } from "./stage/stage.js";
 import { createBedrijf } from "./objectControllers/bedrijfController.js";
 import { createStagementor } from "./userControllers/stagementorController.js";
 import { linkBedrijfToStageMentor } from "./objectControllers/bedrijfController.js";
