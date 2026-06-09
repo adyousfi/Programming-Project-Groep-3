@@ -60,4 +60,78 @@ export function renderDocumenten(container, userName = 'Jan Janssens') {
 
         </div>
     `;
+
+    const uploadZone = container.querySelector('#upload-zone');
+    const fileInput = container.querySelector('#file-input');
+    const uploadBtn = container.querySelector('#upload-btn');
+    const uploadSelected = container.querySelector('#upload-selected');
+    const uploadFilename = container.querySelector('#upload-filename');
+    const uploadRemoveBtn = container.querySelector('#upload-remove-btn');
+    const uploadSubmitBtn = container.querySelector('#upload-submit-btn');
+    const badge = container.querySelector('.document-status-badge');
+
+    function showFile(file) {
+        uploadFilename.textContent = file.name;
+        uploadZone.style.display = 'none';
+        uploadSelected.style.display = 'flex';
+        uploadSubmitBtn.style.display = 'inline-block';
+    }
+
+    function resetUpload() {
+        fileInput.value = '';
+        uploadZone.style.display = '';
+        uploadSelected.style.display = 'none';
+        uploadSubmitBtn.style.display = 'none';
+    }
+
+    // Click op upload zone → open file picker
+    uploadZone.addEventListener('click', () => fileInput.click());
+
+    // Click op "Bestand Selecteren" button
+    uploadBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        fileInput.click();
+    });
+
+    // Bestand geselecteerd via file picker
+    fileInput.addEventListener('change', () => {
+        if (fileInput.files.length > 0) {
+            showFile(fileInput.files[0]);
+        }
+    });
+
+    // Drag & drop
+    uploadZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        uploadZone.classList.add('dragover');
+    });
+
+    uploadZone.addEventListener('dragleave', () => {
+        uploadZone.classList.remove('dragover');
+    });
+
+    uploadZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        uploadZone.classList.remove('dragover');
+        if (e.dataTransfer.files.length > 0) {
+            showFile(e.dataTransfer.files[0]);
+        }
+    });
+
+    // Verwijder bestand
+    uploadRemoveBtn.addEventListener('click', () => resetUpload());
+
+    // Document indienen
+    uploadSubmitBtn.addEventListener('click', () => {
+        badge.textContent = 'Geuploadd';
+        badge.classList.remove('badge-wachtend');
+        badge.classList.add('badge-goedgekeurd');
+        uploadSelected.style.display = 'none';
+        uploadSubmitBtn.style.display = 'none';
+        uploadZone.innerHTML = `
+            <div class="upload-icon">&#10003;</div>
+            <p class="upload-text">Document succesvol geuploadd!</p>
+            <p class="upload-subtext">Je stageovereenkomst is ingediend ter goedkeuring.</p>
+        `;
+    });
 }

@@ -133,6 +133,12 @@
     border: 1px solid #ffecb5;
 }
 
+.badge-goedgekeurd {
+    background-color: #d1e7dd;
+    color: #0f5132;
+    border: 1px solid #badbcc;
+}
+
 .document-card-subtitle {
     font-size: 0.9rem;
     color: #6c757d;
