@@ -22,7 +22,6 @@ const Stage = sequelize.define("stage", {
         allowNull: false,
         primaryKey: true,
         autoIncrement: true,
-        comment: "PK - Stage primary key"
     },
     stageaanvraag_id: {
         type: DataTypes.INTEGER,
@@ -32,12 +31,10 @@ const Stage = sequelize.define("stage", {
     student_id: {
         type: DataTypes.INTEGER,
         allowNull: true,
-        comment: "FK - Reference to student (admin)"
     },
     docent_id: {
         type: DataTypes.INTEGER,
         allowNull: true,
-        comment: "FK - Reference to docent (admin)"
     },
     admin_id: {
         type: DataTypes.INTEGER,
@@ -47,12 +44,10 @@ const Stage = sequelize.define("stage", {
     mentor_id: {
         type: DataTypes.INTEGER,
         allowNull: true,
-        comment: "FK - Reference to mentor"
     },
     bedrijfs_id: {
         type: DataTypes.INTEGER,
         allowNull: true,
-        comment: "FK - Reference to bedrijf"
     },
     omschrijving_opdracht: {
         type: DataTypes.TEXT,

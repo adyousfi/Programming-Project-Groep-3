@@ -11,7 +11,7 @@ const Bedrijf = sequelize.define("Bedrijf", {
         autoIncrement: true,
     },
 
-    name:{
+    naam:{
         type: DataTypes.STRING,
         allownull: false,
     },
