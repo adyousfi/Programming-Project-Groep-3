@@ -1,4 +1,4 @@
-import Student from "../userModel/student.js";
+import Student from "../userModel/users/student.js";
 import { sequelize } from "../dbConnection.js";
 
 const createStudent = async (student_id, user_id) =>
@@ -12,4 +12,4 @@ const createStudent = async (student_id, user_id) =>
 	console.log(student)
   
 }
-export default {createStudent};
+export default createStudent;
