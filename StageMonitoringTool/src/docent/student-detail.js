@@ -14,7 +14,38 @@ function renderNav(activeTab) {
   }).join('');
 }
 
-function renderTabContent(tab) {
+function renderOverzicht(student) {
+  const logboekPercent = student.logboek
+    ? Math.round((student.logboek.ingediend / student.logboek.totaal) * 100)
+    : 0;
+
+  return `
+    <div class="sd-tab-content">
+      <div class="sd-stat-grid">
+        <div class="sd-stat-card">
+          <p class="sd-stat-label">Stage Periode</p>
+          <p class="sd-stat-value">${student.periodeStart} – ${student.periodeEind}</p>
+          <p class="sd-stat-sub">${student.voortgang ? student.voortgang.totaal : '–'} weken totaal</p>
+        </div>
+        <div class="sd-stat-card">
+          <p class="sd-stat-label">Logboek Status</p>
+          <p class="sd-stat-value">${student.logboek ? `${student.logboek.ingediend} / ${student.logboek.totaal} weken` : '–'}</p>
+          <div class="sd-progress-bar-wrap">
+            <div class="sd-progress-bar" style="width: ${logboekPercent}%"></div>
+          </div>
+        </div>
+        <div class="sd-stat-card">
+          <p class="sd-stat-label">Bedrijf</p>
+          <p class="sd-stat-value">${student.bedrijf}</p>
+          <p class="sd-stat-sub">${student.functie}</p>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderTabContent(tab, student) {
+  if (tab === 'overzicht') return renderOverzicht(student);
   return `<div class="sd-tab-content"></div>`;
 }
 
@@ -42,7 +73,7 @@ export function renderStudentDetail(student) {
         <h1 class="sd-title">Student: ${student.naam}</h1>
         <p class="sd-subtitle">${student.email || ''}</p>
         <div class="sd-content" id="sd-content">
-          ${renderTabContent('overzicht')}
+          ${renderTabContent('overzicht', student)}
         </div>
       </main>
     </div>
@@ -58,7 +89,7 @@ export function renderStudentDetail(student) {
       e.preventDefault();
       document.querySelectorAll('.sd-nav-item').forEach(function(i) { i.classList.remove('active'); });
       item.classList.add('active');
-      document.querySelector('#sd-content').innerHTML = renderTabContent(item.dataset.tab);
+      document.querySelector('#sd-content').innerHTML = renderTabContent(item.dataset.tab, student);
     });
   });
 }
