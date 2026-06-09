@@ -175,10 +175,14 @@ export function renderAdmin(app) {
 
   // Elements
   const modal = document.getElementById('modalOverlay');
+  const editModal = document.getElementById('editModal');
   const openBtn = document.getElementById('openModal');
   const closeBtn = document.getElementById('closeModal');
+  const closeEditBtn = document.getElementById('closeEditModal');
   const form = document.getElementById('accountForm');
+  const editForm = document.getElementById('editForm');
   const generateBtn = document.getElementById('generatePassword');
+  const editGenerateBtn = document.getElementById('editGeneratePassword');
   const searchInput = document.getElementById('searchInput');
   const roleFilter = document.getElementById('roleFilter');
   const tableBody = document.getElementById('userTableBody');
@@ -215,11 +219,16 @@ export function renderAdmin(app) {
         <td><span class="role-badge">${roleDisplayMap[user.role] || user.role}</span></td>
         <td><span class="status-badge active">Actief</span></td>
         <td class="actions">
-          <button class="btn-edit">Bewerken</button>
+          <button class="btn-edit" data-id="${user.user_id}">Bewerken</button>
           <button class="btn-deactivate">Deactiveren</button>
         </td>
       </tr>
     `).join('');
+
+    // Add edit button listeners
+    document.querySelectorAll('.btn-edit').forEach(btn => {
+      btn.addEventListener('click', () => openEditModal(btn.dataset.id));
+    });
   }
 
   // Filter users
@@ -240,6 +249,22 @@ export function renderAdmin(app) {
   searchInput.addEventListener('input', filterUsers);
   roleFilter.addEventListener('change', filterUsers);
 
+  // Open edit modal with user data
+  function openEditModal(userId) {
+    const user = allUsers.find(u => u.user_id == userId);
+    if (!user) return;
+
+    document.getElementById('edit-user-id').value = user.user_id;
+    document.getElementById('edit-voornaam').value = user.first_name;
+    document.getElementById('edit-achternaam').value = user.last_name;
+    document.getElementById('edit-email').value = user.email;
+    document.getElementById('edit-telefoon').value = user.phone || '';
+    document.getElementById('edit-wachtwoord').value = '';
+    document.getElementById('edit-rol').value = user.role;
+
+    editModal.classList.add('active');
+  }
+
   // Modal functionality
   openBtn.addEventListener('click', () => {
     modal.classList.add('active');
@@ -250,10 +275,22 @@ export function renderAdmin(app) {
     form.reset();
   });
 
+  closeEditBtn.addEventListener('click', () => {
+    editModal.classList.remove('active');
+    editForm.reset();
+  });
+
   modal.addEventListener('click', (e) => {
     if (e.target === modal) {
       modal.classList.remove('active');
       form.reset();
+    }
+  });
+
+  editModal.addEventListener('click', (e) => {
+    if (e.target === editModal) {
+      editModal.classList.remove('active');
+      editForm.reset();
     }
   });
 
@@ -264,6 +301,15 @@ export function renderAdmin(app) {
       password += chars.charAt(Math.floor(Math.random() * chars.length));
     }
     document.getElementById('wachtwoord').value = password;
+  });
+
+  editGenerateBtn.addEventListener('click', () => {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%';
+    let password = '';
+    for (let i = 0; i < 12; i++) {
+      password += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    document.getElementById('edit-wachtwoord').value = password;
   });
 
   form.addEventListener('submit', async (e) => {
