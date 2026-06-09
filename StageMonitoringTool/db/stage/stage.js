@@ -1,33 +1,28 @@
 
 import { sequelize } from "../dbConnection.js";
 import { DataTypes, Deferrable } from "sequelize";
-import Docent from "../userModel/users/docent.js";
-import Student from "../userModel/users/student.js";
-import Admin from "../userModel/users/admin.js";
-import Stagementor from "../userModel/users/stagementor.js";
-
+import Docent from "../userModel/docent.js";
+import Student from "../userModel/student.js";
+import Admin from "../userModel/admin.js";
+import Stagementor from "../userModel/stagementor.js";
+import Bedrijf from "./bedrijf.js";
 
 export const status = {
-    AANVRAAG: 'Aanvraag',
-    GOEDGEKEURD: 'Goedgekeurd',
-    AANPASSINGENVEREISD: 'Aanpassingen_vereist',
-    DOCUMENTGEUPLOADED: 'documentgeuploaded',
-    KLAAR: 'klaar'
+    AANVRAAG: 'AANVRAAG',
+    GOEDGEKEURD: 'GOEDGEKEURD',
+    AANPASSINGENVEREISD: 'AANPASSINGENVEREISD',
+    DOCUMENTGEUPLOADED: 'DOCUMENTGEUPLOADED',
+    KLAAR: 'KLAAR'
 };
 
 // Stage model
-const Stage = sequelize.define("stage", {
+const Stage = sequelize.define("Stage", {
     stage_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
         primaryKey: true,
         autoIncrement: true,
         comment: "PK - Stage primary key"
-    },
-    stageaanvraag_id: {
-        type: DataTypes.INTEGER,
-        allowNull: true,
-        comment: "FK - Reference to stageaanvraag"
     },
     student_id: {
         type: DataTypes.INTEGER,
@@ -39,17 +34,12 @@ const Stage = sequelize.define("stage", {
         allowNull: true,
         comment: "FK - Reference to docent (admin)"
     },
-    admin_id: {
-        type: DataTypes.INTEGER,
-        allowNull: true,
-        comment: "FK - Reference to admin"
-    },
     mentor_id: {
         type: DataTypes.INTEGER,
         allowNull: true,
         comment: "FK - Reference to mentor"
     },
-    bedrijfs_id: {
+    bedrijf_id: {
         type: DataTypes.INTEGER,
         allowNull: true,
         comment: "FK - Reference to bedrijf"
@@ -61,7 +51,8 @@ const Stage = sequelize.define("stage", {
     status: {
         type: DataTypes.ENUM(Object.values(status)),
         allowNull: true,
-        defaultValue: 'Aanvraag'
+        defaultValue: 'Aanvraag',
+        values: ['AANVRAAG','GOEDGEKEURD','AANPASSINGENVEREISD','DOCUMENTGEUPLOADED','KLAAR']
     },
     begin_datum: {
         type: DataTypes.DATE,
@@ -78,12 +69,21 @@ const Stage = sequelize.define("stage", {
 
 )
 
-
-
 // Define associations
-Stage.belongsTo(Docent, { foreignKey: 'docent_id', as: 'docent' });
-Stage.belongsTo(Student, { foreignKey: 'student_id', as: 'student' });
-Stage.belongsTo(Admin, { foreignKey: 'admin_id', as: 'admin' });
-Stage.belongsTo(Stagementor, { foreignKey: 'mentor_id', as: 'mentor' });
+Stage.belongsTo(Docent, { foreignKey: 'docent_id'});
+Stage.belongsTo(Student, { foreignKey: 'student_id'});
+Stage.belongsTo(Bedrijf, { foreignKey: 'bedrijf_id'});
+Stage.belongsTo(Stagementor, { foreignKey: 'mentor_id'});
+
+
+
+
+const linkStagementorToBedrijf = async (userId, bedrijfId) =>{
+    await Stagementor.update(
+    { bedrijf_id: bedrijfId }, 
+    { where: { user_id: userId } }
+);
+}
+
 
 export default Stage;
