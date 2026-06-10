@@ -390,10 +390,8 @@ function renderStudentDetail(app, stagiair) {
           4: '{competentie} wordt correct uitgevoerd, met af en toe lichte begeleiding of bijsturing nodig.',
           5: '{competentie} wordt zelfstandig en boven de verwachtingen uitgevoerd, met initiatief en reflectie.',
         };
-        const pageTitle = activeTab === 'finale' ? 'Finale evaluatie' : 'Tussentijdse evaluatie';
-        const pageDescription = activeTab === 'finale'
-          ? 'Geef per competentie een finale score en feedback. De student geeft ook zelf een score — de docent ziet beide en bepaalt het definitieve punt.'
-          : 'Geef per competentie een score en feedback. De student geeft ook zelf een score — de docent ziet beide en bepaalt het finale punt.';
+        const pageTitle = 'Tussentijdse evaluatie';
+        const pageDescription = 'Geef per competentie een score en feedback. De student geeft ook zelf een score — de docent ziet beide en bepaalt het finale punt.';
 
         app.innerHTML = `
           <div class="sm-layout">
@@ -425,12 +423,11 @@ function renderStudentDetail(app, stagiair) {
                 <a href="#" class="sm-detail-back" id="sm-back-evaluatie">← Terug naar stagiairs</a>
               </div>
               <div class="sm-eval-tabs">
-                <button class="sm-eval-tab ${activeTab === 'tussentijds' ? 'active' : ''}" data-tab="tussentijds">Tussentijdse evaluatie</button>
-                <button class="sm-eval-tab ${activeTab === 'finale' ? 'active' : ''}" data-tab="finale">Finale evaluatie</button>
+                <button class="sm-eval-tab active" data-tab="tussentijds" disabled>Tussentijdse evaluatie</button>
               </div>
               <div class="sm-eval-content">
                 <div class="sm-eval-summary">
-                  <h2>${activeTab === 'finale' ? 'Finale beoordeling' : 'Tussentijdse bespreking'}</h2>
+                  <h2>Tussentijdse bespreking</h2>
                   <p>${pageDescription}</p>
                 </div>
                 ${competenties.map(comp => `
@@ -442,20 +439,20 @@ function renderStudentDetail(app, stagiair) {
                       </div>
                     </div>
                     <div class="sm-eval-score-panel">
-                      <div class="sm-eval-score-note">HOE SCOOR JE DEZE COMPETENTIE? KLIK OP EEN SCORE (1 = LAAG, 5 = HOOG)</div>
+                      <div class="sm-eval-score-note">Scorepunten kunnen momenteel nog niet worden aangepast. Bekijk de uitleg onder elk cijfer.</div>
                       <div class="sm-eval-score-cards" data-competentie="${comp.key}">
                         ${scores.map(score => `
-                          <button class="sm-score-card sm-score-card--${score}" data-score="${score}" data-competentie="${comp.key}">
+                          <button class="sm-score-card sm-score-card--${score} sm-score-card--disabled" data-score="${score}" data-competentie="${comp.key}" disabled>
                             <span class="sm-score-card-number">${score}</span>
                             <span class="sm-score-card-text">${scoreDescriptions[score].replace('{competentie}', comp.title)}</span>
                           </button>
                         `).join('')}
                       </div>
                     </div>
-                    <div class="sm-eval-mentor-panel ${activeTab === 'finale' ? 'sm-eval-mentor-panel--finale' : ''}">
+                    <div class="sm-eval-mentor-panel">
                       <div class="sm-eval-mentor-title">Jouw beoordeling (mentor)</div>
                       <label class="sm-eval-feedback-label">Feedback</label>
-                      <textarea class="sm-eval-feedback" data-feedback="${comp.key}" placeholder="${activeTab === 'finale' ? 'Beschrijf je gemotiveerde feedback...' : 'Beschrijf je feedback over de vorderingen van de student...'}">${smGetEvaluationFeedback(stagiair.email, activeTab, comp.key)}</textarea>
+                      <textarea class="sm-eval-feedback" data-feedback="${comp.key}" placeholder="Beschrijf je feedback over de vorderingen van de student...">${smGetEvaluationFeedback(stagiair.email, activeTab, comp.key)}</textarea>
                     </div>
                   </div>
                 `).join('')}
@@ -478,12 +475,6 @@ function renderStudentDetail(app, stagiair) {
           if (existingScore && existingScore === card.dataset.score) {
             card.classList.add('selected');
           }
-          card.addEventListener('click', function() {
-            const container = card.closest('.sm-eval-score-cards');
-            if (!container) return;
-            container.querySelectorAll('.sm-score-card').forEach(function(btn) { btn.classList.remove('selected'); });
-            card.classList.add('selected');
-          });
         });
 
         document.querySelectorAll('.sm-nav-item').forEach(function(item) {

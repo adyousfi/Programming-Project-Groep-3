@@ -910,6 +910,11 @@
   transition: all 0.15s ease;
 }
 
+.sm-eval-tab:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
 .sm-eval-tab.active,
 .sm-eval-tab:hover {
   border-color: #2563eb;
@@ -965,6 +970,18 @@
 .sm-score-card:hover {
   border-color: #c7d2fe;
   transform: translateY(-1px);
+}
+
+.sm-score-card--disabled,
+.sm-score-card:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.sm-score-card--disabled:hover,
+.sm-score-card:disabled:hover {
+  border-color: #e5e7eb;
+  transform: none;
 }
 
 .sm-score-card.selected {
