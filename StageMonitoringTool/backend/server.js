@@ -135,7 +135,7 @@ app.get('/api/stages', async (req, res) => {
           einde: s.eind_datum || '',
           urenPerWeek: '',
         },
-        status: s.status === 'Aanvraag' ? 'in_afwachting' : s.status === 'Goedgekeurd' ? 'goedgekeurd' : s.status === 'Afgekeurd' ? 'afgekeurd' : s.status,
+        status: s.status === 'Aanvraag' ? 'in_afwachting' : s.status === 'Goedgekeurd' ? 'goedgekeurd' : s.status === 'Afgekeurd' ? 'afgekeurd' : s.status === 'Aanpassingen_vereist' ? 'aanpassingen' : s.status,
         datum: s.createdAt ? new Date(s.createdAt).toLocaleDateString('nl-BE') : '',
         historiek: null,
       };
@@ -207,6 +207,150 @@ app.post('/api/stages', async (req, res) => {
   } catch (error) {
     console.error('Error creating stage:', error);
     return res.status(500).json({ msg: 'Er is iets misgegaan bij het aanmaken van de stage' });
+  }
+});
+
+// ✅ GET single stage by ID
+app.get('/api/stages/:id', async (req, res) => {
+  try {
+    const stage = await Stage.findByPk(req.params.id, {
+      include: [
+        { model: Student, as: 'student', include: [{ model: User, as: 'User' }] },
+        { model: Stagementor, as: 'mentor', include: [{ model: User, as: 'User' }] },
+        { model: Bedrijf, as: 'bedrijf' },
+        { model: Docent, as: 'docent', include: [{ model: User, as: 'User' }] },
+      ]
+    });
+
+    if (!stage) {
+      return res.status(404).json({ msg: 'Stage niet gevonden' });
+    }
+
+    const studentUser = stage.student ? stage.student.User : null;
+    const mentorUser = stage.mentor ? stage.mentor.User : null;
+    const docentUser = stage.docent ? stage.docent.User : null;
+
+    return res.json({
+      id: stage.stage_id,
+      naam: studentUser ? `${studentUser.first_name} ${studentUser.last_name}` : '',
+      studentEmail: studentUser ? studentUser.email : '',
+      functie: '',
+      bedrijf: {
+        naam: stage.bedrijf ? stage.bedrijf.naam : '',
+        adres: stage.bedrijf ? stage.bedrijf.address : '',
+      },
+      stagementor: {
+        naam: mentorUser ? `${mentorUser.first_name} ${mentorUser.last_name}` : '',
+        email: mentorUser ? mentorUser.email : '',
+      },
+      stageDetails: {
+        omschrijving: stage.omschrijving_opdracht || '',
+        start: stage.begin_datum || '',
+        einde: stage.eind_datum || '',
+      },
+      status: stage.status === 'Aanvraag' ? 'in_afwachting' : stage.status === 'Goedgekeurd' ? 'goedgekeurd' : stage.status === 'Afgekeurd' ? 'afgekeurd' : stage.status === 'Aanpassingen_vereist' ? 'aanpassingen' : stage.status,
+      rawStatus: stage.status,
+      datum: stage.createdAt ? new Date(stage.createdAt).toLocaleDateString('nl-BE') : '',
+      feedback: stage.feedback || null,
+    });
+  } catch (error) {
+    console.error('Error fetching stage:', error);
+    return res.status(500).json({ msg: 'Fout bij ophalen van stage' });
+  }
+});
+
+// ✅ GET stage by student_id (for logged-in student)
+app.get('/api/stages/student/:studentId', async (req, res) => {
+  try {
+    const stage = await Stage.findOne({
+      where: { student_id: req.params.studentId },
+      include: [
+        { model: Student, as: 'student', include: [{ model: User, as: 'User' }] },
+        { model: Stagementor, as: 'mentor', include: [{ model: User, as: 'User' }] },
+        { model: Bedrijf, as: 'bedrijf' },
+        { model: Docent, as: 'docent', include: [{ model: User, as: 'User' }] },
+      ],
+      order: [['createdAt', 'DESC']]
+    });
+
+    if (!stage) {
+      return res.json({ found: false });
+    }
+
+    const studentUser = stage.student ? stage.student.User : null;
+    const mentorUser = stage.mentor ? stage.mentor.User : null;
+
+    return res.json({
+      found: true,
+      id: stage.stage_id,
+      naam: studentUser ? `${studentUser.first_name} ${studentUser.last_name}` : '',
+      studentEmail: studentUser ? studentUser.email : '',
+      bedrijf: {
+        naam: stage.bedrijf ? stage.bedrijf.naam : '',
+        adres: stage.bedrijf ? stage.bedrijf.address : '',
+      },
+      stagementor: {
+        naam: mentorUser ? `${mentorUser.first_name} ${mentorUser.last_name}` : '',
+        email: mentorUser ? mentorUser.email : '',
+      },
+      stageDetails: {
+        omschrijving: stage.omschrijving_opdracht || '',
+        start: stage.begin_datum || '',
+        einde: stage.eind_datum || '',
+      },
+      status: stage.status === 'Aanvraag' ? 'in_afwachting' : stage.status === 'Goedgekeurd' ? 'goedgekeurd' : stage.status === 'Afgekeurd' ? 'afgekeurd' : stage.status === 'Aanpassingen_vereist' ? 'aanpassingen' : stage.status,
+      rawStatus: stage.status,
+      datum: stage.createdAt ? new Date(stage.createdAt).toLocaleDateString('nl-BE') : '',
+      feedback: stage.feedback || null,
+    });
+  } catch (error) {
+    console.error('Error fetching student stage:', error);
+    return res.status(500).json({ msg: 'Fout bij ophalen van stage' });
+  }
+});
+
+// ✅ PUT update stage (status, feedback, en eventueel bedrijf/mentor)
+app.put('/api/stages/:id', async (req, res) => {
+  try {
+    const { status, feedback, bedrijfNaam, bedrijfAdres, mentorNaam, mentorEmail, omschrijving_opdracht, begin_datum, eind_datum } = req.body;
+
+    const stage = await Stage.findByPk(req.params.id, {
+      include: [
+        { model: Bedrijf, as: 'bedrijf' },
+        { model: Stagementor, as: 'mentor' },
+      ]
+    });
+
+    if (!stage) {
+      return res.status(404).json({ msg: 'Stage niet gevonden' });
+    }
+
+    const updateData = {};
+    if (status) updateData.status = status;
+    if (feedback !== undefined) updateData.feedback = feedback;
+    if (omschrijving_opdracht !== undefined) updateData.omschrijving_opdracht = omschrijving_opdracht;
+    if (begin_datum !== undefined) updateData.begin_datum = begin_datum;
+    if (eind_datum !== undefined) updateData.eind_datum = eind_datum;
+
+    await stage.update(updateData);
+
+    if (bedrijfNaam && stage.bedrijf) {
+      await stage.bedrijf.update({ naam: bedrijfNaam, address: bedrijfAdres || stage.bedrijf.address });
+    }
+
+    if (mentorNaam && stage.mentor) {
+      const mentorUser = await User.findByPk(stage.mentor.user_id);
+      if (mentorUser) await mentorUser.update({ first_name: mentorNaam });
+    }
+    if (mentorEmail && stage.mentor) {
+      const mentorUser = await User.findByPk(stage.mentor.user_id);
+      if (mentorUser) await mentorUser.update({ email: mentorEmail });
+    }
+
+    return res.json({ msg: 'Stage succesvol bijgewerkt', data: stage });
+  } catch (error) {
+    console.error('Error updating stage:', error);
+    return res.status(500).json({ msg: 'Fout bij bijwerken van stage' });
   }
 });
 
