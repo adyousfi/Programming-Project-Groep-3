@@ -31,7 +31,7 @@ btn.addEventListener('click', async () => {
   const password = document.getElementById('password').value;
 
   try {
-    const res = await fetch('http://localhost:3000/login', {
+    const res = await fetch('/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
@@ -67,7 +67,7 @@ btn.addEventListener('click', async () => {
 // ✅ CHECK LOGIN (cookie)
 async function checkLogin() {
   try {
-    const res = await fetch('http://localhost:3000/me', {
+    const res = await fetch('/me', {
       credentials: 'include'
     });
 

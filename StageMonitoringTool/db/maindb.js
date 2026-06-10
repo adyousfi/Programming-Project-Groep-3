@@ -47,7 +47,7 @@ router.delete("/delete-user/:id", deleteUser);
 
 router.post("/create-stage", createStage);
 
-const PORT = 3000;
+const PORT = 3001;
 app.listen(PORT, () => {
     console.log(`Server is successfully running on http://localhost:${PORT}`);
 });
