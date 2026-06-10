@@ -1,18 +1,26 @@
 import Opmerkinglogboek from "../objectModel/opmerkingLogboek.js";
 import { sequelize } from "../dbConnection.js";
+import Logboek from "../objectModel/logboek.js";
 
 const createOpmerkinglogboek = async(req,res,next) =>{
     const{
-        stage_id,
+        logboek_id,
         opmerking
     } = req.body;
-    try{
+    try
+    {
         const opmerkingLogboek = await Opmerkinglogboek.create({
-            stage_id:stage_id,
             opmerking:opmerking
         })
+        await Logboek.update(
+            {
+                opmerkinglogboek_id: opmerkingLogboek.opmerkinglogboek_id
+            },
+            {
+                where:{logboek_id: logboek_id}
+            });
         return res.status(200).json({
-            msg: "Opmerkinglogboek created successfully",
+            msg: "Opmerkinglogboek created and binded successfully",
             data: opmerkingLogboek
         })
     }

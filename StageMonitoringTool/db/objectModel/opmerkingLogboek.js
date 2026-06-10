@@ -1,5 +1,6 @@
 import { sequelize } from "../dbConnection.js";
 import { DataTypes, Deferrable } from "sequelize";
+import logboekController from "../objectControllers/logboekController.js";
 
 const Opmerkinglogboek = sequelize.define("OpmerkingLogboek",{
     opmerkinglogboek_id:{
@@ -7,9 +8,6 @@ const Opmerkinglogboek = sequelize.define("OpmerkingLogboek",{
         allowNull: false,
         primaryKey: true,
         autoIncrement: true,
-    },
-    stage_id:{
-        type: DataTypes.INTEGER,
     },
     opmerking:{
         type: DataTypes.STRING

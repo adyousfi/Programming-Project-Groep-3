@@ -64,13 +64,6 @@ const Stage = sequelize.define("Stage", {
 
 )
 
-// Define associations
-// Define associations
-Stage.belongsTo(Docent, { foreignKey: 'docent_id', onDelete: 'NO ACTION' });
-Stage.belongsTo(Student, { foreignKey: 'student_id', onDelete: 'NO ACTION' });
-Stage.belongsTo(Bedrijf, { foreignKey: 'bedrijf_id', onDelete: 'NO ACTION' });
-Stage.belongsTo(Stagementor, { foreignKey: 'stagementor_id', onDelete: 'NO ACTION' });
-
 const linkStagementorToBedrijf = async (userId, bedrijfId) =>{
     await Stagementor.update(
     { bedrijf_id: bedrijfId }, 

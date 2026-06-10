@@ -42,10 +42,10 @@ router.post("/create-bedrijf",bedrijfController.createBedrijf)
 
 //Logboeken
 router.post("/create-logboek",logboekController.createLogboek)
+router.post("/assignopmerking-logboek",logboekController.assignOpmerkingToLogboek)
 
 //Opmerking Logboeken
 router.post("/create-opmerkinglogboek",opmerkingLogboekController.createOpmerkinglogboek)
-
 
 const PORT = 3000;
 app.listen(PORT, () => {

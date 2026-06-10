@@ -1,5 +1,6 @@
 import { sequelize } from "../dbConnection.js";
 import { DataTypes, Deferrable } from "sequelize";
+import Opmerkinglogboek from "./opmerkingLogboek.js";
 
 export const status = {
     NIETINGEVULD: "NIETINGEVULD",
@@ -19,6 +20,10 @@ const Logboek = sequelize.define("Logboek", {
     stage_id:{
         type: DataTypes.INTEGER,
         allowNull: false,
+    },
+    opmerkinglogboek_id:{
+        type:DataTypes.INTEGER,
+        allowNull:true
     },
 
     uitgevoerdeTaken:{
@@ -49,5 +54,7 @@ const Logboek = sequelize.define("Logboek", {
         timestamps: true,
     }
 )
+
+Logboek.belongsTo(Opmerkinglogboek, { foreignKey: 'opmerkinglogboek_id', onDelete: 'SET NULL'});
 
 export default Logboek;
