@@ -167,9 +167,10 @@ export function renderStageformulier(container) {
                 // ignore localStorage errors
             }
             window.location.href = '/?role=wachten';
-            fetch('/api/proposals', {
+            fetch('/api/stages', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
                 body: JSON.stringify(proposal),
             }).catch(() => {});
         });

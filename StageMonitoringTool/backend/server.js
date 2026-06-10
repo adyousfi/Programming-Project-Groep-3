@@ -6,6 +6,11 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { run } from '../db/dbConnection.js';
 import User from '../db/userModel/user.js';
+import Student from '../db/userModel/student.js';
+import Stagementor from '../db/userModel/stagementor.js';
+import Bedrijf from '../db/objectModel/bedrijf.js';
+import Stage from '../db/objectModel/stage.js';
+import Docent from '../db/userModel/docent.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -141,6 +146,69 @@ app.delete('/api/proposals/:id', (req, res) => {
   }
   writeProposals(filtered);
   res.json({ success: true });
+});
+
+// ✅ STAGES API (Database)
+app.post('/api/stages', async (req, res) => {
+  try {
+    const {
+      studentNaam, studentNummer,
+      bedrijfNaam, bedrijfAdres,
+      mentorNaam, mentorEmail,
+      opdrachtOmschrijving,
+      periodeStart, periodeEind
+    } = req.body;
+
+    // 1. Get student_id from cookie
+    const cookieUser = req.cookies.user;
+    if (!cookieUser) {
+      return res.status(401).json({ msg: 'Niet ingelogd' });
+    }
+    const studentProfile = await Student.findByPk(cookieUser.user_id);
+    if (!studentProfile) {
+      return res.status(400).json({ msg: 'Geen studentprofiel gevonden' });
+    }
+    const student_id = studentProfile.user_id;
+
+    // 2. Create Bedrijf
+    const bedrijf = await Bedrijf.create({
+      naam: bedrijfNaam,
+      address: bedrijfAdres
+    });
+
+    // 3. Create Stagementor user + sub-profile
+    const mentorUser = await User.create({
+      first_name: mentorNaam,
+      last_name: '',
+      email: mentorEmail,
+      password: 'pending',
+      role: 'stagementor',
+      phone: 'no phone'
+    });
+    await Stagementor.create({
+      user_id: mentorUser.user_id,
+      bedrijf_id: bedrijf.bedrijf_id
+    });
+
+    // 4. Create Stage
+    const stage = await Stage.create({
+      student_id,
+      mentor_id: mentorUser.user_id,
+      bedrijfs_id: bedrijf.bedrijf_id,
+      omschrijving_opdracht: opdrachtOmschrijving,
+      status: 'Aanvraag',
+      begin_datum: periodeStart,
+      eind_datum: periodeEind
+    });
+
+    return res.status(201).json({
+      msg: 'Stage succesvol aangemaakt',
+      data: stage
+    });
+  } catch (error) {
+    console.error('Error creating stage:', error);
+    return res.status(500).json({ msg: 'Er is iets misgegaan bij het aanmaken van de stage' });
+  }
 });
 
 app.listen(3000, () => {
