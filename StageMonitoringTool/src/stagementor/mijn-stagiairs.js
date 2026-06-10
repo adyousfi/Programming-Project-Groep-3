@@ -109,69 +109,107 @@ function getWeekRange(stagiair, weekNum) {
   return `${formatShortDate(weekStart)} t/m ${formatShortDate(weekEnd)}`;
 }
 
-function getWeekLogEntries(weekNum) {
-  const sampleWeek1 = [
+function getDayDate(stagiair, weekNum, offset) {
+  const start = parseStageDate(stagiair.start);
+  if (!start) return 'N.v.t.';
+  const date = new Date(start.getTime());
+  date.setDate(date.getDate() + (weekNum - 1) * 7 + offset);
+  return formatShortDate(date);
+}
+
+function getWeekLogEntries(stagiair, weekNum) {
+  const baseEntries = [
     {
-      name: 'Maandag',
-      date: '3 feb',
-      submitted: true,
-      sections: [
-        { title: 'Beschrijving van uitgevoerde taken', text: 'Vandaag heb ik gewerkt aan het opzetten van de ontwikkelomgeving en kennismaking met het team. We hebben een kickoff meeting gehad waar de projectdoelen werden toegelicht.' },
-        { title: 'Reflectie', text: 'Ik heb geleerd hoe belangrijk goede communicatie is binnen een team. Het was interessant om te zien hoe professionele projecten worden opgezet.' },
-        { title: 'Problemen of leerpunten', text: 'Geen bijzondere problemen. Wel veel nieuwe informatie in korte tijd.' },
-      ],
+      title: 'Beschrijving van uitgevoerde taken',
+      text: 'Vandaag heb ik gewerkt aan het opzetten van de ontwikkelomgeving en kennismaking met het team. We hebben een kickoff meeting gehad waar de projectdoelen werden toegelicht.',
     },
     {
-      name: 'Dinsdag',
-      date: '4 feb',
-      submitted: true,
-      sections: [
-        { title: 'Beschrijving van uitgevoerde taken', text: 'Verder gewerkt aan het installeren van dependencies en het bestuderen van de bestaande codebase. Paired programming sessie met een senior developer.' },
-        { title: 'Reflectie', text: 'Agile werkwijze is nieuw voor me maar werkt goed. Korte meetings houden iedereen op de hoogte.' },
-        { title: 'Problemen of leerpunten', text: 'Bug was lastiger dan verwacht, moest debugging tools beter leren gebruiken.' },
-      ],
+      title: 'Reflectie',
+      text: 'Ik heb geleerd hoe belangrijk goede communicatie is binnen een team. Het was interessant om te zien hoe professionele projecten worden opgezet.',
     },
     {
-      name: 'Woensdag',
-      date: '5 feb',
-      submitted: false,
-      sections: [
-        { title: 'Beschrijving van uitgevoerde taken', text: 'Deze dag is nog niet ingevuld door de student.' },
-      ],
-    },
-    {
-      name: 'Donderdag',
-      date: '6 feb',
-      submitted: true,
-      sections: [
-        { title: 'Beschrijving van uitgevoerde taken', text: 'Gewerkt aan een bugfix in de user interface. Deelgenomen aan daily standup en sprint planning meeting.' },
-        { title: 'Reflectie', text: 'Agile werkwijze is nieuw voor me maar werkt goed. Korte meetings houden iedereen op de hoogte.' },
-        { title: 'Problemen of leerpunten', text: 'Bug was lastiger dan verwacht, moest debugging tools beter leren gebruiken.' },
-      ],
-    },
-    {
-      name: 'Vrijdag',
-      date: '7 feb',
-      submitted: true,
-      sections: [
-        { title: 'Beschrijving van uitgevoerde taken', text: 'Afronding van de bugfix en deployment naar testomgeving. Retrospective meeting met het team over de afgelopen sprint.' },
-        { title: 'Reflectie', text: 'Eerste week succesvol afgerond. Ik voel me meer onderdeel van het team en begrijp de workflow beter.' },
-        { title: 'Problemen of leerpunten', text: 'Geen bijzondere problemen meer. Goede eerste week gehad.' },
-      ],
+      title: 'Problemen of leerpunten',
+      text: 'Geen bijzondere problemen. Wel veel nieuwe informatie in korte tijd.',
     },
   ];
 
-  if (weekNum === 1) {
-    return sampleWeek1;
-  }
-
-  return [
-    { name: 'Maandag', date: 'N.v.t.', submitted: false, sections: [{ title: 'Beschrijving van uitgevoerde taken', text: 'Deze dag is nog niet ingevuld door de student.' }] },
-    { name: 'Dinsdag', date: 'N.v.t.', submitted: false, sections: [{ title: 'Beschrijving van uitgevoerde taken', text: 'Deze dag is nog niet ingevuld door de student.' }] },
-    { name: 'Woensdag', date: 'N.v.t.', submitted: false, sections: [{ title: 'Beschrijving van uitgevoerde taken', text: 'Deze dag is nog niet ingevuld door de student.' }] },
-    { name: 'Donderdag', date: 'N.v.t.', submitted: false, sections: [{ title: 'Beschrijving van uitgevoerde taken', text: 'Deze dag is nog niet ingevuld door de student.' }] },
-    { name: 'Vrijdag', date: 'N.v.t.', submitted: false, sections: [{ title: 'Beschrijving van uitgevoerde taken', text: 'Deze dag is nog niet ingevuld door de student.' }] },
+  const week2Entries = [
+    {
+      title: 'Beschrijving van uitgevoerde taken',
+      text: 'Vandaag heb ik gewerkt aan het opzetten van de ontwikkelomgeving en kennismaking met het team. We hebben een kickoff meeting gehad waar de projectdoelen werden toegelicht.',
+    },
+    {
+      title: 'Reflectie',
+      text: 'Ik heb geleerd hoe belangrijk goede communicatie is binnen een team. Het was interessant om te zien hoe professionele projecten worden opgezet.',
+    },
+    {
+      title: 'Problemen of leerpunten',
+      text: 'Geen bijzondere problemen. Wel veel nieuwe informatie in korte tijd.',
+    },
   ];
+
+  const week3Entries = [
+    {
+      title: 'Beschrijving van uitgevoerde taken',
+      text: 'Verder gewerkt aan het installeren van dependencies en het bestuderen van de bestaande codebase. Paired programming sessie met een senior developer.',
+    },
+    {
+      title: 'Reflectie',
+      text: 'Agile werkwijze is nieuw voor me maar werkt goed. Korte meetings houden iedereen op de hoogte.',
+    },
+    {
+      title: 'Problemen of leerpunten',
+      text: 'Bug was lastiger dan verwacht, moest debugging tools beter leren gebruiken.',
+    },
+  ];
+
+  const week4Entries = [
+    {
+      title: 'Beschrijving van uitgevoerde taken',
+      text: 'Gewerkt aan een bugfix in de user interface. Deelgenomen aan daily standup en sprint planning meeting.',
+    },
+    {
+      title: 'Reflectie',
+      text: 'Agile werkwijze is nieuw voor me maar werkt goed. Korte meetings houden iedereen op de hoogte.',
+    },
+    {
+      title: 'Problemen of leerpunten',
+      text: 'Bug was lastiger dan verwacht, moest debugging tools beter leren gebruiken.',
+    },
+  ];
+
+  const week5Entries = [
+    {
+      title: 'Beschrijving van uitgevoerde taken',
+      text: 'Afronding van de bugfix en deployment naar testomgeving. Retrospective meeting met het team over de afgelopen sprint.',
+    },
+    {
+      title: 'Reflectie',
+      text: 'Eerste week succesvol afgerond. Ik voel me meer onderdeel van het team en begrijp de workflow beter.',
+    },
+    {
+      title: 'Problemen of leerpunten',
+      text: 'Geen bijzondere problemen meer. Goede eerste week gehad.',
+    },
+  ];
+
+  const entriesByWeek = {
+    1: baseEntries,
+    2: week2Entries,
+    3: week3Entries,
+    4: week4Entries,
+    5: week5Entries,
+  };
+
+  const selectedEntries = entriesByWeek[weekNum] || baseEntries;
+
+  const dayNames = ['Maandag', 'Dinsdag', 'Woensdag', 'Donderdag', 'Vrijdag'];
+  return dayNames.map((name, index) => {
+    const date = getDayDate(stagiair, weekNum, index);
+    const submitted = weekNum <= stagiair.currentWeek;
+    const sections = selectedEntries.map(entry => ({ title: entry.title, text: entry.text }));
+    return { name, date, submitted, sections };
+  });
 }
 
 function smGetWeekComment(email, week) {
@@ -607,15 +645,13 @@ function renderStudentDetail(app, stagiair) {
             </aside>
             <main class="sm-main sm-main--detail">
               <div class="sm-detail-top">
-                <a href="#" class="sm-detail-back" id="sm-back-week">← Terug naar logboek</a>
+                <div class="sm-detail-back-group">
+                  <a href="#" class="sm-detail-back" id="sm-back-stagiairs">← Terug naar stagiairs</a>
+                  <a href="#" class="sm-detail-back sm-detail-back--secondary" id="sm-back-week">← Terug naar weekoverzicht</a>
+                </div>
                 <div>
                   <h1 class="sm-detail-title">Week ${week}</h1>
                   <p class="sm-detail-subtitle">${weekRange}</p>
-                  <div class="sm-week-summary-row">
-                    <span class="sm-status-pill ${afgevinkt ? 'sm-status--ok' : 'sm-status--pending'}">${afgevinkt ? 'Afgevinkt' : 'Open'}</span>
-                    <button class="sm-button sm-week-check" id="sm-week-toggle">${afgevinkt ? 'Markeer als niet afgevinkt' : 'Week afvinken'}</button>
-                  </div>
-                  <p class="sm-detail-email">Bekijk het logboek van ${stagiair.naam}</p>
                 </div>
               </div>
               <div class="sm-week-day-list">
@@ -637,6 +673,11 @@ function renderStudentDetail(app, stagiair) {
                   </div>
                 `).join('')}
               </div>
+              <div class="sm-week-action-card">
+                <h2>Week afvinken</h2>
+                <p class="sm-week-action-text">Vink deze week af wanneer je alle logboeken hebt gecontroleerd en goedgekeurd.</p>
+                <button class="sm-button sm-button--success" id="sm-week-toggle">Week afvinken</button>
+              </div>
               <div class="sm-week-comment-card">
                 <label class="sm-week-comment-label" for="sm-week-comment">Opmerking bij Week ${week}</label>
                 <textarea id="sm-week-comment" class="sm-week-comment" placeholder="Laat hier een opmerking of reactie achter bij het logboek van deze week...">${comment}</textarea>
@@ -647,6 +688,11 @@ function renderStudentDetail(app, stagiair) {
             </main>
           </div>
         `;
+
+        document.querySelector('#sm-back-stagiairs').addEventListener('click', function(event) {
+          event.preventDefault();
+          renderMijnStagiairs(app);
+        });
 
         document.querySelector('#sm-back-week').addEventListener('click', function(event) {
           event.preventDefault();
