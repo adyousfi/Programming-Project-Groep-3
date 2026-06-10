@@ -3,29 +3,121 @@
 <head>
   <meta charset="UTF-8" />
   <title>Stagemonitoringtool</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #f7f8fc;
+    }
+
+    #login-page {
+      display: none;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .login-card {
+      background: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 8px 40px rgba(0, 0, 0, 0.12);
+      padding: 56px 52px;
+      width: 100%;
+      max-width: 500px;
+    }
+
+    .login-title {
+      font-size: 2.1rem;
+      font-weight: 700;
+      color: #111827;
+      text-align: center;
+      margin-bottom: 6px;
+    }
+
+    .login-subtitle {
+      font-size: 1rem;
+      color: #6b7a99;
+      text-align: center;
+      margin-bottom: 36px;
+    }
+
+    .login-field {
+      margin-bottom: 20px;
+    }
+
+    .login-label {
+      display: block;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: #111827;
+      margin-bottom: 8px;
+    }
+
+    .login-input {
+      width: 100%;
+      padding: 16px 18px;
+      border: 1.5px solid #e5e7eb;
+      border-radius: 10px;
+      font-size: 1rem;
+      color: #111827;
+      background: #fff;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .login-input:focus {
+      border-color: #2563eb;
+    }
+
+    .login-btn {
+      width: 100%;
+      padding: 17px;
+      margin-top: 8px;
+      background: #2563eb;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .login-btn:hover { background: #1d4ed8; }
+    .login-btn:disabled { background: #93c5fd; cursor: not-allowed; }
+
+    .login-msg {
+      text-align: center;
+      margin-top: 14px;
+      font-size: 0.9rem;
+      min-height: 20px;
+    }
+  </style>
 </head>
-<body style="margin:0; font-family:sans-serif;">
+<body>
 
   <!-- App container (voor de rol-pagina's) -->
   <div id="app" style="display:none;"></div>
 
   <!-- Login pagina -->
-  <div id="login-page" style="display:none; justify-content:center; align-items:center; height:100vh;">
-    <div style="background:#f0f0f0; padding:30px; border-radius:10px; width:300px;">
-      <h2 style="text-align:center;">Login</h2>
+  <div id="login-page">
+    <div class="login-card">
+      <h1 class="login-title">Stage Monitoring Tool</h1>
+      <p class="login-subtitle">Erasmushogeschool Brussel</p>
 
-      <input id="email" type="email" placeholder="Email"
-        style="width:100%; padding:10px; margin-bottom:10px; box-sizing:border-box; border:1px solid #dee2e6; border-radius:6px; font-size:1rem;">
+      <div class="login-field">
+        <label class="login-label" for="email">Email</label>
+        <input id="email" type="email" placeholder="student@ehb.be" class="login-input">
+      </div>
 
-      <input id="password" type="password" placeholder="Wachtwoord"
-        style="width:100%; padding:10px; margin-bottom:10px; box-sizing:border-box; border:1px solid #dee2e6; border-radius:6px; font-size:1rem;">
+      <div class="login-field">
+        <label class="login-label" for="password">Wachtwoord</label>
+        <input id="password" type="password" placeholder="••••••••" class="login-input">
+      </div>
 
-      <button id="btn"
-        style="width:100%; padding:10px; background:#667eea; color:white; border:none; border-radius:6px; font-size:1rem; font-weight:600; cursor:pointer;">
-        Login
-      </button>
-
-      <p id="msg" style="text-align:center; margin-top:10px;"></p>
+      <button id="btn" class="login-btn">Login</button>
+      <p id="msg" class="login-msg"></p>
     </div>
   </div>
 
