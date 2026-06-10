@@ -79,9 +79,18 @@ app.post('/login', async (req, res) => {
 });
 
 // ✅ CHECK login via cookie
-app.get('/me', (req, res) => {
+app.get('/me', async (req, res) => {
   if (req.cookies.user) {
-    res.json({ loggedIn: true, user: req.cookies.user });
+    const cookie = req.cookies.user;
+    if (!cookie.last_name && cookie.user_id) {
+      const fullUser = await User.findByPk(cookie.user_id);
+      if (fullUser) {
+        cookie.last_name = fullUser.last_name;
+        cookie.first_name = fullUser.first_name;
+        res.cookie('user', cookie, { httpOnly: true, maxAge: 1000 * 60 * 60, sameSite: 'lax' });
+      }
+    }
+    res.json({ loggedIn: true, user: cookie });
   } else {
     res.json({ loggedIn: false });
   }
@@ -90,6 +99,7 @@ app.get('/me', (req, res) => {
 // ✅ LOGOUT
 app.post('/logout', (req, res) => {
   res.clearCookie('user');
+  res.cookie('user', '', { maxAge: 0, httpOnly: true, sameSite: 'lax' });
   res.json({ success: true });
 });
 
