@@ -1,4 +1,4 @@
-import { sequelize } from "sequelize";
+import { sequelize } from './dbConnection.js';
 import dotenv from 'dotenv';
 
 import User from "./userModel/user.js";
@@ -51,3 +51,5 @@ Stage.belongsTo(Stagementor, { foreignKey: 'stagementor_id', onDelete: 'NO ACTIO
 //Logboek & Opmerking Relaties
 Opmerkinglogboek.hasMany(Logboek, { foreignKey: 'opmerkinglogboek_id' });
 Logboek.belongsTo(Opmerkinglogboek, { foreignKey: 'opmerkinglogboek_id', onDelete: 'SET NULL'});
+
+export const confirmRelations = "relations are made";

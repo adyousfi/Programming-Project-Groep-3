@@ -9,9 +9,10 @@ import bedrijfController from "./objectControllers/bedrijfController.js";
 import Bedrijf from "./objectModel/bedrijf.js";
 import logboekController from "./objectControllers/logboekController.js";
 import opmerkingLogboekController from "./objectControllers/opmerkingLogboekController.js";
-
+import { confirmRelations } from "./allimport.js";
+import { runRelationTest } from "./testrelation.js";
 await run();
-
+console.log(confirmRelations)
 // Create the router instance using lowercase 'router'
 const router = express.Router();
 
@@ -27,6 +28,9 @@ app.use(router);
 
 //needs to be runned first because it drops all tables to not make any duplicates
 await seedDatabase();
+
+//test of de relatie klopt
+runRelationTest();
 
 //Users
 router.post("/create-user", userController.createUser)
