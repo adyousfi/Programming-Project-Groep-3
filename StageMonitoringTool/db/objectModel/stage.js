@@ -12,6 +12,7 @@ export const status = {
     AANVRAAG: 'Aanvraag',
     GOEDGEKEURD: 'Goedgekeurd',
     AANPASSINGENVEREISD: 'Aanpassingen_vereist',
+    AFGEKEURD: 'Afgekeurd',
     DOCUMENTGEUPLOADED: 'documentgeuploaded',
     KLAAR: 'klaar'
 };
@@ -66,6 +67,11 @@ const Stage = sequelize.define("stage", {
     eind_datum: {
         type: DataTypes.DATE,
         allowNull: true,
+    },
+    feedback: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+        comment: "Feedback from stagecommissie"
     },
     },
     {
