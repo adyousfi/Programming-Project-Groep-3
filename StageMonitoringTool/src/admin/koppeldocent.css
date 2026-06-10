@@ -101,3 +101,65 @@
 .kp-btn--wijzigen:hover {
   background: #eff6ff;
 }
+
+.kp-modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 100;
+  justify-content: center;
+  align-items: center;
+}
+
+.kp-modal-overlay.active {
+  display: flex;
+}
+
+.kp-modal {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 28px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+}
+
+.kp-modal-titel {
+  font-size: 18px;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 20px;
+}
+
+.kp-modal-body {
+  margin-bottom: 24px;
+}
+
+.kp-modal-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 8px;
+}
+
+.kp-modal-select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #111827;
+  outline: none;
+}
+
+.kp-modal-select:focus {
+  border-color: #2563eb;
+}
+
+.kp-modal-acties {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
