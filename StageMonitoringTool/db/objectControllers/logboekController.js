@@ -42,10 +42,15 @@ const assignOpmerkingToLogboek = async (req,res,next) =>{
     } = req.body;
 
     try{
-        const ulogboek = await Logboek.update({
-            opmerkinglogboek_id: opmerkinglogboek_id,
+        const ulogboek = await Logboek.update(
+        {
+             opmerkinglogboek_id: opmerkinglogboek_id,
+        },
+        {
             where:{ stage_id: stage_id}
-        })
+        }          
+            
+        )
         return res.status(200).json({
             msg: "Logboek updated successfully",
             data: ulogboek

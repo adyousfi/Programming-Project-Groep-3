@@ -11,6 +11,9 @@ import logboekController from "./objectControllers/logboekController.js";
 import opmerkingLogboekController from "./objectControllers/opmerkingLogboekController.js";
 import { confirmRelations } from "./allimport.js";
 import { runRelationTest } from "./testrelation.js";
+import behaaldeScoreController from "./objectControllers/behaaldeScoreController.js";
+import competentieController from "./objectControllers/competentieController.js";
+import rubriekController from "./objectControllers/rubriekController.js";
 await run();
 console.log(confirmRelations)
 // Create the router instance using lowercase 'router'
@@ -50,6 +53,17 @@ router.post("/assignopmerking-logboek",logboekController.assignOpmerkingToLogboe
 
 //Opmerking Logboeken
 router.post("/create-opmerkinglogboek",opmerkingLogboekController.createOpmerkinglogboek)
+
+//Behaaldescores
+router.post("/createbehaaldescore",behaaldeScoreController.createBehaaldescore)
+
+//Competenties
+router.post("/create-competentie",competentieController.createCompetentie)
+
+//Rubriek
+router.post("/create-rubriek",rubriekController.createRubriek)
+
+
 
 const PORT = 3000;
 app.listen(PORT, () => {

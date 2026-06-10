@@ -11,6 +11,7 @@ import Bedrijf from "./objectModel/bedrijf.js";
 import Stage from "./objectModel/stage.js";
 import Logboek from "./objectModel/logboek.js";
 import Opmerkinglogboek from "./objectModel/opmerkingLogboek.js";
+import Behaaldescore from './objectModel/behaaldeScore.js';
 
 //RELATIONS
 
@@ -47,9 +48,11 @@ Stage.belongsTo(Docent, { foreignKey: 'docent_id', onDelete: 'NO ACTION' });
 Stage.belongsTo(Student, { foreignKey: 'student_id', onDelete: 'NO ACTION' });
 Stage.belongsTo(Bedrijf, { foreignKey: 'bedrijf_id', onDelete: 'NO ACTION' });
 Stage.belongsTo(Stagementor, { foreignKey: 'stagementor_id', onDelete: 'NO ACTION' });
-
+Stage.hasMany(Behaaldescore, { foreignKey: 'stage_id', onDelete: 'CASCADE' });
 //Logboek & Opmerking Relaties
 Opmerkinglogboek.hasMany(Logboek, { foreignKey: 'opmerkinglogboek_id' });
 Logboek.belongsTo(Opmerkinglogboek, { foreignKey: 'opmerkinglogboek_id', onDelete: 'SET NULL'});
 
+//behaaldescore
+Behaaldescore.belongsTo(Stage, { foreignKey: 'stage_id' });
 export const confirmRelations = "relations are made";
