@@ -1,0 +1,190 @@
+/* Reset */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: Inter, Arial, sans-serif;
+}
+
+/* Layout */
+.app {
+  display: flex;
+  min-height: 100vh;
+  background: #f9fafb;
+}
+
+/* SIDEBAR */
+.sidebar {
+  width: 250px;
+  background: white;
+  border-right: 1px solid #e5e7eb;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-header {
+  padding: 20px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.sidebar-title {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.sidebar-subtitle {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.sidebar-nav {
+  padding: 20px;
+  flex: 1;
+}
+
+.nav-item {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 6px;
+  border-radius: 6px;
+  background: transparent;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+}
+
+.nav-item:hover {
+  background: #f3f4f6;
+}
+
+.nav-item.active {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+/* FOOTER */
+.sidebar-footer {
+  padding: 20px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.logout {
+  color: #2563eb;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+/* MAIN CONTENT */
+.main {
+  flex: 1;
+  padding: 40px;
+}
+
+/* TITELS */
+.title {
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+/* SECTIONS */
+.section {
+  margin-bottom: 40px;
+}
+
+.section-title {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.section-title.orange {
+  color: #b45309;
+}
+
+/* TABLE */
+.card {
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  overflow: hidden;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th {
+  font-size: 14px;
+  padding: 14px;
+  text-align: left;
+}
+
+td {
+  padding: 14px;
+  font-size: 14px;
+}
+
+thead.orange {
+  background: #fff7ed;
+  border-bottom: 1px solid #fed7aa;
+}
+
+thead.gray {
+  background: #f9fafb;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+/* ROWS */
+.row-warning {
+  background: #fffbeb;
+}
+
+tr {
+  border-bottom: 1px solid #f3f4f6;
+}
+
+/* BADGES */
+.badge {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+}
+
+.badge-warning {
+  background: #fde68a;
+  color: #92400e;
+}
+
+.badge-success {
+  background: #bbf7d0;
+  color: #166534;
+}
+
+/* BUTTONS */
+.btn-primary {
+  background: #2563eb;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-primary:hover {
+  background: #1d4ed8;
+}
+
+.btn-outline {
+  border: 1px solid #2563eb;
+  color: #2563eb;
+  background: white;
+  padding: 4px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.btn-outline:hover {
+  background: #eff6ff;
+}

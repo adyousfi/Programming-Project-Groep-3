@@ -1,4 +1,6 @@
 import './admin.css';
+import { renderKoppelingen } from './koppeldocent.js';
+
 
 const API_URL = 'http://localhost:3001';
 
@@ -8,7 +10,7 @@ const roleDisplayMap = {
   'stagementor': 'Stagementor',
   'stagecommisie': 'Stagecommissie',
   'admin': 'Administratie'
-};
+};  
 
 export function renderAdmin(app) {
   app.innerHTML = `
@@ -20,7 +22,7 @@ export function renderAdmin(app) {
         </div>
         <nav class="sidebar-nav">
           <a href="#" class="nav-item active">Gebruikers</a>
-          <a href="#" class="nav-item">Koppelingen</a>
+          <a href="#" class="nav-item" id="navKoppelingen">Koppelingen</a>
           <a href="#" class="nav-item">Documenten</a>
           <a href="#" class="nav-item">Competenties</a>
         </nav>
@@ -229,6 +231,12 @@ export function renderAdmin(app) {
     document.querySelectorAll('.btn-edit').forEach(btn => {
       btn.addEventListener('click', () => openEditModal(btn.dataset.id));
     });
+    const navKoppelingen = document.getElementById('navKoppelingen');
+
+    navKoppelingen.addEventListener('click', (e) => {
+    e.preventDefault();
+    renderKoppelingen(app);
+});
 
     // Add delete button listeners
     document.querySelectorAll('.btn-deactivate').forEach(btn => {
