@@ -40,7 +40,7 @@ const Stage = sequelize.define("Stage", {
         allowNull: true,
     },
     omschrijving_opdracht: {
-        type: DataTypes.TEXT,
+        type: DataTypes.STRING,
         allowNull: true,
     },
     status: {
