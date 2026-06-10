@@ -1,5 +1,6 @@
 import './feedback.css';
 import { getActiveProposalId, getProposalById } from './dataService.js';
+import { logout } from '../utils/auth.js';
 
 export async function renderFeedback(container, userName = '[Studentnaam]') {
     container.innerHTML = `<div class="feedback-dashboard"><main class="dashboard-content"><p>Feedback laden...</p></main></div>`;
@@ -24,7 +25,7 @@ export async function renderFeedback(container, userName = '[Studentnaam]') {
                 </div>
                 <div class="user-profile">
                     <span class="user-name" id="user-name-display">${proposal?.studentNaam || userName}</span>
-                    <a href="/" class="logout-link">Uitloggen</a>
+                    <button id="feedback-logout-btn" class="logout-link">Uitloggen</button>
                 </div>
             </header>
 
@@ -103,6 +104,8 @@ export async function renderFeedback(container, userName = '[Studentnaam]') {
             </main>
         </div>
     `;
+
+    container.querySelector('#feedback-logout-btn').addEventListener('click', logout);
 
     const adjustBtn = container.querySelector('.action-button');
     if (adjustBtn) {

@@ -1,5 +1,6 @@
 import './wachten.css';
 import { getActiveProposalId } from './dataService.js';
+import { logout } from '../utils/auth.js';
 
 export function renderWachten(container, userName = '[Studentnaam]') {
     const activeId = getActiveProposalId() || 'onbekend';
@@ -20,7 +21,7 @@ export function renderWachten(container, userName = '[Studentnaam]') {
                 </div>
                 <div class="sidebar-bottom">
                     <span class="sidebar-user-name">${userName}</span>
-                    <a href="/" class="sidebar-logout">Uitloggen</a>
+                    <button id="wachten-logout-btn" class="sidebar-logout">Uitloggen</button>
                 </div>
             </aside>
 
@@ -79,4 +80,6 @@ export function renderWachten(container, userName = '[Studentnaam]') {
 
         </div>
     `;
+
+    container.querySelector('#wachten-logout-btn').addEventListener('click', logout);
 }
