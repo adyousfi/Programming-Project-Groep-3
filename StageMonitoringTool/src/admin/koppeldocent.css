@@ -29,8 +29,8 @@
 }
 
 .kp-thead--oranje tr {
-  background: #fff7ed;
-  border-bottom: 1px solid #fed7aa;
+  background: #fde8c8;
+  border-bottom: 1px solid #fbbf70;
 }
 
 .kp-tabel th {
@@ -53,7 +53,7 @@
 }
 
 .kp-rij--oranje {
-  background: #fffbf5;
+  background: #fef0d8;
 }
 
 .kp-badge {
