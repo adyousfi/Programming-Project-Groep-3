@@ -37,7 +37,8 @@ const app = express();
 app.use(router);
 
 // Seed database
-//await seedDatabase();
+
+// await seedDatabase();
 
 // Routes
 router.post("/create-user", createUser);

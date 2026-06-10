@@ -1,7 +1,19 @@
 import './student.css';
 
 
-export function renderStudentDashboard(container, userName = '[Studentnaam placeholder]') {
+export async function renderStudentDashboard(container, userName = '') {
+    if (!userName) {
+        try {
+            const res = await fetch('/me', { credentials: 'include' });
+            const data = await res.json();
+            if (data.loggedIn && data.user) {
+                userName = data.user.first_name || 'Student';
+            }
+        } catch {
+            userName = 'Student';
+        }
+    }
+
     container.innerHTML = `
         <div class="student-dashboard">
             <!-- Header Sectie -->

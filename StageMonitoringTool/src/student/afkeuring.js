@@ -1,30 +1,21 @@
-import './wachten.css';
+import './afkeuring.css';
 
-export async function renderWachten(container, userName = '') {
-    if (!userName) {
-        try {
-            const res = await fetch('/me', { credentials: 'include' });
-            const data = await res.json();
-            if (data.loggedIn && data.user) {
-                userName = data.user.first_name || 'Student';
-            }
-        } catch {
-            userName = 'Student';
-        }
-    }
+export function renderAfkeuring(container, userName = '[Studentnaam]', stageData = null) {
+    const feedback = stageData?.feedback || 'Geen feedback opgegeven door de stagecommissie.';
+    const bedrijfNaam = stageData?.bedrijf?.naam || 'Onbekend bedrijf';
 
     container.innerHTML = `
-        <div class="wachten-layout">
+        <div class="afkeuring-layout">
 
             <!-- Linkerzijbalk -->
-            <aside class="wachten-sidebar">
+            <aside class="afkeuring-sidebar">
                 <div class="sidebar-top">
                     <div class="sidebar-logo">
                         <span class="sidebar-logo-title">Stage Monitoring</span>
                         <span class="sidebar-logo-sub">Erasmushogeschool Brussel</span>
                     </div>
                     <nav class="sidebar-nav">
-                        <a href="#" class="sidebar-nav-item active">In afwachting</a>
+                        <a href="/?role=student" class="sidebar-nav-item">Nieuwe Aanvraag</a>
                     </nav>
                 </div>
                 <div class="sidebar-bottom">
@@ -34,7 +25,7 @@ export async function renderWachten(container, userName = '') {
             </aside>
 
             <!-- Hoofdinhoud -->
-            <main class="wachten-main">
+            <main class="afkeuring-main">
 
                 <!-- Voortgangsbalk (Stepper) -->
                 <div class="stepper-wrapper">
@@ -45,10 +36,10 @@ export async function renderWachten(container, userName = '') {
                             <span class="step-sub">Voltooid</span>
                         </div>
                         <div class="step-line completed"></div>
-                        <div class="step active">
-                            <div class="step-circle">2</div>
-                            <span class="step-label">In beoordeling</span>
-                            <span class="step-sub">Actief</span>
+                        <div class="step rejected">
+                            <div class="step-circle">&#10007;</div>
+                            <span class="step-label">Afgekeurd</span>
+                            <span class="step-sub">Afgewezen</span>
                         </div>
                         <div class="step-line"></div>
                         <div class="step">
@@ -71,20 +62,36 @@ export async function renderWachten(container, userName = '') {
                     </div>
                 </div>
 
-                <div class="wachten-statusbar">
-                    <span class="wachten-status-pill">Ingediend, wachtend op goedkeuring</span>
-                    <p class="status-description">Je stagevoorstel wordt beoordeeld door de stagecommissie.</p>
+                <div class="afkeuring-statusbar">
+                    <span class="afkeuring-status-pill">Aanvraag afgekeurd</span>
+                    <p class="status-description">Je stagevoorstel voor <strong>${bedrijfNaam}</strong> is helaas afgekeurd door de stagecommissie.</p>
                 </div>
 
-                <section class="wachten-card">
-                    <div class="wachten-card-icon">⏱</div>
-                    <h1>Je stagevoorstel is ingediend</h1>
-                    <p>De stagecommissie zal je aanvraag zo spoedig mogelijk beoordelen. Je ontvangt een melding zodra er een beslissing is genomen.</p>
-                    <p class="wachten-card-note">In afwachting van goedkeuring heb je nog geen toegang tot je stagedossier.</p>
+                <section class="afkeuring-card">
+                    <div class="afkeuring-card-icon">&#10007;</div>
+                    <h1>Stageaanvraag Afgekeurd</h1>
+                    <p>De stagecommissie heeft je aanvraag beoordeeld en besloten deze niet goed te keuren.</p>
+
+                    <div class="afkeuring-feedback-box">
+                        <h3>Feedback van de stagecommissie:</h3>
+                        <p class="afkeuring-feedback-text">${feedback}</p>
+                    </div>
+
+                    <div class="afkeuring-actions">
+                        <p>Je kunt een nieuwe stageaanvraag indienen voor een ander bedrijf of contact opnemen met je docent voor meer informatie.</p>
+                        <button class="afkeuring-btn-primary" id="afkeuring-nieuwe-aanvraag">Nieuwe Stageaanvraag Indienen</button>
+                    </div>
                 </section>
 
             </main>
 
         </div>
     `;
+
+    const nieuwAanvraagBtn = container.querySelector('#afkeuring-nieuwe-aanvraag');
+    if (nieuwAanvraagBtn) {
+        nieuwAanvraagBtn.addEventListener('click', () => {
+            window.location.search = '?role=student';
+        });
+    }
 }

@@ -5,12 +5,14 @@ import Docent from "../userModel/docent.js";
 import Student from "../userModel/student.js";
 import Admin from "../userModel/admin.js";
 import Stagementor from "../userModel/stagementor.js";
+import Bedrijf from "./bedrijf.js";
 
 
 export const status = {
     AANVRAAG: 'Aanvraag',
     GOEDGEKEURD: 'Goedgekeurd',
     AANPASSINGENVEREISD: 'Aanpassingen_vereist',
+    AFGEKEURD: 'Afgekeurd',
     DOCUMENTGEUPLOADED: 'documentgeuploaded',
     KLAAR: 'klaar'
 };
@@ -66,6 +68,11 @@ const Stage = sequelize.define("stage", {
         type: DataTypes.DATE,
         allowNull: true,
     },
+    feedback: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+        comment: "Feedback from stagecommissie"
+    },
     },
     {
         timestamps: true,
@@ -80,5 +87,6 @@ Stage.belongsTo(Docent, { foreignKey: 'docent_id', as: 'docent' });
 Stage.belongsTo(Student, { foreignKey: 'student_id', as: 'student' });
 Stage.belongsTo(Admin, { foreignKey: 'admin_id', as: 'admin' });
 Stage.belongsTo(Stagementor, { foreignKey: 'mentor_id', as: 'mentor' });
+Stage.belongsTo(Bedrijf, { foreignKey: 'bedrijfs_id', as: 'bedrijf' });
 
 export default Stage;

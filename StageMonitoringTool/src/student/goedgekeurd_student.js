@@ -1,6 +1,10 @@
 import './goedgekeurd_student.css';
 
-export function renderGoedgekeurdStudent(container, userName = 'Jan Janssens') {
+export function renderGoedgekeurdStudent(container, userName = 'Jan Janssens', stageData = null) {
+    const bedrijfNaam = stageData?.bedrijf?.naam || 'TechCorp';
+    const startDatum = stageData?.stageDetails?.start ? new Date(stageData.stageDetails.start).toLocaleDateString('nl-BE', { day: 'numeric', month: 'short' }) : '3 feb';
+    const eindDatum = stageData?.stageDetails?.einde ? new Date(stageData.stageDetails.einde).toLocaleDateString('nl-BE', { day: 'numeric', month: 'short' }) : '30 mei';
+
     container.innerHTML = `
         <div class="goedgekeurd-layout">
             <!-- Linkerzijbalk -->
@@ -71,8 +75,8 @@ export function renderGoedgekeurdStudent(container, userName = 'Jan Janssens') {
                             <span class="info-card-icon">&#128197;</span>
                         </div>
                         <div class="info-card-content">
-                            <span class="info-card-main">3 feb - 30 mei</span>
-                            <span class="info-card-sub">16 weken totaal</span>
+                            <span class="info-card-main">${startDatum} - ${eindDatum}</span>
+                            <span class="info-card-sub">Stage goedgekeurd</span>
                         </div>
                     </div>
                     <div class="info-card">
@@ -93,8 +97,8 @@ export function renderGoedgekeurdStudent(container, userName = 'Jan Janssens') {
                             <span class="info-card-icon">&#127970;</span>
                         </div>
                         <div class="info-card-content">
-                            <span class="info-card-main">TechCorp</span>
-                            <span class="info-card-sub">Frontend Developer</span>
+                            <span class="info-card-main">${bedrijfNaam}</span>
+                            <span class="info-card-sub">Stage goedgekeurd</span>
                         </div>
                     </div>
                 </section>

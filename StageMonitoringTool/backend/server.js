@@ -1,28 +1,13 @@
 import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
 import { run } from '../db/dbConnection.js';
 import User from '../db/userModel/user.js';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const PROPOSALS_PATH = path.join(__dirname, '..', 'src', 'data', 'stagevoorstellen.json');
-
-function readProposals() {
-  try {
-    const raw = fs.readFileSync(PROPOSALS_PATH, 'utf-8');
-    return JSON.parse(raw).proposals || [];
-  } catch {
-    return [];
-  }
-}
-
-function writeProposals(proposals) {
-  fs.writeFileSync(PROPOSALS_PATH, JSON.stringify({ proposals }, null, 2));
-}
+import Student from '../db/userModel/student.js';
+import Stagementor from '../db/userModel/stagementor.js';
+import Bedrijf from '../db/objectModel/bedrijf.js';
+import Stage from '../db/objectModel/stage.js';
+import Docent from '../db/userModel/docent.js';
 
 
 const app = express();
@@ -106,41 +91,267 @@ app.post('/logout', (req, res) => {
   res.json({ success: true });
 });
 
-// ✅ PROPOSALS API
-app.get('/api/proposals', (req, res) => {
-  res.json(readProposals());
+// ✅ STAGES API (Database)
+app.get('/api/stages', async (req, res) => {
+  try {
+    const stages = await Stage.findAll({
+      include: [
+        { model: Student, as: 'student', include: [{ model: User, as: 'User' }] },
+        { model: Stagementor, as: 'mentor', include: [{ model: User, as: 'User' }] },
+        { model: Bedrijf, as: 'bedrijf' },
+        { model: Docent, as: 'docent', include: [{ model: User, as: 'User' }] },
+      ]
+    });
+
+    const result = stages.map(s => {
+      const studentUser = s.student ? s.student.User : null;
+      const mentorUser = s.mentor ? s.mentor.User : null;
+      const docentUser = s.docent ? s.docent.User : null;
+
+      return {
+        id: s.stage_id,
+        naam: studentUser ? `${studentUser.first_name} ${studentUser.last_name}` : '',
+        studentEmail: studentUser ? studentUser.email : '',
+        functie: '',
+        bedrijf: {
+          naam: s.bedrijf ? s.bedrijf.naam : '',
+          adres: s.bedrijf ? s.bedrijf.address : '',
+          contactpersoon: '',
+          email: '',
+          telefoon: '',
+        },
+        stagementor: {
+          naam: mentorUser ? `${mentorUser.first_name} ${mentorUser.last_name}` : '',
+          email: mentorUser ? mentorUser.email : '',
+          telefoon: mentorUser ? mentorUser.phone : '',
+        },
+        docent: {
+          naam: docentUser ? `${docentUser.first_name} ${docentUser.last_name}` : '',
+          email: docentUser ? docentUser.email : '',
+        },
+        stageDetails: {
+          omschrijving: s.omschrijving_opdracht || '',
+          start: s.begin_datum || '',
+          einde: s.eind_datum || '',
+          urenPerWeek: '',
+        },
+        status: s.status === 'Aanvraag' ? 'in_afwachting' : s.status === 'Goedgekeurd' ? 'goedgekeurd' : s.status === 'Afgekeurd' ? 'afgekeurd' : s.status === 'Aanpassingen_vereist' ? 'aanpassingen' : s.status,
+        datum: s.createdAt ? new Date(s.createdAt).toLocaleDateString('nl-BE') : '',
+        historiek: null,
+      };
+    });
+
+    return res.json(result);
+  } catch (error) {
+    console.error('Error fetching stages:', error);
+    return res.status(500).json({ msg: 'Fout bij ophalen van stages' });
+  }
 });
 
-app.post('/api/proposals', (req, res) => {
-  const proposals = readProposals();
-  const proposal = req.body;
-  if (!proposal.id) {
-    proposal.id = `proposal-${Date.now()}`;
+app.post('/api/stages', async (req, res) => {
+  try {
+    const {
+      studentNaam, studentNummer,
+      bedrijfNaam, bedrijfAdres,
+      mentorNaam, mentorEmail,
+      opdrachtOmschrijving,
+      periodeStart, periodeEind
+    } = req.body;
+
+    // 1. Get student_id from cookie
+    const cookieUser = req.cookies.user;
+    if (!cookieUser) {
+      return res.status(401).json({ msg: 'Niet ingelogd' });
+    }
+    const studentProfile = await Student.findByPk(cookieUser.user_id);
+    if (!studentProfile) {
+      return res.status(400).json({ msg: 'Geen studentprofiel gevonden' });
+    }
+    const student_id = studentProfile.user_id;
+
+    // 2. Create Bedrijf
+    const bedrijf = await Bedrijf.create({
+      naam: bedrijfNaam,
+      address: bedrijfAdres
+    });
+
+    // 3. Create Stagementor user + sub-profile
+    const mentorUser = await User.create({
+      first_name: mentorNaam,
+      last_name: '',
+      email: mentorEmail,
+      password: 'pending',
+      role: 'stagementor',
+      phone: 'no phone'
+    });
+    await Stagementor.create({
+      user_id: mentorUser.user_id,
+      bedrijf_id: bedrijf.bedrijf_id
+    });
+
+    // 4. Create Stage
+    const stage = await Stage.create({
+      student_id,
+      mentor_id: mentorUser.user_id,
+      bedrijfs_id: bedrijf.bedrijf_id,
+      omschrijving_opdracht: opdrachtOmschrijving,
+      status: 'Aanvraag',
+      begin_datum: periodeStart,
+      eind_datum: periodeEind
+    });
+
+    return res.status(201).json({
+      msg: 'Stage succesvol aangemaakt',
+      data: stage
+    });
+  } catch (error) {
+    console.error('Error creating stage:', error);
+    return res.status(500).json({ msg: 'Er is iets misgegaan bij het aanmaken van de stage' });
   }
-  proposals.push(proposal);
-  writeProposals(proposals);
-  res.status(201).json(proposal);
 });
 
-app.put('/api/proposals/:id', (req, res) => {
-  const proposals = readProposals();
-  const index = proposals.findIndex(p => p.id === req.params.id);
-  if (index === -1) {
-    return res.status(404).json({ msg: 'Proposal niet gevonden' });
+// ✅ GET single stage by ID
+app.get('/api/stages/:id', async (req, res) => {
+  try {
+    const stage = await Stage.findByPk(req.params.id, {
+      include: [
+        { model: Student, as: 'student', include: [{ model: User, as: 'User' }] },
+        { model: Stagementor, as: 'mentor', include: [{ model: User, as: 'User' }] },
+        { model: Bedrijf, as: 'bedrijf' },
+        { model: Docent, as: 'docent', include: [{ model: User, as: 'User' }] },
+      ]
+    });
+
+    if (!stage) {
+      return res.status(404).json({ msg: 'Stage niet gevonden' });
+    }
+
+    const studentUser = stage.student ? stage.student.User : null;
+    const mentorUser = stage.mentor ? stage.mentor.User : null;
+    const docentUser = stage.docent ? stage.docent.User : null;
+
+    return res.json({
+      id: stage.stage_id,
+      naam: studentUser ? `${studentUser.first_name} ${studentUser.last_name}` : '',
+      studentEmail: studentUser ? studentUser.email : '',
+      functie: '',
+      bedrijf: {
+        naam: stage.bedrijf ? stage.bedrijf.naam : '',
+        adres: stage.bedrijf ? stage.bedrijf.address : '',
+      },
+      stagementor: {
+        naam: mentorUser ? `${mentorUser.first_name} ${mentorUser.last_name}` : '',
+        email: mentorUser ? mentorUser.email : '',
+      },
+      stageDetails: {
+        omschrijving: stage.omschrijving_opdracht || '',
+        start: stage.begin_datum || '',
+        einde: stage.eind_datum || '',
+      },
+      status: stage.status === 'Aanvraag' ? 'in_afwachting' : stage.status === 'Goedgekeurd' ? 'goedgekeurd' : stage.status === 'Afgekeurd' ? 'afgekeurd' : stage.status === 'Aanpassingen_vereist' ? 'aanpassingen' : stage.status,
+      rawStatus: stage.status,
+      datum: stage.createdAt ? new Date(stage.createdAt).toLocaleDateString('nl-BE') : '',
+      feedback: stage.feedback || null,
+    });
+  } catch (error) {
+    console.error('Error fetching stage:', error);
+    return res.status(500).json({ msg: 'Fout bij ophalen van stage' });
   }
-  proposals[index] = { ...proposals[index], ...req.body, id: req.params.id, laatstBewerktOp: new Date().toISOString() };
-  writeProposals(proposals);
-  res.json(proposals[index]);
 });
 
-app.delete('/api/proposals/:id', (req, res) => {
-  const proposals = readProposals();
-  const filtered = proposals.filter(p => p.id !== req.params.id);
-  if (filtered.length === proposals.length) {
-    return res.status(404).json({ msg: 'Proposal niet gevonden' });
+// ✅ GET stage by student_id (for logged-in student)
+app.get('/api/stages/student/:studentId', async (req, res) => {
+  try {
+    const stage = await Stage.findOne({
+      where: { student_id: req.params.studentId },
+      include: [
+        { model: Student, as: 'student', include: [{ model: User, as: 'User' }] },
+        { model: Stagementor, as: 'mentor', include: [{ model: User, as: 'User' }] },
+        { model: Bedrijf, as: 'bedrijf' },
+        { model: Docent, as: 'docent', include: [{ model: User, as: 'User' }] },
+      ],
+      order: [['createdAt', 'DESC']]
+    });
+
+    if (!stage) {
+      return res.json({ found: false });
+    }
+
+    const studentUser = stage.student ? stage.student.User : null;
+    const mentorUser = stage.mentor ? stage.mentor.User : null;
+
+    return res.json({
+      found: true,
+      id: stage.stage_id,
+      naam: studentUser ? `${studentUser.first_name} ${studentUser.last_name}` : '',
+      studentEmail: studentUser ? studentUser.email : '',
+      bedrijf: {
+        naam: stage.bedrijf ? stage.bedrijf.naam : '',
+        adres: stage.bedrijf ? stage.bedrijf.address : '',
+      },
+      stagementor: {
+        naam: mentorUser ? `${mentorUser.first_name} ${mentorUser.last_name}` : '',
+        email: mentorUser ? mentorUser.email : '',
+      },
+      stageDetails: {
+        omschrijving: stage.omschrijving_opdracht || '',
+        start: stage.begin_datum || '',
+        einde: stage.eind_datum || '',
+      },
+      status: stage.status === 'Aanvraag' ? 'in_afwachting' : stage.status === 'Goedgekeurd' ? 'goedgekeurd' : stage.status === 'Afgekeurd' ? 'afgekeurd' : stage.status === 'Aanpassingen_vereist' ? 'aanpassingen' : stage.status,
+      rawStatus: stage.status,
+      datum: stage.createdAt ? new Date(stage.createdAt).toLocaleDateString('nl-BE') : '',
+      feedback: stage.feedback || null,
+    });
+  } catch (error) {
+    console.error('Error fetching student stage:', error);
+    return res.status(500).json({ msg: 'Fout bij ophalen van stage' });
   }
-  writeProposals(filtered);
-  res.json({ success: true });
+});
+
+// ✅ PUT update stage (status, feedback, en eventueel bedrijf/mentor)
+app.put('/api/stages/:id', async (req, res) => {
+  try {
+    const { status, feedback, bedrijfNaam, bedrijfAdres, mentorNaam, mentorEmail, omschrijving_opdracht, begin_datum, eind_datum } = req.body;
+
+    const stage = await Stage.findByPk(req.params.id, {
+      include: [
+        { model: Bedrijf, as: 'bedrijf' },
+        { model: Stagementor, as: 'mentor' },
+      ]
+    });
+
+    if (!stage) {
+      return res.status(404).json({ msg: 'Stage niet gevonden' });
+    }
+
+    const updateData = {};
+    if (status) updateData.status = status;
+    if (feedback !== undefined) updateData.feedback = feedback;
+    if (omschrijving_opdracht !== undefined) updateData.omschrijving_opdracht = omschrijving_opdracht;
+    if (begin_datum !== undefined) updateData.begin_datum = begin_datum;
+    if (eind_datum !== undefined) updateData.eind_datum = eind_datum;
+
+    await stage.update(updateData);
+
+    if (bedrijfNaam && stage.bedrijf) {
+      await stage.bedrijf.update({ naam: bedrijfNaam, address: bedrijfAdres || stage.bedrijf.address });
+    }
+
+    if (mentorNaam && stage.mentor) {
+      const mentorUser = await User.findByPk(stage.mentor.user_id);
+      if (mentorUser) await mentorUser.update({ first_name: mentorNaam });
+    }
+    if (mentorEmail && stage.mentor) {
+      const mentorUser = await User.findByPk(stage.mentor.user_id);
+      if (mentorUser) await mentorUser.update({ email: mentorEmail });
+    }
+
+    return res.json({ msg: 'Stage succesvol bijgewerkt', data: stage });
+  } catch (error) {
+    console.error('Error updating stage:', error);
+    return res.status(500).json({ msg: 'Fout bij bijwerken van stage' });
+  }
 });
 
 app.listen(3000, () => {

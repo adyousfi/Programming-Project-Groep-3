@@ -1,7 +1,15 @@
 import './formulier.css';
-import { setActiveProposalId } from './dataService.js';
 
-export function renderStageformulier(container) {
+export async function renderStageformulier(container) {
+    let userName = '';
+    try {
+        const res = await fetch('/me', { credentials: 'include' });
+        const data = await res.json();
+        if (data.loggedIn && data.user) {
+            userName = data.user.first_name || '';
+        }
+    } catch {}
+
     container.innerHTML = `
         <div class="form-page-wrapper">
             <div class="form-container">
@@ -16,7 +24,7 @@ export function renderStageformulier(container) {
                         <div class="form-row">
                             <div class="form-group">
                                 <label for="student-naam">Naam *</label>
-                                <input type="text" id="student-naam" value="">
+                                <input type="text" id="student-naam" value="${userName}" readonly>
                             </div>
                             <div class="form-group">
                                 <label for="student-nummer">Studentnummer *</label>
@@ -74,6 +82,7 @@ export function renderStageformulier(container) {
                 </div>
                 
                 <div class="form-footer">
+                    <button type="button" class="btn-fill-random">Vul willekeurig in</button>
                     <button type="button" class="btn-primary">Indienen</button>
                     <button type="button" class="btn-secondary">Annuleren</button>
                 </div>
@@ -88,9 +97,57 @@ export function renderStageformulier(container) {
     const closeBtn = container.querySelector('.form-close-btn');
     const cancelBtn = container.querySelector('.btn-secondary');
     const submitBtn = container.querySelector('.btn-primary');
+    const randomBtn = container.querySelector('.btn-fill-random');
 
     if (closeBtn) closeBtn.addEventListener('click', goBack);
     if (cancelBtn) cancelBtn.addEventListener('click', goBack);
+
+    if (randomBtn) {
+        randomBtn.addEventListener('click', () => {
+            const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
+            const randNum = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+
+            const voornamen = ['Jan', 'Pieter', 'Thomas', 'Lars', 'Mathias', 'Senne', 'Florian', 'Wout', 'Arno', 'Jelle'];
+            const achternamen = ['De Smedt', 'Peeters', 'Janssens', 'Mertens', 'Claes', 'Wouters', 'Goossens', 'Bogaert', 'Dubois', 'Simon'];
+            const bedrijven = ['CloudTech NV', 'WebStudio BVBA', 'Digital Solutions', 'Innovation Labs', 'DataSoft Solutions', 'Mobile Apps Inc', 'TechCorp Belgium', 'SmartSystems'];
+            const straten = ['Brusselsestraat', 'Kerkstraat', 'Steenstraat', 'Keizerlaan', 'Antwerpsesteenweg', 'Technologielaan', 'Gasthuisstraat'];
+            const steden = ['1000 Brussel', '2000 Antwerpen', '3000 Leuven', '9000 Gent', '8000 Brugge'];
+            const functies = ['Frontend Developer', 'Backend Developer', 'Full Stack Developer', 'Mobile Developer', 'DevOps Engineer', 'Data Analyst', 'UX Designer'];
+            const omschrijvingen = [
+                'Bouwen van moderne web interfaces met React en Node.js.',
+                'Ontwikkeling van een cross-platform mobiele applicatie.',
+                'Optimaliseren van cloud infrastructuren en CI/CD pipelines.',
+                'Data-analyse en het bouwen van dashboards voor interne rapportering.',
+                'Ontwerpen en implementeren van RESTful API\'s.',
+                'Werken aan een SaaS-platform voor het beheren van klantrelaties.'
+            ];
+
+            const startDag = randNum(1, 28);
+            const startMaand = randNum(9, 12);
+            const startJaar = 2026;
+            const eindDag = randNum(1, 28);
+            const eindMaand = randNum(1, 6);
+            const eindJaar = 2027;
+
+            const voornaam = pick(voornamen);
+            const achternaam = pick(achternamen);
+            const mentorVoornaam = pick(voornamen);
+            const mentorAchternaam = pick(achternamen);
+
+            container.querySelector('#student-naam').value = `${voornaam} ${achternaam}`;
+            container.querySelector('#student-nummer').value = `20${randNum(20, 99)}${randNum(1000, 9999)}`;
+            container.querySelector('#bedrijf-naam').value = pick(bedrijven);
+            container.querySelector('#bedrijf-adres').value = `${pick(straten)} ${randNum(1, 200)}, ${pick(steden)}`;
+            container.querySelector('#mentor-naam').value = `${mentorVoornaam} ${mentorAchternaam}`;
+            container.querySelector('#mentor-email').value = `${mentorVoornaam.toLowerCase()}.${mentorAchternaam.toLowerCase()}@${pick(['techsolutions.be', 'webstudio.be', 'innovation.be', 'cloudtech.be'])}`;
+            container.querySelector('#opdracht-omschrijving').value = pick(omschrijvingen);
+            container.querySelector('#periode-start').value = `${startJaar}-${String(startMaand).padStart(2, '0')}-${String(startDag).padStart(2, '0')}`;
+            container.querySelector('#periode-eind').value = `${eindJaar}-${String(eindMaand).padStart(2, '0')}-${String(eindDag).padStart(2, '0')}`;
+
+            // Reset border colors
+            container.querySelectorAll('input, textarea').forEach(el => el.style.borderColor = '#ced4da');
+        });
+    }
 
     if (submitBtn) {
         submitBtn.addEventListener('click', (event) => {
@@ -140,7 +197,6 @@ export function renderStageformulier(container) {
             }
 
             const proposal = {
-                id: `proposal-${Date.now()}`,
                 studentNaam: container.querySelector('#student-naam').value.trim(),
                 studentNummer: container.querySelector('#student-nummer').value.trim(),
                 bedrijfNaam: container.querySelector('#bedrijf-naam').value.trim(),
@@ -150,26 +206,14 @@ export function renderStageformulier(container) {
                 opdrachtOmschrijving: container.querySelector('#opdracht-omschrijving').value.trim(),
                 periodeStart: container.querySelector('#periode-start').value,
                 periodeEind: container.querySelector('#periode-eind').value,
-                status: 'wachten',
-                feedback: null,
-                ingediendOp: new Date().toISOString(),
-                laatstBewerktOp: new Date().toISOString()
             };
 
             submitBtn.disabled = true;
-            setActiveProposalId(proposal.id);
-            try {
-                const raw = localStorage.getItem('stagevoorstellen_mock');
-                const proposals = raw ? JSON.parse(raw) : [];
-                proposals.push(proposal);
-                localStorage.setItem('stagevoorstellen_mock', JSON.stringify(proposals, null, 2));
-            } catch (e) {
-                // ignore localStorage errors
-            }
             window.location.href = '/?role=wachten';
-            fetch('/api/proposals', {
+            fetch('/api/stages', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
                 body: JSON.stringify(proposal),
             }).catch(() => {});
         });
