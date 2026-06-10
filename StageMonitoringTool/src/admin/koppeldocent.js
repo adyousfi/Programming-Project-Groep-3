@@ -130,7 +130,7 @@ export function renderKoppelingen(app) {
       </aside>
 
       <main class="main-content">
-        <h1 class="page-title" style="margin-bottom: 28px;">Docent Koppelingen</h1>
+        <h1 class="page-title" style="margin-bottom: 28px; text-align: left;">Docent Koppelingen</h1>
         <section class="kp-sectie" id="sectie-zonder">${renderZonderDocent(zonderDocent)}</section>
         <section class="kp-sectie" id="sectie-gekoppeld">${renderGekoppeld(gekoppeld)}</section>
       </main>
