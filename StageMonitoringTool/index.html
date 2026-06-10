@@ -44,10 +44,16 @@ btn.addEventListener('click', async () => {
       msg.style.color = 'green';
       msg.textContent = "Welkom " + data.user.first_name;
 
-      // ✅ check cookie na login
-      checkLogin();
+      // ✅ redirect op basis van rol
+      const role = data.user.role;
+      if (role) {
+        window.location.href = `http://localhost:5173/?role=${encodeURIComponent(role)}`;
+      } else {
+        checkLogin();
+      }
 
     } else {
+
       msg.style.color = 'red';
       msg.textContent = data.message;
     }
