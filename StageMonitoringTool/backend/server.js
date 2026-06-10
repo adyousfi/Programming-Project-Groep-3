@@ -79,6 +79,13 @@ app.get('/me', (req, res) => {
     res.json({ loggedIn: false });
   }
 });
+app.post('/logout', (req, res) => {
+  res.clearCookie('user', {
+    httpOnly: true,
+    sameSite: 'lax'
+  });
+  res.json({ success: true });
+});
 
 // ✅ LOGOUT
 app.post('/logout', (req, res) => {

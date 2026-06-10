@@ -2,95 +2,33 @@
 <html lang="nl">
 <head>
   <meta charset="UTF-8" />
-  <title>Login</title>
+  <title>Stagemonitoringtool</title>
 </head>
-
 <body style="margin:0; font-family:sans-serif;">
 
-  <div id="app"></div>
+  <!-- App container (voor de rol-pagina's) -->
+  <div id="app" style="display:none;"></div>
 
-  <div id="login-page" style="display:none; justify-content:center; align-items:center; position:fixed; top:0; left:0; width:100%; height:100vh; z-index:10;">
+  <!-- Login pagina -->
+  <div id="login-page" style="display:none; justify-content:center; align-items:center; height:100vh;">
     <div style="background:#f0f0f0; padding:30px; border-radius:10px; width:300px;">
       <h2 style="text-align:center;">Login</h2>
 
       <input id="email" type="email" placeholder="Email"
-        style="width:100%; padding:10px; margin-bottom:10px;"><br>
+        style="width:100%; padding:10px; margin-bottom:10px; box-sizing:border-box; border:1px solid #dee2e6; border-radius:6px; font-size:1rem;">
 
-      <input id="password" type="password" placeholder="Password"
-        style="width:100%; padding:10px; margin-bottom:10px;"><br>
+      <input id="password" type="password" placeholder="Wachtwoord"
+        style="width:100%; padding:10px; margin-bottom:10px; box-sizing:border-box; border:1px solid #dee2e6; border-radius:6px; font-size:1rem;">
 
-      <button id="btn" style="width:100%; padding:10px;">Login</button>
+      <button id="btn"
+        style="width:100%; padding:10px; background:#667eea; color:white; border:none; border-radius:6px; font-size:1rem; font-weight:600; cursor:pointer;">
+        Login
+      </button>
 
-      <p id="msg" style="text-align:center;"></p>
+      <p id="msg" style="text-align:center; margin-top:10px;"></p>
     </div>
   </div>
 
-<script type="module" src="/src/main.js"></script>
-<script>
-const btn = document.getElementById('btn');
-const msg = document.getElementById('msg');
-
-// ✅ LOGIN
-btn.addEventListener('click', async () => {
-  const email = document.getElementById('email').value;
-  const password = document.getElementById('password').value;
-
-  try {
-    const res = await fetch('/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify({ email, password })
-    });
-
-    const data = await res.json();
-
-    if (data.success) {
-      msg.style.color = 'green';
-      msg.textContent = "Welkom " + data.user.first_name;
-
-      // ✅ redirect op basis van rol
-      const role = data.user.role;
-      if (role) {
-        window.location.href = `http://localhost:5173/?role=${encodeURIComponent(role)}`;
-      } else {
-        checkLogin();
-      }
-
-    } else {
-
-      msg.style.color = 'red';
-      msg.textContent = data.message;
-    }
-
-  } catch (err) {
-    msg.style.color = 'red';
-    msg.textContent = "Server fout";
-  }
-});
-
-// ✅ CHECK LOGIN (cookie)
-async function checkLogin() {
-  try {
-    const res = await fetch('/me', {
-      credentials: 'include'
-    });
-
-    const data = await res.json();
-
-    if (data.loggedIn) {
-      console.log("✅ Ingelogd:", data.user.first_name);
-    } else {
-      console.log("❌ Niet ingelogd");
-    }
-  } catch (err) {
-    console.log("Fout bij checkLogin");
-  }
-}
-
-// ✅ check bij page load
-checkLogin();
-</script>
-
+  <script type="module" src="/src/main.js"></script>
 </body>
 </html>

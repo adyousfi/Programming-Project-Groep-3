@@ -1,6 +1,20 @@
 import './mijn-studenten.css';
 import { studentenMockdata as studenten } from '../data/mockdata.js';
 
+async function logout() {
+  try {
+    await fetch('http://localhost:3000/logout', {
+      method: 'POST',
+      credentials: 'include'
+    });
+  } catch (err) {
+    console.error('Fout bij uitloggen:', err);
+  } finally {
+    document.cookie = 'user=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+    window.location.href = '/login';
+  }
+}
+
 function renderMijlpalen(lijst) {
   return lijst.map(function(m, i) {
     const lijn = i < lijst.length - 1
@@ -136,6 +150,7 @@ export function renderMijnStudenten() {
   const actief    = studenten.filter(function(s) { return s.status === 'lopend'; });
   const afgelopen = studenten.filter(function(s) { return s.status === 'afgelopen'; });
 
+  // ✅ 1. eerst HTML renderen
   document.querySelector('#app').innerHTML = `
     <div class="dc-layout">
       <aside class="dc-sidebar">
@@ -150,7 +165,7 @@ export function renderMijnStudenten() {
         </div>
         <div class="dc-sidebar-bottom">
           <span class="dc-user-name">Prof. Sarah Claes</span>
-          <a href="/" class="dc-logout">Uitloggen</a>
+          <button id="logout-btn" class="dc-logout">Uitloggen</button>
         </div>
       </aside>
       <main class="dc-main">
@@ -163,6 +178,8 @@ export function renderMijnStudenten() {
     </div>
   `;
 
+  // ✅ 2. daarna pas event listeners toevoegen
   setupFilter(studenten);
   setupStudentButtons(studenten);
+  document.getElementById('logout-btn').addEventListener('click', logout);
 }
