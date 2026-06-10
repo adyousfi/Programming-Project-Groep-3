@@ -5,6 +5,7 @@ import { renderStageformulier } from './student/formulier.js';
 import { renderWachten } from './student/wachten.js';
 import { renderFeedback } from './student/feedback.js';
 import { renderAanpassen } from './student/aanpassen.js';
+import { renderAfkeuring } from './student/afkeuring.js';
 import { renderMijnStagiairs } from './stagementor/mijn-stagiairs.js';
 import { renderMijnStudenten } from './docent/mijn-studenten.js';
 import { renderGoedgekeurdStudent } from './student/goedgekeurd_student.js';
@@ -15,11 +16,51 @@ import { renderAdmin } from './admin/admin.js';
 const app = document.querySelector('#app');
 const role = new URLSearchParams(window.location.search).get('role');
 
-if (role === 'admin') {
-  // Admin route
+async function getLoggedInUser() {
+  try {
+    const res = await fetch('/me', { credentials: 'include' });
+    const data = await res.json();
+    if (data.loggedIn) return data.user;
+    return null;
+  } catch { return null; }
+}
+
+async function getStudentStage(studentId) {
+  try {
+    const res = await fetch(`/api/stages/student/${studentId}`, { credentials: 'include' });
+    return await res.json();
+  } catch { return { found: false }; }
+}
+
+if (role === 'student') {
+  const user = await getLoggedInUser();
+  if (user && user.role === 'student') {
+    const stageData = await getStudentStage(user.user_id);
+    if (!stageData.found) {
+      renderStudentDashboard(app, user.first_name);
+    } else {
+      switch (stageData.rawStatus) {
+        case 'Aanvraag':
+          renderWachten(app, user.first_name);
+          break;
+        case 'Goedgekeurd':
+          renderGoedgekeurdStudent(app, user.first_name, stageData);
+          break;
+        case 'Aanpassingen_vereist':
+          renderAanpassen(app, user.first_name, stageData);
+          break;
+        case 'Afgekeurd':
+          renderAfkeuring(app, user.first_name, stageData);
+          break;
+        default:
+          renderWachten(app, user.first_name);
+      }
+    }
+  } else {
+    renderStudentDashboard(app);
+  }
+} else if (role === 'admin') {
   renderAdmin(app);
-} else if (role === 'student') {
-  renderStudentDashboard(app);
 } else if (role === 'stageformulier') {
   renderStageformulier(app);
 } else if (role === 'wachten') {
@@ -28,20 +69,21 @@ if (role === 'admin') {
   renderFeedback(app);
 } else if (role === 'aanpassen') {
   renderAanpassen(app);
-  } else if (role === 'stagecommisie') {
-    renderAanvragen();
+} else if (role === 'afkeuring') {
+  renderAfkeuring(app);
+} else if (role === 'stagecommisie') {
+  renderAanvragen();
 } else if (role === 'stagementor') {
   renderMijnStagiairs(app);
 } else if (role === 'docent') {
   renderMijnStudenten();
 } else if (role === 'goedgekeurd_student') {
   renderGoedgekeurdStudent(app);
-  } else if (role === 'documenten') {
-    renderDocumenten(app);
-  } else if (role === 'documenten_ingedient') {
-    renderDocumentenIngedient(app);
-  } else if (role === 'frontend') {
-  // Front-end portaal: kies welke rol paginas te bekijken
+} else if (role === 'documenten') {
+  renderDocumenten(app);
+} else if (role === 'documenten_ingedient') {
+  renderDocumentenIngedient(app);
+} else if (role === 'frontend') {
   app.innerHTML = `
     <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; font-family: sans-serif; background-color: #f8f9fa;">
       <h1 style="margin-bottom: 2rem; color: #212529;">Stage Monitoring Tool</h1>
@@ -58,11 +100,9 @@ if (role === 'admin') {
     </div>
   `;
 } else if (role === 'backend') {
-  // Back-end portaal: toon login pagina
   document.querySelector('#login-page').style.display = 'flex';
   app.innerHTML = '';
 } else {
-  // Hoofdportaal: kies tussen Front-end en Back-end
   app.innerHTML = `
     <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; font-family: sans-serif; background-color: #f8f9fa;">
       <h1 style="margin-bottom: 1rem; color: #212529;">Stage Monitoring Tool</h1>
