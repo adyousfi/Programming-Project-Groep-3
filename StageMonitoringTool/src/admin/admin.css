@@ -81,7 +81,8 @@
 .main-content {
   flex: 1;
   background: #f9fafb;
-  padding: 2rem 2.5rem;
+  padding: 1.5rem 2rem;
+  overflow-x: auto;
 }
 
 .page-header {
@@ -214,6 +215,7 @@
   border-radius: 6px;
   font-size: 0.9375rem;
   background: white;
+  color: #111827;
 }
 
 .form-group input:focus,
@@ -300,8 +302,10 @@
 
 .user-table th,
 .user-table td {
-  padding: 1rem 1.25rem;
+  padding: 0.5rem 0.75rem;
   text-align: left;
+  font-size: 0.875rem;
+  white-space: nowrap;
 }
 
 .user-table th {
@@ -347,16 +351,16 @@
 
 .actions {
   display: flex;
-  gap: 0.5rem;
+  gap: 0.25rem;
 }
 
 .btn-edit {
-  padding: 0.5rem 1rem;
+  padding: 0.3rem 0.5rem;
   background: white;
   border: 1px solid #2563eb;
   color: #2563eb;
-  border-radius: 6px;
-  font-size: 0.875rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
   cursor: pointer;
   transition: all 0.15s;
 }
@@ -366,12 +370,12 @@
 }
 
 .btn-deactivate {
-  padding: 0.5rem 1rem;
+  padding: 0.3rem 0.5rem;
   background: white;
   border: 1px solid #dc2626;
   color: #dc2626;
-  border-radius: 6px;
-  font-size: 0.875rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
   cursor: pointer;
   transition: all 0.15s;
 }

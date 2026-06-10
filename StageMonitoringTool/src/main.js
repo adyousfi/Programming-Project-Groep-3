@@ -9,6 +9,7 @@ import { renderMijnStagiairs } from './stagementor/mijn-stagiairs.js';
 import { renderMijnStudenten } from './docent/mijn-studenten.js';
 import { renderGoedgekeurdStudent } from './student/goedgekeurd_student.js';
 import { renderDocumenten } from './student/documenten.js';
+import { renderDocumentenIngedient } from './student/documenten-ingedient.js';
 import { renderAdmin } from './admin/admin.js';
 
 const app = document.querySelector('#app');
@@ -27,17 +28,19 @@ if (role === 'admin') {
   renderFeedback(app);
 } else if (role === 'aanpassen') {
   renderAanpassen(app);
-} else if (role === 'stagecommissie') {
-  renderAanvragen();
+  } else if (role === 'stagecommisie') {
+    renderAanvragen();
 } else if (role === 'stagementor') {
   renderMijnStagiairs(app);
 } else if (role === 'docent') {
   renderMijnStudenten();
 } else if (role === 'goedgekeurd_student') {
   renderGoedgekeurdStudent(app);
-} else if (role === 'documenten') {
-  renderDocumenten(app);
-} else if (role === 'frontend') {
+  } else if (role === 'documenten') {
+    renderDocumenten(app);
+  } else if (role === 'documenten_ingedient') {
+    renderDocumentenIngedient(app);
+  } else if (role === 'frontend') {
   // Front-end portaal: kies welke rol paginas te bekijken
   app.innerHTML = `
     <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; font-family: sans-serif; background-color: #f8f9fa;">
@@ -46,7 +49,7 @@ if (role === 'admin') {
       <div style="display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;">
         <a href="?role=student" style="padding: 1rem 2rem; background-color: #0d6efd; color: white; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 1.1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">Studenten Portaal</a>
         <a href="?role=feedback" style="padding: 1rem 2rem; background-color: #fd7e14; color: white; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 1.1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">Feedback Portaal</a>
-        <a href="?role=stagecommissie" style="padding: 1rem 2rem; background-color: #198754; color: white; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 1.1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">Stagecommissie Portaal</a>
+        <a href="?role=stagecommisie" style="padding: 1rem 2rem; background-color: #198754; color: white; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 1.1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">Stagecommissie Portaal</a>
         <a href="?role=stagementor" style="padding: 1rem 2rem; background-color: #0f766e; color: white; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 1.1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">Stagementor Portaal</a>
         <a href="?role=docent" style="padding: 1rem 2rem; background-color: #7c3aed; color: white; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 1.1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">Docent Portaal</a>
         <a href="?role=admin" style="padding: 1rem 2rem; background-color: #6b7280; color: white; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 1.1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">Admin Portaal</a>
