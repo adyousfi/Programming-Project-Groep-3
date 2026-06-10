@@ -149,6 +149,62 @@ app.delete('/api/proposals/:id', (req, res) => {
 });
 
 // ✅ STAGES API (Database)
+app.get('/api/stages', async (req, res) => {
+  try {
+    const stages = await Stage.findAll({
+      include: [
+        { model: Student, as: 'student', include: [{ model: User, as: 'User' }] },
+        { model: Stagementor, as: 'mentor', include: [{ model: User, as: 'User' }] },
+        { model: Bedrijf, as: 'bedrijf' },
+        { model: Docent, as: 'docent', include: [{ model: User, as: 'User' }] },
+      ]
+    });
+
+    const result = stages.map(s => {
+      const studentUser = s.student ? s.student.User : null;
+      const mentorUser = s.mentor ? s.mentor.User : null;
+      const docentUser = s.docent ? s.docent.User : null;
+
+      return {
+        id: s.stage_id,
+        naam: studentUser ? `${studentUser.first_name} ${studentUser.last_name}` : '',
+        studentEmail: studentUser ? studentUser.email : '',
+        functie: '',
+        bedrijf: {
+          naam: s.bedrijf ? s.bedrijf.naam : '',
+          adres: s.bedrijf ? s.bedrijf.address : '',
+          contactpersoon: '',
+          email: '',
+          telefoon: '',
+        },
+        stagementor: {
+          naam: mentorUser ? `${mentorUser.first_name} ${mentorUser.last_name}` : '',
+          email: mentorUser ? mentorUser.email : '',
+          telefoon: mentorUser ? mentorUser.phone : '',
+        },
+        docent: {
+          naam: docentUser ? `${docentUser.first_name} ${docentUser.last_name}` : '',
+          email: docentUser ? docentUser.email : '',
+        },
+        stageDetails: {
+          omschrijving: s.omschrijving_opdracht || '',
+          start: s.begin_datum || '',
+          einde: s.eind_datum || '',
+          urenPerWeek: '',
+        },
+        status: s.status === 'Aanvraag' ? 'in_afwachting' : s.status === 'Goedgekeurd' ? 'goedgekeurd' : s.status === 'Afgekeurd' ? 'afgekeurd' : s.status,
+        datum: s.createdAt ? new Date(s.createdAt).toLocaleDateString('nl-BE') : '',
+        historiek: null,
+      };
+    });
+
+    return res.json(result);
+  } catch (error) {
+    console.error('Error fetching stages:', error);
+    return res.status(500).json({ msg: 'Fout bij ophalen van stages' });
+  }
+});
+
 app.post('/api/stages', async (req, res) => {
   try {
     const {
