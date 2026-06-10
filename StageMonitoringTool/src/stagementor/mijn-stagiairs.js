@@ -470,7 +470,17 @@ function renderStudentDetail(app, stagiair) {
                       <div class="sm-eval-score-note">Scorepunten kunnen momenteel nog niet worden aangepast. Bekijk de uitleg onder elk cijfer.</div>
                       <div class="sm-eval-score-cards" data-competentie="${comp.key}">
                         ${scores.map(score => `
-                          <button class="sm-score-card sm-score-card--${score} sm-score-card--disabled" data-score="${score}" data-competentie="${comp.key}" disabled>
+
+
+                        <button
+  class="sm-score-card sm-score-card--${score}"
+  data-score="${score}"
+  data-competentie="${comp.key}"
+>
+
+
+
+
                             <span class="sm-score-card-number">${score}</span>
                             <span class="sm-score-card-text">${scoreDescriptions[score].replace('{competentie}', comp.title)}</span>
                           </button>
@@ -504,6 +514,28 @@ function renderStudentDetail(app, stagiair) {
             card.classList.add('selected');
           }
         });
+
+        document.querySelectorAll('.sm-score-card').forEach(card => {
+  card.addEventListener('click', () => {
+
+    const competencie = card.dataset.competentie;
+
+    document
+      .querySelectorAll(
+        `.sm-score-card[data-competentie="${competencie}"]`
+      )
+      .forEach(item => {
+        item.classList.remove('selected');
+      });
+
+    card.classList.add('selected');
+  });
+});
+
+
+
+
+
 
         document.querySelectorAll('.sm-nav-item').forEach(function(item) {
           item.addEventListener('click', function(event) {
@@ -749,4 +781,4 @@ function renderStudentDetail(app, stagiair) {
     app.innerHTML = renderSectionContent();
     setupStudentLinks(app);
   }
-  
+
