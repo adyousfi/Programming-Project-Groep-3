@@ -52,6 +52,7 @@ app.post('/login', async (req, res) => {
       user_id: user.user_id,
       email: user.email,
       first_name: user.first_name,
+      last_name: user.last_name,
       role: user.role
     }, {
       httpOnly: true,          // 🔒 veiliger
@@ -65,6 +66,7 @@ app.post('/login', async (req, res) => {
       message: 'Login succesvol',
       user: {
         first_name: user.first_name,
+        last_name: user.last_name,
         role: user.role
   
       }

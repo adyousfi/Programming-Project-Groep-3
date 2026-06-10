@@ -47,7 +47,7 @@ if (role === 'student') {
           renderGoedgekeurdStudent(app, user.first_name, stageData);
           break;
         case 'Aanpassingen_vereist':
-          renderAanpassen(app, user.first_name, stageData);
+          renderFeedback(app, user.first_name, stageData);
           break;
         case 'Afgekeurd':
           renderAfkeuring(app, user.first_name, stageData);
@@ -68,7 +68,13 @@ if (role === 'student') {
 } else if (role === 'feedback') {
   renderFeedback(app);
 } else if (role === 'aanpassen') {
-  renderAanpassen(app);
+  const user = await getLoggedInUser();
+  if (user) {
+    const stageData = await getStudentStage(user.user_id);
+    renderAanpassen(app, user.first_name, stageData.found ? stageData : null);
+  } else {
+    renderAanpassen(app);
+  }
 } else if (role === 'afkeuring') {
   renderAfkeuring(app);
 } else if (role === 'stagecommisie') {

@@ -1,12 +1,16 @@
 import './formulier.css';
 
 export async function renderStageformulier(container) {
-    let userName = '';
+    let displayName = '';
     try {
         const res = await fetch('/me', { credentials: 'include' });
         const data = await res.json();
         if (data.loggedIn && data.user) {
-            userName = data.user.first_name || '';
+            if (data.user.last_name && data.user.first_name) {
+                displayName = `${data.user.last_name.toUpperCase()} ${data.user.first_name}`;
+            } else {
+                displayName = data.user.first_name || '';
+            }
         }
     } catch {}
 
@@ -24,7 +28,7 @@ export async function renderStageformulier(container) {
                         <div class="form-row">
                             <div class="form-group">
                                 <label for="student-naam">Naam *</label>
-                                <input type="text" id="student-naam" value="${userName}" readonly>
+                                <input type="text" id="student-naam" value="${displayName}" readonly>
                             </div>
                             <div class="form-group">
                                 <label for="student-nummer">Studentnummer *</label>
