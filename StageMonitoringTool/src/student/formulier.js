@@ -1,6 +1,15 @@
 import './formulier.css';
 
-export function renderStageformulier(container) {
+export async function renderStageformulier(container) {
+    let userName = '';
+    try {
+        const res = await fetch('/me', { credentials: 'include' });
+        const data = await res.json();
+        if (data.loggedIn && data.user) {
+            userName = data.user.first_name || '';
+        }
+    } catch {}
+
     container.innerHTML = `
         <div class="form-page-wrapper">
             <div class="form-container">
@@ -15,7 +24,7 @@ export function renderStageformulier(container) {
                         <div class="form-row">
                             <div class="form-group">
                                 <label for="student-naam">Naam *</label>
-                                <input type="text" id="student-naam" value="">
+                                <input type="text" id="student-naam" value="${userName}" readonly>
                             </div>
                             <div class="form-group">
                                 <label for="student-nummer">Studentnummer *</label>
