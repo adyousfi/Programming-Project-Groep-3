@@ -1,4 +1,5 @@
 import './admin.css';
+import { logout } from '../utils/auth.js';
 
 const API_URL = 'http://localhost:3001';
 
@@ -26,7 +27,7 @@ export function renderAdmin(app) {
         </nav>
         <div class="sidebar-footer">
           <p class="user-name">Admin User</p>
-          <a href="/" class="logout-link">Uitloggen</a>
+          <button id="admin-logout-btn" class="logout-link">Uitloggen</button>
         </div>
       </aside>
       <main class="main-content">
@@ -172,6 +173,8 @@ export function renderAdmin(app) {
       </div>
     </div>
   `;
+
+  document.getElementById('admin-logout-btn').addEventListener('click', logout);
 
   // Elements
   const modal = document.getElementById('modalOverlay');
