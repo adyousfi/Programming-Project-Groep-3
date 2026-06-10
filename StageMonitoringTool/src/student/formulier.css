@@ -109,6 +109,21 @@
     background-color: #f8f9fa;
 }
 
+.btn-fill-random {
+    background-color: #6b7280;
+    color: white;
+    border: none;
+    padding: 0.6rem 1.5rem;
+    border-radius: 4px;
+    font-weight: 500;
+    font-size: 0.95rem;
+    cursor: pointer;
+}
+
+.btn-fill-random:hover {
+    background-color: #4b5563;
+}
+
 .form-row {
     display: flex;
     gap: 1.5rem;

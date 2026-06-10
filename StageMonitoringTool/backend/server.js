@@ -1,9 +1,6 @@
 import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
 import { run } from '../db/dbConnection.js';
 import User from '../db/userModel/user.js';
 import Student from '../db/userModel/student.js';
@@ -11,23 +8,6 @@ import Stagementor from '../db/userModel/stagementor.js';
 import Bedrijf from '../db/objectModel/bedrijf.js';
 import Stage from '../db/objectModel/stage.js';
 import Docent from '../db/userModel/docent.js';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const PROPOSALS_PATH = path.join(__dirname, '..', 'src', 'data', 'stagevoorstellen.json');
-
-function readProposals() {
-  try {
-    const raw = fs.readFileSync(PROPOSALS_PATH, 'utf-8');
-    return JSON.parse(raw).proposals || [];
-  } catch {
-    return [];
-  }
-}
-
-function writeProposals(proposals) {
-  fs.writeFileSync(PROPOSALS_PATH, JSON.stringify({ proposals }, null, 2));
-}
 
 
 const app = express();
@@ -108,43 +88,6 @@ app.get('/me', (req, res) => {
 // ✅ LOGOUT
 app.post('/logout', (req, res) => {
   res.clearCookie('user');
-  res.json({ success: true });
-});
-
-// ✅ PROPOSALS API
-app.get('/api/proposals', (req, res) => {
-  res.json(readProposals());
-});
-
-app.post('/api/proposals', (req, res) => {
-  const proposals = readProposals();
-  const proposal = req.body;
-  if (!proposal.id) {
-    proposal.id = `proposal-${Date.now()}`;
-  }
-  proposals.push(proposal);
-  writeProposals(proposals);
-  res.status(201).json(proposal);
-});
-
-app.put('/api/proposals/:id', (req, res) => {
-  const proposals = readProposals();
-  const index = proposals.findIndex(p => p.id === req.params.id);
-  if (index === -1) {
-    return res.status(404).json({ msg: 'Proposal niet gevonden' });
-  }
-  proposals[index] = { ...proposals[index], ...req.body, id: req.params.id, laatstBewerktOp: new Date().toISOString() };
-  writeProposals(proposals);
-  res.json(proposals[index]);
-});
-
-app.delete('/api/proposals/:id', (req, res) => {
-  const proposals = readProposals();
-  const filtered = proposals.filter(p => p.id !== req.params.id);
-  if (filtered.length === proposals.length) {
-    return res.status(404).json({ msg: 'Proposal niet gevonden' });
-  }
-  writeProposals(filtered);
   res.json({ success: true });
 });
 

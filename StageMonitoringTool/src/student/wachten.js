@@ -1,9 +1,6 @@
 import './wachten.css';
-import { getActiveProposalId } from './dataService.js';
 
 export function renderWachten(container, userName = '[Studentnaam]') {
-    const activeId = getActiveProposalId() || 'onbekend';
-
     container.innerHTML = `
         <div class="wachten-layout">
 
@@ -72,7 +69,6 @@ export function renderWachten(container, userName = '[Studentnaam]') {
                     <h1>Je stagevoorstel is ingediend</h1>
                     <p>De stagecommissie zal je aanvraag zo spoedig mogelijk beoordelen. Je ontvangt een melding zodra er een beslissing is genomen.</p>
                     <p class="wachten-card-note">In afwachting van goedkeuring heb je nog geen toegang tot je stagedossier.</p>
-                    <p class="wachten-card-id" style="margin-top:1rem;font-size:0.85rem;color:#888;">Voorstel ID: <code>${activeId}</code></p>
                 </section>
 
             </main>
