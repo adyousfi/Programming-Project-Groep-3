@@ -1,34 +1,11 @@
 import './aanvragen.css';
 import { renderBeoordelen } from './beoordelen.js';
+import { getAllAanvragen } from '../services/aanvragenService.js';
 
-const aanvragen = [
-  {
-    id: 1, naam: 'Lisa Peeters', studentEmail: 'lisa.peeters@student.ehb.be', functie: 'DevOps Engineer', datum: '28/4/2026', status: 'in_afwachting',
-    bedrijf: { naam: 'CloudTech NV', adres: 'Brusselsestraat 100, 1000 Brussel', contactpersoon: 'Jan De Smedt', email: 'jan@cloudtech.be', telefoon: '0498 12 34 56' },
-    stagementor: { naam: 'Jan De Smedt', email: 'jan@cloudtech.be', telefoon: '0498 12 34 56' },
-    docent: { naam: 'Prof. De Vries', email: 'devries@ehb.be' },
-    stageDetails: { omschrijving: 'Beheer van cloud infrastructuren en CI/CD pipelines.', start: '1/9/2026', einde: '31/1/2027', urenPerWeek: 38 }
-  },
-  {
-    id: 2, naam: 'Tom Claes', studentEmail: 'tom.claes@student.ehb.be', functie: 'Mobile Developer', datum: '1/5/2026', status: 'in_afwachting',
-    bedrijf: { naam: 'Mobile Apps Inc', adres: 'Keizerlaan 20, 1000 Brussel', contactpersoon: 'Sophie Peeters', email: 'sophie@mobileapps.be', telefoon: '0476 23 45 67' },
-    stagementor: { naam: 'Sophie Peeters', email: 'sophie@mobileapps.be', telefoon: '0476 23 45 67' },
-    docent: { naam: 'Prof. De Vries', email: 'devries@ehb.be' },
-    stageDetails: { omschrijving: 'Ontwikkeling van cross-platform mobiele applicaties.', start: '1/9/2026', einde: '31/1/2027', urenPerWeek: 38 }
-  },
-  {
-    id: 3, naam: 'Sara Janssen', studentEmail: 'sara.janssen@student.ehb.be', functie: 'Frontend Developer', datum: '3/5/2026', status: 'goedgekeurd',
-    bedrijf: { naam: 'WebStudio BVBA', adres: 'Steenstraat 5, 1000 Brussel', contactpersoon: 'Peter Janssens', email: 'peter@webstudio.be', telefoon: '0456 34 56 78' },
-    stagementor: { naam: 'Peter Janssens', email: 'peter@webstudio.be', telefoon: '0456 34 56 78' },
-    docent: { naam: 'Prof. De Vries', email: 'devries@ehb.be' },
-    stageDetails: { omschrijving: 'Bouwen van moderne web interfaces met React en Vue.', start: '1/9/2026', einde: '31/1/2027', urenPerWeek: 38 }
-  },
-];
-
-const aantalAfwachting = aanvragen.filter(function(a) { return a.status === 'in_afwachting'; }).length;
+let aanvragen = [];
 
 function statusLabel(status) {
-  const labels = { in_afwachting: 'In afwachting', goedgekeurd: 'Goedgekeurd', afgekeurd: 'Afgekeurd' };
+  const labels = { in_afwachting: 'In afwachting', goedgekeurd: 'Goedgekeurd', afgekeurd: 'Afgekeurd', aanpassingen: 'Aanpassingen nodig' };
   return labels[status] || status;
 }
 
@@ -54,8 +31,8 @@ function renderKaarten(lijst) {
 function setupBeoordelenButtons() {
   document.querySelectorAll('.sc-card-btn').forEach(function(btn) {
     btn.addEventListener('click', function() {
-      const id = parseInt(btn.dataset.id);
-      const aanvraag = aanvragen.find(function(a) { return a.id === id; });
+      const id = btn.dataset.id;
+      const aanvraag = aanvragen.find(function(a) { return a.id == id; });
       if (aanvraag) {
         renderBeoordelen(aanvraag);
       }
@@ -84,7 +61,11 @@ function setupFilter() {
   });
 }
 
-export function renderAanvragen() {
+export async function renderAanvragen() {
+  aanvragen = await getAllAanvragen();
+
+  const aantalAfwachting = aanvragen.filter(function(a) { return a.status === 'in_afwachting'; }).length;
+
   document.querySelector('#app').innerHTML = `
     <div class="sc-layout">
       <aside class="sc-sidebar">
