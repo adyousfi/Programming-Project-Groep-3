@@ -55,10 +55,13 @@ body {
 }
 
 .logout-link {
-    font-size: 0.95rem;
-    color: #0d6efd;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    font-size: 14px;
+    color: #2563eb;
     text-decoration: none;
-    font-weight: 500;
 }
 
 .logout-link:hover {
