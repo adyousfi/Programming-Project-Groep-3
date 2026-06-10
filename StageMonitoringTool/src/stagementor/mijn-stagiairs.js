@@ -155,7 +155,7 @@ function renderStudentDetail(app, stagiair) {
         </div>
         <div class="sm-sidebar-bottom">
           <span class="sm-user-name">Mieke Peeters</span>
-          <a href="#" class="sm-logout" id="sm-logout">Uitloggen</a>
+          <a href="/" class="sm-logout" id="sm-logout">Uitloggen</a>
         </div>
       </aside>
       <main class="sm-main sm-main--detail">
@@ -268,7 +268,7 @@ function renderStudentDetail(app, stagiair) {
               </div>
               <div class="sm-sidebar-bottom">
                 <span class="sm-user-name">Mieke Peeters</span>
-                <a href="#" class="sm-logout">Uitloggen</a>
+                <a href="/" class="sm-logout">Uitloggen</a>
               </div>
             </aside>
             <main class="sm-main sm-main--detail">
@@ -411,7 +411,7 @@ function renderStudentDetail(app, stagiair) {
               </div>
               <div class="sm-sidebar-bottom">
                 <span class="sm-user-name">Mieke Peeters</span>
-                <a href="#" class="sm-logout">Uitloggen</a>
+                <a href="/" class="sm-logout">Uitloggen</a>
               </div>
             </aside>
             <main class="sm-main sm-main--detail">

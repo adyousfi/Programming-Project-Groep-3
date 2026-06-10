@@ -2,26 +2,25 @@
 <html lang="nl">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Login</title>
 </head>
 
-<body style="margin:0; font-family:sans-serif;">
+<body>
 
   <div id="app"></div>
 
-  <div id="login-page" style="display:none; justify-content:center; align-items:center; position:fixed; top:0; left:0; width:100%; height:100vh; z-index:10;">
-    <div style="background:#f0f0f0; padding:30px; border-radius:10px; width:300px;">
-      <h2 style="text-align:center;">Login</h2>
+  <div id="login-page">
+    <div class="login-box">
+      <h2 class="login-title">Login</h2>
 
-      <input id="email" type="email" placeholder="Email"
-        style="width:100%; padding:10px; margin-bottom:10px;"><br>
+      <input id="email" type="email" placeholder="Email" class="login-input"><br>
 
-      <input id="password" type="password" placeholder="Password"
-        style="width:100%; padding:10px; margin-bottom:10px;"><br>
+      <input id="password" type="password" placeholder="Password" class="login-input"><br>
 
-      <button id="btn" style="width:100%; padding:10px;">Login</button>
+      <button id="btn" class="login-btn">Login</button>
 
-      <p id="msg" style="text-align:center;"></p>
+      <p id="msg" class="login-msg"></p>
     </div>
   </div>
 
