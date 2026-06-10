@@ -1,19 +1,6 @@
 import './mijn-studenten.css';
 import { studentenMockdata as studenten } from '../data/mockdata.js';
-
-async function logout() {
-  try {
-    await fetch('http://localhost:3000/logout', {
-      method: 'POST',
-      credentials: 'include'
-    });
-  } catch (err) {
-    console.error('Fout bij uitloggen:', err);
-  } finally {
-    document.cookie = 'user=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-    window.location.href = '/login';
-  }
-}
+import { logout } from '../utils/auth.js';
 
 function renderMijlpalen(lijst) {
   return lijst.map(function(m, i) {
