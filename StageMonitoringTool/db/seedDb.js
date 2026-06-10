@@ -2,13 +2,11 @@
 import { ENUM } from "sequelize";
 import {sequelize} from "./dbConnection.js";
 import User, { ROLES } from "./userModel/user.js";
-import userController from "./userControllers/userController.js";
-import createStage from "./userControllers/stageController.js";
+import { createUserCore } from "./userControllers/userController.js";
+import { createStageCore } from "./objectControllers/stageController.js";
 import { status } from "./objectModel/stage.js";
-import { createBedrijf } from "./objectControllers/bedrijfController.js";
-import { createStagementor } from "./userControllers/stagementorController.js";
-import { linkBedrijfToStageMentor } from "./objectControllers/bedrijfController.js";
-import { linkStageToMoreUser } from "./objectControllers/stageController.js";
+import { createBedrijfCore } from "./objectControllers/bedrijfController.js";
+import { createStagementor, linkStagementorToBedrijf } from "./userControllers/stagementorController.js";
 
 
 const seedDatabase = async () => {
@@ -24,32 +22,28 @@ const seedDatabase = async () => {
 
     // 3. Bulk insert the dummy data
     
-    await User.create("jon","hys","hys.jon@html.com","passwrd",ROLES.STUDENT,"0493998987");
-    await User.create("John","Doe","john.doe@school.com","hashed_password_123",ROLES.DOCENT);
-    await User.create("huh","hah","helnah@hotmail.com","hashpassword", ROLES.ADMIN);
-    await User.create("Jane","Smith","jane.smith@stagecommisie.com","hashedPasswordnotfound",ROLES.STAGECOMMISIE);
-    await User.create("Alex","Jones","alex.jones@school.com","notAPassword",ROLES.STUDENT);
-    await User.create("Emily","Brown","emily.brown@something.com","noPassword",ROLES.STAGEMENTOR)
-    await User.create("ariga","toe","arigatoe@html.com","IlikeToes",ROLES.STUDENT);
-    await User.create()
-    await User.create("some","dude","some.dude@something.com","whatisdas",ROLES.STAGEMENTOR)
-    await User.create("some","other","some.other@something.com","whatisdas",ROLES.STAGEMENTOR)
-
-    await createBedrijf("aqua","finland");
-    await createBedrijf("kanker","kankerstraat");
+    await createUserCore("jon","hys","hys.jon@html.com","passwrd",ROLES.STUDENT,"0493998987");
+    await createUserCore("John","Doe","john.doe@school.com","hashed_password_123",ROLES.DOCENT);
+    await createUserCore("huh","hah","helnah@hotmail.com","hashpassword", ROLES.ADMIN);
+    await createUserCore("Jane","Smith","jane.smith@stagecommisie.com","hashedPasswordnotfound",ROLES.STAGECOMMISIE);
+    await createUserCore("Alex","Jones","alex.jones@school.com","notAPassword",ROLES.STUDENT);
+    await createUserCore("Emily","Brown","emily.brown@something.com","noPassword",ROLES.STAGEMENTOR)
+    await createUserCore("ariga","toe","arigatoe@html.com","IlikeToes",ROLES.STUDENT);
     
-    await linkBedrijfToStageMentor(6,1);
-    await linkBedrijfToStageMentor(8,1);
+    await createUserCore("some","dude","some.dude@something.com","whatisdas",ROLES.STAGEMENTOR)
+    await createUserCore("some","other","some.other@something.com","whatisdas",ROLES.STAGEMENTOR)
 
-
-    await createStage("doe iets",status.DOCUMENTGEUPLOADED,"2020-1-20","2021-10-12")
+    await createBedrijfCore("aqua","finland");
+    await createBedrijfCore("kanker","kankerstraat");
     
-    await linkStageToMoreUser(1,1,2,6,1);
+    await linkStagementorToBedrijf(6,1);
+    await linkStagementorToBedrijf(8,1);
+    linkStagementorToBedrijf(9,2)
 
 
     console.log("Successfully seeded 5 users into the database!");
     //                                                    year-month-day
-    
+    await createStageCore("doe iets",status.DOCUMENTGEUPLOADED,"2020-1-20","2021-10-12")
 
     
 

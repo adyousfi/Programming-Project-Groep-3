@@ -1,4 +1,4 @@
-import { sequelize } from '../../dbConnection.js';
+import { sequelize } from '../dbConnection.js';
 import { DataTypes } from 'sequelize';
 import User from './user.js';
 import Bedrijf from '../objectModel/bedrijf.js';
@@ -43,7 +43,7 @@ Bedrijf.hasMany(Stagementor, {
 
 
 User.hasOne(Stagementor, { 
-    foreignKey: 'bedrijf_id', 
+    foreignKey: 'user_id', 
     onDelete: 'CASCADE' 
 });
 Stagementor.belongsTo(User, { 

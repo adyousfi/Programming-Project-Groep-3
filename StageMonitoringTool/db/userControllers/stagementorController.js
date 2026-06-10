@@ -13,5 +13,12 @@ const createStagementor = async (stagementor_id, user_id) =>
   
 }
 
+const linkStagementorToBedrijf = async (userId, bedrijfId) =>{
+    await Stagementor.update(
+    { bedrijf_id: bedrijfId }, 
+    { where: { user_id: userId } }
+);
+}
 
-export {createStagementor};
+
+export {createStagementor, linkStagementorToBedrijf};

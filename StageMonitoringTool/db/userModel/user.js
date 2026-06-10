@@ -1,13 +1,13 @@
-import { sequelize } from "../../dbConnection.js";
+import { sequelize } from "../dbConnection.js";
 import { DataTypes, Deferrable } from "sequelize"
 
 
 export const ROLES = {
-    STUDENT: 'STUDENT',
-    DOCENT: 'DOCENT',
-    ADMIN: 'ADMIN',
-    STAGECOMMISIE: 'STAGECOMMISIE',
-    STAGEMENTOR: 'STAGEMENTOR'
+    STUDENT: 'student',
+    DOCENT: 'docent',
+    ADMIN: 'admin',
+    STAGECOMMISIE: 'stagecommisie',
+    STAGEMENTOR: 'stagementor'
 };
 
 const User = sequelize.define("User", {

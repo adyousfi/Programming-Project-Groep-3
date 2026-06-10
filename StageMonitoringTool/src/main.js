@@ -1,60 +1,79 @@
-import './style.css'
-import javascriptLogo from './assets/javascript.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import { setupCounter } from './counter.js'
+import './style.css';
+import { renderAanvragen } from './stagecommissie/aanvragen.js';
+import { renderStudentDashboard } from './student/student.js';
+import { renderStageformulier } from './student/formulier.js';
+import { renderWachten } from './student/wachten.js';
+import { renderFeedback } from './student/feedback.js';
+import { renderAanpassen } from './student/aanpassen.js';
+import { renderMijnStagiairs } from './stagementor/mijn-stagiairs.js';
+import { renderMijnStudenten } from './docent/mijn-studenten.js';
+import { renderGoedgekeurdStudent } from './student/goedgekeurd_student.js';
+import { renderDocumenten } from './student/documenten.js';
+import { renderAdmin } from './admin/admin.js';
 
-document.querySelector('#app').innerHTML = `
-<section id="center">
-  <div class="hero">
-    <img src="${heroImg}" class="base" width="170" height="179">
-    <img src="${javascriptLogo}" class="framework" alt="JavaScript logo"/>
-    <img src="${viteLogo}" class="vite" alt="Vite logo" />
-  </div>
-  <div>
-    <h1>Get started</h1>
-    <p>Edit <code>src/main.js</code> and save to test <code>HMR</code></p>
-  </div>
-  <button id="counter" type="button" class="counter"></button>
-</section>
+const app = document.querySelector('#app');
+const role = new URLSearchParams(window.location.search).get('role');
 
-<div class="ticks"></div>
-
-<section id="next-steps">
-  <div id="docs">
-    <svg class="icon" role="presentation" aria-hidden="true"><use href="/icons.svg#documentation-icon"></use></svg>
-    <h2>Documentation</h2>
-    <p>Your questions, answered</p>
-    <ul>
-      <li>
-        <a href="https://vite.dev/" target="_blank">
-          <img class="logo" src="${viteLogo}" alt="" />
-          Explore Vite
+if (role === 'admin') {
+  // Admin route
+  renderAdmin(app);
+} else if (role === 'student') {
+  renderStudentDashboard(app);
+} else if (role === 'stageformulier') {
+  renderStageformulier(app);
+} else if (role === 'wachten') {
+  renderWachten(app);
+} else if (role === 'feedback') {
+  renderFeedback(app);
+} else if (role === 'aanpassen') {
+  renderAanpassen(app);
+} else if (role === 'stagecommissie') {
+  renderAanvragen();
+} else if (role === 'stagementor') {
+  renderMijnStagiairs(app);
+} else if (role === 'docent') {
+  renderMijnStudenten();
+} else if (role === 'goedgekeurd_student') {
+  renderGoedgekeurdStudent(app);
+} else if (role === 'documenten') {
+  renderDocumenten(app);
+} else if (role === 'frontend') {
+  // Front-end portaal: kies welke rol paginas te bekijken
+  app.innerHTML = `
+    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; font-family: sans-serif; background-color: #f8f9fa;">
+      <h1 style="margin-bottom: 2rem; color: #212529;">Stage Monitoring Tool</h1>
+      <p style="margin-bottom: 2rem; color: #6c757d; font-size: 1.1rem;">Kies het portaal dat je wilt bekijken:</p>
+      <div style="display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;">
+        <a href="?role=student" style="padding: 1rem 2rem; background-color: #0d6efd; color: white; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 1.1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">Studenten Portaal</a>
+        <a href="?role=feedback" style="padding: 1rem 2rem; background-color: #fd7e14; color: white; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 1.1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">Feedback Portaal</a>
+        <a href="?role=stagecommissie" style="padding: 1rem 2rem; background-color: #198754; color: white; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 1.1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">Stagecommissie Portaal</a>
+        <a href="?role=stagementor" style="padding: 1rem 2rem; background-color: #0f766e; color: white; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 1.1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">Stagementor Portaal</a>
+        <a href="?role=docent" style="padding: 1rem 2rem; background-color: #7c3aed; color: white; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 1.1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">Docent Portaal</a>
+        <a href="?role=admin" style="padding: 1rem 2rem; background-color: #6b7280; color: white; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 1.1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">Admin Portaal</a>
+        <a href="?role=goedgekeurd_student" style="padding: 1rem 2rem; background-color: #dc3545; color: white; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 1.1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">Goedgekeurd Student</a>
+      </div>
+    </div>
+  `;
+} else if (role === 'backend') {
+  // Back-end portaal: toon login pagina
+  document.querySelector('#login-page').style.display = 'flex';
+  app.innerHTML = '';
+} else {
+  // Hoofdportaal: kies tussen Front-end en Back-end
+  app.innerHTML = `
+    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; font-family: sans-serif; background-color: #f8f9fa;">
+      <h1 style="margin-bottom: 1rem; color: #212529;">Stage Monitoring Tool</h1>
+      <p style="margin-bottom: 2.5rem; color: #6c757d; font-size: 1.1rem;">Selecteer een portaal:</p>
+      <div style="display: flex; gap: 2rem; flex-wrap: wrap; justify-content: center;">
+        <a href="?role=frontend" style="display: flex; flex-direction: column; align-items: center; padding: 2rem 3rem; background-color: #0d6efd; color: white; text-decoration: none; border-radius: 12px; font-weight: bold; font-size: 1.3rem; box-shadow: 0 6px 12px rgba(0,0,0,0.15); min-width: 200px; transition: transform 0.2s;">
+          Front-end
+          <span style="font-size: 0.85rem; font-weight: normal; margin-top: 0.5rem; opacity: 0.9;">Bekijk de portalen</span>
         </a>
-      </li>
-      <li>
-        <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript" target="_blank">
-          <img class="button-icon" src="${javascriptLogo}" alt="">scrip
-          Learn more
+        <a href="?role=backend" style="display: flex; flex-direction: column; align-items: center; padding: 2rem 3rem; background-color: #198754; color: white; text-decoration: none; border-radius: 12px; font-weight: bold; font-size: 1.3rem; box-shadow: 0 6px 12px rgba(0,0,0,0.15); min-width: 200px; transition: transform 0.2s;">
+          Back-end
+          <span style="font-size: 0.85rem; font-weight: normal; margin-top: 0.5rem; opacity: 0.9;">Inloggen</span>
         </a>
-      </li>
-    </ul>
-  </div>
-  <div id="social">
-    <svg class="icon" role="presentation" aria-hidden="true"><use href="/icons.svg#social-icon"></use></svg>
-    <h2>Connect with us</h2>
-    <p>Join the Vite community</p>
-    <ul>
-      <li><a href="https://github.com/vitejs/vite" target="_blank"><svg class="button-icon" role="presentation" aria-hidden="true"><use href="/icons.svg#github-icon"></use></svg>GitHub</a></li>
-      <li><a href="https://chat.vite.dev/" target="_blank"><svg class="button-icon" role="presentation" aria-hidden="true"><use href="/icons.svg#discord-icon"></use></svg>Discord</a></li>
-      <li><a href="https://x.com/vite_js" target="_blank"><svg class="button-icon" role="presentation" aria-hidden="true"><use href="/icons.svg#x-icon"></use></svg>X.com</a></li>
-      <li><a href="https://bsky.app/profile/vite.dev" tascriptrget="_blank"><svg class="button-icon" role="presentation" aria-hidden="true"><use href="/icons.svg#bluesky-icon"></use></svg>Bluesky</a></li>
-    </ul>
-  </div>
-</section>
-
-<div class="ticks"></div>
-<section id="spacer"></section>
-`
-
-setupCounter(document.querySelector('#counter'))
+      </div>
+    </div>
+  `;
+}

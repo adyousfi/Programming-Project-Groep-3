@@ -1,5 +1,5 @@
 import { sequelize } from "../dbConnection.js";
-import Docent from "../userModel/users/docent.js";
+import Docent from "../userModel/docent.js";
 
 const createDocent = async (docent_id, user_id) =>
 {

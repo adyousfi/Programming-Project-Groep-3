@@ -1,5 +1,5 @@
 import { sequelize } from "../dbConnection.js";
-import Stagecommisie from "../userModel/users/stagecommisie.js";
+import Stagecommisie from "../userModel/stagecommisie.js";
 
 const createStagecommisie = async (stagecommisie_id, user_id) =>
 {
