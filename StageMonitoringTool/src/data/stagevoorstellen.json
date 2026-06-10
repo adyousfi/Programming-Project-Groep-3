@@ -326,6 +326,22 @@
       "feedback": null,
       "ingediendOp": "2026-06-08T12:14:49.429Z",
       "laatstBewerktOp": "2026-06-08T12:16:20.857Z"
+    },
+    {
+      "id": "proposal-1781084761188",
+      "studentNaam": "A",
+      "studentNummer": "3",
+      "bedrijfNaam": "zqd",
+      "bedrijfAdres": "zqd",
+      "mentorNaam": "dzq",
+      "mentorEmail": "eee@student.ehb.be",
+      "opdrachtOmschrijving": "EE",
+      "periodeStart": "2026-06-25",
+      "periodeEind": "2026-06-25",
+      "status": "wachten",
+      "feedback": null,
+      "ingediendOp": "2026-06-10T09:46:01.188Z",
+      "laatstBewerktOp": "2026-06-10T09:46:33.942Z"
     }
   ]
 }

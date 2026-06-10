@@ -1,6 +1,6 @@
 import './admin.css';
 
-const API_URL = 'http://localhost:3000';
+const API_URL = 'http://localhost:3001';
 
 const roleDisplayMap = {
   'student': 'Student',
@@ -26,7 +26,7 @@ export function renderAdmin(app) {
         </nav>
         <div class="sidebar-footer">
           <p class="user-name">Admin User</p>
-          <a href="#" class="logout-link">Uitloggen</a>
+          <a href="/" class="logout-link">Uitloggen</a>
         </div>
       </aside>
       <main class="main-content">

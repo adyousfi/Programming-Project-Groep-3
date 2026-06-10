@@ -1,15 +1,11 @@
 import './aanvragen.css';
+import { renderBeoordelen } from './beoordelen.js';
+import { getAllAanvragen } from '../services/aanvragenService.js';
 
-const aanvragen = [
-  { id: 1, naam: 'Lisa Peeters',  functie: 'DevOps Engineer',    bedrijf: 'CloudTech NV',    datum: '28/4/2026', status: 'in_afwachting' },
-  { id: 2, naam: 'Tom Claes',     functie: 'Mobile Developer',   bedrijf: 'Mobile Apps Inc', datum: '1/5/2026',  status: 'in_afwachting' },
-  { id: 3, naam: 'Sara Janssen',  functie: 'Frontend Developer', bedrijf: 'WebStudio BVBA',  datum: '3/5/2026',  status: 'goedgekeurd'   },
-];
-
-const aantalAfwachting = aanvragen.filter(function(a) { return a.status === 'in_afwachting'; }).length;
+let aanvragen = [];
 
 function statusLabel(status) {
-  const labels = { in_afwachting: 'In afwachting', goedgekeurd: 'Goedgekeurd', afgekeurd: 'Afgekeurd' };
+  const labels = { in_afwachting: 'In afwachting', goedgekeurd: 'Goedgekeurd', afgekeurd: 'Afgekeurd', aanpassingen: 'Aanpassingen nodig' };
   return labels[status] || status;
 }
 
@@ -21,15 +17,27 @@ function renderKaarten(lijst) {
           <div class="sc-card-info">
             <h2 class="sc-card-naam">${a.naam}</h2>
             <p class="sc-card-functie">${a.functie}</p>
-            <p class="sc-card-bedrijf">${a.bedrijf}</p>
+            <p class="sc-card-bedrijf">${a.bedrijf.naam}</p>
             <p class="sc-card-datum">Ingediend op: ${a.datum}</p>
-            <button class="sc-card-btn">Beoordelen</button>
+            <button class="sc-card-btn" data-id="${a.id}">Beoordelen</button>
           </div>
           <span class="sc-badge sc-badge--${a.status}">${statusLabel(a.status)}</span>
         </div>
       </div>
     `;
   }).join('');
+}
+
+function setupBeoordelenButtons() {
+  document.querySelectorAll('.sc-card-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      const id = btn.dataset.id;
+      const aanvraag = aanvragen.find(function(a) { return a.id == id; });
+      if (aanvraag) {
+        renderBeoordelen(aanvraag);
+      }
+    });
+  });
 }
 
 function setupFilter() {
@@ -48,11 +56,16 @@ function setupFilter() {
         : aanvragen;
 
       kaartenDiv.innerHTML = renderKaarten(gefilterd);
+      setupBeoordelenButtons();
     });
   });
 }
 
-export function renderAanvragen() {
+export async function renderAanvragen() {
+  aanvragen = await getAllAanvragen();
+
+  const aantalAfwachting = aanvragen.filter(function(a) { return a.status === 'in_afwachting'; }).length;
+
   document.querySelector('#app').innerHTML = `
     <div class="sc-layout">
       <aside class="sc-sidebar">
@@ -68,7 +81,7 @@ export function renderAanvragen() {
         </div>
         <div class="sc-sidebar-bottom">
           <span class="sc-user-name">Prof. De Vries</span>
-          <a href="#" class="sc-logout">Uitloggen</a>
+          <a href="/" class="sc-logout">Uitloggen</a>
         </div>
       </aside>
       <main class="sc-main">
@@ -84,4 +97,5 @@ export function renderAanvragen() {
   `;
 
   setupFilter();
+  setupBeoordelenButtons();
 }
