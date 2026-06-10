@@ -123,40 +123,62 @@ export function renderBeoordelen(aanvraag) {
     import('./aanvragen.js').then(function(m) { m.renderAanvragen(); });
   });
 
-  document.querySelector('#bd-uitloggen').addEventListener('click', function() {
+  document.querySelector('#bd-uitloggen').addEventListener('click', async function() {
+    try { await fetch('/logout', { method: 'POST', credentials: 'include' }); } catch {}
+    document.cookie = 'user=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
     window.location.href = '/';
   });
 
-  document.querySelector('#bd-goedkeuren').addEventListener('click', function() {
+  document.querySelector('#bd-goedkeuren').addEventListener('click', async function() {
     const feedback = document.querySelector('#bd-feedback').value.trim();
+    try {
+      const response = await fetch(`/api/stages/${aanvraag.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ status: 'Goedgekeurd', feedback: feedback || null }),
+      });
+      if (!response.ok) throw new Error('Server fout: ' + response.status);
+    } catch (err) {
+      alert('Fout bij opslaan: ' + err.message);
+      return;
+    }
     toonHistoriek(aanvraag, 'goedgekeurd', feedback);
   });
 
   document.querySelector('#bd-aanpassingen').addEventListener('click', async function() {
     const feedback = document.querySelector('#bd-feedback').value.trim();
     if (!feedback) { toonFeedbackFout(); return; }
-
     try {
-      const response = await fetch(`/api/proposals/${aanvraag.id}`, {
+      const response = await fetch(`/api/stages/${aanvraag.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          status: 'aanpassingen_vereist',
-          feedback: { intro: feedback, punten: [], conclusie: '' },
-        }),
+        credentials: 'include',
+        body: JSON.stringify({ status: 'Aanpassingen_vereist', feedback }),
       });
       if (!response.ok) throw new Error('Server fout: ' + response.status);
     } catch (err) {
-      alert('Kon aanpassingen niet opslaan: ' + err.message);
+      alert('Fout bij opslaan: ' + err.message);
       return;
     }
-
     toonHistoriek(aanvraag, 'aanpassingen', feedback);
   });
 
-  document.querySelector('#bd-afkeuren').addEventListener('click', function() {
+  document.querySelector('#bd-afkeuren').addEventListener('click', async function() {
     const feedback = document.querySelector('#bd-feedback').value.trim();
     if (!feedback) { toonFeedbackFout(); return; }
+    try {
+      const response = await fetch(`/api/stages/${aanvraag.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ status: 'Afgekeurd', feedback }),
+      });
+      if (!response.ok) throw new Error('Server fout: ' + response.status);
+    } catch (err) {
+      alert('Fout bij opslaan: ' + err.message);
+      return;
+    }
     toonHistoriek(aanvraag, 'afgekeurd', feedback);
   });
 }
