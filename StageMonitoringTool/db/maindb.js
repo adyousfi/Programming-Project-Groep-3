@@ -37,6 +37,7 @@ const app = express();
 app.use(router);
 
 // Seed database
+
 // await seedDatabase();
 
 // Routes
