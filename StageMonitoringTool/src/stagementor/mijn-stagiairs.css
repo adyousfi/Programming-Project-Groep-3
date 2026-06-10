@@ -1058,3 +1058,42 @@
 
 
 
+
+/* Overzichtpagina (Mijn Stagiairs) - afgestemd op Figma */
+.sm-logo .sm-logo-title {
+  font-size: 18px;
+}
+ 
+.sm-main-header .sm-welcome {
+  margin: 8px 0 0;
+}
+ 
+.sm-stagiair-bottom {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 20px;
+}
+ 
+.sm-stagiair-dates {
+  width: 100%;
+  gap: 0;
+}
+ 
+.sm-stagiair-dates > div {
+  flex: 0 0 auto;
+}
+ 
+.sm-stagiair-dates > div:first-child {
+  min-width: 360px;
+}
+ 
+.sm-stagiair-label {
+  font-weight: 400;
+  color: #4b5563;
+}
+ 
+.sm-stagiair-value {
+  font-weight: 600;
+  color: #111827;
+}
+

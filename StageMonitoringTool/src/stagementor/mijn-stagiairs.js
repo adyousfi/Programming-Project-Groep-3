@@ -7,8 +7,8 @@ const stagiairs = [
     email: 'jan.janssens@student.ehb.be',
     bedrijf: 'TechCorp Belgium',
     bedrijfFunctie: 'Frontend Developer',
-    start: '3 feb',
-    einde: '30 mei',
+    start: '1 feb',
+    einde: '31 mei',
     totalWeeks: 16,
     currentWeek: 2,
     badges: [
@@ -95,6 +95,12 @@ function parseStageDate(text) {
 function formatShortDate(date) {
   const monthNames = ['jan', 'feb', 'mrt', 'apr', 'mei', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'dec'];
   return `${date.getDate()} ${monthNames[date.getMonth()]}`;
+}
+
+function formatNumericDate(text) {
+  const date = parseStageDate(text);
+  if (!date) return text;
+  return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
 }
 
 function getWeekRange(stagiair, weekNum) {
@@ -263,8 +269,8 @@ function renderStagiairKaart(stagiair, index) {
       </div>
       <div class="sm-stagiair-bottom">
         <div class="sm-stagiair-dates">
-          <div><span class="sm-stagiair-label">Start:</span> ${stagiair.start}</div>
-          <div><span class="sm-stagiair-label">Einde:</span> ${stagiair.einde}</div>
+          <div><span class="sm-stagiair-label">Start:</span> <span class="sm-stagiair-value">${formatNumericDate(stagiair.start)}</span></div>
+          <div><span class="sm-stagiair-label">Einde:</span> <span class="sm-stagiair-value">${formatNumericDate(stagiair.einde)}</span></div>
         </div>
         <button class="sm-button" data-index="${index}">Student Bekijken</button>
       </div>
@@ -274,9 +280,31 @@ function renderStagiairKaart(stagiair, index) {
 
 function renderSectionContent() {
   return `
-    <div class="sm-stagiair-list">
-      <p class="sm-welcome">Welkom, Mieke Peeters</p>
-      ${stagiairs.map(renderStagiairKaart).join('')}
+    <div class="sm-layout">
+      <aside class="sm-sidebar">
+        <div class="sm-sidebar-top">
+          <div class="sm-logo">
+            <span class="sm-logo-title">Stagementor</span>
+            <span class="sm-logo-sub">Erasmushogeschool Brussel</span>
+          </div>
+          <nav class="sm-nav">
+            <a href="#" class="sm-nav-item active" data-page="mijn-stagiairs">Mijn Stagiairs</a>
+          </nav>
+        </div>
+        <div class="sm-sidebar-bottom">
+          <span class="sm-user-name">Mieke Peeters</span>
+          <a href="/" class="sm-logout">Uitloggen</a>
+        </div>
+      </aside>
+      <main class="sm-main">
+        <div class="sm-main-header">
+          <h1 class="sm-main-title">Mijn Stagiairs</h1>
+          <p class="sm-welcome">Welkom, Mieke Peeters</p>
+        </div>
+        <div class="sm-stagiair-list">
+          ${stagiairs.map(renderStagiairKaart).join('')}
+        </div>
+      </main>
     </div>
   `;
 }
@@ -721,3 +749,4 @@ function renderStudentDetail(app, stagiair) {
     app.innerHTML = renderSectionContent();
     setupStudentLinks(app);
   }
+  
