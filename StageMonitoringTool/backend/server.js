@@ -3,17 +3,7 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import { run } from '../db/dbConnection.js';
 import User from '../db/userModel/user.js';
-import { renderAanvragen } from '../src/admin/admin.js';
-import { renderStudentDashboard } from './student/student.js';
-import { renderStageformulier } from './student/formulier.js';
-import { renderWachten } from './student/wachten.js';
-import { renderFeedback } from './student/feedback.js';
-import { renderAanpassen } from './student/aanpassen.js';
-import { renderMijnStagiairs } from './stagementor/mijn-stagiairs.js';
-import { renderMijnStudenten } from './docent/mijn-studenten.js';
-import { renderGoedgekeurdStudent } from './student/goedgekeurd_student.js';
-import { renderDocumenten } from './student/documenten.js';
-import { renderAdmin } from './admin/admin.js';
+
 
 const app = express();
 
