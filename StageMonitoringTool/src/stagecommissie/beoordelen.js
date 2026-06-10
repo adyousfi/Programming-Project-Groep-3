@@ -1,4 +1,5 @@
 import './beoordelen.css';
+import { logout } from '../utils/auth.js';
 
 function statusLabel(status) {
   const labels = {
@@ -123,9 +124,7 @@ export function renderBeoordelen(aanvraag) {
     import('./aanvragen.js').then(function(m) { m.renderAanvragen(); });
   });
 
-  document.querySelector('#bd-uitloggen').addEventListener('click', function() {
-    window.location.href = '/';
-  });
+  document.querySelector('#bd-uitloggen').addEventListener('click', logout);
 
   document.querySelector('#bd-goedkeuren').addEventListener('click', function() {
     const feedback = document.querySelector('#bd-feedback').value.trim();
@@ -209,9 +208,7 @@ function toonHistoriek(aanvraag, beslissing, feedback) {
     import('./aanvragen.js').then(function(m) { m.renderAanvragen(); });
   });
 
-  document.querySelector('#bd-uitloggen').addEventListener('click', function() {
-    window.location.href = '/';
-  });
+  document.querySelector('#bd-uitloggen').addEventListener('click', logout);
 }
 
 export function renderDetails(aanvraag) {
@@ -249,7 +246,5 @@ export function renderDetails(aanvraag) {
     import('./aanvragen.js').then(function(m) { m.renderAanvragen(); });
   });
 
-  document.querySelector('#bd-uitloggen').addEventListener('click', function() {
-    window.location.href = '/';
-  });
+  document.querySelector('#bd-uitloggen').addEventListener('click', logout);
 }
