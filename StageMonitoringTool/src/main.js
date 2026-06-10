@@ -37,7 +37,7 @@ function redirectBasedOnRole(role) {
     case 'wachten':             renderWachten(app);             break;
     case 'feedback':            renderFeedback(app);            break;
     case 'aanpassen':           renderAanpassen(app);           break;
-    case 'stagecommissie':      renderAanvragen();              break;
+    case 'stagecommisie':      renderAanvragen();              break;
     case 'stagementor':         renderMijnStagiairs(app);       break;
     case 'docent':              renderMijnStudenten();          break;
     case 'goedgekeurd_student': renderGoedgekeurdStudent(app);  break;
