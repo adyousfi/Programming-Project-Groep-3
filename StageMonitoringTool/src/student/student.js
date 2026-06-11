@@ -1,5 +1,5 @@
 import './student.css';
-import { logout } from '../utils/auth.js';
+
 
 export async function renderStudentDashboard(container, userName = '') {
     if (!userName) {
@@ -26,7 +26,7 @@ export async function renderStudentDashboard(container, userName = '') {
                 </div>
                 <div class="user-profile">
                     <span class="user-name" id="user-name-display">${userName}</span>
-                    <button id="student-logout-btn" class="logout-link">Uitloggen</button>
+                    <a href="/" class="logout-link">Uitloggen</a>
                 </div>
             </header>
 
@@ -91,8 +91,6 @@ export async function renderStudentDashboard(container, userName = '') {
             </main>
         </div>
     `;
-
-    container.querySelector('#student-logout-btn').addEventListener('click', logout);
 
     // Event listener voor "Stagevoorstel Indienen" button (paginadirectie)
     const indienenBtn = container.querySelector('.primary-button');

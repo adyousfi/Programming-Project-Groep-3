@@ -1,6 +1,5 @@
 import './mijn-studenten.css';
 import { studentenMockdata as studenten } from '../data/mockdata.js';
-import { logout } from '../utils/auth.js';
 
 function renderMijlpalen(lijst) {
   return lijst.map(function(m, i) {
@@ -137,7 +136,6 @@ export function renderMijnStudenten() {
   const actief    = studenten.filter(function(s) { return s.status === 'lopend'; });
   const afgelopen = studenten.filter(function(s) { return s.status === 'afgelopen'; });
 
-  // ✅ 1. eerst HTML renderen
   document.querySelector('#app').innerHTML = `
     <div class="dc-layout">
       <aside class="dc-sidebar">
@@ -152,7 +150,7 @@ export function renderMijnStudenten() {
         </div>
         <div class="dc-sidebar-bottom">
           <span class="dc-user-name">Prof. Sarah Claes</span>
-          <button id="logout-btn" class="dc-logout">Uitloggen</button>
+          <a href="/" class="dc-logout">Uitloggen</a>
         </div>
       </aside>
       <main class="dc-main">
@@ -165,8 +163,6 @@ export function renderMijnStudenten() {
     </div>
   `;
 
-  // ✅ 2. daarna pas event listeners toevoegen
   setupFilter(studenten);
   setupStudentButtons(studenten);
-  document.getElementById('logout-btn').addEventListener('click', logout);
 }

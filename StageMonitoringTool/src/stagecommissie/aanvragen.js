@@ -1,7 +1,6 @@
 import './aanvragen.css';
 import { renderBeoordelen } from './beoordelen.js';
 import { getAllAanvragen } from '../services/aanvragenService.js';
-import { logout } from '../utils/auth.js';
 
 let aanvragen = [];
 let userName = 'Stagecommissie';
@@ -99,8 +98,6 @@ export async function renderAanvragen() {
         <div class="sc-sidebar-bottom">
           <span class="sc-user-name">${userName}</span>
           <a href="/" class="sc-logout">Uitloggen</a>
-          <span class="sc-user-name">Prof. De Vries</span>
-          <button id="sc-logout-btn" class="sc-logout">Uitloggen</button>
         </div>
       </aside>
       <main class="sc-main">
@@ -117,5 +114,4 @@ export async function renderAanvragen() {
 
   setupFilter();
   setupBeoordelenButtons();
-  document.getElementById('sc-logout-btn').addEventListener('click', logout);
 }

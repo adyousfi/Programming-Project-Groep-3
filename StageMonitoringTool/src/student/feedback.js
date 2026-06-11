@@ -1,6 +1,4 @@
 import './feedback.css';
-import { getActiveProposalId, getProposalById } from './dataService.js';
-import { logout } from '../utils/auth.js';
 
 export async function renderFeedback(container, user = null, stageData = null) {
     let displayName = 'Student';
@@ -45,9 +43,9 @@ export async function renderFeedback(container, user = null, stageData = null) {
                     <nav class="sidebar-nav">
                     </nav>
                 </div>
-                <div class="user-profile">
-                    <span class="user-name" id="user-name-display">${proposal?.studentNaam || userName}</span>
-                    <button id="feedback-logout-btn" class="logout-link">Uitloggen</button>
+                <div class="sidebar-bottom">
+                    <span class="sidebar-user-name">${displayName}</span>
+                    <a href="/" class="sidebar-logout">Uitloggen</a>
                 </div>
             </aside>
 
@@ -116,12 +114,10 @@ export async function renderFeedback(container, user = null, stageData = null) {
         </div>
     `;
 
-    container.querySelector('#feedback-logout-btn').addEventListener('click', logout);
-
-    const adjustBtn = container.querySelector('.action-button');
-    if (adjustBtn) {
-        adjustBtn.addEventListener('click', () => {
-            window.location.href = '/?role=aanpassen';
+    const aanpassenBtn = container.querySelector('#feedback-aanpassen');
+    if (aanpassenBtn) {
+        aanpassenBtn.addEventListener('click', () => {
+            window.location.search = '?role=aanpassen';
         });
     }
 }

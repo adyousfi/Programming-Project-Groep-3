@@ -1,5 +1,4 @@
 import './student-detail.css';
-import { logout } from '../utils/auth.js';
 
 const navItems = [
   { id: 'overzicht',    label: 'Overzicht' },
@@ -93,7 +92,7 @@ export function renderStudentDetail(student) {
         </div>
         <div class="sd-sidebar-bottom">
           <span class="sd-user-name">Prof. Sarah Claes</span>
-          <button id="sd-logout-btn" class="sd-logout">Uitloggen</button>
+          <a href="/" class="sd-logout">Uitloggen</a>
         </div>
       </aside>
 
@@ -109,8 +108,6 @@ export function renderStudentDetail(student) {
       </main>
     </div>
   `;
-
-  document.getElementById('sd-logout-btn').addEventListener('click', logout);
 
   document.querySelector('#sd-terug').addEventListener('click', function(e) {
     e.preventDefault();

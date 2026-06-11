@@ -1,5 +1,4 @@
 import './mijn-stagiairs.css';
-import { logout } from '../utils/auth.js';
 
 const stagiairs = [
   {
@@ -156,7 +155,7 @@ function renderStudentDetail(app, stagiair) {
         </div>
         <div class="sm-sidebar-bottom">
           <span class="sm-user-name">Mieke Peeters</span>
-          <button class="sm-logout" id="sm-logout-btn">Uitloggen</button>
+          <a href="/" class="sm-logout" id="sm-logout">Uitloggen</a>
         </div>
       </aside>
       <main class="sm-main sm-main--detail">
@@ -205,8 +204,6 @@ function renderStudentDetail(app, stagiair) {
       </main>
     </div>
   `;
-
-  document.querySelector('#sm-logout-btn').addEventListener('click', logout);
 
   document.querySelector('#sm-back').addEventListener('click', function(event) {
     event.preventDefault();
@@ -271,7 +268,7 @@ function renderStudentDetail(app, stagiair) {
               </div>
               <div class="sm-sidebar-bottom">
                 <span class="sm-user-name">Mieke Peeters</span>
-                <button class="sm-logout" id="sm-logout-btn">Uitloggen</button>
+                <a href="/" class="sm-logout">Uitloggen</a>
               </div>
             </aside>
             <main class="sm-main sm-main--detail">
@@ -325,8 +322,6 @@ function renderStudentDetail(app, stagiair) {
             </main>
           </div>
         `;
-
-        document.querySelector('#sm-logout-btn').addEventListener('click', logout);
 
         document.querySelector('#sm-back-evaluatie').addEventListener('click', function(e) {
           e.preventDefault();
@@ -416,7 +411,7 @@ function renderStudentDetail(app, stagiair) {
               </div>
               <div class="sm-sidebar-bottom">
                 <span class="sm-user-name">Mieke Peeters</span>
-                <button class="sm-logout" id="sm-logout-btn">Uitloggen</button>
+                <a href="/" class="sm-logout">Uitloggen</a>
               </div>
             </aside>
             <main class="sm-main sm-main--detail">
@@ -449,8 +444,6 @@ function renderStudentDetail(app, stagiair) {
           </div>
         `;
   
-        document.querySelector('#sm-logout-btn').addEventListener('click', logout);
-
         document.querySelector('#sm-back-logboek').addEventListener('click', function(e) {
           e.preventDefault();
           renderStudentDetail(app, stagiair);

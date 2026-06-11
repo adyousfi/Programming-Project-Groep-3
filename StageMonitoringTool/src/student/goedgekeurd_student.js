@@ -1,5 +1,4 @@
 import './goedgekeurd_student.css';
-import { logout } from '../utils/auth.js';
 
 export function renderGoedgekeurdStudent(container, userName = 'Jan Janssens', stageData = null) {
     const bedrijfNaam = stageData?.bedrijf?.naam || 'Onbekend';
@@ -27,7 +26,7 @@ export function renderGoedgekeurdStudent(container, userName = 'Jan Janssens', s
                 </div>
                 <div class="sidebar-bottom">
                     <span class="sidebar-user-name">${userName}</span>
-                    <button id="goedgekeurd-logout-btn" class="sidebar-logout">Uitloggen</button>
+                    <a href="/" class="sidebar-logout">Uitloggen</a>
                 </div>
             </aside>
 
@@ -129,6 +128,4 @@ export function renderGoedgekeurdStudent(container, userName = 'Jan Janssens', s
             </main>
         </div>
     `;
-
-    container.querySelector('#goedgekeurd-logout-btn').addEventListener('click', logout);
 }
