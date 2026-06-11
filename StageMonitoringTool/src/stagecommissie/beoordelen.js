@@ -231,7 +231,8 @@ function toonHistoriek(aanvraag, beslissing, feedback, userName = 'Stagecommissi
     import('./aanvragen.js').then(function(m) { m.renderAanvragen(); });
   });
 
-  document.querySelector('#bd-uitloggen').addEventListener('click', function() {
+  document.querySelector('#bd-uitloggen').addEventListener('click', async function() {
+    try { await fetch('/logout', { method: 'POST', credentials: 'include' }); } catch {}
     window.location.href = '/';
   });
 }
@@ -271,7 +272,8 @@ export function renderDetails(aanvraag, userName = 'Stagecommissie') {
     import('./aanvragen.js').then(function(m) { m.renderAanvragen(); });
   });
 
-  document.querySelector('#bd-uitloggen').addEventListener('click', function() {
+  document.querySelector('#bd-uitloggen').addEventListener('click', async function() {
+    try { await fetch('/logout', { method: 'POST', credentials: 'include' }); } catch {}
     window.location.href = '/';
   });
 }
