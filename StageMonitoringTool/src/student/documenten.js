@@ -1,10 +1,34 @@
 import './documenten.css';
 
-export function renderDocumenten(container, userName = 'Jan Janssens') {
+export async function renderDocumenten(container) {
+    let userName = 'Student';
+    try {
+        const res = await fetch('/me', { credentials: 'include' });
+        const data = await res.json();
+        if (data.loggedIn && data.user) {
+            userName = data.user.last_name && data.user.first_name
+                ? `${data.user.last_name.toUpperCase()} ${data.user.first_name}`
+                : data.user.first_name || 'Student';
+        }
+    } catch {}
+
+    let adminDocs = [];
+    let studentDocs = [];
+    try {
+        const res = await fetch('/api/documents/mijn', { credentials: 'include' });
+        const docs = await res.json();
+        if (Array.isArray(docs)) {
+            adminDocs = docs.filter(d => d.type === 'admin_template');
+            studentDocs = docs.filter(d => d.type === 'student_submission');
+        }
+    } catch {}
+
+    const hasAdminDoc = adminDocs.length > 0;
+    const hasStudentSubmission = studentDocs.length > 0;
+
     container.innerHTML = `
         <div class="documenten-layout">
 
-            <!-- Linkerzijbalk -->
             <aside class="documenten-sidebar">
                 <div class="sidebar-top">
                     <div class="sidebar-logo">
@@ -25,26 +49,75 @@ export function renderDocumenten(container, userName = 'Jan Janssens') {
                 </div>
             </aside>
 
-            <!-- Hoofdinhoud -->
             <main class="documenten-main">
 
                 <h1 class="page-title">Documenten</h1>
 
-                <!-- Stageovereenkomst Upload Card -->
+                <!-- Stap 1: Document van school downloaden -->
                 <div class="document-card">
                     <div class="document-card-header">
-                        <h2 class="document-card-title">Stageovereenkomst</h2>
-                        <span class="document-status-badge badge-wachtend">Nog niet geuploadd</span>
+                        <h2 class="document-card-title">Document van school</h2>
+                        ${hasAdminDoc
+                            ? `<span class="document-status-badge badge-beschikbaar">Beschikbaar</span>`
+                            : `<span class="document-status-badge badge-wachtend">Wacht op school</span>`
+                        }
                     </div>
-                    <p class="document-card-subtitle">Officieel document tussen student, bedrijf en school</p>
+                    <p class="document-card-subtitle">Download dit document, vul het in en dien het hieronder in</p>
                     <hr class="document-card-divider">
-                    <p class="document-card-description">Upload de ondertekende stageovereenkomst hier. Het document moet ondertekend zijn door alle partijen (student, bedrijf en school).</p>
+
+                    ${hasAdminDoc ? `
+                        <div class="doc-list">
+                            ${adminDocs.map(d => `
+                                <div class="doc-list-item">
+                                    <span class="doc-file-icon">&#128196;</span>
+                                    <span class="doc-file-name">${d.name}</span>
+                                    <span class="doc-file-date">${d.datum}</span>
+                                    <a href="/api/documents/${d.id}/download" class="doc-download-btn" download>Downloaden</a>
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : `
+                        <p class="document-card-description">
+                            De school heeft nog geen document voor jou klaarstaan. Je ontvangt een melding zodra dit beschikbaar is.
+                        </p>
+                    `}
+                </div>
+
+                <!-- Stap 2: Ingevuld document terugsturen -->
+                <div class="document-card" ${!hasAdminDoc ? 'style="opacity:0.5;pointer-events:none;"' : ''}>
+                    <div class="document-card-header">
+                        <h2 class="document-card-title">Ingevuld document indienen</h2>
+                        ${hasStudentSubmission
+                            ? `<span class="document-status-badge badge-ingediend">Ingediend</span>`
+                            : `<span class="document-status-badge badge-wachtend">Nog niet ingediend</span>`
+                        }
+                    </div>
+                    <p class="document-card-subtitle">Upload hier het ingevulde document terug naar de school</p>
+                    <hr class="document-card-divider">
+
+                    ${hasStudentSubmission ? `
+                        <div class="doc-list" style="margin-bottom:16px;">
+                            ${studentDocs.map(d => `
+                                <div class="doc-list-item">
+                                    <span class="doc-file-icon">&#10003;</span>
+                                    <span class="doc-file-name">${d.name}</span>
+                                    <span class="doc-file-date">${d.datum}</span>
+                                    <a href="/api/documents/${d.id}/download" class="doc-download-btn" download>Bekijken</a>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <p class="document-card-description">Wil je een nieuw document indienen? Selecteer hieronder een bestand.</p>
+                    ` : `
+                        <p class="document-card-description">
+                            Download eerst het document hierboven, vul het in, en upload het hier terug.
+                        </p>
+                    `}
 
                     <div class="upload-zone" id="upload-zone">
                         <div class="upload-icon">&#128194;</div>
                         <p class="upload-text">Sleep je bestand hierheen of klik om te selecteren</p>
-                        <p class="upload-subtext">PDF, JPG of PNG — max. 10MB</p>
-                        <input type="file" id="file-input" class="upload-file-input" accept=".pdf,.jpg,.jpeg,.png">
+                        <p class="upload-subtext">PDF, DOCX — max. 10MB</p>
+                        <input type="file" id="file-input" class="upload-file-input" accept=".pdf,.doc,.docx">
                         <button type="button" class="upload-btn" id="upload-btn">Bestand Selecteren</button>
                     </div>
 
@@ -52,21 +125,19 @@ export function renderDocumenten(container, userName = 'Jan Janssens') {
                         <span class="upload-error-text" id="upload-error-text"></span>
                     </div>
 
-                    <div class="upload-selected" id="upload-selected" style="display: none;">
+                    <div class="upload-error" id="upload-error" style="display: none;">
+                        <span class="upload-error-text" id="upload-error-text"></span>
+                    </div>
+
+                    <div class="upload-selected" id="upload-selected" style="display:none;">
                         <span class="upload-filename" id="upload-filename"></span>
                         <button type="button" class="upload-remove-btn" id="upload-remove-btn">Verwijderen</button>
                     </div>
 
-                    <button type="button" class="upload-submit-btn" id="upload-submit-btn" style="display: none;">Document Indienen</button>
-                </div>
-
-                <div class="download-template">
-                    <p class="download-template-text">Nog geen stageovereenkomst? Download eerst het template, vul het in, en upload het hier terug.</p>
-                    <a href="/templates/stageovereenkomst.pdf" download class="download-template-btn">Download Template</a>
+                    <button type="button" class="upload-submit-btn" id="upload-submit-btn" style="display:none;">Document Indienen</button>
                 </div>
 
             </main>
-
         </div>
     `;
 
@@ -77,7 +148,6 @@ export function renderDocumenten(container, userName = 'Jan Janssens') {
     const uploadFilename = container.querySelector('#upload-filename');
     const uploadRemoveBtn = container.querySelector('#upload-remove-btn');
     const uploadSubmitBtn = container.querySelector('#upload-submit-btn');
-    const badge = container.querySelector('.document-status-badge');
     let selectedFile = null;
 
     function validateFile(file) {
@@ -129,45 +199,48 @@ export function renderDocumenten(container, userName = 'Jan Janssens') {
         hideError();
     }
 
-    // Click op upload zone → open file picker
     uploadZone.addEventListener('click', () => fileInput.click());
+    uploadBtn.addEventListener('click', (e) => { e.stopPropagation(); fileInput.click(); });
+    fileInput.addEventListener('change', () => { if (fileInput.files.length > 0) showFile(fileInput.files[0]); });
 
-    // Click op "Bestand Selecteren" button
-    uploadBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        fileInput.click();
-    });
-
-    // Bestand geselecteerd via file picker
-    fileInput.addEventListener('change', () => {
-        if (fileInput.files.length > 0) {
-            showFile(fileInput.files[0]);
-        }
-    });
-
-    // Drag & drop
-    uploadZone.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        uploadZone.classList.add('dragover');
-    });
-
-    uploadZone.addEventListener('dragleave', () => {
-        uploadZone.classList.remove('dragover');
-    });
-
+    uploadZone.addEventListener('dragover', (e) => { e.preventDefault(); uploadZone.classList.add('dragover'); });
+    uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('dragover'));
     uploadZone.addEventListener('drop', (e) => {
         e.preventDefault();
         uploadZone.classList.remove('dragover');
-        if (e.dataTransfer.files.length > 0) {
-            showFile(e.dataTransfer.files[0]);
-        }
+        if (e.dataTransfer.files.length > 0) showFile(e.dataTransfer.files[0]);
     });
 
-    // Verwijder bestand
-    uploadRemoveBtn.addEventListener('click', () => resetUpload());
+    uploadRemoveBtn.addEventListener('click', resetUpload);
 
-    // Document indienen
-    uploadSubmitBtn.addEventListener('click', () => {
+    uploadSubmitBtn.addEventListener('click', async () => {
+        if (!fileInput.files[0]) return;
+        uploadSubmitBtn.disabled = true;
+        uploadSubmitBtn.textContent = 'Bezig met uploaden...';
+
+        const formData = new FormData();
+        formData.append('document', fileInput.files[0]);
+
+        try {
+            const res = await fetch('/api/documents/student-upload', {
+                method: 'POST',
+                credentials: 'include',
+                body: formData,
+            });
+            if (!res.ok) {
+                const err = await res.json().catch(() => ({}));
+                alert('Fout bij indienen: ' + (err.msg || res.status));
+                uploadSubmitBtn.disabled = false;
+                uploadSubmitBtn.textContent = 'Document Indienen';
+                return;
+            }
+        } catch {
+            alert('Geen verbinding met de server. Probeer opnieuw.');
+            uploadSubmitBtn.disabled = false;
+            uploadSubmitBtn.textContent = 'Document Indienen';
+            return;
+        }
+
         if (!selectedFile) {
             showError('Geen bestand geselecteerd.');
             return;

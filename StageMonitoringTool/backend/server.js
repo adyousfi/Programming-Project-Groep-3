@@ -1,6 +1,10 @@
 import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
+import multer from 'multer';
+import path from 'path';
+import fs from 'fs';
+import { fileURLToPath } from 'url';
 import { run } from '../db/dbConnection.js';
 import User from '../db/userModel/user.js';
 import Student from '../db/userModel/student.js';
@@ -8,6 +12,21 @@ import Stagementor from '../db/userModel/stagementor.js';
 import Bedrijf from '../db/objectModel/bedrijf.js';
 import Stage from '../db/objectModel/stage.js';
 import Docent from '../db/userModel/docent.js';
+import StageDocument from '../db/objectModel/stageDocument.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const uploadsDir = path.join(__dirname, '..', 'uploads');
+if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, uploadsDir),
+  filename: (req, file, cb) => {
+    const unique = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
+    cb(null, `${unique}-${file.originalname}`);
+  },
+});
+const upload = multer({ storage, limits: { fileSize: 10 * 1024 * 1024 } });
 
 
 const app = express();
@@ -222,6 +241,27 @@ app.post('/api/stages', async (req, res) => {
   }
 });
 
+// ✅ GET stages with status Goedgekeurd (must be before /:id)
+app.get('/api/stages/goedgekeurd', async (req, res) => {
+  try {
+    const stages = await Stage.findAll({
+      where: { status: 'Goedgekeurd' },
+      include: [
+        { model: Student, as: 'student', include: [{ model: User, as: 'User' }] },
+        { model: Bedrijf, as: 'bedrijf' },
+      ],
+    });
+    return res.json(stages.map(s => ({
+      id: s.stage_id,
+      naam: s.student?.User ? `${s.student.User.last_name.toUpperCase()} ${s.student.User.first_name}` : 'Onbekend',
+      bedrijf: s.bedrijf?.naam || '',
+    })));
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ msg: 'Fout bij ophalen stages' });
+  }
+});
+
 // ✅ GET single stage by ID
 app.get('/api/stages/:id', async (req, res) => {
   try {
@@ -368,6 +408,108 @@ app.put('/api/stages/:id', async (req, res) => {
   } catch (error) {
     console.error('Error updating stage:', error);
     return res.status(500).json({ msg: 'Fout bij bijwerken van stage' });
+  }
+});
+
+// ✅ DOCUMENTS API
+
+// Admin uploads a document for a specific stage
+app.post('/api/documents/admin-upload', upload.single('document'), async (req, res) => {
+  try {
+    const cookieUser = req.cookies.user;
+    if (!cookieUser) return res.status(401).json({ msg: 'Niet ingelogd' });
+    const { stage_id } = req.body;
+    if (!stage_id || !req.file) return res.status(400).json({ msg: 'stage_id en bestand zijn verplicht' });
+    const doc = await StageDocument.create({
+      stage_id: parseInt(stage_id),
+      type: 'admin_template',
+      original_name: req.file.originalname,
+      stored_name: req.file.filename,
+      uploaded_by: cookieUser.user_id,
+    });
+    return res.status(201).json({ msg: 'Document geüpload', document_id: doc.document_id });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ msg: 'Fout bij uploaden' });
+  }
+});
+
+// Student uploads their filled document
+app.post('/api/documents/student-upload', upload.single('document'), async (req, res) => {
+  try {
+    const cookieUser = req.cookies.user;
+    if (!cookieUser) return res.status(401).json({ msg: 'Niet ingelogd' });
+    const stage = await Stage.findOne({ where: { student_id: cookieUser.user_id } });
+    if (!stage) return res.status(404).json({ msg: 'Geen stage gevonden' });
+    if (!req.file) return res.status(400).json({ msg: 'Bestand is verplicht' });
+    const doc = await StageDocument.create({
+      stage_id: stage.stage_id,
+      type: 'student_submission',
+      original_name: req.file.originalname,
+      stored_name: req.file.filename,
+      uploaded_by: cookieUser.user_id,
+    });
+    return res.status(201).json({ msg: 'Document ingediend', document_id: doc.document_id });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ msg: 'Fout bij uploaden' });
+  }
+});
+
+// Get documents for the logged-in student
+app.get('/api/documents/mijn', async (req, res) => {
+  try {
+    const cookieUser = req.cookies.user;
+    if (!cookieUser) return res.status(401).json({ msg: 'Niet ingelogd' });
+    const stage = await Stage.findOne({ where: { student_id: cookieUser.user_id } });
+    if (!stage) return res.json([]);
+    const docs = await StageDocument.findAll({
+      where: { stage_id: stage.stage_id },
+      order: [['createdAt', 'DESC']],
+    });
+    return res.json(docs.map(d => ({
+      id: d.document_id,
+      type: d.type,
+      name: d.original_name,
+      datum: new Date(d.createdAt).toLocaleDateString('nl-BE'),
+    })));
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ msg: 'Fout bij ophalen documenten' });
+  }
+});
+
+// Get all documents for a stage (admin use)
+app.get('/api/documents/stage/:stageId', async (req, res) => {
+  try {
+    const docs = await StageDocument.findAll({
+      where: { stage_id: req.params.stageId },
+      order: [['createdAt', 'DESC']],
+    });
+    return res.json(docs.map(d => ({
+      id: d.document_id,
+      type: d.type,
+      name: d.original_name,
+      datum: new Date(d.createdAt).toLocaleDateString('nl-BE'),
+    })));
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ msg: 'Fout bij ophalen documenten' });
+  }
+});
+
+// Download a document
+app.get('/api/documents/:id/download', async (req, res) => {
+  try {
+    const doc = await StageDocument.findByPk(req.params.id);
+    if (!doc) return res.status(404).json({ msg: 'Document niet gevonden' });
+    const filePath = path.join(uploadsDir, doc.stored_name);
+    if (!fs.existsSync(filePath)) return res.status(404).json({ msg: 'Bestand niet gevonden op server' });
+    res.setHeader('Content-Disposition', `attachment; filename="${doc.original_name}"`);
+    return res.sendFile(filePath);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ msg: 'Fout bij downloaden' });
   }
 });
 

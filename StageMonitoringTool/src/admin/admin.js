@@ -1,5 +1,6 @@
 import './admin.css';
 import { renderKoppelingen } from './koppeldocent.js';
+import { renderAdminDocumenten } from './adminDocumenten.js';
 
 
 const API_URL = 'http://localhost:3001';
@@ -23,7 +24,7 @@ export function renderAdmin(app) {
         <nav class="sidebar-nav">
           <a href="#" class="nav-item active">Gebruikers</a>
           <a href="#" class="nav-item" id="navKoppelingen">Koppelingen</a>
-          <a href="#" class="nav-item">Documenten</a>
+          <a href="#" class="nav-item" id="navDocumenten">Documenten</a>
           <a href="#" class="nav-item">Competenties</a>
         </nav>
         <div class="sidebar-footer">
@@ -237,6 +238,11 @@ export function renderAdmin(app) {
     e.preventDefault();
     renderKoppelingen(app);
 });
+
+    document.getElementById('navDocumenten').addEventListener('click', (e) => {
+      e.preventDefault();
+      renderAdminDocumenten(app);
+    });
 
     // Add delete button listeners
     document.querySelectorAll('.btn-deactivate').forEach(btn => {
