@@ -153,12 +153,23 @@ function attachNav(app, stagiair) {
     item.addEventListener('click', (e) => {
       e.preventDefault();
       const page = item.dataset.page;
-      if (page === 'logboek') renderLogboekOverview(app, stagiair);
-      else if (page === 'evaluatie') renderEvaluatiePage(app, stagiair, 'tussentijds');
-      else if (page === 'overzicht') renderStudentDetail(app, stagiair);
+
+      if (page === 'overzicht') {
+        renderStudentDetail(app, stagiair);
+
+      } else if (page === 'documenten') {
+        renderDocumentenPage(app, stagiair);
+
+      } else if (page === 'logboek') {
+        renderLogboekOverview(app, stagiair);
+
+      } else if (page === 'evaluatie') {
+        renderEvaluatiePage(app, stagiair, 'tussentijds');
+      }
     });
   });
 }
+
 
 function renderStudentDetail(app, stagiair) {
   const progressPct = Math.round((stagiair.currentWeek / stagiair.totalWeeks) * 100);
@@ -469,6 +480,60 @@ function renderWeekDetail(app, stagiair, weekNum) {
     });
   }
 }
+function renderDocumentenPage(app, stagiair) {
+  app.innerHTML = `
+    <div class="sm-layout">
+      ${sidebarHtml('documenten')}
+
+      <main class="sm-main sm-main--detail">
+        <div class="sm-detail-top">
+          <div>
+            <h1 class="sm-detail-title">Documenten</h1>
+          </div>
+
+          <a href="#" id="sm-back-documenten" class="sm-detail-back">
+            ← Terug naar stagiairs
+          </a>
+        </div>
+
+        <div class="sm-document-card">
+          <div class="sm-document-header">
+            <div>
+              <h2 class="sm-document-title">Stageovereenkomst</h2>
+              <p class="sm-document-subtitle">
+                Officieel document tussen student, bedrijf en school
+              </p>
+            </div>
+
+            <span class="sm-document-status">
+              Ondertekend
+            </span>
+          </div>
+
+          <div class="sm-document-divider"></div>
+
+          <p class="sm-document-text">
+            De stageovereenkomst is opgesteld en ondertekend door alle partijen.
+          </p>
+
+          <button class="sm-button">
+            Download Overeenkomst
+          </button>
+        </div>
+      </main>
+    </div>
+  `;
+
+  document
+    .querySelector('#sm-back-documenten')
+    .addEventListener('click', (e) => {
+      e.preventDefault();
+      renderStudentDetail(app, stagiair);
+    });
+
+  attachNav(app, stagiair);
+}
+
 
 export function renderMijnStagiairs(app) {
   renderStagementorPage(app);
