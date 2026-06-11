@@ -22,26 +22,20 @@ const seedDatabase = async () => {
 
     // 3. Bulk insert the dummy data
     
-    await createUserCore("jon","hys","hys.jon@html.com","passwrd",ROLES.STUDENT,"0493998987");
-    await createUserCore("John","Doe","john.doe@school.com","hashed_password_123",ROLES.DOCENT);
-    await createUserCore("huh","hah","helnah@hotmail.com","hashpassword", ROLES.ADMIN);
-    await createUserCore("Jane","Smith","jane.smith@stagecommisie.com","hashedPasswordnotfound",ROLES.STAGECOMMISIE);
-    await createUserCore("Alex","Jones","alex.jones@school.com","notAPassword",ROLES.STUDENT);
-    await createUserCore("Emily","Brown","emily.brown@something.com","noPassword",ROLES.STAGEMENTOR)
-    await createUserCore("ariga","toe","arigatoe@html.com","IlikeToes",ROLES.STUDENT);
-    
-    await createUserCore("some","dude","some.dude@something.com","whatisdas",ROLES.STAGEMENTOR)
-    await createUserCore("some","other","some.other@something.com","whatisdas",ROLES.STAGEMENTOR)
+    await createUserCore("Jan","Student","jan@student.com","wachtwoord",ROLES.STUDENT,"0493998987");
+    await createUserCore("Pieter","Peer","pieter@student.com","wachtwoord",ROLES.STUDENT);
+    await createUserCore("Sara","Docent","sara@docent.com","wachtwoord",ROLES.DOCENT);
+    await createUserCore("Admin","Beheer","admin@admin.com","wachtwoord",ROLES.ADMIN);
+    await createUserCore("Lia","Commissie","lia@commissie.com","wachtwoord",ROLES.STAGECOMMISIE);
+    await createUserCore("Tom","Mentor","tom@mentor.com","wachtwoord",ROLES.STAGEMENTOR);
 
     await createBedrijfCore("aqua","finland");
     await createBedrijfCore("kanker","kankerstraat");
     
     await linkStagementorToBedrijf(6,1);
-    await linkStagementorToBedrijf(8,1);
-    linkStagementorToBedrijf(9,2)
 
 
-    console.log("Successfully seeded 5 users into the database!");
+    console.log("Successfully seeded 6 users into the database!");
     //                                                    year-month-day
     await createStageCore("doe iets",status.DOCUMENTGEUPLOADED,"2020-1-20","2021-10-12")
 
