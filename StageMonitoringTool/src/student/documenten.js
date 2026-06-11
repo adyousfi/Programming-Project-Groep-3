@@ -78,8 +78,42 @@ export function renderDocumenten(container, userName = 'Jan Janssens') {
     const uploadRemoveBtn = container.querySelector('#upload-remove-btn');
     const uploadSubmitBtn = container.querySelector('#upload-submit-btn');
     const badge = container.querySelector('.document-status-badge');
+    let selectedFile = null;
+
+    function validateFile(file) {
+        const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png'];
+        const maxSize = 10 * 1024 * 1024;
+
+        if (!allowedTypes.includes(file.type)) {
+            return { valid: false, error: 'Bestandstype niet toegestaan. Alleen PDF, JPG en PNG zijn toegestaan.' };
+        }
+        if (file.size > maxSize) {
+            return { valid: false, error: 'Bestand is te groot. Maximale grootte is 10MB.' };
+        }
+        return { valid: true, error: null };
+    }
+
+    function showError(message) {
+        const errorDiv = container.querySelector('#upload-error');
+        const errorText = container.querySelector('#upload-error-text');
+        errorText.textContent = message;
+        errorDiv.style.display = 'block';
+    }
+
+    function hideError() {
+        const errorDiv = container.querySelector('#upload-error');
+        errorDiv.style.display = 'none';
+    }
 
     function showFile(file) {
+        const result = validateFile(file);
+        if (!result.valid) {
+            resetUpload();
+            showError(result.error);
+            return;
+        }
+        hideError();
+        selectedFile = file;
         uploadFilename.textContent = file.name;
         uploadZone.style.display = 'none';
         uploadSelected.style.display = 'flex';
@@ -88,9 +122,11 @@ export function renderDocumenten(container, userName = 'Jan Janssens') {
 
     function resetUpload() {
         fileInput.value = '';
+        selectedFile = null;
         uploadZone.style.display = '';
         uploadSelected.style.display = 'none';
         uploadSubmitBtn.style.display = 'none';
+        hideError();
     }
 
     // Click op upload zone → open file picker
@@ -132,6 +168,16 @@ export function renderDocumenten(container, userName = 'Jan Janssens') {
 
     // Document indienen
     uploadSubmitBtn.addEventListener('click', () => {
+        if (!selectedFile) {
+            showError('Geen bestand geselecteerd.');
+            return;
+        }
+        const result = validateFile(selectedFile);
+        if (!result.valid) {
+            resetUpload();
+            showError(result.error);
+            return;
+        }
         window.location.href = '/?role=documenten_ingedient';
     });
 }
