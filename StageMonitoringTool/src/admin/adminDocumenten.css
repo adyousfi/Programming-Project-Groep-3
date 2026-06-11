@@ -1,0 +1,206 @@
+.ad-upload-card,
+.ad-history-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 28px;
+  margin-bottom: 24px;
+  max-width: 640px;
+}
+
+.ad-card-title {
+  font-size: 17px;
+  font-weight: 600;
+  color: #111827;
+  margin: 0 0 6px;
+}
+
+.ad-card-sub {
+  font-size: 14px;
+  color: #6b7280;
+  margin: 0 0 24px;
+}
+
+.ad-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.ad-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ad-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #374151;
+}
+
+.ad-select {
+  padding: 10px 12px;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #111827;
+  outline: none;
+  background: #fff;
+}
+
+.ad-select:focus {
+  border-color: #2563eb;
+}
+
+.ad-upload-zone {
+  border: 2px dashed #d1d5db;
+  border-radius: 10px;
+  padding: 28px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  background: #f9fafb;
+}
+
+.ad-upload-zone:hover,
+.ad-upload-zone.dragover {
+  border-color: #2563eb;
+  background: #eff6ff;
+}
+
+.ad-upload-icon {
+  font-size: 28px;
+  margin-bottom: 8px;
+}
+
+.ad-upload-text {
+  font-size: 14px;
+  font-weight: 500;
+  color: #374151;
+  margin: 0 0 4px;
+}
+
+.ad-upload-subtext {
+  font-size: 13px;
+  color: #9ca3af;
+  margin: 0;
+}
+
+.ad-file-input {
+  display: none;
+}
+
+.ad-selected {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 8px;
+}
+
+.ad-selected-name {
+  flex: 1;
+  font-size: 14px;
+  color: #166534;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ad-remove-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #6b7280;
+  font-size: 16px;
+  padding: 0;
+  line-height: 1;
+}
+
+.ad-remove-btn:hover {
+  color: #dc2626;
+}
+
+.ad-submit-btn {
+  padding: 12px 20px;
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s;
+  align-self: flex-start;
+}
+
+.ad-submit-btn:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+}
+
+.ad-submit-btn:not(:disabled):hover {
+  background: #1d4ed8;
+}
+
+.ad-history-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin: 0 0 10px;
+}
+
+.ad-history-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 0;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.ad-history-item:last-child {
+  border-bottom: none;
+}
+
+.ad-doc-icon {
+  font-size: 20px;
+}
+
+.ad-doc-name {
+  flex: 1;
+  font-size: 14px;
+  color: #111827;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ad-doc-date {
+  font-size: 13px;
+  color: #9ca3af;
+  white-space: nowrap;
+}
+
+.ad-download-btn {
+  padding: 6px 14px;
+  background: #fff;
+  border: 1.5px solid #2563eb;
+  color: #2563eb;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background 0.15s;
+}
+
+.ad-download-btn:hover {
+  background: #eff6ff;
+}
