@@ -125,10 +125,6 @@ export async function renderDocumenten(container) {
                         <span class="upload-error-text" id="upload-error-text"></span>
                     </div>
 
-                    <div class="upload-error" id="upload-error" style="display: none;">
-                        <span class="upload-error-text" id="upload-error-text"></span>
-                    </div>
-
                     <div class="upload-selected" id="upload-selected" style="display:none;">
                         <span class="upload-filename" id="upload-filename"></span>
                         <button type="button" class="upload-remove-btn" id="upload-remove-btn">Verwijderen</button>
