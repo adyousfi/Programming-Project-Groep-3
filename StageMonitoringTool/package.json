@@ -9,7 +9,7 @@
     "testdbAzure": "node db/testConnection/testdbAzure",
     "testdbMysql": "node db/testConnection/testdbMysql",
     "startdb": "node db/maindb.js",
-    "start": "concurrently \"node backend/server.js\" \"vite\"",
+    "start": "concurrently \"node backend/server.js\" \"vite\" \"node db/maindb.js\"",
     "dev": "vite",
     "server": "node server.js",
     "build": "vite build",

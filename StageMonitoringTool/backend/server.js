@@ -28,21 +28,17 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage, limits: { fileSize: 10 * 1024 * 1024 } });
 
-
 const app = express();
 
 app.use(express.json());
 app.use(cookieParser());
 
-// ✅ CORS met cookies
 app.use(cors({
   origin: (origin, cb) => {
     const allowed = [
       'http://localhost:5173',
       'http://127.0.0.1:5500'
     ];
-
-    // allow requests without Origin (e.g. curl / same-origin)
     if (!origin) return cb(null, true);
     if (allowed.includes(origin)) return cb(null, true);
     return cb(new Error('Not allowed by CORS'));
@@ -52,21 +48,16 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 
-// ✅ start DB
 await run();
 
-// ✅ LOGIN + COOKIE
+// ✅ LOGIN
 app.post('/login', async (req, res) => {
   const { email, password } = req.body;
-
   try {
     const user = await User.findOne({ where: { email } });
-
     if (!user || user.password !== password) {
       return res.json({ success: false, message: 'Foute login' });
     }
-
-    // 🔥 COOKIE zetten
     res.cookie('user', {
       user_id: user.user_id,
       email: user.email,
@@ -74,12 +65,10 @@ app.post('/login', async (req, res) => {
       last_name: user.last_name,
       role: user.role
     }, {
-      httpOnly: true,          // 🔒 veiliger
-      maxAge: 1000 * 60 * 60,  // 1 uur
+      httpOnly: true,
+      maxAge: 1000 * 60 * 60,
       sameSite: 'lax'
     });
-
-    // ✅ stuur rol mee zodat main.js meteen de juiste pagina toont
     res.json({
       success: true,
       message: 'Login succesvol',
@@ -87,17 +76,15 @@ app.post('/login', async (req, res) => {
         first_name: user.first_name,
         last_name: user.last_name,
         role: user.role
-  
       }
     });
-
   } catch (err) {
     console.error(err);
     res.status(500).json({ success: false });
   }
 });
 
-// ✅ CHECK login via cookie
+// ✅ CHECK login
 app.get('/me', async (req, res) => {
   if (req.cookies.user) {
     const cookie = req.cookies.user;
@@ -129,7 +116,7 @@ app.post('/logout', (req, res) => {
   res.json({ success: true });
 });
 
-// ✅ STAGES API (Database)
+// ✅ GET alle stages
 app.get('/api/stages', async (req, res) => {
   try {
     const stages = await Stage.findAll({
@@ -166,6 +153,7 @@ app.get('/api/stages', async (req, res) => {
         docent: {
           naam: docentUser ? `${docentUser.first_name} ${docentUser.last_name}` : '',
           email: docentUser ? docentUser.email : '',
+          user_id: s.docent_id || null,
         },
         stageDetails: {
           omschrijving: s.omschrijving_opdracht || '',
@@ -173,7 +161,11 @@ app.get('/api/stages', async (req, res) => {
           einde: s.eind_datum || '',
           urenPerWeek: '',
         },
-        status: s.status === 'Aanvraag' ? 'in_afwachting' : s.status === 'Goedgekeurd' ? 'goedgekeurd' : s.status === 'Afgekeurd' ? 'afgekeurd' : s.status === 'Aanpassingen_vereist' ? 'aanpassingen' : s.status,
+        status: s.status === 'Aanvraag' ? 'in_afwachting'
+          : s.status === 'Goedgekeurd' ? 'goedgekeurd'
+          : s.status === 'Afgekeurd' ? 'afgekeurd'
+          : s.status === 'Aanpassingen_vereist' ? 'aanpassingen'
+          : s.status,
         datum: s.createdAt ? new Date(s.createdAt).toLocaleDateString('nl-BE') : '',
         historiek: null,
       };
@@ -186,6 +178,7 @@ app.get('/api/stages', async (req, res) => {
   }
 });
 
+// ✅ POST nieuwe stage aanmaken
 app.post('/api/stages', async (req, res) => {
   try {
     const {
@@ -196,24 +189,15 @@ app.post('/api/stages', async (req, res) => {
       periodeStart, periodeEind
     } = req.body;
 
-    // 1. Get student_id from cookie
     const cookieUser = req.cookies.user;
-    if (!cookieUser) {
-      return res.status(401).json({ msg: 'Niet ingelogd' });
-    }
+    if (!cookieUser) return res.status(401).json({ msg: 'Niet ingelogd' });
+
     const studentProfile = await Student.findByPk(cookieUser.user_id);
-    if (!studentProfile) {
-      return res.status(400).json({ msg: 'Geen studentprofiel gevonden' });
-    }
+    if (!studentProfile) return res.status(400).json({ msg: 'Geen studentprofiel gevonden' });
     const student_id = studentProfile.user_id;
 
-    // 2. Create Bedrijf
-    const bedrijf = await Bedrijf.create({
-      naam: bedrijfNaam,
-      address: bedrijfAdres
-    });
+    const bedrijf = await Bedrijf.create({ naam: bedrijfNaam, address: bedrijfAdres });
 
-    // 3. Create Stagementor user + sub-profile
     const mentorUser = await User.create({
       first_name: mentorNaam,
       last_name: '',
@@ -222,12 +206,8 @@ app.post('/api/stages', async (req, res) => {
       role: 'stagementor',
       phone: 'no phone'
     });
-    await Stagementor.create({
-      user_id: mentorUser.user_id,
-      bedrijf_id: bedrijf.bedrijf_id
-    });
+    await Stagementor.create({ user_id: mentorUser.user_id, bedrijf_id: bedrijf.bedrijf_id });
 
-    // 4. Create Stage
     const stage = await Stage.create({
       student_id,
       mentor_id: mentorUser.user_id,
@@ -238,17 +218,14 @@ app.post('/api/stages', async (req, res) => {
       eind_datum: periodeEind
     });
 
-    return res.status(201).json({
-      msg: 'Stage succesvol aangemaakt',
-      data: stage
-    });
+    return res.status(201).json({ msg: 'Stage succesvol aangemaakt', data: stage });
   } catch (error) {
     console.error('Error creating stage:', error);
     return res.status(500).json({ msg: 'Er is iets misgegaan bij het aanmaken van de stage' });
   }
 });
 
-// ✅ GET stages with status Goedgekeurd (must be before /:id)
+// ✅ GET goedgekeurde stages (moet vóór /:id staan)
 app.get('/api/stages/goedgekeurd', async (req, res) => {
   try {
     const stages = await Stage.findAll({
@@ -269,7 +246,38 @@ app.get('/api/stages/goedgekeurd', async (req, res) => {
   }
 });
 
-// ✅ GET single stage by ID
+// ✅ GET alle docenten
+app.get('/api/docenten', async (req, res) => {
+  try {
+    const docenten = await Docent.findAll({
+      include: [{ model: User, as: 'User' }]
+    });
+    return res.json(docenten.map(d => ({
+      user_id: d.user_id,
+      first_name: d.User.first_name,
+      last_name: d.User.last_name,
+    })));
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ msg: 'Fout bij ophalen docenten' });
+  }
+});
+
+// ✅ PUT docent koppelen aan stage
+app.put('/api/stages/:id/docent', async (req, res) => {
+  try {
+    const { docent_id } = req.body;
+    const stage = await Stage.findByPk(req.params.id);
+    if (!stage) return res.status(404).json({ msg: 'Stage niet gevonden' });
+    await stage.update({ docent_id });
+    return res.json({ msg: 'Docent gekoppeld' });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ msg: 'Fout bij koppelen docent' });
+  }
+});
+
+// ✅ GET stage by ID
 app.get('/api/stages/:id', async (req, res) => {
   try {
     const stage = await Stage.findByPk(req.params.id, {
@@ -281,9 +289,7 @@ app.get('/api/stages/:id', async (req, res) => {
       ]
     });
 
-    if (!stage) {
-      return res.status(404).json({ msg: 'Stage niet gevonden' });
-    }
+    if (!stage) return res.status(404).json({ msg: 'Stage niet gevonden' });
 
     const studentUser = stage.student ? stage.student.User : null;
     const mentorUser = stage.mentor ? stage.mentor.User : null;
@@ -302,12 +308,21 @@ app.get('/api/stages/:id', async (req, res) => {
         naam: mentorUser ? `${mentorUser.first_name} ${mentorUser.last_name}` : '',
         email: mentorUser ? mentorUser.email : '',
       },
+      docent: {
+        naam: docentUser ? `${docentUser.first_name} ${docentUser.last_name}` : '',
+        email: docentUser ? docentUser.email : '',
+        user_id: stage.docent_id || null,
+      },
       stageDetails: {
         omschrijving: stage.omschrijving_opdracht || '',
         start: stage.begin_datum || '',
         einde: stage.eind_datum || '',
       },
-      status: stage.status === 'Aanvraag' ? 'in_afwachting' : stage.status === 'Goedgekeurd' ? 'goedgekeurd' : stage.status === 'Afgekeurd' ? 'afgekeurd' : stage.status === 'Aanpassingen_vereist' ? 'aanpassingen' : stage.status,
+      status: stage.status === 'Aanvraag' ? 'in_afwachting'
+        : stage.status === 'Goedgekeurd' ? 'goedgekeurd'
+        : stage.status === 'Afgekeurd' ? 'afgekeurd'
+        : stage.status === 'Aanpassingen_vereist' ? 'aanpassingen'
+        : stage.status,
       rawStatus: stage.status,
       datum: stage.createdAt ? new Date(stage.createdAt).toLocaleDateString('nl-BE') : '',
       feedback: stage.feedback || null,
@@ -318,7 +333,7 @@ app.get('/api/stages/:id', async (req, res) => {
   }
 });
 
-// ✅ GET stage by student_id (for logged-in student)
+// ✅ GET stage by student_id
 app.get('/api/stages/student/:studentId', async (req, res) => {
   try {
     const stage = await Stage.findOne({
@@ -332,9 +347,7 @@ app.get('/api/stages/student/:studentId', async (req, res) => {
       order: [['createdAt', 'DESC']]
     });
 
-    if (!stage) {
-      return res.json({ found: false });
-    }
+    if (!stage) return res.json({ found: false });
 
     const studentUser = stage.student ? stage.student.User : null;
     const mentorUser = stage.mentor ? stage.mentor.User : null;
@@ -362,7 +375,11 @@ app.get('/api/stages/student/:studentId', async (req, res) => {
         start: stage.begin_datum || '',
         einde: stage.eind_datum || '',
       },
-      status: stage.status === 'Aanvraag' ? 'in_afwachting' : stage.status === 'Goedgekeurd' ? 'goedgekeurd' : stage.status === 'Afgekeurd' ? 'afgekeurd' : stage.status === 'Aanpassingen_vereist' ? 'aanpassingen' : stage.status,
+      status: stage.status === 'Aanvraag' ? 'in_afwachting'
+        : stage.status === 'Goedgekeurd' ? 'goedgekeurd'
+        : stage.status === 'Afgekeurd' ? 'afgekeurd'
+        : stage.status === 'Aanpassingen_vereist' ? 'aanpassingen'
+        : stage.status,
       rawStatus: stage.status,
       datum: stage.createdAt ? new Date(stage.createdAt).toLocaleDateString('nl-BE') : '',
       feedback: stage.feedback || null,
@@ -373,7 +390,7 @@ app.get('/api/stages/student/:studentId', async (req, res) => {
   }
 });
 
-// ✅ PUT update stage (status, feedback, en eventueel bedrijf/mentor)
+// ✅ PUT update stage
 app.put('/api/stages/:id', async (req, res) => {
   try {
     const { status, feedback, bedrijfNaam, bedrijfAdres, mentorNaam, mentorEmail, omschrijving_opdracht, begin_datum, eind_datum } = req.body;
@@ -385,9 +402,7 @@ app.put('/api/stages/:id', async (req, res) => {
       ]
     });
 
-    if (!stage) {
-      return res.status(404).json({ msg: 'Stage niet gevonden' });
-    }
+    if (!stage) return res.status(404).json({ msg: 'Stage niet gevonden' });
 
     const updateData = {};
     if (status) updateData.status = status;
@@ -401,7 +416,6 @@ app.put('/api/stages/:id', async (req, res) => {
     if (bedrijfNaam && stage.bedrijf) {
       await stage.bedrijf.update({ naam: bedrijfNaam, address: bedrijfAdres || stage.bedrijf.address });
     }
-
     if (mentorNaam && stage.mentor) {
       const mentorUser = await User.findByPk(stage.mentor.user_id);
       if (mentorUser) await mentorUser.update({ first_name: mentorNaam });
@@ -418,9 +432,7 @@ app.put('/api/stages/:id', async (req, res) => {
   }
 });
 
-// ✅ DOCUMENTS API
-
-// Admin uploads a document for a specific stage
+// ✅ Admin upload document
 app.post('/api/documents/admin-upload', upload.single('document'), async (req, res) => {
   try {
     const cookieUser = req.cookies.user;
@@ -441,7 +453,7 @@ app.post('/api/documents/admin-upload', upload.single('document'), async (req, r
   }
 });
 
-// Student uploads their filled document
+// ✅ Student upload document
 app.post('/api/documents/student-upload', upload.single('document'), async (req, res) => {
   try {
     const cookieUser = req.cookies.user;
@@ -463,7 +475,7 @@ app.post('/api/documents/student-upload', upload.single('document'), async (req,
   }
 });
 
-// Get documents for the logged-in student
+// ✅ GET documenten voor ingelogde student
 app.get('/api/documents/mijn', async (req, res) => {
   try {
     const cookieUser = req.cookies.user;
@@ -486,7 +498,7 @@ app.get('/api/documents/mijn', async (req, res) => {
   }
 });
 
-// Get all documents for a stage (admin use)
+// ✅ GET documenten voor een stage (admin)
 app.get('/api/documents/stage/:stageId', async (req, res) => {
   try {
     const docs = await StageDocument.findAll({
@@ -505,7 +517,7 @@ app.get('/api/documents/stage/:stageId', async (req, res) => {
   }
 });
 
-// Download a document
+// ✅ Download document
 app.get('/api/documents/:id/download', async (req, res) => {
   try {
     const doc = await StageDocument.findByPk(req.params.id);
