@@ -282,6 +282,21 @@
     background-color: #157347;
 }
 
+/* Upload Error */
+.upload-error {
+    padding: 0.6rem 1rem;
+    background-color: #f8d7da;
+    border: 1px solid #f5c2c7;
+    border-radius: 6px;
+    margin-top: 0.5rem;
+}
+
+.upload-error-text {
+    font-size: 0.85rem;
+    color: #842029;
+    font-weight: 500;
+}
+
 /* Download Template */
 .download-template {
     display: flex;
