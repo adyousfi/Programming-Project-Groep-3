@@ -86,7 +86,14 @@ if (role === 'student') {
 } else if (role === 'docent') {
   renderMijnStudenten();
 } else if (role === 'goedgekeurd_student') {
-  renderGoedgekeurdStudent(app);
+  const user = await getLoggedInUser();
+  if (user && user.user_id) {
+    const displayName = user.last_name ? `${user.last_name.toUpperCase()} ${user.first_name}` : user.first_name;
+    const stageData = await getStudentStage(user.user_id);
+    renderGoedgekeurdStudent(app, displayName, stageData.found ? stageData : null);
+  } else {
+    renderGoedgekeurdStudent(app);
+  }
 } else if (role === 'documenten') {
   await renderDocumenten(app);
 } else if (role === 'documenten_ingedient') {

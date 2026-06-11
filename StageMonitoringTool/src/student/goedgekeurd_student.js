@@ -1,9 +1,11 @@
 import './goedgekeurd_student.css';
 
 export function renderGoedgekeurdStudent(container, userName = 'Jan Janssens', stageData = null) {
-    const bedrijfNaam = stageData?.bedrijf?.naam || 'TechCorp';
-    const startDatum = stageData?.stageDetails?.start ? new Date(stageData.stageDetails.start).toLocaleDateString('nl-BE', { day: 'numeric', month: 'short' }) : '3 feb';
-    const eindDatum = stageData?.stageDetails?.einde ? new Date(stageData.stageDetails.einde).toLocaleDateString('nl-BE', { day: 'numeric', month: 'short' }) : '30 mei';
+    const bedrijfNaam = stageData?.bedrijf?.naam || 'Onbekend';
+    const bedrijfAdres = stageData?.bedrijf?.adres || '';
+    const startDatum = stageData?.stageDetails?.start ? new Date(stageData.stageDetails.start).toLocaleDateString('nl-BE', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Nog niet vastgelegd';
+    const eindDatum = stageData?.stageDetails?.einde ? new Date(stageData.stageDetails.einde).toLocaleDateString('nl-BE', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Nog niet vastgelegd';
+    const omschrijving = stageData?.stageDetails?.omschrijving || '';
 
     container.innerHTML = `
         <div class="goedgekeurd-layout">
@@ -76,7 +78,7 @@ export function renderGoedgekeurdStudent(container, userName = 'Jan Janssens', s
                         </div>
                         <div class="info-card-content">
                             <span class="info-card-main">${startDatum} - ${eindDatum}</span>
-                            <span class="info-card-sub">Stage goedgekeurd</span>
+                            <span class="info-card-sub">${stageData?.stageDetails?.start && stageData?.stageDetails?.einde ? 'Stage goedgekeurd' : 'Wacht op vastlegging'}</span>
                         </div>
                     </div>
                     <div class="info-card">
@@ -85,7 +87,7 @@ export function renderGoedgekeurdStudent(container, userName = 'Jan Janssens', s
                             <span class="info-card-icon">&#128203;</span>
                         </div>
                         <div class="info-card-content">
-                            <span class="info-card-main"><span class="logboek-count">2</span> / 16 weken</span>
+                            <span class="info-card-main"><span class="logboek-count">0</span> / 16 weken</span>
                             <div class="logboek-progress-bar">
                                 <div class="logboek-progress-fill"></div>
                             </div>
@@ -98,7 +100,7 @@ export function renderGoedgekeurdStudent(container, userName = 'Jan Janssens', s
                         </div>
                         <div class="info-card-content">
                             <span class="info-card-main">${bedrijfNaam}</span>
-                            <span class="info-card-sub">Stage goedgekeurd</span>
+                            <span class="info-card-sub">${bedrijfAdres || 'Locatie nog niet opgegeven'}</span>
                         </div>
                     </div>
                 </section>
