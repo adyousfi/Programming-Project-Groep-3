@@ -11,6 +11,7 @@ import { renderMijnStudenten } from './docent/mijn-studenten.js';
 import { renderGoedgekeurdStudent } from './student/goedgekeurd_student.js';
 import { renderDocumenten } from './student/documenten.js';
 import { renderDocumentenIngedient } from './student/documenten-ingedient.js';
+import { renderStagedetails } from './student/stagedetails.js';
 import { renderAdmin } from './admin/admin.js';
 
 const app = document.querySelector('#app');
@@ -35,25 +36,26 @@ async function getStudentStage(studentId) {
 if (role === 'student') {
   const user = await getLoggedInUser();
   if (user && user.role === 'student') {
+    const displayName = user.last_name ? `${user.last_name.toUpperCase()} ${user.first_name}` : user.first_name;
     const stageData = await getStudentStage(user.user_id);
     if (!stageData.found) {
-      renderStudentDashboard(app, user.first_name);
+      renderStudentDashboard(app, displayName);
     } else {
       switch (stageData.rawStatus) {
         case 'Aanvraag':
-          renderWachten(app, user.first_name);
+          renderWachten(app, displayName);
           break;
         case 'Goedgekeurd':
-          renderGoedgekeurdStudent(app, user.first_name, stageData);
+          renderGoedgekeurdStudent(app, displayName, stageData);
           break;
         case 'Aanpassingen_vereist':
-          renderAanpassen(app, user.first_name, stageData);
+          renderFeedback(app, user, stageData);
           break;
         case 'Afgekeurd':
-          renderAfkeuring(app, user.first_name, stageData);
+          renderAfkeuring(app, displayName, stageData);
           break;
         default:
-          renderWachten(app, user.first_name);
+          renderWachten(app, displayName);
       }
     }
   } else {
@@ -68,7 +70,13 @@ if (role === 'student') {
 } else if (role === 'feedback') {
   renderFeedback(app);
 } else if (role === 'aanpassen') {
-  renderAanpassen(app);
+  const user = await getLoggedInUser();
+  if (user) {
+    const stageData = await getStudentStage(user.user_id);
+    renderAanpassen(app, user.first_name, stageData.found ? stageData : null);
+  } else {
+    renderAanpassen(app);
+  }
 } else if (role === 'afkeuring') {
   renderAfkeuring(app);
 } else if (role === 'stagecommisie') {
@@ -78,11 +86,27 @@ if (role === 'student') {
 } else if (role === 'docent') {
   renderMijnStudenten();
 } else if (role === 'goedgekeurd_student') {
-  renderGoedgekeurdStudent(app);
+  const user = await getLoggedInUser();
+  if (user && user.user_id) {
+    const displayName = user.last_name ? `${user.last_name.toUpperCase()} ${user.first_name}` : user.first_name;
+    const stageData = await getStudentStage(user.user_id);
+    renderGoedgekeurdStudent(app, displayName, stageData.found ? stageData : null);
+  } else {
+    renderGoedgekeurdStudent(app);
+  }
 } else if (role === 'documenten') {
-  renderDocumenten(app);
+  await renderDocumenten(app);
 } else if (role === 'documenten_ingedient') {
   renderDocumentenIngedient(app);
+} else if (role === 'stagedetails') {
+  const user = await getLoggedInUser();
+  if (user && user.user_id) {
+    const displayName = user.last_name ? `${user.last_name.toUpperCase()} ${user.first_name}` : user.first_name;
+    const stageData = await getStudentStage(user.user_id);
+    renderStagedetails(app, displayName, stageData.found ? stageData : null);
+  } else {
+    renderStagedetails(app);
+  }
 } else if (role === 'frontend') {
   app.innerHTML = `
     <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; font-family: sans-serif; background-color: #f8f9fa;">

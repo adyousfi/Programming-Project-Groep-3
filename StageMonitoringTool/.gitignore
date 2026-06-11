@@ -57,6 +57,9 @@ coverage/
 
 # Environment variables
 .env
+
+# Uploaded files
+uploads/
 .env.local
 .env.*.local
 .env.development

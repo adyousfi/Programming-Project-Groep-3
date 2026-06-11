@@ -1,5 +1,6 @@
 import './admin.css';
 import { renderKoppelingen } from './koppeldocent.js';
+import { renderAdminDocumenten } from './adminDocumenten.js';
 
 
 const API_URL = 'http://localhost:3001';
@@ -21,10 +22,10 @@ export function renderAdmin(app) {
           <p class="sidebar-subtitle">Erasmushogeschool Brussel</p>
         </div>
         <nav class="sidebar-nav">
-          <a href="#" class="nav-item active">Gebruikers</a>
+          <a href="#" class="nav-item active" id="navGebruikers">Gebruikers</a>
           <a href="#" class="nav-item" id="navKoppelingen">Koppelingen</a>
-          <a href="#" class="nav-item">Documenten</a>
-          <a href="#" class="nav-item">Competenties</a>
+          <a href="#" class="nav-item" id="navDocumenten">Documenten</a>
+          <a href="#" class="nav-item" id="navCompetenties">Competenties</a>
         </nav>
         <div class="sidebar-footer">
           <p class="user-name">Admin User</p>
@@ -55,7 +56,6 @@ export function renderAdmin(app) {
                 <th>E-mailadres</th>
                 <th>Telefoon</th>
                 <th>Rol</th>
-                <th>Status</th>
                 <th>Acties</th>
               </tr>
             </thead>
@@ -219,7 +219,6 @@ export function renderAdmin(app) {
         <td>${user.email}</td>
         <td>${user.phone || '-'}</td>
         <td><span class="role-badge">${roleDisplayMap[user.role] || user.role}</span></td>
-        <td><span class="status-badge active">Actief</span></td>
         <td class="actions">
           <button class="btn-edit" data-id="${user.user_id}">Bewerken</button>
           <button class="btn-deactivate" data-id="${user.user_id}">Deactiveren</button>
@@ -231,12 +230,31 @@ export function renderAdmin(app) {
     document.querySelectorAll('.btn-edit').forEach(btn => {
       btn.addEventListener('click', () => openEditModal(btn.dataset.id));
     });
+    const navGebruikers = document.getElementById('navGebruikers');
     const navKoppelingen = document.getElementById('navKoppelingen');
+    const navDocumenten = document.getElementById('navDocumenten');
+    const navCompetenties = document.getElementById('navCompetenties');
+
+    navGebruikers.addEventListener('click', (e) => {
+      e.preventDefault();
+      renderAdmin(app);
+    });
 
     navKoppelingen.addEventListener('click', (e) => {
-    e.preventDefault();
-    renderKoppelingen(app);
-});
+      e.preventDefault();
+      renderKoppelingen(app);
+    });
+
+    navDocumenten.addEventListener('click', (e) => {
+      e.preventDefault();
+      renderAdminDocumenten(app);
+    });
+
+    // Competenties: fallback (if not implemented, don't break navigation)
+    navCompetenties.addEventListener('click', (e) => {
+      e.preventDefault();
+      renderAdmin(app);
+    });
 
     // Add delete button listeners
     document.querySelectorAll('.btn-deactivate').forEach(btn => {

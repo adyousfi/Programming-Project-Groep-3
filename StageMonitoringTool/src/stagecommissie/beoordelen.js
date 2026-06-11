@@ -76,14 +76,14 @@ function detailKaart(aanvraag, badgeStatus) {
   `;
 }
 
-export function renderBeoordelen(aanvraag) {
+export function renderBeoordelen(aanvraag, userName = 'Stagecommissie') {
   document.querySelector('#app').innerHTML = `
     <div class="bd-page">
       <header class="bd-header">
         <h1 class="bd-header-title">Stage Monitoring Tool</h1>
         <div class="bd-header-right">
           <div class="bd-header-user">
-            <span class="bd-header-naam">Prof. De Vries</span>
+            <span class="bd-header-naam">${userName}</span>
             <span class="bd-header-rol">Stagecommissie</span>
           </div>
           <button class="bd-header-btn" id="bd-uitloggen">Uitloggen</button>
@@ -143,7 +143,7 @@ export function renderBeoordelen(aanvraag) {
       alert('Fout bij opslaan: ' + err.message);
       return;
     }
-    toonHistoriek(aanvraag, 'goedgekeurd', feedback);
+    toonHistoriek(aanvraag, 'goedgekeurd', feedback, userName);
   });
 
   document.querySelector('#bd-aanpassingen').addEventListener('click', async function() {
@@ -161,7 +161,7 @@ export function renderBeoordelen(aanvraag) {
       alert('Fout bij opslaan: ' + err.message);
       return;
     }
-    toonHistoriek(aanvraag, 'aanpassingen', feedback);
+    toonHistoriek(aanvraag, 'aanpassingen', feedback, userName);
   });
 
   document.querySelector('#bd-afkeuren').addEventListener('click', async function() {
@@ -179,7 +179,7 @@ export function renderBeoordelen(aanvraag) {
       alert('Fout bij opslaan: ' + err.message);
       return;
     }
-    toonHistoriek(aanvraag, 'afgekeurd', feedback);
+    toonHistoriek(aanvraag, 'afgekeurd', feedback, userName);
   });
 }
 
@@ -190,14 +190,14 @@ function toonFeedbackFout() {
   input.focus();
 }
 
-function toonHistoriek(aanvraag, beslissing, feedback) {
+function toonHistoriek(aanvraag, beslissing, feedback, userName = 'Stagecommissie') {
   document.querySelector('#app').innerHTML = `
     <div class="bd-page">
       <header class="bd-header">
         <h1 class="bd-header-title">Stage Monitoring Tool</h1>
         <div class="bd-header-right">
           <div class="bd-header-user">
-            <span class="bd-header-naam">Prof. De Vries</span>
+            <span class="bd-header-naam">${userName}</span>
             <span class="bd-header-rol">Stagecommissie</span>
           </div>
           <button class="bd-header-btn" id="bd-uitloggen">Uitloggen</button>
@@ -236,14 +236,14 @@ function toonHistoriek(aanvraag, beslissing, feedback) {
   });
 }
 
-export function renderDetails(aanvraag) {
+export function renderDetails(aanvraag, userName = 'Stagecommissie') {
   document.querySelector('#app').innerHTML = `
     <div class="bd-page">
       <header class="bd-header">
         <h1 class="bd-header-title">Stage Monitoring Tool</h1>
         <div class="bd-header-right">
           <div class="bd-header-user">
-            <span class="bd-header-naam">Prof. De Vries</span>
+            <span class="bd-header-naam">${userName}</span>
             <span class="bd-header-rol">Stagecommissie</span>
           </div>
           <button class="bd-header-btn" id="bd-uitloggen">Uitloggen</button>
