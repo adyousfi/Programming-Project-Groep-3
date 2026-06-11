@@ -138,7 +138,6 @@ export async function renderStageformulier(container) {
             const mentorVoornaam = pick(voornamen);
             const mentorAchternaam = pick(achternamen);
 
-            container.querySelector('#student-naam').value = `${voornaam} ${achternaam}`;
             container.querySelector('#student-nummer').value = `20${randNum(20, 99)}${randNum(1000, 9999)}`;
             container.querySelector('#bedrijf-naam').value = pick(bedrijven);
             container.querySelector('#bedrijf-adres').value = `${pick(straten)} ${randNum(1, 200)}, ${pick(steden)}`;
