@@ -1,6 +1,33 @@
 import './stagedetails.css';
 
-export function renderStagedetails(container, userName = 'Jan Janssens') {
+export function renderStagedetails(container, userName = 'Jan Janssens', stageData = null) {
+    const studentNaam = stageData?.naam || 'Onbekend';
+    const studentNummer = stageData?.studentNummer || 'Onbekend';
+    const bedrijfNaam = stageData?.bedrijf?.naam || 'Onbekend';
+    const bedrijfAdres = stageData?.bedrijf?.adres || 'Onbekend';
+    const mentorNaam = stageData?.stagementor?.naam || 'Onbekend';
+    const mentorEmail = stageData?.stagementor?.email || 'Onbekend';
+    const docentNaam = stageData?.docent?.naam || 'Onbekend';
+    const omschrijving = stageData?.stageDetails?.omschrijving || 'Geen omschrijving beschikbaar';
+
+    let startDatum = 'Onbekend';
+    let eindDatum = 'Onbekend';
+    if (stageData?.stageDetails?.start) {
+        startDatum = new Date(stageData.stageDetails.start).toLocaleDateString('nl-BE', { day: 'numeric', month: 'short', year: 'numeric' });
+    }
+    if (stageData?.stageDetails?.einde) {
+        eindDatum = new Date(stageData.stageDetails.einde).toLocaleDateString('nl-BE', { day: 'numeric', month: 'short', year: 'numeric' });
+    }
+
+    const statusClass = stageData?.rawStatus === 'Goedgekeurd' ? 'status-goedgekeurd'
+        : stageData?.rawStatus === 'Aanvraag' ? 'status-in_afwachting'
+        : stageData?.rawStatus === 'Afgekeurd' ? 'status-afgekeurd'
+        : 'status-goedgekeurd';
+    const statusLabel = stageData?.rawStatus === 'Goedgekeurd' ? 'Goedgekeurd'
+        : stageData?.rawStatus === 'Aanvraag' ? 'In afwachting'
+        : stageData?.rawStatus === 'Afgekeurd' ? 'Afgekeurd'
+        : stageData?.rawStatus || 'Onbekend';
+
     container.innerHTML = `
         <div class="stagedetails-layout">
             <aside class="stagedetails-sidebar">
@@ -25,40 +52,40 @@ export function renderStagedetails(container, userName = 'Jan Janssens') {
 
             <main class="stagedetails-main">
                 <h1 class="page-title">Stagedetails</h1>
-                <span class="status-badge status-goedgekeurd">Goedgekeurd</span>
+                <span class="status-badge ${statusClass}">${statusLabel}</span>
 
                 <div class="details-card" id="details-card">
                     <div class="detail-section">
                         <h3 class="detail-label">Student</h3>
-                        <p class="detail-value" id="detail-student-naam">Jan Janssens</p>
-                        <p class="detail-sub" id="detail-student-nummer">Studentnummer: 12345678</p>
+                        <p class="detail-value">${studentNaam}</p>
+                        <p class="detail-sub">Studentnummer: ${studentNummer}</p>
                     </div>
 
                     <div class="detail-section">
                         <h3 class="detail-label">Bedrijf</h3>
-                        <p class="detail-value" id="detail-bedrijf-naam">TechCorp Belgium</p>
-                        <p class="detail-sub" id="detail-bedrijf-adres">Innovation Street 42, 1050 Brussels</p>
+                        <p class="detail-value">${bedrijfNaam}</p>
+                        <p class="detail-sub">${bedrijfAdres}</p>
                     </div>
 
                     <div class="detail-section">
                         <h3 class="detail-label">Stagementor</h3>
-                        <p class="detail-value" id="detail-mentor-naam">Mieke Peeters</p>
-                        <p class="detail-sub" id="detail-mentor-email">mieke.peeters@techcorp.be</p>
+                        <p class="detail-value">${mentorNaam}</p>
+                        <p class="detail-sub">${mentorEmail}</p>
                     </div>
 
                     <div class="detail-section">
                         <h3 class="detail-label">Toegewezen EhB-docent</h3>
-                        <p class="detail-value" id="detail-docent-naam">Prof. Sarah Claes</p>
+                        <p class="detail-value">${docentNaam}</p>
                     </div>
 
                     <div class="detail-section">
                         <h3 class="detail-label">Periode</h3>
-                        <p class="detail-value" id="detail-periode">3 feb 2026 t/m 30 mei 2026</p>
+                        <p class="detail-value">${startDatum} t/m ${eindDatum}</p>
                     </div>
 
                     <div class="detail-section">
                         <h3 class="detail-label">Omschrijving van de opdracht</h3>
-                        <p class="detail-sub" id="detail-omschrijving">De stagair zal werken aan het ontwikkelen van frontend applicaties met React en TypeScript. Focus op moderne webontwikkeling en samenwerking in een professioneel team.</p>
+                        <p class="detail-sub">${omschrijving}</p>
                     </div>
                 </div>
             </main>

@@ -93,9 +93,10 @@ if (role === 'student') {
   renderDocumentenIngedient(app);
 } else if (role === 'stagedetails') {
   const user = await getLoggedInUser();
-  if (user) {
+  if (user && user.user_id) {
     const displayName = user.last_name ? `${user.last_name.toUpperCase()} ${user.first_name}` : user.first_name;
-    renderStagedetails(app, displayName);
+    const stageData = await getStudentStage(user.user_id);
+    renderStagedetails(app, displayName, stageData.found ? stageData : null);
   } else {
     renderStagedetails(app);
   }
