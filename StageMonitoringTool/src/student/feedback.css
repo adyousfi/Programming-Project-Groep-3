@@ -68,9 +68,13 @@
     color: #212529;
 }
 
-.sidebar-logout {
-    font-size: 0.85rem;
-    color: #0d6efd;
+.logout-link {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    font-size: 14px;
+    color: #2563eb;
     text-decoration: none;
 }
 

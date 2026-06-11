@@ -1,4 +1,5 @@
 import './beoordelen.css';
+import { logout } from '../utils/auth.js';
 
 function statusLabel(status) {
   const labels = {
@@ -123,11 +124,7 @@ export function renderBeoordelen(aanvraag, userName = 'Stagecommissie') {
     import('./aanvragen.js').then(function(m) { m.renderAanvragen(); });
   });
 
-  document.querySelector('#bd-uitloggen').addEventListener('click', async function() {
-    try { await fetch('/logout', { method: 'POST', credentials: 'include' }); } catch {}
-    document.cookie = 'user=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-    window.location.href = '/';
-  });
+  document.querySelector('#bd-uitloggen').addEventListener('click', logout);
 
   document.querySelector('#bd-goedkeuren').addEventListener('click', async function() {
     const feedback = document.querySelector('#bd-feedback').value.trim();
@@ -231,9 +228,7 @@ function toonHistoriek(aanvraag, beslissing, feedback, userName = 'Stagecommissi
     import('./aanvragen.js').then(function(m) { m.renderAanvragen(); });
   });
 
-  document.querySelector('#bd-uitloggen').addEventListener('click', function() {
-    window.location.href = '/';
-  });
+  document.querySelector('#bd-uitloggen').addEventListener('click', logout);
 }
 
 export function renderDetails(aanvraag, userName = 'Stagecommissie') {
@@ -271,7 +266,5 @@ export function renderDetails(aanvraag, userName = 'Stagecommissie') {
     import('./aanvragen.js').then(function(m) { m.renderAanvragen(); });
   });
 
-  document.querySelector('#bd-uitloggen').addEventListener('click', function() {
-    window.location.href = '/';
-  });
+  document.querySelector('#bd-uitloggen').addEventListener('click', logout);
 }

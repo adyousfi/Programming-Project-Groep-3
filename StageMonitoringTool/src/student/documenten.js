@@ -1,4 +1,5 @@
 import './documenten.css';
+import { logout } from '../utils/auth.js';
 
 export async function renderDocumenten(container) {
     let userName = 'Student';
@@ -45,7 +46,7 @@ export async function renderDocumenten(container) {
                 </div>
                 <div class="sidebar-bottom">
                     <span class="sidebar-user-name">${userName}</span>
-                    <a href="/" class="sidebar-logout">Uitloggen</a>
+                    <button id="documenten-logout-btn" class="sidebar-logout">Uitloggen</button>
                 </div>
             </aside>
 
@@ -136,6 +137,8 @@ export async function renderDocumenten(container) {
             </main>
         </div>
     `;
+
+    container.querySelector('#documenten-logout-btn').addEventListener('click', logout);
 
     const uploadZone = container.querySelector('#upload-zone');
     const fileInput = container.querySelector('#file-input');

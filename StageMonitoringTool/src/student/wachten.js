@@ -1,4 +1,6 @@
 import './wachten.css';
+import { getActiveProposalId } from './dataService.js';
+import { logout } from '../utils/auth.js';
 
 export async function renderWachten(container, userName = '') {
     if (!userName) {
@@ -31,7 +33,7 @@ export async function renderWachten(container, userName = '') {
                 </div>
                 <div class="sidebar-bottom">
                     <span class="sidebar-user-name">${userName}</span>
-                    <a href="/" class="sidebar-logout">Uitloggen</a>
+                    <button id="wachten-logout-btn" class="sidebar-logout">Uitloggen</button>
                 </div>
             </aside>
 
@@ -89,4 +91,6 @@ export async function renderWachten(container, userName = '') {
 
         </div>
     `;
+
+    container.querySelector('#wachten-logout-btn').addEventListener('click', logout);
 }
