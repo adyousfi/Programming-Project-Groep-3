@@ -1,78 +1,24 @@
 import './koppeldocent.css';
 import { renderAdmin } from './admin.js';
-import { renderAdminDocumenten } from './adminDocumenten.js'; // check pad!
 
-const API_URL = 'http://localhost:3000';
+const beschikbareDocenten = [
+  'Sarah Claes',
+  'Jan De Smedt',
+  'Lien Peeters',
+  'Marc Willems',
+];
 
-let zonderDocent = [];
-let gekoppeld = [];
-let beschikbareDocenten = [];
+let zonderDocent = [
+  { id: 1, naam: 'Emma Willems', bedrijf: 'DataSoft Solutions', periode: '3 mrt - 30 jun 2026' },
+];
 
-// ================= DATA =================
-async function loadData() {
-  const stagesRes = await fetch(`${API_URL}/api/stages`);
-  if (!stagesRes.ok) throw new Error('Fout bij laden stages');
-  const stages = await stagesRes.json();
+let gekoppeld = [
+  { id: 2, naam: 'Jan Janssens', bedrijf: 'TechCorp Belgium', periode: '3 feb - 30 mei 2026', docent: 'Sarah Claes', status: 'Actief' },
+];
 
-  const docentenRes = await fetch(`${API_URL}/api/docenten`);
-  if (!docentenRes.ok) throw new Error('Fout bij laden docenten');
-  beschikbareDocenten = await docentenRes.json();
-
-  zonderDocent = stages
-    .filter(s => !s.docent || !s.docent.naam)
-    .map(s => ({
-      id: s.id,
-      naam: s.naam || '-',
-      bedrijf: s.bedrijf?.naam || '-',
-      periode: formatPeriode(s.stageDetails?.start, s.stageDetails?.einde),
-    }));
-
-  gekoppeld = stages
-    .filter(s => s.docent && s.docent.naam)
-    .map(s => ({
-      id: s.id,
-      naam: s.naam || '-',
-      bedrijf: s.bedrijf?.naam || '-',
-      periode: formatPeriode(s.stageDetails?.start, s.stageDetails?.einde),
-      docent: s.docent.naam,
-      docent_id: s.docent.user_id || null,
-      status: s.status,
-    }));
-}
-
-function formatPeriode(begin, eind) {
-  if (!begin || !eind) return '-';
-  const fmt = d =>
-    new Date(d).toLocaleDateString('nl-BE', {
-      day: 'numeric',
-      month: 'short',
-      year: 'numeric',
-    });
-  return `${fmt(begin)} - ${fmt(eind)}`;
-}
-
-// ================= API =================
-async function slaDocentOp(stageId, docentId) {
-  const res = await fetch(`${API_URL}/api/stages/${stageId}/docent`, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    credentials: 'include',
-    body: JSON.stringify({ docent_id: docentId }),
-  });
-
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(err.msg || 'Onbekende fout');
-  }
-}
-
-// ================= RENDER =================
 function renderZonderDocent(lijst) {
   return `
-    <h3 class="kp-sectie-titel kp-sectie-titel--oranje">
-      Studenten zonder docent (${lijst.length})
-    </h3>
-
+    <h3 class="kp-sectie-titel kp-sectie-titel--oranje">Studenten zonder docent (${lijst.length})</h3>
     <table class="kp-tabel">
       <thead class="kp-thead--oranje">
         <tr>
@@ -83,36 +29,18 @@ function renderZonderDocent(lijst) {
           <th>Acties</th>
         </tr>
       </thead>
-
       <tbody>
-        ${
-          lijst.length === 0
-            ? `<tr><td colspan="5" style="padding:16px;color:#6b7280;">
-                 Geen studenten zonder docent.
-               </td></tr>`
-            : lijst
-                .map(
-                  s => `
-          <tr class="kp-rij--oranje">
-            <td>${s.naam}</td>
-            <td>${s.bedrijf}</td>
-            <td>${s.periode}</td>
-            <td>
-              <span class="kp-badge kp-badge--oranje">
-                Geen docent toegewezen
-              </span>
-            </td>
-            <td>
-              <button class="kp-btn kp-btn--toewijzen"
-                data-id="${s.id}" data-actie="toewijzen">
-                Docent toewijzen
-              </button>
-            </td>
-          </tr>
-        `
-                )
-                .join('')
-        }
+        ${lijst.length === 0
+          ? `<tr><td colspan="5" style="padding:16px;color:#6b7280;">Geen studenten zonder docent.</td></tr>`
+          : lijst.map(s => `
+            <tr class="kp-rij--oranje">
+              <td>${s.naam}</td>
+              <td>${s.bedrijf}</td>
+              <td>${s.periode}</td>
+              <td><span class="kp-badge kp-badge--oranje">Geen docent toegewezen</span></td>
+              <td><button class="kp-btn kp-btn--toewijzen" data-id="${s.id}" data-actie="toewijzen">Docent toewijzen</button></td>
+            </tr>
+          `).join('')}
       </tbody>
     </table>
   `;
@@ -120,10 +48,7 @@ function renderZonderDocent(lijst) {
 
 function renderGekoppeld(lijst) {
   return `
-    <h3 class="kp-sectie-titel" style="margin-top: 32px;">
-      Gekoppelde studenten (${lijst.length})
-    </h3>
-
+    <h3 class="kp-sectie-titel" style="margin-top: 32px;">Gekoppelde studenten (${lijst.length})</h3>
     <table class="kp-tabel">
       <thead>
         <tr>
@@ -135,107 +60,69 @@ function renderGekoppeld(lijst) {
           <th>Acties</th>
         </tr>
       </thead>
-
       <tbody>
-        ${
-          lijst.length === 0
-            ? `<tr><td colspan="6" style="padding:16px;color:#6b7280;">
-                 Geen gekoppelde studenten.
-               </td></tr>`
-            : lijst
-                .map(
-                  s => `
-          <tr>
-            <td>${s.naam}</td>
-            <td>${s.bedrijf}</td>
-            <td>${s.periode}</td>
-            <td>${s.docent}</td>
-            <td>
-              <span class="kp-badge kp-badge--groen">
-                ${s.status}
-              </span>
-            </td>
-            <td>
-              <button class="kp-btn kp-btn--wijzigen"
-                data-id="${s.id}" data-actie="wijzigen">
-                Wijzigen
-              </button>
-            </td>
-          </tr>
-        `
-                )
-                .join('')
-        }
+        ${lijst.length === 0
+          ? `<tr><td colspan="6" style="padding:16px;color:#6b7280;">Geen gekoppelde studenten.</td></tr>`
+          : lijst.map(s => `
+            <tr>
+              <td>${s.naam}</td>
+              <td>${s.bedrijf}</td>
+              <td>${s.periode}</td>
+              <td>${s.docent}</td>
+              <td><span class="kp-badge kp-badge--groen">${s.status}</span></td>
+              <td><button class="kp-btn kp-btn--wijzigen" data-id="${s.id}" data-actie="wijzigen">Wijzigen</button></td>
+            </tr>
+          `).join('')}
       </tbody>
     </table>
   `;
 }
 
 function herrender() {
-  document.getElementById('sectie-zonder').innerHTML =
-    renderZonderDocent(zonderDocent);
-
-  document.getElementById('sectie-gekoppeld').innerHTML =
-    renderGekoppeld(gekoppeld);
-
+  document.getElementById('sectie-zonder').innerHTML = renderZonderDocent(zonderDocent);
+  document.getElementById('sectie-gekoppeld').innerHTML = renderGekoppeld(gekoppeld);
   setupKnoppen();
 }
 
-// ================= MODAL =================
-function openModal(stageId, actie) {
+function openModal(studentId, actie) {
   const alleStudenten = [...zonderDocent, ...gekoppeld];
-  const student = alleStudenten.find(s => s.id === stageId);
+  const student = alleStudenten.find(s => s.id === studentId);
   if (!student) return;
 
+  const huidig = student.docent || '';
+
   const modal = document.getElementById('kp-modal');
-
   document.getElementById('kp-modal-titel').textContent =
-    actie === 'toewijzen'
-      ? `Docent toewijzen aan ${student.naam}`
-      : `Docent wijzigen voor ${student.naam}`;
-
+    actie === 'toewijzen' ? `Docent toewijzen aan ${student.naam}` : `Docent wijzigen voor ${student.naam}`;
   document.getElementById('kp-docent-select').innerHTML =
-    beschikbareDocenten
-      .map(
-        d => `
-        <option value="${d.user_id}"
-          ${d.user_id === student.docent_id ? 'selected' : ''}>
-          ${d.first_name} ${d.last_name}
-        </option>
-      `
-      )
-      .join('');
+    beschikbareDocenten.map(d => `<option value="${d}" ${d === huidig ? 'selected' : ''}>${d}</option>`).join('');
 
-  modal.dataset.stageId = stageId;
+  modal.dataset.studentId = studentId;
   modal.classList.add('active');
 }
 
 function setupKnoppen() {
-  document.querySelectorAll('.kp-btn[data-actie]').forEach(btn => {
-    btn.addEventListener('click', () =>
-      openModal(parseInt(btn.dataset.id), btn.dataset.actie)
-    );
+  document.querySelectorAll('.kp-btn[data-actie]').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      openModal(parseInt(btn.dataset.id), btn.dataset.actie);
+    });
   });
 }
 
-// ================= MAIN RENDER =================
-export async function renderKoppelingen(app) {
+export function renderKoppelingen(app) {
   app.innerHTML = `
     <div class="admin-layout">
-
       <aside class="sidebar">
         <div class="sidebar-header">
           <h1 class="sidebar-title">Administratie</h1>
           <p class="sidebar-subtitle">Erasmushogeschool Brussel</p>
         </div>
-
         <nav class="sidebar-nav">
           <a href="#" class="nav-item" id="navGebruikers">Gebruikers</a>
-          <a href="#" class="nav-item active" id="navKoppelingen">Koppelingen</a>
-          <a href="#" class="nav-item" id="navDocumenten">Documenten</a>
-          <a href="#" class="nav-item" id="navCompetenties">Competenties</a>
+          <a href="#" class="nav-item active">Koppelingen</a>
+          <a href="#" class="nav-item">Documenten</a>
+          <a href="#" class="nav-item">Competenties</a>
         </nav>
-
         <div class="sidebar-footer">
           <p class="user-name">Admin User</p>
           <button class="logout-link" id="kp-logout">Uitloggen</button>
@@ -243,96 +130,66 @@ export async function renderKoppelingen(app) {
       </aside>
 
       <main class="main-content">
-        <h1 class="page-title">Docent Koppelingen</h1>
-        <section class="kp-sectie" id="sectie-zonder">
-          <p class="loading">Laden...</p>
-        </section>
-        <section class="kp-sectie" id="sectie-gekoppeld"></section>
+        <h1 class="page-title" style="margin-bottom: 28px; text-align: left;">Docent Koppelingen</h1>
+        <section class="kp-sectie" id="sectie-zonder">${renderZonderDocent(zonderDocent)}</section>
+        <section class="kp-sectie" id="sectie-gekoppeld">${renderGekoppeld(gekoppeld)}</section>
       </main>
     </div>
 
     <!-- Modal -->
     <div class="kp-modal-overlay" id="kp-modal">
       <div class="kp-modal">
-        <h2 id="kp-modal-titel"></h2>
-
-        <div>
-          <label>Kies een docent</label>
-          <select id="kp-docent-select"></select>
+        <h2 class="kp-modal-titel" id="kp-modal-titel"></h2>
+        <div class="kp-modal-body">
+          <label class="kp-modal-label">Kies een docent</label>
+          <select class="kp-modal-select" id="kp-docent-select"></select>
         </div>
-
-        <div>
-          <button id="kp-modal-opslaan">Opslaan</button>
-          <button id="kp-modal-annuleren">Annuleren</button>
+        <div class="kp-modal-acties">
+          <button class="btn-primary" id="kp-modal-opslaan">Opslaan</button>
+          <button class="btn-cancel" id="kp-modal-annuleren">Annuleren</button>
         </div>
       </div>
     </div>
   `;
 
-  // ================= NAVIGATIE =================
-  document.getElementById('navGebruikers').addEventListener('click', e => {
+  setupKnoppen();
+
+  document.getElementById('navGebruikers').addEventListener('click', function(e) {
     e.preventDefault();
     renderAdmin(app);
   });
 
-  document.getElementById('navKoppelingen').addEventListener('click', e => {
-    e.preventDefault();
-    renderKoppelingen(app);
-  });
-
-  document.getElementById('navDocumenten').addEventListener('click', e => {
-    e.preventDefault();
-    renderAdminDocumenten(app);
-  });
-
-  document.getElementById('navCompetenties').addEventListener('click', e => {
-    e.preventDefault();
-    renderAdmin(app); // fallback
-  });
-
-  // ================= LOGOUT =================
-  document.getElementById('kp-logout').addEventListener('click', async () => {
-    try {
-      await fetch('/logout', { method: 'POST', credentials: 'include' });
-    } catch {}
-
-    document.cookie =
-      'user=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+  document.getElementById('kp-logout').addEventListener('click', async function() {
+    try { await fetch('/logout', { method: 'POST', credentials: 'include' }); } catch {}
+    document.cookie = 'user=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
     window.location.href = '/';
   });
 
-  // ================= MODAL EVENTS =================
-  document.getElementById('kp-modal-annuleren').addEventListener('click', () => {
+  document.getElementById('kp-modal-annuleren').addEventListener('click', function() {
     document.getElementById('kp-modal').classList.remove('active');
   });
 
-  document.getElementById('kp-modal').addEventListener('click', function (e) {
+  document.getElementById('kp-modal').addEventListener('click', function(e) {
     if (e.target === this) this.classList.remove('active');
   });
 
-  document.getElementById('kp-modal-opslaan').addEventListener('click', async () => {
+  document.getElementById('kp-modal-opslaan').addEventListener('click', function() {
     const modal = document.getElementById('kp-modal');
-    const stageId = parseInt(modal.dataset.stageId);
-    const docentId = parseInt(
-      document.getElementById('kp-docent-select').value
-    );
+    const studentId = parseInt(modal.dataset.studentId);
+    const gekozenDocent = document.getElementById('kp-docent-select').value;
 
-    try {
-      await slaDocentOp(stageId, docentId);
-      modal.classList.remove('active');
-      await loadData();
-      herrender();
-    } catch (err) {
-      alert('Fout bij opslaan: ' + err.message);
+    const zonderIdx = zonderDocent.findIndex(s => s.id === studentId);
+    if (zonderIdx !== -1) {
+      const student = zonderDocent.splice(zonderIdx, 1)[0];
+      student.docent = gekozenDocent;
+      student.status = 'Actief';
+      gekoppeld.push(student);
+    } else {
+      const gekIdx = gekoppeld.findIndex(s => s.id === studentId);
+      if (gekIdx !== -1) gekoppeld[gekIdx].docent = gekozenDocent;
     }
-  });
 
-  // ================= INIT =================
-  try {
-    await loadData();
+    modal.classList.remove('active');
     herrender();
-  } catch (err) {
-    document.getElementById('sectie-zonder').innerHTML =
-      `<p style="color:red;">Kan data niet laden: ${err.message}</p>`;
-  }
+  });
 }

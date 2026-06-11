@@ -1,24 +1,20 @@
 import './adminDocumenten.css';
 import { renderAdmin } from './admin.js';
-import { renderKoppelingen } from './koppeldocent.js'; // check pad!
 
 export async function renderAdminDocumenten(app) {
   app.innerHTML = `
     <div class="admin-layout">
-      
       <aside class="sidebar">
         <div class="sidebar-header">
           <h1 class="sidebar-title">Administratie</h1>
           <p class="sidebar-subtitle">Erasmushogeschool Brussel</p>
         </div>
-
         <nav class="sidebar-nav">
           <a href="#" class="nav-item" id="navGebruikers">Gebruikers</a>
-          <a href="#" class="nav-item" id="navKoppelingen">Koppelingen</a>
-          <a href="#" class="nav-item active" id="navDocumenten">Documenten</a>
-          <a href="#" class="nav-item" id="navCompetenties">Competenties</a>
+          <a href="#" class="nav-item">Koppelingen</a>
+          <a href="#" class="nav-item active">Documenten</a>
+          <a href="#" class="nav-item">Competenties</a>
         </nav>
-
         <div class="sidebar-footer">
           <p class="user-name">Admin User</p>
           <button class="logout-link" id="ad-logout">Uitloggen</button>
@@ -30,9 +26,7 @@ export async function renderAdminDocumenten(app) {
 
         <div class="ad-upload-card">
           <h2 class="ad-card-title">Document versturen naar student</h2>
-          <p class="ad-card-sub">
-            Selecteer een goedgekeurde stage en upload het document dat de student moet invullen.
-          </p>
+          <p class="ad-card-sub">Selecteer een goedgekeurde stage en upload het document dat de student moet invullen.</p>
 
           <div class="ad-form">
             <div class="ad-form-group">
@@ -41,27 +35,20 @@ export async function renderAdminDocumenten(app) {
                 <option value="">Laden...</option>
               </select>
             </div>
-
             <div class="ad-form-group">
               <label class="ad-label">Document uploaden</label>
               <div class="ad-upload-zone" id="ad-upload-zone">
                 <div class="ad-upload-icon">&#128194;</div>
-                <p class="ad-upload-text">
-                  Sleep je bestand hierheen of klik om te selecteren
-                </p>
+                <p class="ad-upload-text">Sleep je bestand hierheen of klik om te selecteren</p>
                 <p class="ad-upload-subtext">PDF, DOCX — max. 10MB</p>
                 <input type="file" id="ad-file-input" class="ad-file-input" accept=".pdf,.doc,.docx">
               </div>
-
               <div class="ad-selected" id="ad-selected" style="display:none;">
                 <span class="ad-selected-name" id="ad-selected-name"></span>
                 <button type="button" class="ad-remove-btn" id="ad-remove-btn">&#10005;</button>
               </div>
             </div>
-
-            <button type="button" class="ad-submit-btn" id="ad-submit-btn" disabled>
-              Versturen naar student
-            </button>
+            <button type="button" class="ad-submit-btn" id="ad-submit-btn" disabled>Versturen naar student</button>
           </div>
         </div>
 
@@ -73,32 +60,13 @@ export async function renderAdminDocumenten(app) {
     </div>
   `;
 
-  // ================= NAVIGATIE =================
   document.getElementById('navGebruikers').addEventListener('click', (e) => {
     e.preventDefault();
     renderAdmin(app);
   });
 
-  document.getElementById('navKoppelingen').addEventListener('click', (e) => {
-    e.preventDefault();
-    renderKoppelingen(app);
-  });
-
-  document.getElementById('navDocumenten').addEventListener('click', (e) => {
-    e.preventDefault();
-    renderAdminDocumenten(app);
-  });
-
-  document.getElementById('navCompetenties').addEventListener('click', (e) => {
-    e.preventDefault();
-    renderAdmin(app); // fallback
-  });
-
-  // ================= LOGOUT =================
   document.getElementById('ad-logout').addEventListener('click', async () => {
-    try {
-      await fetch('/logout', { method: 'POST', credentials: 'include' });
-    } catch {}
+    try { await fetch('/logout', { method: 'POST', credentials: 'include' }); } catch {}
     document.cookie = 'user=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
     window.location.href = '/';
   });
@@ -117,17 +85,12 @@ export async function renderAdminDocumenten(app) {
     try {
       const res = await fetch('/api/stages/goedgekeurd', { credentials: 'include' });
       const stages = await res.json();
-
       if (!Array.isArray(stages) || stages.length === 0) {
         stageSelect.innerHTML = '<option value="">Geen goedgekeurde stages gevonden</option>';
         return;
       }
-
-      stageSelect.innerHTML =
-        '<option value="">Kies een student...</option>' +
-        stages
-          .map(s => `<option value="${s.id}">${s.naam} — ${s.bedrijf}</option>`)
-          .join('');
+      stageSelect.innerHTML = '<option value="">Kies een student...</option>' +
+        stages.map(s => `<option value="${s.id}">${s.naam} — ${s.bedrijf}</option>`).join('');
     } catch {
       stageSelect.innerHTML = '<option value="">Fout bij laden</option>';
     }
@@ -154,25 +117,15 @@ export async function renderAdminDocumenten(app) {
   }
 
   uploadZone.addEventListener('click', () => fileInput.click());
-  uploadZone.addEventListener('dragover', (e) => {
-    e.preventDefault();
-    uploadZone.classList.add('dragover');
-  });
-  uploadZone.addEventListener('dragleave', () => {
-    uploadZone.classList.remove('dragover');
-  });
+  uploadZone.addEventListener('dragover', (e) => { e.preventDefault(); uploadZone.classList.add('dragover'); });
+  uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('dragover'));
   uploadZone.addEventListener('drop', (e) => {
     e.preventDefault();
     uploadZone.classList.remove('dragover');
     if (e.dataTransfer.files.length > 0) showFile(e.dataTransfer.files[0]);
   });
-
-  fileInput.addEventListener('change', () => {
-    if (fileInput.files[0]) showFile(fileInput.files[0]);
-  });
-
+  fileInput.addEventListener('change', () => { if (fileInput.files[0]) showFile(fileInput.files[0]); });
   removeBtn.addEventListener('click', resetFile);
-
   stageSelect.addEventListener('change', () => {
     updateSubmitBtn();
     loadDocumentHistory(stageSelect.value);
@@ -180,7 +133,6 @@ export async function renderAdminDocumenten(app) {
 
   submitBtn.addEventListener('click', async () => {
     if (!stageSelect.value || !selectedFile) return;
-
     submitBtn.disabled = true;
     submitBtn.textContent = 'Bezig met uploaden...';
 
@@ -194,7 +146,6 @@ export async function renderAdminDocumenten(app) {
         credentials: 'include',
         body: formData,
       });
-
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
         alert('Fout bij uploaden: ' + (err.msg || res.status));
@@ -218,29 +169,17 @@ export async function renderAdminDocumenten(app) {
   async function loadDocumentHistory(stageId) {
     const historyCard = document.getElementById('ad-history-card');
     const historyList = document.getElementById('ad-history-list');
-
-    if (!stageId) {
-      historyCard.style.display = 'none';
-      return;
-    }
+    if (!stageId) { historyCard.style.display = 'none'; return; }
 
     try {
-      const res = await fetch(`/api/documents/stage/${stageId}`, {
-        credentials: 'include',
-      });
-
+      const res = await fetch(`/api/documents/stage/${stageId}`, { credentials: 'include' });
       const docs = await res.json();
-
       const adminDocs = docs.filter(d => d.type === 'admin_template');
       const studentDocs = docs.filter(d => d.type === 'student_submission');
 
-      if (docs.length === 0) {
-        historyCard.style.display = 'none';
-        return;
-      }
+      if (docs.length === 0) { historyCard.style.display = 'none'; return; }
 
       historyCard.style.display = '';
-
       historyList.innerHTML = `
         ${adminDocs.length > 0 ? `
           <p class="ad-history-label">Verstuurd door admin</p>
@@ -253,7 +192,6 @@ export async function renderAdminDocumenten(app) {
             </div>
           `).join('')}
         ` : ''}
-
         ${studentDocs.length > 0 ? `
           <p class="ad-history-label" style="margin-top:16px;">Ingediend door student</p>
           ${studentDocs.map(d => `
