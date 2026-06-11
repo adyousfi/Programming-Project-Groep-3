@@ -11,6 +11,7 @@ import { renderMijnStudenten } from './docent/mijn-studenten.js';
 import { renderGoedgekeurdStudent } from './student/goedgekeurd_student.js';
 import { renderDocumenten } from './student/documenten.js';
 import { renderDocumentenIngedient } from './student/documenten-ingedient.js';
+import { renderStagedetails } from './student/stagedetails.js';
 import { renderAdmin } from './admin/admin.js';
 
 const app = document.querySelector('#app');
@@ -85,11 +86,27 @@ if (role === 'student') {
 } else if (role === 'docent') {
   renderMijnStudenten();
 } else if (role === 'goedgekeurd_student') {
-  renderGoedgekeurdStudent(app);
+  const user = await getLoggedInUser();
+  if (user && user.user_id) {
+    const displayName = user.last_name ? `${user.last_name.toUpperCase()} ${user.first_name}` : user.first_name;
+    const stageData = await getStudentStage(user.user_id);
+    renderGoedgekeurdStudent(app, displayName, stageData.found ? stageData : null);
+  } else {
+    renderGoedgekeurdStudent(app);
+  }
 } else if (role === 'documenten') {
   await renderDocumenten(app);
 } else if (role === 'documenten_ingedient') {
   renderDocumentenIngedient(app);
+} else if (role === 'stagedetails') {
+  const user = await getLoggedInUser();
+  if (user && user.user_id) {
+    const displayName = user.last_name ? `${user.last_name.toUpperCase()} ${user.first_name}` : user.first_name;
+    const stageData = await getStudentStage(user.user_id);
+    renderStagedetails(app, displayName, stageData.found ? stageData : null);
+  } else {
+    renderStagedetails(app);
+  }
 } else if (role === 'frontend') {
   app.innerHTML = `
     <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; font-family: sans-serif; background-color: #f8f9fa;">

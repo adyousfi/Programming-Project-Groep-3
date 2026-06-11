@@ -331,12 +331,14 @@ app.get('/api/stages/student/:studentId', async (req, res) => {
 
     const studentUser = stage.student ? stage.student.User : null;
     const mentorUser = stage.mentor ? stage.mentor.User : null;
+    const docentUser = stage.docent ? stage.docent.User : null;
 
     return res.json({
       found: true,
       id: stage.stage_id,
       naam: studentUser ? `${studentUser.first_name} ${studentUser.last_name}` : '',
       studentEmail: studentUser ? studentUser.email : '',
+      studentNummer: stage.student ? stage.student.studentnummer : '',
       bedrijf: {
         naam: stage.bedrijf ? stage.bedrijf.naam : '',
         adres: stage.bedrijf ? stage.bedrijf.address : '',
@@ -344,6 +346,9 @@ app.get('/api/stages/student/:studentId', async (req, res) => {
       stagementor: {
         naam: mentorUser ? `${mentorUser.first_name} ${mentorUser.last_name}` : '',
         email: mentorUser ? mentorUser.email : '',
+      },
+      docent: {
+        naam: docentUser ? `Prof. ${docentUser.first_name} ${docentUser.last_name}` : '',
       },
       stageDetails: {
         omschrijving: stage.omschrijving_opdracht || '',

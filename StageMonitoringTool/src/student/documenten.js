@@ -121,6 +121,10 @@ export async function renderDocumenten(container) {
                         <button type="button" class="upload-btn" id="upload-btn">Bestand Selecteren</button>
                     </div>
 
+                    <div class="upload-error" id="upload-error" style="display: none;">
+                        <span class="upload-error-text" id="upload-error-text"></span>
+                    </div>
+
                     <div class="upload-selected" id="upload-selected" style="display:none;">
                         <span class="upload-filename" id="upload-filename"></span>
                         <button type="button" class="upload-remove-btn" id="upload-remove-btn">Verwijderen</button>
@@ -140,8 +144,42 @@ export async function renderDocumenten(container) {
     const uploadFilename = container.querySelector('#upload-filename');
     const uploadRemoveBtn = container.querySelector('#upload-remove-btn');
     const uploadSubmitBtn = container.querySelector('#upload-submit-btn');
+    let selectedFile = null;
+
+    function validateFile(file) {
+        const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png'];
+        const maxSize = 10 * 1024 * 1024;
+
+        if (!allowedTypes.includes(file.type)) {
+            return { valid: false, error: 'Bestandstype niet toegestaan. Alleen PDF, JPG en PNG zijn toegestaan.' };
+        }
+        if (file.size > maxSize) {
+            return { valid: false, error: 'Bestand is te groot. Maximale grootte is 10MB.' };
+        }
+        return { valid: true, error: null };
+    }
+
+    function showError(message) {
+        const errorDiv = container.querySelector('#upload-error');
+        const errorText = container.querySelector('#upload-error-text');
+        errorText.textContent = message;
+        errorDiv.style.display = 'block';
+    }
+
+    function hideError() {
+        const errorDiv = container.querySelector('#upload-error');
+        errorDiv.style.display = 'none';
+    }
 
     function showFile(file) {
+        const result = validateFile(file);
+        if (!result.valid) {
+            resetUpload();
+            showError(result.error);
+            return;
+        }
+        hideError();
+        selectedFile = file;
         uploadFilename.textContent = file.name;
         uploadZone.style.display = 'none';
         uploadSelected.style.display = 'flex';
@@ -150,9 +188,11 @@ export async function renderDocumenten(container) {
 
     function resetUpload() {
         fileInput.value = '';
+        selectedFile = null;
         uploadZone.style.display = '';
         uploadSelected.style.display = 'none';
         uploadSubmitBtn.style.display = 'none';
+        hideError();
     }
 
     uploadZone.addEventListener('click', () => fileInput.click());
@@ -197,6 +237,16 @@ export async function renderDocumenten(container) {
             return;
         }
 
+        if (!selectedFile) {
+            showError('Geen bestand geselecteerd.');
+            return;
+        }
+        const result = validateFile(selectedFile);
+        if (!result.valid) {
+            resetUpload();
+            showError(result.error);
+            return;
+        }
         window.location.href = '/?role=documenten_ingedient';
     });
 }
