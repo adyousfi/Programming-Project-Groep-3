@@ -121,3 +121,48 @@ if (role === 'student') {
   app.style.display = 'none';
   document.querySelector('#login-page').style.display = 'flex';
 }
+
+const loginBtn = document.getElementById('btn');
+if (loginBtn) {
+  loginBtn.addEventListener('click', async () => {
+    const emailInput    = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    const msg           = document.getElementById('msg');
+    const email         = emailInput.value.trim();
+    const password      = passwordInput.value;
+
+    if (!email || !password) {
+      msg.style.color   = 'red';
+      msg.textContent   = 'Vul alle velden in.';
+      return;
+    }
+
+    loginBtn.disabled    = true;
+    loginBtn.textContent = 'Bezig...';
+    msg.textContent      = '';
+
+    try {
+      const res  = await fetch('/login', {
+        method:      'POST',
+        headers:     { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body:        JSON.stringify({ email, password }),
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        window.location.href = `/?role=${encodeURIComponent(data.user.role)}`;
+      } else {
+        msg.style.color      = 'red';
+        msg.textContent      = data.message || 'Foute login';
+        loginBtn.disabled    = false;
+        loginBtn.textContent = 'Login';
+      }
+    } catch {
+      msg.style.color      = 'red';
+      msg.textContent      = 'Server fout';
+      loginBtn.disabled    = false;
+      loginBtn.textContent = 'Login';
+    }
+  });
+}
