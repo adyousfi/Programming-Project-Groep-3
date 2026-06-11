@@ -6,7 +6,9 @@ export async function renderWachten(container, userName = '') {
             const res = await fetch('/me', { credentials: 'include' });
             const data = await res.json();
             if (data.loggedIn && data.user) {
-                userName = data.user.first_name || 'Student';
+                userName = (data.user.last_name && data.user.first_name)
+                    ? `${data.user.last_name.toUpperCase()} ${data.user.first_name}`
+                    : data.user.first_name || 'Student';
             }
         } catch {
             userName = 'Student';

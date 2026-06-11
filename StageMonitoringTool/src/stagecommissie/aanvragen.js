@@ -3,10 +3,25 @@ import { renderBeoordelen } from './beoordelen.js';
 import { getAllAanvragen } from '../services/aanvragenService.js';
 
 let aanvragen = [];
+let userName = 'Stagecommissie';
 
 function statusLabel(status) {
   const labels = { in_afwachting: 'In afwachting', goedgekeurd: 'Goedgekeurd', afgekeurd: 'Afgekeurd', aanpassingen: 'Aanpassingen nodig' };
   return labels[status] || status;
+}
+
+async function getLoggedInUser() {
+  try {
+    const res = await fetch('/me', { credentials: 'include' });
+    const data = await res.json();
+    if (data.loggedIn && data.user) {
+      if (data.user.last_name && data.user.first_name) {
+        return `${data.user.last_name.toUpperCase()} ${data.user.first_name}`;
+      }
+      return data.user.first_name || 'Stagecommissie';
+    }
+  } catch {}
+  return 'Stagecommissie';
 }
 
 function renderKaarten(lijst) {
@@ -34,7 +49,7 @@ function setupBeoordelenButtons() {
       const id = btn.dataset.id;
       const aanvraag = aanvragen.find(function(a) { return a.id == id; });
       if (aanvraag) {
-        renderBeoordelen(aanvraag);
+        renderBeoordelen(aanvraag, userName);
       }
     });
   });
@@ -62,6 +77,7 @@ function setupFilter() {
 }
 
 export async function renderAanvragen() {
+  userName = await getLoggedInUser();
   aanvragen = await getAllAanvragen();
 
   const aantalAfwachting = aanvragen.filter(function(a) { return a.status === 'in_afwachting'; }).length;
@@ -80,7 +96,7 @@ export async function renderAanvragen() {
           </nav>
         </div>
         <div class="sc-sidebar-bottom">
-          <span class="sc-user-name">Prof. De Vries</span>
+          <span class="sc-user-name">${userName}</span>
           <a href="/" class="sc-logout">Uitloggen</a>
         </div>
       </aside>

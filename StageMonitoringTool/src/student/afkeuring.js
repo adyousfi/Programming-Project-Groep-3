@@ -15,7 +15,7 @@ export function renderAfkeuring(container, userName = '[Studentnaam]', stageData
                         <span class="sidebar-logo-sub">Erasmushogeschool Brussel</span>
                     </div>
                     <nav class="sidebar-nav">
-                        <a href="/?role=student" class="sidebar-nav-item">Nieuwe Aanvraag</a>
+                        <a href="/?role=stageformulier" class="sidebar-nav-item">Nieuwe Aanvraag</a>
                     </nav>
                 </div>
                 <div class="sidebar-bottom">
@@ -91,7 +91,7 @@ export function renderAfkeuring(container, userName = '[Studentnaam]', stageData
     const nieuwAanvraagBtn = container.querySelector('#afkeuring-nieuwe-aanvraag');
     if (nieuwAanvraagBtn) {
         nieuwAanvraagBtn.addEventListener('click', () => {
-            window.location.search = '?role=student';
+            window.location.search = '?role=stageformulier';
         });
     }
 }
