@@ -87,7 +87,7 @@ if (role === 'student') {
 } else if (role === 'goedgekeurd_student') {
   renderGoedgekeurdStudent(app);
 } else if (role === 'documenten') {
-  renderDocumenten(app);
+  await renderDocumenten(app);
 } else if (role === 'documenten_ingedient') {
   renderDocumentenIngedient(app);
 } else if (role === 'frontend') {
