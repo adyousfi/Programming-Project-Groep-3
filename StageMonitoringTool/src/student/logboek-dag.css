@@ -1,0 +1,307 @@
+/* Layout */
+.logboek-dag-layout {
+    display: flex;
+    min-height: 100vh;
+    font-family: 'Inter', sans-serif;
+    background-color: #f8f9fa;
+}
+
+/* Sidebar */
+.logboek-dag-sidebar {
+    width: 200px;
+    min-width: 200px;
+    background-color: #ffffff;
+    border-right: 1px solid #e9ecef;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 1.5rem 1rem;
+    box-sizing: border-box;
+}
+
+.logboek-dag-sidebar .sidebar-logo-title {
+    display: block;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #111;
+}
+
+.logboek-dag-sidebar .sidebar-logo-sub {
+    display: block;
+    font-size: 0.75rem;
+    color: #6c757d;
+    margin-top: 0.15rem;
+}
+
+.logboek-dag-sidebar .sidebar-nav {
+    margin-top: 2rem;
+}
+
+.logboek-dag-sidebar .sidebar-nav-item {
+    display: block;
+    padding: 0.5rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    color: #495057;
+    text-decoration: none;
+}
+
+.logboek-dag-sidebar .sidebar-nav-item.active {
+    background-color: #e0e7ff;
+    color: #3b82f6;
+    font-weight: 600;
+}
+
+.logboek-dag-sidebar .sidebar-nav-item:hover:not(.active) {
+    background-color: #f1f3f5;
+}
+
+.logboek-dag-sidebar .sidebar-nav-item.disabled {
+    color: #adb5bd;
+    pointer-events: none;
+    cursor: default;
+}
+
+.logboek-dag-sidebar .sidebar-bottom {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.logboek-dag-sidebar .sidebar-user-name {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #212529;
+}
+
+.logboek-dag-sidebar .sidebar-logout {
+    font-size: 0.85rem;
+    color: #0d6efd;
+    text-decoration: none;
+}
+
+.logboek-dag-sidebar .sidebar-logout:hover {
+    text-decoration: underline;
+}
+
+/* Main */
+.logboek-dag-main {
+    flex: 1;
+    padding: 2rem;
+    overflow-y: auto;
+}
+
+/* Back link */
+.logboek-dag-back {
+    display: inline-block;
+    font-size: 0.875rem;
+    color: #0d6efd;
+    text-decoration: none;
+    margin-bottom: 1rem;
+}
+
+.logboek-dag-back:hover {
+    text-decoration: underline;
+}
+
+/* Header */
+.logboek-dag-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.5rem;
+}
+
+.logboek-dag-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #111;
+    margin: 0;
+}
+
+.logboek-dag-dates {
+    font-size: 0.9rem;
+    color: #6c757d;
+    margin: 0.25rem 0 0;
+}
+
+.logboek-dag-submit-btn {
+    padding: 0.6rem 1.5rem;
+    background: #0d6efd;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.15s;
+}
+
+.logboek-dag-submit-btn:hover {
+    background: #0b5ed7;
+}
+
+.logboek-dag-submit-btn:disabled {
+    background: #9ca3af;
+    cursor: not-allowed;
+}
+
+/* Info text */
+.logboek-dag-info {
+    font-size: 0.85rem;
+    color: #6c757d;
+    margin: 0 0 1.5rem;
+}
+
+/* Day cards */
+.logboek-dag-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.logboek-dag-card {
+    background: #fff;
+    border: 1px solid #e9ecef;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.logboek-dag-card.locked {
+    opacity: 0.6;
+}
+
+.logboek-dag-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.logboek-dag-card-left {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+}
+
+.logboek-dag-card-name {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #111;
+}
+
+.logboek-dag-card-date {
+    font-size: 0.8rem;
+    color: #6c757d;
+}
+
+/* Badges */
+.logboek-dag-card-badge {
+    display: inline-block;
+    padding: 0.3rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.badge-available {
+    background-color: #d1e7dd;
+    color: #0f5132;
+    border: 1px solid #badbcc;
+}
+
+.badge-locked {
+    background-color: #f3f4f6;
+    color: #6b7280;
+    border: 1px solid #e5e7eb;
+}
+
+.badge-filled {
+    background-color: #cfe2ff;
+    color: #0a3882;
+    border: 1px solid #b6d4fe;
+}
+
+/* Form */
+.logboek-dag-card-form {
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.logboek-dag-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.logboek-dag-label {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #374151;
+}
+
+.logboek-dag-textarea {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-family: inherit;
+    color: #111827;
+    background: #fff;
+    resize: vertical;
+    outline: none;
+    transition: border-color 0.15s;
+    box-sizing: border-box;
+}
+
+.logboek-dag-textarea:focus {
+    border-color: #2563eb;
+}
+
+.logboek-dag-textarea::placeholder {
+    color: #9ca3af;
+}
+
+.logboek-dag-textarea:disabled {
+    background: #f9fafb;
+    color: #6b7280;
+}
+
+.logboek-dag-save-btn {
+    align-self: flex-start;
+    padding: 0.6rem 1.5rem;
+    background: #0d6efd;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.logboek-dag-save-btn:hover {
+    background: #0b5ed7;
+}
+
+.logboek-dag-save-btn:disabled {
+    background: #9ca3af;
+    cursor: not-allowed;
+}
+
+/* Locked form placeholder */
+.logboek-dag-card-locked {
+    padding: 1.5rem;
+    text-align: center;
+}
+
+.logboek-dag-locked-text {
+    font-size: 0.85rem;
+    color: #adb5bd;
+}

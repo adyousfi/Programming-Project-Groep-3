@@ -2,28 +2,46 @@ import './logboek.css';
 
 export function renderLogboek(container, userName = 'Student', stageData = null) {
     const startDate = stageData?.stageDetails?.start ? new Date(stageData.stageDetails.start) : null;
+    const endDate = stageData?.stageDetails?.einde ? new Date(stageData.stageDetails.einde) : null;
+
+    function formatDate(d) {
+        return d.toLocaleDateString('nl-BE', { day: 'numeric', month: 'short' });
+    }
 
     function getWeekDates(weekIndex) {
-        if (!startDate) return { start: '?', end: '?' };
+        if (!startDate) return { start: '?', end: '?', days: 5 };
         const weekStart = new Date(startDate);
         weekStart.setDate(startDate.getDate() + weekIndex * 7);
         const weekEnd = new Date(weekStart);
         weekEnd.setDate(weekStart.getDate() + 4);
-        const opts = { day: 'numeric', month: 'short' };
+
+        let days = 5;
+        if (endDate && weekEnd > endDate) {
+            weekEnd.setTime(endDate.getTime());
+            const dayOfWeek = weekEnd.getDay();
+            const diff = weekEnd.getDate() - weekStart.getDate() + 1;
+            days = Math.max(1, Math.min(5, diff));
+        }
+
         return {
-            start: weekStart.toLocaleDateString('nl-BE', opts),
-            end: weekEnd.toLocaleDateString('nl-BE', opts)
+            start: formatDate(weekStart),
+            end: formatDate(weekEnd),
+            days
         };
     }
 
-    const weeks = Array.from({ length: 16 }, (_, i) => {
+    const totalWeeks = startDate && endDate
+        ? Math.ceil(((endDate - startDate) / (1000 * 60 * 60 * 24) + 1) / 7)
+        : 16;
+
+    const weeks = Array.from({ length: Math.max(1, totalWeeks) }, (_, i) => {
         const dates = getWeekDates(i);
         return {
             number: i + 1,
             start: dates.start,
             end: dates.end,
             daysFilled: 0,
-            totalDays: 5,
+            totalDays: dates.days,
             status: 'not_submitted'
         };
     });
@@ -65,7 +83,7 @@ export function renderLogboek(container, userName = 'Student', stageData = null)
                         }
 
                         return `
-                            <div class="logboek-week-card">
+                            <a href="?role=logboek_dag&week=${w.number}" class="logboek-week-card">
                                 <div class="logboek-week-left">
                                     <span class="logboek-week-name">Week ${w.number}</span>
                                     <span class="logboek-week-dates">${w.start} t/m ${w.end}</span>
@@ -79,7 +97,7 @@ export function renderLogboek(container, userName = 'Student', stageData = null)
                                     </div>
                                     ${statusBadge}
                                 </div>
-                            </div>
+                            </a>
                         `;
                     }).join('')}
                 </div>

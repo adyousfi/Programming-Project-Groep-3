@@ -119,6 +119,15 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    text-decoration: none;
+    color: inherit;
+    transition: box-shadow 0.15s, border-color 0.15s;
+    cursor: pointer;
+}
+
+.logboek-week-card:hover {
+    border-color: #0d6efd;
+    box-shadow: 0 2px 8px rgba(13, 110, 253, 0.1);
 }
 
 .logboek-week-left {
