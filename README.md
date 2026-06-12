@@ -1,6 +1,3 @@
-Hier is je README als **één doorlopende tekst**, maar nog steeds netjes en overzichtelijk qua opmaak 👇
-
-````markdown
 # 📊 Stage Monitoring Tool
 
 ## 📖 Inleiding
