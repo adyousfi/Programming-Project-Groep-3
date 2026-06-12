@@ -1,5 +1,6 @@
 import { sequelize } from "../dbConnection.js";
 import Docent from "../userModel/docent.js";
+import User from "../userModel/user.js";
 
 const createDocent = async (docent_id, user_id) =>
 {
@@ -15,7 +16,9 @@ const createDocent = async (docent_id, user_id) =>
 
 const selectDocent = async (req, res, next) => {
 	try {
-		const docent = await Docent.findAll();
+		const docent = await Docent.findAll({
+			include: [{ model: User, as: 'User' }]
+		});
         return res.status(200).json({
             msg: "Docenten selected successfully",
             data: docent

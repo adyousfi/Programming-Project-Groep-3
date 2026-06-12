@@ -51,17 +51,17 @@ if (role === 'student') {
     if (!stageData.found) {
       renderStudentDashboard(app, displayName);
     } else {
-      switch (stageData.rawStatus) {
-        case 'Aanvraag':
+      switch (stageData.status?.toLowerCase()) {
+        case 'in_afwachting':
           renderWachten(app, displayName);
           break;
-        case 'Goedgekeurd':
+        case 'goedgekeurd':
           renderGoedgekeurdStudent(app, displayName, stageData);
           break;
-        case 'Aanpassingen_vereist':
+        case 'aanpassingen':
           renderFeedback(app, user, stageData);
           break;
-        case 'Afgekeurd':
+        case 'afgekeurd':
           renderAfkeuring(app, displayName, stageData);
           break;
         default:

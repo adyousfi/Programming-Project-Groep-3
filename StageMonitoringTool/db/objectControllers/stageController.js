@@ -1,8 +1,12 @@
 import Stage from "../objectModel/stage.js";
 import Stagementor from "../userModel/stagementor.js";
 import { sequelize } from "../dbConnection.js";
+import Student from "../userModel/student.js";
+import User from "../userModel/user.js";
+import Bedrijf from "../objectModel/bedrijf.js";
+import Docent from "../userModel/docent.js";
 
-const createStage = async (req,res,next) =>{
+const createStage = async (req,res,next) => {
 
     const {
         student_id,
@@ -58,6 +62,10 @@ const updateStage = async (req, res, next) => {
         bedrijf_id: bedrijf_id
     },
     {where: { stage_id: stage_id }});
+    
+    return res.status(200).json({
+        msg: "Stage updated successfully"
+    });
     }
     catch(error){
         console.error("Error updating stage: ", error); 
@@ -69,7 +77,24 @@ const updateStage = async (req, res, next) => {
 
 const selectStage = async (req, res, next) => {
     try {
-        const stage = await Stage.findAll();
+        const stage = await Stage.findAll({
+            include: [
+                {
+                    model: Student,
+                    as: 'student',
+                    include: [{ model: User, as: 'User' }]
+                },
+                {
+                    model: Bedrijf,
+                    as: 'bedrijf'
+                },
+                {
+                    model: Docent,
+                    as: 'docent',
+                    include: [{ model: User, as: 'User' }]
+                }
+            ]
+        });
         return res.status(200).json({
             msg: "Stage selected successfully",
             data: stage

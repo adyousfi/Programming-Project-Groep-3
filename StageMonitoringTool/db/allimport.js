@@ -23,13 +23,13 @@ User.hasOne(Stagementor, {foreignKey: 'bedrijf_id',onDelete: 'CASCADE'});
 User.hasOne(Student, {foreignKey: 'user_id',onDelete: 'CASCADE'});
 
 //Studenten
-Student.belongsTo(User, { foreignKey: 'user_id', onDelete: 'CASCADE' });
+Student.belongsTo(User, { as: 'User', foreignKey: 'user_id', onDelete: 'CASCADE' });
 
 //Docenten
-Docent.belongsTo(User, { foreignKey: 'user_id', onDelete: 'CASCADE' });
+Docent.belongsTo(User, { as: 'User', foreignKey: 'user_id', onDelete: 'CASCADE' });
 
 //Stagementors
-Stagementor.belongsTo(User, { foreignKey: 'user_id', onDelete: 'CASCADE' });
+Stagementor.belongsTo(User, { as: 'User', foreignKey: 'user_id', onDelete: 'CASCADE' });
 
 //Stagecommisie
 Stagecommisie.belongsTo(User, {foreignKey: 'user_id',onDelete: 'CASCADE'});
@@ -44,10 +44,10 @@ Stagementor.belongsTo(Bedrijf, { foreignKey: 'bedrijf_id', onDelete: 'CASCADE' }
 Bedrijf.hasMany(Stagementor, { foreignKey: 'bedrijf_id',onDelete: 'CASCADE'});
 
 //Stage Relaties
-Stage.belongsTo(Docent, { foreignKey: 'docent_id', onDelete: 'CASCADE' });
-Stage.belongsTo(Student, { foreignKey: 'user_id', onDelete: 'CASCADE' });
-Stage.belongsTo(Bedrijf, { foreignKey: 'bedrijf_id', onDelete: 'CASCADE' });
-Stage.belongsTo(Stagementor, { foreignKey: 'stagementor_id', onDelete: 'CASCADE' });
+Stage.belongsTo(Docent, { as: 'docent', foreignKey: 'docent_id', onDelete: 'CASCADE' });
+Stage.belongsTo(Student, { as: 'student', foreignKey: 'student_id', onDelete: 'CASCADE' });
+Stage.belongsTo(Bedrijf, { as: 'bedrijf', foreignKey: 'bedrijf_id', onDelete: 'CASCADE' });
+Stage.belongsTo(Stagementor, { as: 'mentor', foreignKey: 'stagementor_id', onDelete: 'CASCADE' });
 Stage.hasMany(Behaaldescore, { foreignKey: 'stage_id', onDelete: 'CASCADE' });
 //Logboek & Opmerking Relaties
 Opmerkinglogboek.hasMany(Logboek, { foreignKey: 'opmerkinglogboek_id', onDelete: 'CASCADE' });

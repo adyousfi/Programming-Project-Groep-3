@@ -15,10 +15,12 @@ export const runRelationTest = async () => {
             include: [
                 { 
                     model: Student, 
-                    include: [User]
+                    as: 'student',
+                    include: [{ model: User, as: 'User' }]
                 }, 
                 { 
-                    model: Bedrijf 
+                    model: Bedrijf,
+                    as: 'bedrijf'
                 }
             ]
         });
@@ -28,14 +30,14 @@ export const runRelationTest = async () => {
             console.log(`Stage ID: ${testStage.stage_id}`);
             console.log(`Omschrijving: ${testStage.omschrijving_opdracht}`);
             
-            if (testStage.Student && testStage.Student.User) {
-                console.log(`Gekoppelde Student: ${testStage.Student.User.first_name} ${testStage.Student.User.last_name}`);
+            if (testStage.student && testStage.student.User) {
+                console.log(`Gekoppelde Student: ${testStage.student.User.first_name} ${testStage.student.User.last_name}`);
             } else {
                 console.log("Waarschuwing: Stage gevonden, maar de relatie met Student/User is leeg.");
             }
 
-            if (testStage.Bedrijf) {
-                console.log(`Gekoppeld Bedrijf: ${testStage.Bedrijf.naam} (${testStage.Bedrijf.address})`);
+            if (testStage.bedrijf) {
+                console.log(`Gekoppeld Bedrijf: ${testStage.bedrijf.naam} (${testStage.bedrijf.address})`);
             } else {
                 console.log("Waarschuwing: Stage gevonden, maar de relatie met Bedrijf is leeg.");
             }
