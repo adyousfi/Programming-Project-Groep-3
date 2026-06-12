@@ -12,6 +12,7 @@ import { renderGoedgekeurdStudent } from './student/goedgekeurd_student.js';
 import { renderDocumenten } from './student/documenten.js';
 import { renderDocumentenIngedient } from './student/documenten-ingedient.js';
 import { renderStagedetails } from './student/stagedetails.js';
+import { renderLogboek } from './student/logboek.js';
 import { renderAdmin } from './admin/admin.js';
 
 const app = document.querySelector('#app');
@@ -116,6 +117,15 @@ if (role === 'student') {
     renderStagedetails(app, displayName, stageData.found ? stageData : null);
   } else {
     renderStagedetails(app);
+  }
+} else if (role === 'logboek') {
+  const user = await getLoggedInUser();
+  if (user && user.user_id) {
+    const displayName = user.last_name ? `${user.last_name.toUpperCase()} ${user.first_name}` : user.first_name;
+    const stageData = await getStudentStage(user.user_id);
+    renderLogboek(app, displayName, stageData.found ? stageData : null);
+  } else {
+    renderLogboek(app);
   }
 } else {
   app.style.display = 'none';

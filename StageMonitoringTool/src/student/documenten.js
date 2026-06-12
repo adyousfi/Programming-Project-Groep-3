@@ -44,7 +44,7 @@ export async function renderDocumenten(container) {
                         <a href="?role=goedgekeurd_student" class="sidebar-nav-item">Overzicht</a>
                         <a href="#" class="sidebar-nav-item">Stagedetails</a>
                         <a href="?role=documenten" class="sidebar-nav-item active">Documenten</a>
-                        <a href="#" class="sidebar-nav-item${docValidated ? '' : ' disabled'}">Logboek</a>
+                        <a href="${docValidated ? '?role=logboek' : '#'}" class="sidebar-nav-item${docValidated ? '' : ' disabled'}">Logboek</a>
                         <a href="#" class="sidebar-nav-item${docValidated ? '' : ' disabled'}">Evaluatie</a>
                     </nav>
                 </div>

@@ -1,0 +1,195 @@
+/* Layout */
+.logboek-layout {
+    display: flex;
+    min-height: 100vh;
+    font-family: 'Inter', sans-serif;
+    background-color: #f8f9fa;
+}
+
+/* Sidebar */
+.logboek-sidebar {
+    width: 200px;
+    min-width: 200px;
+    background-color: #ffffff;
+    border-right: 1px solid #e9ecef;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 1.5rem 1rem;
+    box-sizing: border-box;
+}
+
+.logboek-sidebar .sidebar-logo-title {
+    display: block;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #111;
+}
+
+.logboek-sidebar .sidebar-logo-sub {
+    display: block;
+    font-size: 0.75rem;
+    color: #6c757d;
+    margin-top: 0.15rem;
+}
+
+.logboek-sidebar .sidebar-nav {
+    margin-top: 2rem;
+}
+
+.logboek-sidebar .sidebar-nav-item {
+    display: block;
+    padding: 0.5rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    color: #495057;
+    text-decoration: none;
+}
+
+.logboek-sidebar .sidebar-nav-item.active {
+    background-color: #e0e7ff;
+    color: #3b82f6;
+    font-weight: 600;
+}
+
+.logboek-sidebar .sidebar-nav-item:hover:not(.active) {
+    background-color: #f1f3f5;
+}
+
+.logboek-sidebar .sidebar-nav-item.disabled {
+    color: #adb5bd;
+    pointer-events: none;
+    cursor: default;
+}
+
+.logboek-sidebar .sidebar-bottom {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.logboek-sidebar .sidebar-user-name {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #212529;
+}
+
+.logboek-sidebar .sidebar-logout {
+    font-size: 0.85rem;
+    color: #0d6efd;
+    text-decoration: none;
+}
+
+.logboek-sidebar .sidebar-logout:hover {
+    text-decoration: underline;
+}
+
+/* Main */
+.logboek-main {
+    flex: 1;
+    padding: 2rem;
+    overflow-y: auto;
+}
+
+.logboek-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #111;
+    margin: 0 0 0.5rem;
+}
+
+.logboek-subtitle {
+    font-size: 0.9rem;
+    color: #6c757d;
+    margin: 0 0 1.5rem;
+}
+
+/* Week cards */
+.logboek-weeks {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.logboek-week-card {
+    background: #ffffff;
+    border: 1px solid #e9ecef;
+    border-radius: 10px;
+    padding: 1rem 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.logboek-week-left {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+}
+
+.logboek-week-name {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #111;
+}
+
+.logboek-week-dates {
+    font-size: 0.8rem;
+    color: #6c757d;
+}
+
+.logboek-week-right {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+}
+
+.logboek-week-progress-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.3rem;
+    min-width: 140px;
+}
+
+.logboek-week-count {
+    font-size: 0.8rem;
+    color: #6c757d;
+}
+
+.logboek-week-bar {
+    width: 100%;
+    height: 5px;
+    background-color: #e9ecef;
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.logboek-week-bar-fill {
+    height: 100%;
+    background-color: #0d6efd;
+    border-radius: 3px;
+    transition: width 0.3s ease;
+}
+
+/* Badges */
+.logboek-badge {
+    display: inline-block;
+    padding: 0.3rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.logboek-badge-validated {
+    background-color: #d1e7dd;
+    color: #0f5132;
+    border: 1px solid #badbcc;
+}
+
+.logboek-badge-pending {
+    background-color: #f3f4f6;
+    color: #6b7280;
+    border: 1px solid #e5e7eb;
+}

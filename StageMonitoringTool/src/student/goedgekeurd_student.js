@@ -21,7 +21,7 @@ export function renderGoedgekeurdStudent(container, userName = 'Jan Janssens', s
                         <a href="?role=goedgekeurd_student" class="sidebar-nav-item active">Overzicht</a>
                         <a href="?role=stagedetails" class="sidebar-nav-item">Stagedetails</a>
                         <a href="?role=documenten" class="sidebar-nav-item">Documenten</a>
-                        <a href="${docValidated ? '#' : '#'}" class="sidebar-nav-item${docValidated ? '' : ' disabled'}">Logboek</a>
+                        <a href="${docValidated ? '?role=logboek' : '#'}" class="sidebar-nav-item${docValidated ? '' : ' disabled'}">Logboek</a>
                         <a href="${docValidated ? '#' : '#'}" class="sidebar-nav-item${docValidated ? '' : ' disabled'}">Evaluatie</a>
                     </nav>
                 </div>
