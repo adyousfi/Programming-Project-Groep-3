@@ -21,12 +21,4 @@ const Student = sequelize.define("Student", {
         
 )
 
-User.hasOne(Student, { 
-    foreignKey: 'user_id', 
-    onDelete: 'CASCADE' 
-});
-Student.belongsTo(User, { 
-    foreignKey: 'user_id' 
-});
-
 export default Student;

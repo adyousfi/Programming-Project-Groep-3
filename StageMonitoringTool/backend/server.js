@@ -13,6 +13,8 @@ import Bedrijf from '../db/objectModel/bedrijf.js';
 import Stage from '../db/objectModel/stage.js';
 import Docent from '../db/userModel/docent.js';
 import StageDocument from '../db/objectModel/stageDocument.js';
+import {sequelize} from '../db/dbConnection.js';
+import { confirmRelations } from '../db/allimport.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -154,10 +156,10 @@ app.get('/api/stages', async (req, res) => {
           einde: s.eind_datum || '',
           urenPerWeek: '',
         },
-        status: s.status === 'Aanvraag' ? 'in_afwachting'
-          : s.status === 'Goedgekeurd' ? 'goedgekeurd'
-          : s.status === 'Afgekeurd' ? 'afgekeurd'
-          : s.status === 'Aanpassingen_vereist' ? 'aanpassingen'
+        status: s.status?.toLowerCase() === 'aanvraag' ? 'in_afwachting'
+          : s.status?.toLowerCase() === 'goedgekeurd' ? 'goedgekeurd'
+          : s.status?.toLowerCase() === 'afgekeurd' ? 'afgekeurd'
+          : s.status?.toLowerCase() === 'aanpassingen_vereist' ? 'aanpassingen'
           : s.status,
         datum: s.createdAt ? new Date(s.createdAt).toLocaleDateString('nl-BE') : '',
         historiek: null,
@@ -311,10 +313,10 @@ app.get('/api/stages/:id', async (req, res) => {
         start: stage.begin_datum || '',
         einde: stage.eind_datum || '',
       },
-      status: stage.status === 'Aanvraag' ? 'in_afwachting'
-        : stage.status === 'Goedgekeurd' ? 'goedgekeurd'
-        : stage.status === 'Afgekeurd' ? 'afgekeurd'
-        : stage.status === 'Aanpassingen_vereist' ? 'aanpassingen'
+      status: stage.status?.toLowerCase() === 'aanvraag' ? 'in_afwachting'
+        : stage.status?.toLowerCase() === 'goedgekeurd' ? 'goedgekeurd'
+        : stage.status?.toLowerCase() === 'afgekeurd' ? 'afgekeurd'
+        : stage.status?.toLowerCase() === 'aanpassingen_vereist' ? 'aanpassingen'
         : stage.status,
       rawStatus: stage.status,
       datum: stage.createdAt ? new Date(stage.createdAt).toLocaleDateString('nl-BE') : '',
@@ -368,10 +370,10 @@ app.get('/api/stages/student/:studentId', async (req, res) => {
         start: stage.begin_datum || '',
         einde: stage.eind_datum || '',
       },
-      status: stage.status === 'Aanvraag' ? 'in_afwachting'
-        : stage.status === 'Goedgekeurd' ? 'goedgekeurd'
-        : stage.status === 'Afgekeurd' ? 'afgekeurd'
-        : stage.status === 'Aanpassingen_vereist' ? 'aanpassingen'
+      status: stage.status?.toLowerCase() === 'aanvraag' ? 'in_afwachting'
+        : stage.status?.toLowerCase() === 'goedgekeurd' ? 'goedgekeurd'
+        : stage.status?.toLowerCase() === 'afgekeurd' ? 'afgekeurd'
+        : stage.status?.toLowerCase() === 'aanpassingen_vereist' ? 'aanpassingen'
         : stage.status,
       rawStatus: stage.status,
       datum: stage.createdAt ? new Date(stage.createdAt).toLocaleDateString('nl-BE') : '',

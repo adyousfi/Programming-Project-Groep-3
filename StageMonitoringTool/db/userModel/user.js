@@ -41,7 +41,7 @@ const User = sequelize.define("User", {
     role: {
         type: DataTypes.ENUM,
         defaultValue: ROLES.STUDENT,
-        values: ['student','docent','admin','stagecommisie','stagementor']
+        values: [ROLES.STUDENT, ROLES.DOCENT, ROLES.ADMIN, ROLES.STAGECOMMISIE, ROLES.STAGEMENTOR]
     },
     phone: {
         type: DataTypes.STRING,

@@ -1,5 +1,6 @@
 import { sequelize } from "../dbConnection.js";
 import Docent from "../userModel/docent.js";
+import User from "../userModel/user.js";
 
 const createDocent = async (docent_id, user_id) =>
 {
@@ -12,4 +13,21 @@ const createDocent = async (docent_id, user_id) =>
 	console.log(docent)
   
 }
-export default createDocent;
+
+const selectDocent = async (req, res, next) => {
+	try {
+		const docent = await Docent.findAll({
+			include: [{ model: User, as: 'User' }]
+		});
+        return res.status(200).json({
+            msg: "Docenten selected successfully",
+            data: docent
+        });
+	} catch (error) {
+		console.error("Error selecting users: ", error);
+		return res.status(500).json({
+			msg: "something went wrong while selecting users"
+		});
+	}
+}
+export default {createDocent, selectDocent};

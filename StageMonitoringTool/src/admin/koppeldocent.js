@@ -2,7 +2,7 @@ import './koppeldocent.css';
 import { renderAdmin } from './admin.js';
 import { renderAdminDocumenten } from './adminDocumenten.js'; // check pad!
 
-const API_URL = 'http://localhost:3000';
+const API_URL = 'http://localhost:3001';
 
 let zonderDocent = [];
 let gekoppeld = [];
@@ -10,34 +10,59 @@ let beschikbareDocenten = [];
 
 // ================= DATA =================
 async function loadData() {
-  const stagesRes = await fetch(`${API_URL}/api/stages`);
+  const stagesRes = await fetch(`${API_URL}/select-stage`);
   if (!stagesRes.ok) throw new Error('Fout bij laden stages');
-  const stages = await stagesRes.json();
+  // 1. Get the full response object
+  const stagesResult = await stagesRes.json();
+  // 2. Extract the actual array from the .data property
+  const stages = stagesResult.data || [];
 
-  const docentenRes = await fetch(`${API_URL}/api/docenten`);
+  const docentenRes = await fetch(`${API_URL}/select-docent`);
   if (!docentenRes.ok) throw new Error('Fout bij laden docenten');
-  beschikbareDocenten = await docentenRes.json();
+  // 3. Extract the docenten array
+  const docentenResult = await docentenRes.json();
+  const rawDocenten = docentenResult.data || [];
+
+  // Map docenten so they have user_id, first_name, last_name
+  beschikbareDocenten = rawDocenten.map(d => ({
+    user_id: d.user_id,
+    first_name: d.User?.first_name || '',
+    last_name: d.User?.last_name || '',
+  }));
 
   zonderDocent = stages
-    .filter(s => !s.docent || !s.docent.naam)
-    .map(s => ({
-      id: s.id,
-      naam: s.naam || '-',
-      bedrijf: s.bedrijf?.naam || '-',
-      periode: formatPeriode(s.stageDetails?.start, s.stageDetails?.einde),
-    }));
+    .filter(s => !s.docent || !s.docent.User || !s.docent.User.first_name)
+    .map(s => {
+      const studentUser = s.student?.User;
+      const studentNaam = studentUser ? `${studentUser.first_name} ${studentUser.last_name}` : '-';
+      const bedrijfNaam = s.bedrijf?.naam || '-';
+      return {
+        id: s.stage_id,
+        naam: studentNaam,
+        bedrijf: bedrijfNaam,
+        periode: formatPeriode(s.begin_datum, s.eind_datum),
+        docent_id: null,
+      };
+    });
 
   gekoppeld = stages
-    .filter(s => s.docent && s.docent.naam)
-    .map(s => ({
-      id: s.id,
-      naam: s.naam || '-',
-      bedrijf: s.bedrijf?.naam || '-',
-      periode: formatPeriode(s.stageDetails?.start, s.stageDetails?.einde),
-      docent: s.docent.naam,
-      docent_id: s.docent.user_id || null,
-      status: s.status,
-    }));
+    .filter(s => s.docent && s.docent.User && s.docent.User.first_name)
+    .map(s => {
+      const studentUser = s.student?.User;
+      const studentNaam = studentUser ? `${studentUser.first_name} ${studentUser.last_name}` : '-';
+      const bedrijfNaam = s.bedrijf?.naam || '-';
+      const docentUser = s.docent?.User;
+      const docentNaam = docentUser ? `${docentUser.first_name} ${docentUser.last_name}` : '-';
+      return {
+        id: s.stage_id,
+        naam: studentNaam,
+        bedrijf: bedrijfNaam,
+        periode: formatPeriode(s.begin_datum, s.eind_datum),
+        docent: docentNaam,
+        docent_id: s.docent?.user_id || null,
+        status: s.status,
+      };
+    });
 }
 
 function formatPeriode(begin, eind) {
@@ -53,11 +78,10 @@ function formatPeriode(begin, eind) {
 
 // ================= API =================
 async function slaDocentOp(stageId, docentId) {
-  const res = await fetch(`${API_URL}/api/stages/${stageId}/docent`, {
-    method: 'PUT',
+  const res = await fetch(`${API_URL}/update-stage`, {
+    method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    credentials: 'include',
-    body: JSON.stringify({ docent_id: docentId }),
+    body: JSON.stringify({ stage_id: stageId, docent_id: docentId }),
   });
 
   if (!res.ok) {
