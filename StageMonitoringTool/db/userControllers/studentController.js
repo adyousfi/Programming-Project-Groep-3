@@ -12,4 +12,4 @@ const createStudent = async (student_id, user_id) =>
 	console.log(student)
   
 }
-export default {createStudent};
+export default createStudent;

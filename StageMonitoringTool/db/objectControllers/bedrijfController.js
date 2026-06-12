@@ -1,40 +1,34 @@
 import Bedrijf from "../objectModel/bedrijf.js";
 import Stagementor from "../userModel/stagementor.js";
 
-const createBedrijf = async (req,res,next) =>{
-
-    const{
+const createBedrijfCore = async (naam, address) => {
+    const bedrijf = await Bedrijf.create({
         naam,
-        address,
-    } = req.body;
+        address
+    });
+    return bedrijf;
+};
 
-    try{
-        const user = await Bedrijf.create({
-            naam:naam,
-            address:address
-        });
+const createBedrijf = async (req, res, next) => {
+    const { naam, address } = req.body;
+
+    try {
+        const bedrijf = await createBedrijfCore(naam, address);
         return res.status(200).json({
-            msg: "Bedrijfs created successfully",
-            data: Bedrijf
-        })
-    }
-    catch(error){
-        console.error("Error creating bedrijf: ", error); 
+            msg: "Bedrijf created successfully",
+            data: bedrijf
+        });
+    } catch (error) {
+        console.error("Error creating bedrijf: ", error);
         return res.status(500).json({
             msg: "something went wrong while creating bedrijf"
         });
-
     }
-}
+};
 
-
-
-const linkBedrijfToStageMentor = async (req,res,next) =>{
-    try{
-        const{
-            user_id,
-            bedrijf_id
-        } = req.body;
+const linkBedrijfToStageMentor = async (req, res, next) => {
+    try {
+        const { user_id, bedrijf_id } = req.body;
 
         await Stagementor.update(
     { bedrijf_id: bedrijf_id }, 
@@ -51,7 +45,6 @@ const linkBedrijfToStageMentor = async (req,res,next) =>{
             msg: "something went wrong while updating stagementor"
         })
     }
-}
+};
 
-
-export default {createBedrijf, linkBedrijfToStageMentor};
+export { createBedrijfCore, createBedrijf, linkBedrijfToStageMentor };

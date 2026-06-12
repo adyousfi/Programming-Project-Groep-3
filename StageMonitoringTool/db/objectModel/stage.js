@@ -7,21 +7,28 @@ import Admin from "../userModel/admin.js";
 import Stagementor from "../userModel/stagementor.js";
 import Bedrijf from "./bedrijf.js";
 
+
 export const status = {
-    AANVRAAG: 'AANVRAAG',
-    GOEDGEKEURD: 'GOEDGEKEURD',
-    AANPASSINGENVEREISD: 'AANPASSINGENVEREISD',
-    DOCUMENTGEUPLOADED: 'DOCUMENTGEUPLOADED',
-    KLAAR: 'KLAAR'
+    AANVRAAG: 'Aanvraag',
+    GOEDGEKEURD: 'Goedgekeurd',
+    AANPASSINGENVEREISD: 'Aanpassingen_vereist',
+    AFGEKEURD: 'Afgekeurd',
+    DOCUMENTGEUPLOADED: 'documentgeuploaded',
+    KLAAR: 'klaar'
 };
 
 // Stage model
-const Stage = sequelize.define("Stage", {
+const Stage = sequelize.define("stage", {
     stage_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
         primaryKey: true,
         autoIncrement: true,
+    },
+    stageaanvraag_id: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        comment: "FK - Reference to stageaanvraag"
     },
     student_id: {
         type: DataTypes.INTEGER,
@@ -31,11 +38,16 @@ const Stage = sequelize.define("Stage", {
         type: DataTypes.INTEGER,
         allowNull: true,
     },
+    admin_id: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        comment: "FK - Reference to admin"
+    },
     stagementor_id: {
         type: DataTypes.INTEGER,
         allowNull: true,
     },
-    bedrijf_id: {
+    bedrijfs_id: {
         type: DataTypes.INTEGER,
         allowNull: true,
     },
@@ -56,6 +68,11 @@ const Stage = sequelize.define("Stage", {
     eind_datum: {
         type: DataTypes.DATE,
         allowNull: true,
+    },
+    feedback: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+        comment: "Feedback from stagecommissie"
     },
     },
     {

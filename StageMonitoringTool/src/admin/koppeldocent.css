@@ -1,0 +1,166 @@
+.kp-sectie {
+  margin-bottom: 12px;
+}
+
+.kp-sectie-titel {
+  font-size: 18px;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 14px;
+  text-align: left;
+}
+
+.kp-sectie-titel--oranje {
+  color: #c2410c;
+}
+
+.kp-tabel {
+  width: 100%;
+  border-collapse: collapse;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.kp-tabel thead tr {
+  background: #f9fafb;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.kp-thead--oranje tr {
+  background: #fde8c8;
+  border-bottom: 1px solid #fbbf70;
+}
+
+.kp-tabel th {
+  padding: 14px 16px;
+  text-align: left;
+  font-size: 14px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.kp-tabel td {
+  padding: 16px;
+  font-size: 14px;
+  color: #374151;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.kp-tabel tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.kp-rij--oranje {
+  background: #fef0d8;
+}
+
+.kp-badge {
+  display: inline-block;
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.kp-badge--oranje {
+  background: #fde68a;
+  color: #92400e;
+}
+
+.kp-badge--groen {
+  background: #bbf7d0;
+  color: #166534;
+}
+
+.kp-btn {
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.kp-btn--toewijzen {
+  background: #2563eb;
+  color: #ffffff;
+  border: none;
+}
+
+.kp-btn--toewijzen:hover {
+  background: #1d4ed8;
+}
+
+.kp-btn--wijzigen {
+  background: #ffffff;
+  color: #2563eb;
+  border: 1.5px solid #2563eb;
+}
+
+.kp-btn--wijzigen:hover {
+  background: #eff6ff;
+}
+
+.kp-modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 100;
+  justify-content: center;
+  align-items: center;
+}
+
+.kp-modal-overlay.active {
+  display: flex;
+}
+
+.kp-modal {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 28px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+}
+
+.kp-modal-titel {
+  font-size: 18px;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 20px;
+}
+
+.kp-modal-body {
+  margin-bottom: 24px;
+}
+
+.kp-modal-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 8px;
+}
+
+.kp-modal-select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #111827;
+  outline: none;
+}
+
+.kp-modal-select:focus {
+  border-color: #2563eb;
+}
+
+.kp-modal-acties {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}

@@ -6,14 +6,14 @@ const Bedrijf = sequelize.define("Bedrijf", {
 
     bedrijf_id:{
         type: DataTypes.INTEGER,
-        allowNull: false,
+        allownull: true,
         primaryKey: true,
         autoIncrement: true,
     },
 
     naam:{
         type: DataTypes.STRING,
-        allowNull: false,
+        allownull: false,
     },
 
     address:{

@@ -1,60 +1,168 @@
-import './style.css'
-import javascriptLogo from './assets/javascript.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import { setupCounter } from './counter.js'
+import './style.css';
+import { renderAanvragen } from './stagecommissie/aanvragen.js';
+import { renderStudentDashboard } from './student/student.js';
+import { renderStageformulier } from './student/formulier.js';
+import { renderWachten } from './student/wachten.js';
+import { renderFeedback } from './student/feedback.js';
+import { renderAanpassen } from './student/aanpassen.js';
+import { renderAfkeuring } from './student/afkeuring.js';
+import { renderMijnStagiairs } from './stagementor/mijn-stagiairs.js';
+import { renderMijnStudenten } from './docent/mijn-studenten.js';
+import { renderGoedgekeurdStudent } from './student/goedgekeurd_student.js';
+import { renderDocumenten } from './student/documenten.js';
+import { renderDocumentenIngedient } from './student/documenten-ingedient.js';
+import { renderStagedetails } from './student/stagedetails.js';
+import { renderAdmin } from './admin/admin.js';
 
-document.querySelector('#app').innerHTML = `
-<section id="center">
-  <div class="hero">
-    <img src="${heroImg}" class="base" width="170" height="179">
-    <img src="${javascriptLogo}" class="framework" alt="JavaScript logo"/>
-    <img src="${viteLogo}" class="vite" alt="Vite logo" />
-  </div>
-  <div>
-    <h1>Get started</h1>
-    <p>Edit <code>src/main.js</code> and save to test <code>HMR</code></p>
-  </div>
-  <button id="counter" type="button" class="counter"></button>
-</section>
+const app = document.querySelector('#app');
+const role = new URLSearchParams(window.location.search).get('role');
 
-<div class="ticks"></div>
+document.addEventListener('click', async (e) => {
+  const link = e.target.closest('a');
+  if (!link) return;
+  const text = link.textContent.trim().toLowerCase();
+  if (text !== 'uitloggen') return;
+  e.preventDefault();
+  try { await fetch('/logout', { method: 'POST', credentials: 'include' }); } catch {}
+  window.location.href = '/';
+});
 
-<section id="next-steps">
-  <div id="docs">
-    <svg class="icon" role="presentation" aria-hidden="true"><use href="/icons.svg#documentation-icon"></use></svg>
-    <h2>Documentation</h2>
-    <p>Your questions, answered</p>
-    <ul>
-      <li>
-        <a href="https://vite.dev/" target="_blank">
-          <img class="logo" src="${viteLogo}" alt="" />
-          Explore Vite
-        </a>
-      </li>
-      <li>
-        <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript" target="_blank">
-          <img class="button-icon" src="${javascriptLogo}" alt="">
-          Learn more
-        </a>
-      </li>
-    </ul>
-  </div>
-  <div id="social">
-    <svg class="icon" role="presentation" aria-hidden="true"><use href="/icons.svg#social-icon"></use></svg>
-    <h2>Connect with us</h2>
-    <p>Join the Vite community</p>
-    <ul>
-      <li><a href="https://github.com/vitejs/vite" target="_blank"><svg class="button-icon" role="presentation" aria-hidden="true"><use href="/icons.svg#github-icon"></use></svg>GitHub</a></li>
-      <li><a href="https://chat.vite.dev/" target="_blank"><svg class="button-icon" role="presentation" aria-hidden="true"><use href="/icons.svg#discord-icon"></use></svg>Discord</a></li>
-      <li><a href="https://x.com/vite_js" target="_blank"><svg class="button-icon" role="presentation" aria-hidden="true"><use href="/icons.svg#x-icon"></use></svg>X.com</a></li>
-      <li><a href="https://bsky.app/profile/vite.dev" target="_blank"><svg class="button-icon" role="presentation" aria-hidden="true"><use href="/icons.svg#bluesky-icon"></use></svg>Bluesky</a></li>
-    </ul>
-  </div>
-</section>
+async function getLoggedInUser() {
+  try {
+    const res = await fetch('/me', { credentials: 'include' });
+    const data = await res.json();
+    if (data.loggedIn) return data.user;
+    return null;
+  } catch { return null; }
+}
 
-<div class="ticks"></div>
-<section id="spacer"></section>
-`
+async function getStudentStage(studentId) {
+  try {
+    const res = await fetch(`/api/stages/student/${studentId}`, { credentials: 'include' });
+    return await res.json();
+  } catch { return { found: false }; }
+}
 
-setupCounter(document.querySelector('#counter'))
+if (role === 'student') {
+  const user = await getLoggedInUser();
+  if (user && user.role === 'student') {
+    const displayName = user.last_name ? `${user.last_name.toUpperCase()} ${user.first_name}` : user.first_name;
+    const stageData = await getStudentStage(user.user_id);
+    if (!stageData.found) {
+      renderStudentDashboard(app, displayName);
+    } else {
+      switch (stageData.rawStatus) {
+        case 'Aanvraag':
+          renderWachten(app, displayName);
+          break;
+        case 'Goedgekeurd':
+          renderGoedgekeurdStudent(app, displayName, stageData);
+          break;
+        case 'Aanpassingen_vereist':
+          renderFeedback(app, user, stageData);
+          break;
+        case 'Afgekeurd':
+          renderAfkeuring(app, displayName, stageData);
+          break;
+        default:
+          renderWachten(app, displayName);
+      }
+    }
+  } else {
+    renderStudentDashboard(app);
+  }
+} else if (role === 'admin') {
+  renderAdmin(app);
+} else if (role === 'stageformulier') {
+  renderStageformulier(app);
+} else if (role === 'wachten') {
+  renderWachten(app);
+} else if (role === 'feedback') {
+  renderFeedback(app);
+} else if (role === 'aanpassen') {
+  const user = await getLoggedInUser();
+  if (user) {
+    const stageData = await getStudentStage(user.user_id);
+    renderAanpassen(app, user.first_name, stageData.found ? stageData : null);
+  } else {
+    renderAanpassen(app);
+  }
+} else if (role === 'afkeuring') {
+  renderAfkeuring(app);
+} else if (role === 'stagecommisie') {
+  renderAanvragen();
+} else if (role === 'stagementor') {
+  renderMijnStagiairs(app);
+} else if (role === 'docent') {
+  renderMijnStudenten();
+} else if (role === 'goedgekeurd_student') {
+  const user = await getLoggedInUser();
+  if (user && user.user_id) {
+    const displayName = user.last_name ? `${user.last_name.toUpperCase()} ${user.first_name}` : user.first_name;
+    const stageData = await getStudentStage(user.user_id);
+    renderGoedgekeurdStudent(app, displayName, stageData.found ? stageData : null);
+  } else {
+    renderGoedgekeurdStudent(app);
+  }
+} else if (role === 'documenten') {
+  await renderDocumenten(app);
+} else if (role === 'documenten_ingedient') {
+  renderDocumentenIngedient(app);
+} else if (role === 'stagedetails') {
+  const user = await getLoggedInUser();
+  if (user && user.user_id) {
+    const displayName = user.last_name ? `${user.last_name.toUpperCase()} ${user.first_name}` : user.first_name;
+    const stageData = await getStudentStage(user.user_id);
+    renderStagedetails(app, displayName, stageData.found ? stageData : null);
+  } else {
+    renderStagedetails(app);
+  }
+} else {
+  app.style.display = 'none';
+  document.querySelector('#login-page').style.display = 'flex';
+}
+
+const loginBtn = document.getElementById('btn');
+if (loginBtn) {
+  loginBtn.addEventListener('click', async () => {
+    const emailInput    = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    const msg           = document.getElementById('msg');
+    const email         = emailInput.value.trim();
+    const password      = passwordInput.value;
+
+    if (!email || !password) {
+      msg.style.color   = 'red';
+      msg.textContent   = 'Vul alle velden in.';
+      return;
+    }
+
+    loginBtn.disabled    = true;
+    loginBtn.textContent = 'Bezig...';
+    msg.textContent      = '';
+
+    try {
+      const res  = await fetch('/login', {
+        method:      'POST',
+        headers:     { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body:        JSON.stringify({ email, password }),
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        window.location.href = `/?role=${encodeURIComponent(data.user.role)}`;
+      } else {
+        msg.style.color      = 'red';
+        msg.textContent      = data.message || 'Foute login';
+        loginBtn.disabled    = false;
+        loginBtn.textContent = 'Login';
+      }
+    } catch {
+      msg.style.color      = 'red';
+      msg.textContent      = 'Server fout';
+      loginBtn.disabled    = false;
+      loginBtn.textContent = 'Login';
+    }
+  });
+}
