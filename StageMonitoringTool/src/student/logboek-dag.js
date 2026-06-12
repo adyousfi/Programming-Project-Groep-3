@@ -8,26 +8,57 @@ const DAYS = [
     { name: 'Vrijdag', short: 'vr' }
 ];
 
+let testDateOverride = null;
+let lastUserName = 'Student';
+let lastStageData = null;
+let lastWeekNumber = 1;
+
+function getNow() {
+    return testDateOverride || new Date();
+}
+
+function sameDay(d1, d2) {
+    return d1.getFullYear() === d2.getFullYear()
+        && d1.getMonth() === d2.getMonth()
+        && d1.getDate() === d2.getDate();
+}
+
 export function renderLogboekDag(container, userName = 'Student', stageData = null, weekNumber = 1) {
+    lastUserName = userName || lastUserName;
+    lastStageData = stageData || lastStageData;
+    lastWeekNumber = weekNumber || lastWeekNumber;
     const startDate = stageData?.stageDetails?.start ? new Date(stageData.stageDetails.start) : null;
     const endDate = stageData?.stageDetails?.einde ? new Date(stageData.stageDetails.einde) : null;
+    const today = getNow();
 
-    function getDayDate(weekIndex, dayIndex) {
-        if (!startDate) return '?';
+    function getDayDateObj(weekIndex, dayIndex) {
+        if (!startDate) return null;
         const d = new Date(startDate);
         d.setDate(startDate.getDate() + weekIndex * 7 + dayIndex);
-        return d.toLocaleDateString('nl-BE', { day: 'numeric', month: 'short' });
+        return d;
+    }
+
+    function getDayDateStr(weekIndex, dayIndex) {
+        const d = getDayDateObj(weekIndex, dayIndex);
+        return d ? d.toLocaleDateString('nl-BE', { day: 'numeric', month: 'short' }) : '?';
     }
 
     function isDayInStage(weekIndex, dayIndex) {
-        if (!startDate || !endDate) return true;
-        const d = new Date(startDate);
-        d.setDate(startDate.getDate() + weekIndex * 7 + dayIndex);
+        const d = getDayDateObj(weekIndex, dayIndex);
+        if (!d || !endDate) return true;
         return d <= endDate;
     }
 
+    function getDayStatus(weekIndex, dayIndex) {
+        const d = getDayDateObj(weekIndex, dayIndex);
+        if (!d) return 'future';
+        if (sameDay(d, today)) return 'today';
+        if (d < today) return 'past';
+        return 'future';
+    }
+
     const weekIndex = weekNumber - 1;
-    const weekStart = getDayDate(weekIndex, 0);
+    const weekStart = getDayDateStr(weekIndex, 0);
 
     const weekEndDate = new Date(startDate);
     if (startDate) {
@@ -40,7 +71,44 @@ export function renderLogboekDag(container, userName = 'Student', stageData = nu
 
     const visibleDays = DAYS.filter((_, i) => isDayInStage(weekIndex, i));
 
-    let filledDays = 0;
+    function getFormHTML(dayIndex) {
+        return `
+            <div class="logboek-dag-card-form">
+                <div class="logboek-dag-field">
+                    <label class="logboek-dag-label">Beschrijving van uitgevoerde taken</label>
+                    <textarea class="logboek-dag-textarea" placeholder="Wat heb je vandaag gedaan?" rows="4"></textarea>
+                </div>
+                <div class="logboek-dag-field">
+                    <label class="logboek-dag-label">Reflectie</label>
+                    <textarea class="logboek-dag-textarea" placeholder="Wat heb je geleerd?" rows="4"></textarea>
+                </div>
+                <div class="logboek-dag-field">
+                    <label class="logboek-dag-label">Problemen of leerpunten</label>
+                    <textarea class="logboek-dag-textarea" placeholder="Welke uitdagingen kwam je tegen?" rows="4"></textarea>
+                </div>
+                <div class="logboek-dag-actions">
+                    <button class="logboek-dag-save-btn" data-day="${dayIndex}">Dag opslaan</button>
+                    <button class="logboek-dag-absent-btn" data-day="${dayIndex}">Afwezig?</button>
+                </div>
+            </div>
+        `;
+    }
+
+    function getLockedHTML() {
+        return `
+            <div class="logboek-dag-card-locked">
+                <span class="logboek-dag-locked-text">Vul eerst de vorige dag in om deze dag te ontgrendelen</span>
+            </div>
+        `;
+    }
+
+    function getWaitingHTML() {
+        return `
+            <div class="logboek-dag-card-locked">
+                <span class="logboek-dag-locked-text">Deze dag is nog niet beschikbaar. Je kunt alleen de huidige dag invullen.</span>
+            </div>
+        `;
+    }
 
     container.innerHTML = `
         <div class="logboek-dag-layout">
@@ -80,43 +148,46 @@ export function renderLogboekDag(container, userName = 'Student', stageData = nu
                 <div class="logboek-dag-cards" id="logboek-dag-cards">
                     ${visibleDays.map((day, i) => {
                         const dayIndex = i;
-                        const dayDate = getDayDate(weekIndex, dayIndex);
-                        const isFirst = i === 0;
+                        const dayDate = getDayDateStr(weekIndex, dayIndex);
+                        const dayStatus = getDayStatus(weekIndex, dayIndex);
+
+                        let badgeClass = 'badge-locked';
+                        let badgeText = 'Nog niet beschikbaar';
+                        let contentHTML = getLockedHTML();
+
+                        if (dayStatus === 'today') {
+                            badgeClass = 'badge-available';
+                            badgeText = 'Beschikbaar';
+                            contentHTML = getFormHTML(dayIndex);
+                        } else if (dayStatus === 'future') {
+                            badgeClass = 'badge-locked';
+                            badgeText = 'Nog niet beschikbaar';
+                            contentHTML = getWaitingHTML();
+                        }
+
                         return `
-                            <div class="logboek-dag-card${isFirst ? ' unlocked' : ' locked'}" data-day="${dayIndex}" data-filled="false">
+                            <div class="logboek-dag-card${dayStatus === 'today' ? ' unlocked' : ' locked'}" data-day="${dayIndex}" data-filled="false">
                                 <div class="logboek-dag-card-header">
                                     <div class="logboek-dag-card-left">
                                         <span class="logboek-dag-card-name">${day.name}</span>
                                         <span class="logboek-dag-card-date">${dayDate}</span>
                                     </div>
-                                    <span class="logboek-dag-card-badge${isFirst ? ' badge-available' : ' badge-locked'}">${isFirst ? 'Beschikbaar' : 'Nog niet beschikbaar'}</span>
+                                    <span class="logboek-dag-card-badge ${badgeClass}">${badgeText}</span>
                                 </div>
-                                ${isFirst ? `
-                                    <div class="logboek-dag-card-form">
-                                        <div class="logboek-dag-field">
-                                            <label class="logboek-dag-label">Beschrijving van uitgevoerde taken</label>
-                                            <textarea class="logboek-dag-textarea" placeholder="Wat heb je vandaag gedaan?" rows="4"></textarea>
-                                        </div>
-                                        <div class="logboek-dag-field">
-                                            <label class="logboek-dag-label">Reflectie</label>
-                                            <textarea class="logboek-dag-textarea" placeholder="Wat heb je geleerd?" rows="4"></textarea>
-                                        </div>
-                                        <div class="logboek-dag-field">
-                                            <label class="logboek-dag-label">Problemen of leerpunten</label>
-                                            <textarea class="logboek-dag-textarea" placeholder="Welke uitdagingen kwam je tegen?" rows="4"></textarea>
-                                        </div>
-                                        <button class="logboek-dag-save-btn" data-day="${dayIndex}">Dag opslaan</button>
-                                    </div>
-                                ` : `
-                                    <div class="logboek-dag-card-locked">
-                                        <span class="logboek-dag-locked-text">Vul eerst de vorige dag in om deze dag te ontgrendelen</span>
-                                    </div>
-                                `}
+                                ${contentHTML}
                             </div>
                         `;
                     }).join('')}
                 </div>
             </main>
+        </div>
+
+        <!-- Test date picker -->
+        <div class="test-date-picker">
+            <label class="test-date-label">Test datum:</label>
+            <input type="date" id="test-date-input" class="test-date-input">
+            <button class="test-date-apply" id="test-date-apply">Zet</button>
+            <button class="test-date-reset" id="test-date-reset">Reset</button>
         </div>
     `;
 
@@ -135,64 +206,42 @@ function initLogboekDagHandlers(totalDays) {
         if (submitBtn) submitBtn.disabled = count < totalDays;
     }
 
-    function unlockNextDay(currentIndex) {
-        const nextCard = document.querySelector(`.logboek-dag-card[data-day="${currentIndex + 1}"]`);
-        if (!nextCard) return;
+    function markDayFilled(card, dayIndex, isAbsent) {
+        card.dataset.filled = 'true';
 
-        nextCard.classList.remove('locked');
-        nextCard.classList.add('unlocked');
-        nextCard.dataset.filled = 'false';
+        const badge = card.querySelector('.logboek-dag-card-badge');
+        badge.classList.remove('badge-available');
+        badge.classList.add('badge-filled');
+        badge.textContent = isAbsent ? 'Afwezig' : 'Ingevuld';
 
-        const badge = nextCard.querySelector('.logboek-dag-card-badge');
-        badge.classList.remove('badge-locked');
-        badge.classList.add('badge-available');
-        badge.textContent = 'Beschikbaar';
-
-        const lockedDiv = nextCard.querySelector('.logboek-dag-card-locked');
-        if (lockedDiv) {
-            lockedDiv.outerHTML = `
-                <div class="logboek-dag-card-form">
-                    <div class="logboek-dag-field">
-                        <label class="logboek-dag-label">Beschrijving van uitgevoerde taken</label>
-                        <textarea class="logboek-dag-textarea" placeholder="Wat heb je vandaag gedaan?" rows="4"></textarea>
-                    </div>
-                    <div class="logboek-dag-field">
-                        <label class="logboek-dag-label">Reflectie</label>
-                        <textarea class="logboek-dag-textarea" placeholder="Wat heb je geleerd?" rows="4"></textarea>
-                    </div>
-                    <div class="logboek-dag-field">
-                        <label class="logboek-dag-label">Problemen of leerpunten</label>
-                        <textarea class="logboek-dag-textarea" placeholder="Welke uitdagingen kwam je tegen?" rows="4"></textarea>
-                    </div>
-                    <button class="logboek-dag-save-btn" data-day="${currentIndex + 1}">Dag opslaan</button>
-                </div>
-            `;
-            attachSaveHandler(nextCard);
+        const form = card.querySelector('.logboek-dag-card-form');
+        if (form) {
+            form.querySelectorAll('textarea').forEach(ta => { ta.disabled = true; });
+            const saveBtn = form.querySelector('.logboek-dag-save-btn');
+            const absentBtn = form.querySelector('.logboek-dag-absent-btn');
+            if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = 'Opgeslagen'; }
+            if (absentBtn) { absentBtn.disabled = true; absentBtn.textContent = 'Gemarkeerd'; }
         }
+
+        updateFilledCount();
     }
 
     function attachSaveHandler(card) {
         const saveBtn = card.querySelector('.logboek-dag-save-btn');
-        if (!saveBtn) return;
-        saveBtn.addEventListener('click', () => {
-            const dayIndex = parseInt(saveBtn.dataset.day);
-            card.dataset.filled = 'true';
+        if (saveBtn) {
+            saveBtn.addEventListener('click', () => {
+                const dayIndex = parseInt(saveBtn.dataset.day);
+                markDayFilled(card, dayIndex, false);
+            });
+        }
 
-            const badge = card.querySelector('.logboek-dag-card-badge');
-            badge.classList.remove('badge-available');
-            badge.classList.add('badge-filled');
-            badge.textContent = 'Ingevuld';
-
-            const form = card.querySelector('.logboek-dag-card-form');
-            if (form) {
-                form.querySelectorAll('textarea').forEach(ta => { ta.disabled = true; });
-                saveBtn.disabled = true;
-                saveBtn.textContent = 'Opgeslagen';
-            }
-
-            updateFilledCount();
-            unlockNextDay(dayIndex);
-        });
+        const absentBtn = card.querySelector('.logboek-dag-absent-btn');
+        if (absentBtn) {
+            absentBtn.addEventListener('click', () => {
+                const dayIndex = parseInt(absentBtn.dataset.day);
+                markDayFilled(card, dayIndex, true);
+            });
+        }
     }
 
     cards.forEach(card => {
@@ -204,6 +253,52 @@ function initLogboekDagHandlers(totalDays) {
     if (submitBtn) {
         submitBtn.addEventListener('click', () => {
             alert('Week succesvol ingediend!');
+        });
+    }
+
+    // Test date picker
+    const testInput = document.getElementById('test-date-input');
+    const testApply = document.getElementById('test-date-apply');
+    const testReset = document.getElementById('test-date-reset');
+    const renderFn = () => {
+        const container = document.getElementById('logboek-dag-cards');
+        if (container && container.closest('.logboek-dag-layout')) {
+            const mainEl = container.closest('.logboek-dag-main');
+            const backLink = mainEl?.querySelector('.logboek-dag-back');
+            const headerEl = mainEl?.querySelector('.logboek-dag-header');
+            const infoEl = mainEl?.querySelector('.logboek-dag-info');
+            const url = new URL(window.location.href);
+            const week = parseInt(url.searchParams.get('week')) || 1;
+            const appEl = document.getElementById('app');
+            if (appEl) {
+                const role = url.searchParams.get('role');
+                import('./logboek-dag.js').then(m => {
+                    m.renderLogboekDag(appEl, undefined, undefined, week);
+                });
+            }
+        }
+    };
+
+    if (testApply) {
+        testApply.addEventListener('click', () => {
+            if (testInput.value) {
+                testDateOverride = new Date(testInput.value + 'T00:00:00');
+                const app = document.getElementById('app');
+                import('./logboek-dag.js').then(m => {
+                    m.renderLogboekDag(app, lastUserName, lastStageData, lastWeekNumber);
+                });
+            }
+        });
+    }
+
+    if (testReset) {
+        testReset.addEventListener('click', () => {
+            testDateOverride = null;
+            testInput.value = '';
+            const app = document.getElementById('app');
+            import('./logboek-dag.js').then(m => {
+                m.renderLogboekDag(app, lastUserName, lastStageData, lastWeekNumber);
+            });
         });
     }
 }
