@@ -55,8 +55,11 @@ Het project is gebouwd met JavaScript, Node.js en een database zoals MySQL of Mo
 
 ## 👥 Team
 
-Dit project werd ontwikkeld door Groep 3 binnen het Programming Project. Voeg hier eventueel de namen van de teamleden toe.
-
+Adam YousfiI
+Imane Azehaf
+Jon Hysenaj
+Len Jochmans
+Mohamed Ayadi
 ## 📄 Licentie
 
 Dit project is ontwikkeld voor educatieve doeleinden.
