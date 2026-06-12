@@ -213,13 +213,23 @@ export async function renderStageformulier(container) {
 
             submitBtn.disabled = true;
             try {
-                await fetch('/api/stages', {
+                const res = await fetch('/api/stages', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     credentials: 'include',
                     body: JSON.stringify(proposal),
                 });
-            } catch (e) {}
+                if (!res.ok) {
+                    const err = await res.json().catch(() => ({}));
+                    alert('Fout bij indienen: ' + (err.msg || 'Onbekende fout'));
+                    submitBtn.disabled = false;
+                    return;
+                }
+            } catch (e) {
+                alert('Netwerkfout bij indienen. Probeer opnieuw.');
+                submitBtn.disabled = false;
+                return;
+            }
             window.location.href = '/?role=wachten';
         });
     }
