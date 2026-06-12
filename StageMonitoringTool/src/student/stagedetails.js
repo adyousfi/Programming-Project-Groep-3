@@ -20,13 +20,13 @@ export function renderStagedetails(container, userName = 'Jan Janssens', stageDa
         eindDatum = new Date(stageData.stageDetails.einde).toLocaleDateString('nl-BE', { day: 'numeric', month: 'short', year: 'numeric' });
     }
 
-    const statusClass = stageData?.rawStatus === 'Goedgekeurd' ? 'status-goedgekeurd'
-        : stageData?.rawStatus === 'Aanvraag' ? 'status-in_afwachting'
-        : stageData?.rawStatus === 'Afgekeurd' ? 'status-afgekeurd'
+    const statusClass = stageData?.rawStatus === 'GOEDGEKEURD' ? 'status-goedgekeurd'
+        : stageData?.rawStatus === 'AANVRAAG' ? 'status-in_afwachting'
+        : stageData?.rawStatus === 'AFGEKEURD' ? 'status-afgekeurd'
         : 'status-goedgekeurd';
-    const statusLabel = stageData?.rawStatus === 'Goedgekeurd' ? 'Goedgekeurd'
-        : stageData?.rawStatus === 'Aanvraag' ? 'In afwachting'
-        : stageData?.rawStatus === 'Afgekeurd' ? 'Afgekeurd'
+    const statusLabel = stageData?.rawStatus === 'GOEDGEKEURD' ? 'Goedgekeurd'
+        : stageData?.rawStatus === 'AANVRAAG' ? 'In afwachting'
+        : stageData?.rawStatus === 'AFGEKEURD' ? 'Afgekeurd'
         : stageData?.rawStatus || 'Onbekend';
 
     container.innerHTML = `

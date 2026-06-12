@@ -159,7 +159,7 @@ app.get('/api/stages', async (req, res) => {
         status: s.status?.toLowerCase() === 'aanvraag' ? 'in_afwachting'
           : s.status?.toLowerCase() === 'goedgekeurd' ? 'goedgekeurd'
           : s.status?.toLowerCase() === 'afgekeurd' ? 'afgekeurd'
-          : s.status?.toLowerCase() === 'aanpassingen_vereist' ? 'aanpassingen'
+          : s.status?.toLowerCase() === 'aanpassingenvereist' ? 'aanpassingen'
           : s.status,
         datum: s.createdAt ? new Date(s.createdAt).toLocaleDateString('nl-BE') : '',
         historiek: null,
@@ -205,10 +205,10 @@ app.post('/api/stages', async (req, res) => {
 
     const stage = await Stage.create({
       student_id,
-      mentor_id: mentorUser.user_id,
-      bedrijfs_id: bedrijf.bedrijf_id,
+      stagementor_id: mentorUser.user_id,
+      bedrijf_id: bedrijf.bedrijf_id,
       omschrijving_opdracht: opdrachtOmschrijving,
-      status: 'Aanvraag',
+      status: 'AANVRAAG',
       begin_datum: periodeStart,
       eind_datum: periodeEind
     });
@@ -316,7 +316,7 @@ app.get('/api/stages/:id', async (req, res) => {
       status: stage.status?.toLowerCase() === 'aanvraag' ? 'in_afwachting'
         : stage.status?.toLowerCase() === 'goedgekeurd' ? 'goedgekeurd'
         : stage.status?.toLowerCase() === 'afgekeurd' ? 'afgekeurd'
-        : stage.status?.toLowerCase() === 'aanpassingen_vereist' ? 'aanpassingen'
+        : stage.status?.toLowerCase() === 'aanpassingenvereist' ? 'aanpassingen'
         : stage.status,
       rawStatus: stage.status,
       datum: stage.createdAt ? new Date(stage.createdAt).toLocaleDateString('nl-BE') : '',
@@ -373,7 +373,7 @@ app.get('/api/stages/student/:studentId', async (req, res) => {
       status: stage.status?.toLowerCase() === 'aanvraag' ? 'in_afwachting'
         : stage.status?.toLowerCase() === 'goedgekeurd' ? 'goedgekeurd'
         : stage.status?.toLowerCase() === 'afgekeurd' ? 'afgekeurd'
-        : stage.status?.toLowerCase() === 'aanpassingen_vereist' ? 'aanpassingen'
+        : stage.status?.toLowerCase() === 'aanpassingenvereist' ? 'aanpassingen'
         : stage.status,
       rawStatus: stage.status,
       datum: stage.createdAt ? new Date(stage.createdAt).toLocaleDateString('nl-BE') : '',

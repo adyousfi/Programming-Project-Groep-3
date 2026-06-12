@@ -9,12 +9,12 @@ import Bedrijf from "./bedrijf.js";
 
 
 export const status = {
-    AANVRAAG: 'Aanvraag',
-    GOEDGEKEURD: 'Goedgekeurd',
-    AANPASSINGENVEREISD: 'Aanpassingen_vereist',
-    AFGEKEURD: 'Afgekeurd',
-    DOCUMENTGEUPLOADED: 'documentgeuploaded',
-    KLAAR: 'klaar'
+    AANVRAAG: 'AANVRAAG',
+    GOEDGEKEURD: 'GOEDGEKEURD',
+    AANPASSINGENVEREISD: 'AANPASSINGENVEREISD',
+    AFGEKEURD: 'AFGEKEURD',
+    DOCUMENTGEUPLOADED: 'DOCUMENTGEUPLOADED',
+    KLAAR: 'KLAAR'
 };
 
 // Stage model
@@ -47,7 +47,7 @@ const Stage = sequelize.define("stage", {
         type: DataTypes.INTEGER,
         allowNull: true,
     },
-    bedrijfs_id: {
+    bedrijf_id: {
         type: DataTypes.INTEGER,
         allowNull: true,
     },
@@ -59,7 +59,7 @@ const Stage = sequelize.define("stage", {
         type: DataTypes.ENUM(Object.values(status)),
         allowNull: true,
         defaultValue: 'AANVRAAG',
-        values: ['AANVRAAG','GOEDGEKEURD','AANPASSINGENVEREISD','DOCUMENTGEUPLOADED','KLAAR']
+        values: Object.values(status)
     },
     begin_datum: {
         type: DataTypes.DATE,

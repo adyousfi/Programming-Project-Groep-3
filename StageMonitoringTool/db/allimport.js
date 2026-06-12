@@ -19,7 +19,7 @@ import Behaaldescore from './objectModel/behaaldeScore.js';
 User.hasOne(Admin, {foreignKey: 'admin_id',onDelete: 'CASCADE'});
 User.hasOne(Docent, {foreignKey: 'docent_id',onDelete: 'CASCADE'});
 User.hasOne(Stagecommisie, {foreignKey: 'stagecommisie_id',onDelete: 'CASCADE'});
-User.hasOne(Stagementor, {foreignKey: 'bedrijf_id',onDelete: 'CASCADE'});
+User.hasOne(Stagementor, {foreignKey: 'user_id',onDelete: 'CASCADE'});
 User.hasOne(Student, {foreignKey: 'user_id',onDelete: 'CASCADE'});
 
 //Studenten
