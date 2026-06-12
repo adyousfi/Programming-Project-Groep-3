@@ -42,7 +42,7 @@ const run = async () => {
     // await sequelize.sync({ force: false });
     // console.log('Tables have been reset and created successfully!');
     //doesn't drop the tables
-    await sequelize.sync();
+    await sequelize.sync({ alter: true });
  
   } catch (error) {
     console.error('Unable to connect to the database or create tables:', error);
