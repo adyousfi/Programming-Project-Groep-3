@@ -215,8 +215,11 @@ app.post('/api/stages', async (req, res) => {
 
     return res.status(201).json({ msg: 'Stage succesvol aangemaakt', data: stage });
   } catch (error) {
-    console.error('Error creating stage:', error);
-    return res.status(500).json({ msg: 'Er is iets misgegaan bij het aanmaken van de stage' });
+    console.error('Error creating stage:', error.message || error);
+    if (error.errors) {
+      error.errors.forEach(e => console.error('  Validation:', e.message));
+    }
+    return res.status(500).json({ msg: 'Er is iets misgegaan: ' + (error.message || 'Onbekende fout') });
   }
 });
 
