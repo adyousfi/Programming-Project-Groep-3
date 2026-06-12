@@ -113,8 +113,27 @@ const deleteUser = async (req, res, next) => {
             return res.status(404).json({ msg: "Gebruiker niet gevonden" });
         }
 
-        await user.destroy();
+        switch (user.role) {
+            case ROLES.STUDENT:
+                await Student.destroy({ where: { user_id: user.user_id } });
+                break;
+            case ROLES.STAGEMENTOR:
+                await Stagementor.destroy({ where: { user_id: user.user_id } });
+                break;
+            case ROLES.ADMIN:
+                await Admin.destroy({ where: { user_id: user.user_id } });
+                break;
+            case ROLES.STAGECOMMISIE:
+                await Stagecommisie.destroy({ where: { user_id: user.user_id } });
+                break;
+            case ROLES.DOCENT:
+                await Docent.destroy({ where: { user_id: user.user_id } });
+                break;
+            default:
+                console.log(`No sub-profile table to delete for role: ${user.role}`);
 
+        }
+        await user.destroy();
         return res.status(200).json({
             msg: "Gebruiker succesvol verwijderd"
         });
@@ -126,4 +145,4 @@ const deleteUser = async (req, res, next) => {
     }
 };
 
-export { createUserCore, createUser, selectUser, updateUser, deleteUser };
+export default { createUserCore, createUser, selectUser, updateUser, deleteUser };

@@ -31,19 +31,20 @@ const linkBedrijfToStageMentor = async (req, res, next) => {
         const { user_id, bedrijf_id } = req.body;
 
         await Stagementor.update(
-            { bedrijf_id: bedrijf_id },
-            { where: { user_id: user_id } }
-        );
-
-        return res.status(200).json({
-            msg: "mentor updated successfully"
-        });
-    } catch (error) {
-        console.error("Error updating mentor: ", error);
+    { bedrijf_id: bedrijf_id }, 
+    { where: { user_id: user_id } })
+    
+    return res.status(200).json({
+            msg: "mentor updated successfully",
+            data: Stagementor
+        })
+    }
+    catch(error){
+        console.error("Error updating stagementor: ", error); 
         return res.status(500).json({
-            msg: "something went wrong while updating mentor"
-        });
+            msg: "something went wrong while updating stagementor"
+        })
     }
 };
 
-export { createBedrijfCore, createBedrijf, linkBedrijfToStageMentor };
+export default { createBedrijfCore, createBedrijf, linkBedrijfToStageMentor };

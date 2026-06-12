@@ -20,12 +20,4 @@ const Docent = sequelize.define("Docent",{
     }
 )
 
-User.hasOne(Docent, { 
-    foreignKey: 'user_id', 
-    onDelete: 'CASCADE' 
-});
-Docent.belongsTo(User, { 
-    foreignKey: 'user_id' 
-});
-
 export default Docent;

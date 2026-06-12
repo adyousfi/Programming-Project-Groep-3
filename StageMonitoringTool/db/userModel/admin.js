@@ -20,12 +20,4 @@ const Admin = sequelize.define("Admin",{
     }
 )
 
-User.hasOne(Admin, { 
-    foreignKey: 'user_id', 
-    onDelete: 'CASCADE' 
-});
-Admin.belongsTo(User, { 
-    foreignKey: 'user_id' 
-});
-
 export default Admin;
