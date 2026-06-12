@@ -204,3 +204,110 @@
 .ad-download-btn:hover {
   background: #eff6ff;
 }
+
+/* Modal */
+.ad-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+}
+
+.ad-modal {
+  background: #fff;
+  border-radius: 12px;
+  padding: 32px;
+  max-width: 400px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+}
+
+.ad-modal-icon {
+  font-size: 36px;
+  margin-bottom: 12px;
+}
+
+.ad-modal-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #111827;
+  margin: 0 0 8px;
+}
+
+.ad-modal-text {
+  font-size: 14px;
+  color: #6b7280;
+  margin: 0 0 24px;
+  line-height: 1.5;
+}
+
+.ad-modal-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.ad-modal-btn {
+  padding: 10px 24px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  transition: background 0.15s;
+}
+
+.ad-modal-btn-cancel {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.ad-modal-btn-cancel:hover {
+  background: #e5e7eb;
+}
+
+.ad-modal-btn-confirm {
+  background: #198754;
+  color: #fff;
+}
+
+.ad-modal-btn-confirm:hover {
+  background: #157347;
+}
+
+.ad-modal-btn-confirm:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+}
+
+/* Success Toast */
+.ad-toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: #198754;
+  color: #fff;
+  padding: 14px 24px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  z-index: 110;
+  animation: ad-toast-in 0.3s ease;
+}
+
+.ad-toast-icon {
+  font-size: 18px;
+}
+
+@keyframes ad-toast-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}

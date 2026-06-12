@@ -56,6 +56,12 @@
     background-color: #f1f3f5;
 }
 
+.sidebar-nav-item.disabled {
+    color: #adb5bd;
+    pointer-events: none;
+    cursor: default;
+}
+
 .sidebar-bottom {
     display: flex;
     flex-direction: column;

@@ -56,6 +56,12 @@
     background-color: #f1f3f5;
 }
 
+.sidebar-nav-item.disabled {
+    color: #adb5bd;
+    pointer-events: none;
+    cursor: default;
+}
+
 .sidebar-bottom {
     display: flex;
     flex-direction: column;
@@ -312,4 +318,42 @@
     font-size: 0.8rem;
     color: #adb5bd;
     margin: 0;
+}
+
+/* Next active step (Logboek icon when document validated) */
+.step-icon-logboek {
+    font-size: 1rem;
+}
+
+.step.next-active .step-circle {
+    background-color: #0d6efd;
+    color: #ffffff;
+    border-color: #0d6efd;
+}
+
+.step.next-active .step-label {
+    color: #0d6efd;
+}
+
+.step.next-active .step-sub {
+    color: #0d6efd;
+}
+
+/* Active cards (when document validated) */
+.coming-soon-card.active-card {
+    opacity: 1;
+    cursor: default;
+}
+
+.coming-soon-icon.active-icon {
+    background-color: #e0e7ff;
+    color: #3b82f6;
+}
+
+.coming-soon-title.active-title {
+    color: #212529;
+}
+
+.coming-soon-sub.active-sub {
+    color: #6c757d;
 }

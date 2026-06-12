@@ -71,6 +71,25 @@ export async function renderAdminDocumenten(app) {
         </div>
       </main>
     </div>
+
+    <!-- Validatie Modal -->
+    <div class="ad-modal-overlay" id="ad-modal-overlay" style="display:none;">
+      <div class="ad-modal">
+        <div class="ad-modal-icon">&#9989;</div>
+        <h3 class="ad-modal-title">Document valideren?</h3>
+        <p class="ad-modal-text">Weet je zeker dat je het ingediende document van de student wilt valideren? Deze actie kan niet ongedaan worden gemaakt.</p>
+        <div class="ad-modal-actions">
+          <button class="ad-modal-btn ad-modal-btn-cancel" id="ad-modal-cancel">Annuleren</button>
+          <button class="ad-modal-btn ad-modal-btn-confirm" id="ad-modal-confirm">Valideer</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Success Toast -->
+    <div class="ad-toast" id="ad-toast" style="display:none;">
+      <span class="ad-toast-icon">&#10003;</span>
+      <span class="ad-toast-text">Document succesvol gevalideerd!</span>
+    </div>
   `;
 
   // ================= NAVIGATIE =================
@@ -279,10 +298,27 @@ export async function renderAdminDocumenten(app) {
     `;
 
     if (!isValidated && studentDocs.length > 0) {
-      document.getElementById('ad-validate-btn').addEventListener('click', async () => {
-        const btn = document.getElementById('ad-validate-btn');
-        btn.disabled = true;
-        btn.textContent = 'Bezig...';
+      const overlay = document.getElementById('ad-modal-overlay');
+      const cancelBtn = document.getElementById('ad-modal-cancel');
+      const confirmBtn = document.getElementById('ad-modal-confirm');
+      const toast = document.getElementById('ad-toast');
+
+      document.getElementById('ad-validate-btn').addEventListener('click', () => {
+        overlay.style.display = 'flex';
+      });
+
+      cancelBtn.addEventListener('click', () => {
+        overlay.style.display = 'none';
+      });
+
+      overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) overlay.style.display = 'none';
+      });
+
+      confirmBtn.addEventListener('click', async () => {
+        overlay.style.display = 'none';
+        confirmBtn.disabled = true;
+        confirmBtn.textContent = 'Bezig...';
         try {
           const res = await fetch(`/api/stages/${stageId}/validate-document`, {
             method: 'PUT',
@@ -290,16 +326,16 @@ export async function renderAdminDocumenten(app) {
           });
           if (res.ok) {
             loadDocumentHistory(stageId);
+            toast.style.display = 'flex';
+            setTimeout(() => { toast.style.display = 'none'; }, 3000);
           } else {
             alert('Fout bij valideren');
-            btn.disabled = false;
-            btn.textContent = 'Valideer Document';
           }
         } catch {
           alert('Geen verbinding met de server');
-          btn.disabled = false;
-          btn.textContent = 'Valideer Document';
         }
+        confirmBtn.disabled = false;
+        confirmBtn.textContent = 'Valideer';
       });
     }
   }

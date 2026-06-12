@@ -2,24 +2,29 @@ import './documenten.css';
 
 export async function renderDocumenten(container) {
     let userName = 'Student';
-    try {
-        const res = await fetch('/me', { credentials: 'include' });
-        const data = await res.json();
-        if (data.loggedIn && data.user) {
-            userName = data.user.last_name && data.user.first_name
-                ? `${data.user.last_name.toUpperCase()} ${data.user.first_name}`
-                : data.user.first_name || 'Student';
-        }
-    } catch {}
-
     let adminDocs = [];
     let studentDocs = [];
+    let docValidated = false;
     try {
-        const res = await fetch('/api/documents/mijn', { credentials: 'include' });
-        const docs = await res.json();
+        const [docsRes, meRes] = await Promise.all([
+            fetch('/api/documents/mijn', { credentials: 'include' }),
+            fetch('/me', { credentials: 'include' })
+        ]);
+        const docs = await docsRes.json();
+        const meData = await meRes.json();
+        if (meData.loggedIn && meData.user) {
+            userName = meData.user.last_name && meData.user.first_name
+                ? `${meData.user.last_name.toUpperCase()} ${meData.user.first_name}`
+                : meData.user.first_name || 'Student';
+        }
         if (Array.isArray(docs)) {
             adminDocs = docs.filter(d => d.type === 'admin_template');
             studentDocs = docs.filter(d => d.type === 'student_submission');
+        }
+        if (meData.loggedIn && meData.user && meData.user.user_id) {
+            const stageRes = await fetch(`/api/stages/student/${meData.user.user_id}`, { credentials: 'include' });
+            const stageData = await stageRes.json();
+            docValidated = stageData.document_validated || false;
         }
     } catch {}
 
@@ -39,8 +44,8 @@ export async function renderDocumenten(container) {
                         <a href="?role=goedgekeurd_student" class="sidebar-nav-item">Overzicht</a>
                         <a href="#" class="sidebar-nav-item">Stagedetails</a>
                         <a href="?role=documenten" class="sidebar-nav-item active">Documenten</a>
-                        <a href="#" class="sidebar-nav-item">Logboek</a>
-                        <a href="#" class="sidebar-nav-item">Evaluatie</a>
+                        <a href="#" class="sidebar-nav-item${docValidated ? '' : ' disabled'}">Logboek</a>
+                        <a href="#" class="sidebar-nav-item${docValidated ? '' : ' disabled'}">Evaluatie</a>
                     </nav>
                 </div>
                 <div class="sidebar-bottom">
