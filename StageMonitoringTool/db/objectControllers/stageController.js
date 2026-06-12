@@ -67,5 +67,5 @@ const updateStage = async (req, res, next) => {
     }
 }; 
 
-export { createStage, updateStage };
+export default { createStage, updateStage };
 

@@ -47,4 +47,4 @@ const linkBedrijfToStageMentor = async (req, res, next) => {
     }
 };
 
-export { createBedrijfCore, createBedrijf, linkBedrijfToStageMentor };
+export default { createBedrijfCore, createBedrijf, linkBedrijfToStageMentor };

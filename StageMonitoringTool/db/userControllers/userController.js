@@ -126,4 +126,4 @@ const deleteUser = async (req, res, next) => {
     }
 };
 
-export { createUserCore, createUser, selectUser, updateUser, deleteUser };
+export default { createUserCore, createUser, selectUser, updateUser, deleteUser };

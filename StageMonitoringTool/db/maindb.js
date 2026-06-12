@@ -1,6 +1,5 @@
 import seedDatabase from "./seedDb.js";
 import { run, sequelize } from "./dbConnection.js";
-import { createUserCore, createUser, selectUser, updateUser, deleteUser } from "./userControllers/userController.js";
 import stage from "./objectModel/stage.js";
 import express from 'express';
 import User from '../db/userModel/user.js';
@@ -14,6 +13,7 @@ import { runRelationTest } from "./testrelation.js";
 import behaaldeScoreController from "./objectControllers/behaaldeScoreController.js";
 import competentieController from "./objectControllers/competentieController.js";
 import rubriekController from "./objectControllers/rubriekController.js";
+import userController from "./userControllers/userController.js";
 await run();
 console.log(confirmRelations)
 // Create the router instance using lowercase 'router'
@@ -39,14 +39,16 @@ app.use(router);
 
 // Seed database
 
-await seedDatabase();
+// await seedDatabase();
 
 //test of de relatie klopt
 runRelationTest();
 
 //Users
-router.post("/create-user", userController.createUser)
-router.get("/select-user", userController.selectUser)
+router.post("/create-user",userController.createUser)
+router.get("/select-user",userController.selectUser)
+router.put("/update-user/:id", userController.updateUser);
+router.delete("/delete-user/:id", userController.deleteUser);
 
 //Stages
 router.post("/create-stage",stageController.createStage)
@@ -75,15 +77,7 @@ router.post("/create-rubriek",rubriekController.createRubriek)
 
 
 const PORT = 3000;
-// Routes
-router.post("/create-user", createUser);
-router.get("/select-user", selectUser);
-router.put("/update-user/:id", updateUser);
-router.delete("/delete-user/:id", deleteUser);
 
-router.post("/create-stage", createStage);
-
-const PORT = 3001;
 app.listen(PORT, () => {
     console.log(`Server is successfully running on http://localhost:${PORT}`);
 });
