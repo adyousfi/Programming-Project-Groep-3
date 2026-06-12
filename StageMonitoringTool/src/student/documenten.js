@@ -92,15 +92,31 @@ export async function renderDocumenten(container) {
                 <div class="document-card" ${!hasAdminDoc ? 'style="opacity:0.5;pointer-events:none;"' : ''}>
                     <div class="document-card-header">
                         <h2 class="document-card-title">Ingevuld document indienen</h2>
-                        ${hasStudentSubmission
-                            ? `<span class="document-status-badge badge-ingediend">Ingediend</span>`
-                            : `<span class="document-status-badge badge-wachtend">Nog niet ingediend</span>`
+                        ${docValidated
+                            ? `<span class="document-status-badge badge-gevalideerd">Gevalideerd</span>`
+                            : hasStudentSubmission
+                                ? `<span class="document-status-badge badge-ingediend">Ingediend</span>`
+                                : `<span class="document-status-badge badge-wachtend">Nog niet ingediend</span>`
                         }
                     </div>
-                    <p class="document-card-subtitle">Upload hier het ingevulde document terug naar de school</p>
+                    ${docValidated
+                        ? `<p class="document-card-subtitle">Je document is succesvol gevalideerd door de admin</p>`
+                        : `<p class="document-card-subtitle">Upload hier het ingevulde document terug naar de school</p>`
+                    }
                     <hr class="document-card-divider">
 
-                    ${hasStudentSubmission ? `
+                    ${docValidated ? `
+                        <div class="doc-list">
+                            ${studentDocs.map(d => `
+                                <div class="doc-list-item">
+                                    <span class="doc-file-icon">&#10003;</span>
+                                    <span class="doc-file-name">${d.name}</span>
+                                    <span class="doc-file-date">${d.datum}</span>
+                                    <a href="/api/documents/${d.id}/download" class="doc-download-btn" download>Bekijken</a>
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : hasStudentSubmission ? `
                         <div class="doc-list" style="margin-bottom:16px;">
                             ${studentDocs.map(d => `
                                 <div class="doc-list-item">
@@ -118,6 +134,7 @@ export async function renderDocumenten(container) {
                         </p>
                     `}
 
+                    ${!docValidated ? `
                     <div class="upload-zone" id="upload-zone">
                         <div class="upload-icon">&#128194;</div>
                         <p class="upload-text">Sleep je bestand hierheen of klik om te selecteren</p>
@@ -136,6 +153,7 @@ export async function renderDocumenten(container) {
                     </div>
 
                     <button type="button" class="upload-submit-btn" id="upload-submit-btn" style="display:none;">Document Indienen</button>
+                    ` : ''}
                 </div>
 
             </main>

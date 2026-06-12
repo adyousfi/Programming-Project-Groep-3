@@ -59,7 +59,7 @@ export function renderGoedgekeurdStudent(container, userName = 'Jan Janssens', s
                         <div class="step${docValidated ? ' next-active' : ''}">
                             <div class="step-circle step-icon-logboek">${docValidated ? '&#128203;' : '4'}</div>
                             <span class="step-label">Logboek</span>
-                            <span class="step-sub">${docValidated ? '2/16 weken' : 'Gepland'}</span>
+                            <span class="step-sub">${docValidated ? '0/16 weken' : 'Gepland'}</span>
                         </div>
                         <div class="step-line"></div>
                         <div class="step">
