@@ -13,7 +13,8 @@
     "dev": "vite",
     "server": "node server.js",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "installpackages": "npm install @sequelize/core @sequelize/mssql cookie-parser cors dotenv expres express mssql multer mysql mysql2 sequelize tedious"
   },
   "devDependencies": {
     "concurrently": "^10.0.3",

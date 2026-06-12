@@ -1,11 +1,14 @@
 # StageMonitoringTool (Stage Monitoring Tool)
 
 ## Lokale setup
-### 1) Installeer dependencies
+
+### 1) Installeer dependencies (alle modules)
+1) Install backend/frontend dependencies:
 ```bash
 cd StageMonitoringTool
 npm install
-```
+
+
 
 ### 2) Configureer je database in `.env`
 Zorg dat `StageMonitoringTool/.env` bevat (namen zoals gebruikt in `db/dbConnection.js`):
@@ -15,18 +18,20 @@ Zorg dat `StageMonitoringTool/.env` bevat (namen zoals gebruikt in `db/dbConnect
 
 > Als je deze vars niet instelt, faalt de app bij het verbinden.
 
-## Database tabellen aanmaken (en seeden)
-Deze opdracht reset de database tabellen en vult dummy data in.
+### 2.1) Verbind met juiste database (lokale MySQL of Azure/cloud)
+- In `db/dbConnection.js` staat momenteel: `host: 'localhost'`.
+- Voor **lokale MySQL** is dit meestal correct.
+- Voor **Azure/cloud** moet je `host` aanpassen naar de hostnaam/IP van je cloud database.
+  - Mogelijk ook poort/SSL parameters indien je databank dat vereist.
+
 
 ```bash
 npm run startdb
 ```
 
-Wat gebeurt er intern?
-- `db/maindb.js` roept `run()` aan (connect + `sequelize.sync()`)
-- `db/seedDb.js` doet vervolgens `sequelize.sync({ force: true })` en seedt daarna users/stages.
 
 ## Applicatie runnen
+In een aparte terminal:
 ### Frontend (Vite)
 In een aparte terminal:
 ```bash
@@ -37,6 +42,13 @@ npm run dev
 Backend endpoints worden gestart via:
 ```bash
 npm run testServer
+
+```
+### Frontend en Backend (Vite)
+In een aparte terminal:
+```bash
+npm run start
+
 ```
 
 ## Korte flow / overzicht van de applicatie
