@@ -153,7 +153,7 @@ export async function renderStageformulier(container) {
     }
 
     if (submitBtn) {
-        submitBtn.addEventListener('click', (event) => {
+        submitBtn.addEventListener('click', async (event) => {
             event.preventDefault();
             const inputs = container.querySelectorAll('input, textarea');
             let hasEmptyFields = false;
@@ -212,13 +212,15 @@ export async function renderStageformulier(container) {
             };
 
             submitBtn.disabled = true;
+            try {
+                await fetch('/api/stages', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify(proposal),
+                });
+            } catch (e) {}
             window.location.href = '/?role=wachten';
-            fetch('/api/stages', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'include',
-                body: JSON.stringify(proposal),
-            }).catch(() => {});
         });
     }
 }

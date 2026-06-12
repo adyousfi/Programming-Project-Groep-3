@@ -159,7 +159,7 @@ app.get('/api/stages', async (req, res) => {
         status: s.status?.toLowerCase() === 'aanvraag' ? 'in_afwachting'
           : s.status?.toLowerCase() === 'goedgekeurd' ? 'goedgekeurd'
           : s.status?.toLowerCase() === 'afgekeurd' ? 'afgekeurd'
-          : s.status?.toLowerCase() === 'aanpassingenvereist' ? 'aanpassingen'
+          : s.status?.toLowerCase() === 'aanpassingenvereisd' ? 'aanpassingen'
           : s.status,
         datum: s.createdAt ? new Date(s.createdAt).toLocaleDateString('nl-BE') : '',
         historiek: null,
@@ -224,7 +224,7 @@ app.post('/api/stages', async (req, res) => {
 app.get('/api/stages/goedgekeurd', async (req, res) => {
   try {
     const stages = await Stage.findAll({
-      where: { status: 'Goedgekeurd' },
+      where: { status: 'GOEDGEKEURD' },
       include: [
         { model: Student, as: 'student', include: [{ model: User, as: 'User' }] },
         { model: Bedrijf, as: 'bedrijf' },
@@ -316,7 +316,7 @@ app.get('/api/stages/:id', async (req, res) => {
       status: stage.status?.toLowerCase() === 'aanvraag' ? 'in_afwachting'
         : stage.status?.toLowerCase() === 'goedgekeurd' ? 'goedgekeurd'
         : stage.status?.toLowerCase() === 'afgekeurd' ? 'afgekeurd'
-        : stage.status?.toLowerCase() === 'aanpassingenvereist' ? 'aanpassingen'
+        : stage.status?.toLowerCase() === 'aanpassingenvereisd' ? 'aanpassingen'
         : stage.status,
       rawStatus: stage.status,
       datum: stage.createdAt ? new Date(stage.createdAt).toLocaleDateString('nl-BE') : '',
@@ -373,7 +373,7 @@ app.get('/api/stages/student/:studentId', async (req, res) => {
       status: stage.status?.toLowerCase() === 'aanvraag' ? 'in_afwachting'
         : stage.status?.toLowerCase() === 'goedgekeurd' ? 'goedgekeurd'
         : stage.status?.toLowerCase() === 'afgekeurd' ? 'afgekeurd'
-        : stage.status?.toLowerCase() === 'aanpassingenvereist' ? 'aanpassingen'
+        : stage.status?.toLowerCase() === 'aanpassingenvereisd' ? 'aanpassingen'
         : stage.status,
       rawStatus: stage.status,
       datum: stage.createdAt ? new Date(stage.createdAt).toLocaleDateString('nl-BE') : '',

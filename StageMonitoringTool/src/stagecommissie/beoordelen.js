@@ -136,7 +136,7 @@ export function renderBeoordelen(aanvraag, userName = 'Stagecommissie') {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify({ status: 'Goedgekeurd', feedback: feedback || null }),
+        body: JSON.stringify({ status: 'GOEDGEKEURD', feedback: feedback || null }),
       });
       if (!response.ok) throw new Error('Server fout: ' + response.status);
     } catch (err) {
@@ -154,7 +154,7 @@ export function renderBeoordelen(aanvraag, userName = 'Stagecommissie') {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify({ status: 'Aanpassingen_vereist', feedback }),
+        body: JSON.stringify({ status: 'AANPASSINGENVEREISD', feedback }),
       });
       if (!response.ok) throw new Error('Server fout: ' + response.status);
     } catch (err) {
@@ -172,7 +172,7 @@ export function renderBeoordelen(aanvraag, userName = 'Stagecommissie') {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify({ status: 'Afgekeurd', feedback }),
+        body: JSON.stringify({ status: 'AFGEKEURD', feedback }),
       });
       if (!response.ok) throw new Error('Server fout: ' + response.status);
     } catch (err) {

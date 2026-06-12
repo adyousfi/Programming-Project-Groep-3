@@ -120,7 +120,7 @@ export async function renderAanpassen(container, userName = '[Studentnaam]', sta
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',
                 body: JSON.stringify({
-                    status: 'Aanvraag',
+                    status: 'AANVRAAG',
                     feedback: null,
                     bedrijfNaam: updatedData.bedrijfNaam,
                     bedrijfAdres: updatedData.bedrijfAdres,
