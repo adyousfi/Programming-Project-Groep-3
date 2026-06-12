@@ -191,6 +191,13 @@ app.post('/api/stages', async (req, res) => {
     if (!studentProfile) return res.status(400).json({ msg: 'Geen studentprofiel gevonden' });
     const student_id = studentProfile.user_id;
 
+    // Delete old stages and their documents so admin always sees only the latest
+    const oldStages = await Stage.findAll({ where: { student_id } });
+    for (const old of oldStages) {
+      await StageDocument.destroy({ where: { stage_id: old.stage_id } });
+      await old.destroy();
+    }
+
     const bedrijf = await Bedrijf.create({ naam: bedrijfNaam, address: bedrijfAdres });
 
     const mentorUser = await User.create({
@@ -474,7 +481,7 @@ app.post('/api/documents/student-upload', upload.single('document'), async (req,
   try {
     const cookieUser = req.cookies.user;
     if (!cookieUser) return res.status(401).json({ msg: 'Niet ingelogd' });
-    const stage = await Stage.findOne({ where: { student_id: cookieUser.user_id } });
+    const stage = await Stage.findOne({ where: { student_id: cookieUser.user_id }, order: [['createdAt', 'DESC']] });
     if (!stage) return res.status(404).json({ msg: 'Geen stage gevonden' });
     if (!req.file) return res.status(400).json({ msg: 'Bestand is verplicht' });
     const doc = await StageDocument.create({
@@ -496,7 +503,7 @@ app.get('/api/documents/mijn', async (req, res) => {
   try {
     const cookieUser = req.cookies.user;
     if (!cookieUser) return res.status(401).json({ msg: 'Niet ingelogd' });
-    const stage = await Stage.findOne({ where: { student_id: cookieUser.user_id } });
+    const stage = await Stage.findOne({ where: { student_id: cookieUser.user_id }, order: [['createdAt', 'DESC']] });
     if (!stage) return res.json([]);
     const docs = await StageDocument.findAll({
       where: { stage_id: stage.stage_id },
