@@ -233,6 +233,12 @@
     gap: 1.25rem;
 }
 
+.logboek-dag-card-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
 .logboek-dag-field {
     display: flex;
     flex-direction: column;
@@ -243,6 +249,11 @@
     font-size: 0.85rem;
     font-weight: 500;
     color: #374151;
+}
+
+.logboek-dag-required {
+    color: #dc3545;
+    font-weight: 600;
 }
 
 .logboek-dag-textarea {
@@ -295,15 +306,7 @@
     cursor: not-allowed;
 }
 
-/* Actions row */
-.logboek-dag-actions {
-    display: flex;
-    gap: 12px;
-    align-items: center;
-}
-
 .logboek-dag-absent-btn {
-    align-self: flex-start;
     padding: 0.6rem 1.5rem;
     background: #fff;
     color: #dc3545;
@@ -313,6 +316,7 @@
     font-weight: 600;
     cursor: pointer;
     transition: background 0.15s, color 0.15s;
+    white-space: nowrap;
 }
 
 .logboek-dag-absent-btn:hover {
@@ -398,4 +402,78 @@
 
 .test-date-reset:hover {
     background: #6b7280;
+}
+
+/* Absent modal */
+.logboek-dag-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+}
+
+.logboek-dag-modal {
+    background: #fff;
+    border-radius: 12px;
+    padding: 32px;
+    max-width: 400px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+}
+
+.logboek-dag-modal-icon {
+    font-size: 36px;
+    margin-bottom: 12px;
+}
+
+.logboek-dag-modal-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #111827;
+    margin: 0 0 8px;
+}
+
+.logboek-dag-modal-text {
+    font-size: 14px;
+    color: #6b7280;
+    margin: 0 0 24px;
+    line-height: 1.5;
+}
+
+.logboek-dag-modal-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+.logboek-dag-modal-btn {
+    padding: 10px 24px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    transition: background 0.15s;
+}
+
+.logboek-dag-modal-cancel {
+    background: #f3f4f6;
+    color: #374151;
+}
+
+.logboek-dag-modal-cancel:hover {
+    background: #e5e7eb;
+}
+
+.logboek-dag-modal-confirm {
+    background: #dc3545;
+    color: #fff;
+}
+
+.logboek-dag-modal-confirm:hover {
+    background: #bb2d3b;
 }

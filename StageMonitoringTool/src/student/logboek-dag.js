@@ -75,20 +75,20 @@ export function renderLogboekDag(container, userName = 'Student', stageData = nu
         return `
             <div class="logboek-dag-card-form">
                 <div class="logboek-dag-field">
-                    <label class="logboek-dag-label">Beschrijving van uitgevoerde taken</label>
-                    <textarea class="logboek-dag-textarea" placeholder="Wat heb je vandaag gedaan?" rows="4"></textarea>
+                    <label class="logboek-dag-label">Beschrijving van uitgevoerde taken <span class="logboek-dag-required">*</span></label>
+                    <textarea class="logboek-dag-textarea" placeholder="Wat heb je vandaag gedaan?" rows="4" required></textarea>
                 </div>
                 <div class="logboek-dag-field">
-                    <label class="logboek-dag-label">Reflectie</label>
-                    <textarea class="logboek-dag-textarea" placeholder="Wat heb je geleerd?" rows="4"></textarea>
+                    <label class="logboek-dag-label">Reflectie <span class="logboek-dag-required">*</span></label>
+                    <textarea class="logboek-dag-textarea" placeholder="Wat heb je geleerd?" rows="4" required></textarea>
                 </div>
                 <div class="logboek-dag-field">
-                    <label class="logboek-dag-label">Problemen of leerpunten</label>
-                    <textarea class="logboek-dag-textarea" placeholder="Welke uitdagingen kwam je tegen?" rows="4"></textarea>
+                    <label class="logboek-dag-label">Problemen of leerpunten <span class="logboek-dag-required">*</span></label>
+                    <textarea class="logboek-dag-textarea" placeholder="Welke uitdagingen kwam je tegen?" rows="4" required></textarea>
                 </div>
-                <div class="logboek-dag-actions">
-                    <button class="logboek-dag-save-btn" data-day="${dayIndex}">Dag opslaan</button>
-                    <button class="logboek-dag-absent-btn" data-day="${dayIndex}">Afwezig?</button>
+                <div class="logboek-dag-card-bottom">
+                    <button class="logboek-dag-save-btn" data-day="${dayIndex}" type="button">Dag opslaan</button>
+                    <button class="logboek-dag-absent-btn" data-day="${dayIndex}" type="button">Afwezig?</button>
                 </div>
             </div>
         `;
@@ -182,6 +182,19 @@ export function renderLogboekDag(container, userName = 'Student', stageData = nu
             </main>
         </div>
 
+        <!-- Afwezig modal -->
+        <div class="logboek-dag-modal-overlay" id="absent-modal" style="display:none;">
+            <div class="logboek-dag-modal">
+                <div class="logboek-dag-modal-icon">&#9888;</div>
+                <h3 class="logboek-dag-modal-title">Afwezig markeren?</h3>
+                <p class="logboek-dag-modal-text">Weet je zeker dat je deze dag als afwezig wilt markeren? Je hoeft dan geen logboek in te vullen voor deze dag.</p>
+                <div class="logboek-dag-modal-actions">
+                    <button class="logboek-dag-modal-btn logboek-dag-modal-cancel" id="absent-cancel">Annuleren</button>
+                    <button class="logboek-dag-modal-btn logboek-dag-modal-confirm" id="absent-confirm">Bevestig afwezig</button>
+                </div>
+            </div>
+        </div>
+
         <!-- Test date picker -->
         <div class="test-date-picker">
             <label class="test-date-label">Test datum:</label>
@@ -218,10 +231,11 @@ function initLogboekDagHandlers(totalDays) {
         if (form) {
             form.querySelectorAll('textarea').forEach(ta => { ta.disabled = true; });
             const saveBtn = form.querySelector('.logboek-dag-save-btn');
-            const absentBtn = form.querySelector('.logboek-dag-absent-btn');
             if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = 'Opgeslagen'; }
-            if (absentBtn) { absentBtn.disabled = true; absentBtn.textContent = 'Gemarkeerd'; }
         }
+
+        const absentBtn = card.querySelector('.logboek-dag-absent-btn');
+        if (absentBtn) { absentBtn.disabled = true; absentBtn.textContent = 'Afwezig'; }
 
         updateFilledCount();
     }
@@ -230,6 +244,18 @@ function initLogboekDagHandlers(totalDays) {
         const saveBtn = card.querySelector('.logboek-dag-save-btn');
         if (saveBtn) {
             saveBtn.addEventListener('click', () => {
+                const form = card.querySelector('.logboek-dag-card-form');
+                if (!form) return;
+                const textareas = form.querySelectorAll('textarea');
+                let allFilled = true;
+                textareas.forEach(ta => {
+                    if (!ta.value.trim()) {
+                        allFilled = false;
+                        ta.style.borderColor = '#dc3545';
+                        ta.addEventListener('input', () => { ta.style.borderColor = ''; }, { once: true });
+                    }
+                });
+                if (!allFilled) return;
                 const dayIndex = parseInt(saveBtn.dataset.day);
                 markDayFilled(card, dayIndex, false);
             });
@@ -239,7 +265,31 @@ function initLogboekDagHandlers(totalDays) {
         if (absentBtn) {
             absentBtn.addEventListener('click', () => {
                 const dayIndex = parseInt(absentBtn.dataset.day);
-                markDayFilled(card, dayIndex, true);
+                const modal = document.getElementById('absent-modal');
+                const cancelBtn = document.getElementById('absent-cancel');
+                const confirmBtn = document.getElementById('absent-confirm');
+
+                modal.style.display = 'flex';
+
+                function closeModal() {
+                    modal.style.display = 'none';
+                    cancelBtn.removeEventListener('click', closeModal);
+                    confirmBtn.removeEventListener('click', confirmAbsence);
+                    modal.removeEventListener('click', onOverlayClick);
+                }
+
+                function onOverlayClick(e) {
+                    if (e.target === modal) closeModal();
+                }
+
+                function confirmAbsence() {
+                    closeModal();
+                    markDayFilled(card, dayIndex, true);
+                }
+
+                cancelBtn.addEventListener('click', closeModal);
+                confirmBtn.addEventListener('click', confirmAbsence);
+                modal.addEventListener('click', onOverlayClick);
             });
         }
     }
