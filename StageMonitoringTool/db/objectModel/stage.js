@@ -73,6 +73,12 @@ const Stage = sequelize.define("stage", {
         allowNull: true,
         comment: "Feedback from stagecommissie"
     },
+    document_validated: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+        comment: "True when admin has validated the student's submitted document"
+    },
     },
     {
         timestamps: true,

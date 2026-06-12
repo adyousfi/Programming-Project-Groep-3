@@ -224,50 +224,83 @@ export async function renderAdminDocumenten(app) {
       return;
     }
 
+    let docs = [];
+    let isValidated = false;
     try {
-      const res = await fetch(`/api/documents/stage/${stageId}`, {
-        credentials: 'include',
-      });
+      const [docsRes, stageRes] = await Promise.all([
+        fetch(`/api/documents/stage/${stageId}`, { credentials: 'include' }),
+        fetch(`/api/stages/${stageId}`, { credentials: 'include' })
+      ]);
+      docs = await docsRes.json();
+      const stageData = await stageRes.json();
+      isValidated = stageData.document_validated || false;
+    } catch {}
 
-      const docs = await res.json();
+    const adminDocs = docs.filter(d => d.type === 'admin_template');
+    const studentDocs = docs.filter(d => d.type === 'student_submission');
 
-      const adminDocs = docs.filter(d => d.type === 'admin_template');
-      const studentDocs = docs.filter(d => d.type === 'student_submission');
-
-      if (docs.length === 0) {
-        historyCard.style.display = 'none';
-        return;
-      }
-
-      historyCard.style.display = '';
-
-      historyList.innerHTML = `
-        ${adminDocs.length > 0 ? `
-          <p class="ad-history-label">Verstuurd door admin</p>
-          ${adminDocs.map(d => `
-            <div class="ad-history-item">
-              <span class="ad-doc-icon">&#128196;</span>
-              <span class="ad-doc-name">${d.name}</span>
-              <span class="ad-doc-date">${d.datum}</span>
-              <a href="/api/documents/${d.id}/download" class="ad-download-btn" download>Downloaden</a>
-            </div>
-          `).join('')}
-        ` : ''}
-
-        ${studentDocs.length > 0 ? `
-          <p class="ad-history-label" style="margin-top:16px;">Ingediend door student</p>
-          ${studentDocs.map(d => `
-            <div class="ad-history-item">
-              <span class="ad-doc-icon">&#128196;</span>
-              <span class="ad-doc-name">${d.name}</span>
-              <span class="ad-doc-date">${d.datum}</span>
-              <a href="/api/documents/${d.id}/download" class="ad-download-btn" download>Downloaden</a>
-            </div>
-          `).join('')}
-        ` : ''}
-      `;
-    } catch {
+    if (docs.length === 0) {
       historyCard.style.display = 'none';
+      return;
+    }
+
+    historyCard.style.display = '';
+
+    historyList.innerHTML = `
+      ${adminDocs.length > 0 ? `
+        <p class="ad-history-label">Verstuurd door admin</p>
+        ${adminDocs.map(d => `
+          <div class="ad-history-item">
+            <span class="ad-doc-icon">&#128196;</span>
+            <span class="ad-doc-name">${d.name}</span>
+            <span class="ad-doc-date">${d.datum}</span>
+            <a href="/api/documents/${d.id}/download" class="ad-download-btn" download>Downloaden</a>
+          </div>
+        `).join('')}
+      ` : ''}
+
+      ${studentDocs.length > 0 ? `
+        <p class="ad-history-label" style="margin-top:16px;">Ingediend door student</p>
+        ${studentDocs.map(d => `
+          <div class="ad-history-item">
+            <span class="ad-doc-icon">&#128196;</span>
+            <span class="ad-doc-name">${d.name}</span>
+            <span class="ad-doc-date">${d.datum}</span>
+            <a href="/api/documents/${d.id}/download" class="ad-download-btn" download>Downloaden</a>
+          </div>
+        `).join('')}
+        <div style="margin-top:16px;">
+          ${isValidated
+            ? `<span style="display:inline-block;padding:8px 16px;background:#198754;color:#fff;border-radius:6px;font-weight:600;font-size:0.9rem;">&#10003; Document Gevalideerd</span>`
+            : `<button id="ad-validate-btn" style="background:#198754;color:#fff;border:none;padding:8px 16px;border-radius:6px;cursor:pointer;font-weight:600;font-size:0.9rem;">Valideer Document</button>`
+          }
+        </div>
+      ` : ''}
+    `;
+
+    if (!isValidated && studentDocs.length > 0) {
+      document.getElementById('ad-validate-btn').addEventListener('click', async () => {
+        const btn = document.getElementById('ad-validate-btn');
+        btn.disabled = true;
+        btn.textContent = 'Bezig...';
+        try {
+          const res = await fetch(`/api/stages/${stageId}/validate-document`, {
+            method: 'PUT',
+            credentials: 'include',
+          });
+          if (res.ok) {
+            loadDocumentHistory(stageId);
+          } else {
+            alert('Fout bij valideren');
+            btn.disabled = false;
+            btn.textContent = 'Valideer Document';
+          }
+        } catch {
+          alert('Geen verbinding met de server');
+          btn.disabled = false;
+          btn.textContent = 'Valideer Document';
+        }
+      });
     }
   }
 

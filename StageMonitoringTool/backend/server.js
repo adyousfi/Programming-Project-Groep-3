@@ -376,6 +376,7 @@ app.get('/api/stages/student/:studentId', async (req, res) => {
       rawStatus: stage.status,
       datum: stage.createdAt ? new Date(stage.createdAt).toLocaleDateString('nl-BE') : '',
       feedback: stage.feedback || null,
+      document_validated: stage.document_validated || false,
     });
   } catch (error) {
     console.error('Error fetching student stage:', error);
@@ -422,6 +423,23 @@ app.put('/api/stages/:id', async (req, res) => {
   } catch (error) {
     console.error('Error updating stage:', error);
     return res.status(500).json({ msg: 'Fout bij bijwerken van stage' });
+  }
+});
+
+// ✅ Admin validate student document
+app.put('/api/stages/:id/validate-document', async (req, res) => {
+  try {
+    const cookieUser = req.cookies.user;
+    if (!cookieUser) return res.status(401).json({ msg: 'Niet ingelogd' });
+
+    const stage = await Stage.findByPk(req.params.id);
+    if (!stage) return res.status(404).json({ msg: 'Stage niet gevonden' });
+
+    await stage.update({ document_validated: true });
+    return res.json({ msg: 'Document succesvol gevalideerd', document_validated: true });
+  } catch (error) {
+    console.error('Error validating document:', error);
+    return res.status(500).json({ msg: 'Fout bij valideren van document' });
   }
 });
 
