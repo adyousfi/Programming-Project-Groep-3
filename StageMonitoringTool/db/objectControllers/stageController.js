@@ -67,5 +67,20 @@ const updateStage = async (req, res, next) => {
     }
 }; 
 
-export default { createStage, updateStage };
+const selectStage = async (req, res, next) => {
+    try {
+        const stage = await Stage.findAll();
+        return res.status(200).json({
+            msg: "Stage selected successfully",
+            data: stage
+        });
+    }
+    catch(error){
+        console.error("Error selecting stage: ", error); 
+        return res.status(500).json({
+            msg: "something went wrong while selecting stage"
+        });
+    }
+}; 
 
+export default { createStage, updateStage, selectStage };

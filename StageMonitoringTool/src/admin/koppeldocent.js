@@ -2,7 +2,7 @@ import './koppeldocent.css';
 import { renderAdmin } from './admin.js';
 import { renderAdminDocumenten } from './adminDocumenten.js'; // check pad!
 
-const API_URL = 'http://localhost:3000';
+const API_URL = 'http://localhost:3001';
 
 let zonderDocent = [];
 let gekoppeld = [];
@@ -10,13 +10,18 @@ let beschikbareDocenten = [];
 
 // ================= DATA =================
 async function loadData() {
-  const stagesRes = await fetch(`${API_URL}/api/stages`);
+  const stagesRes = await fetch(`${API_URL}/select-stage`);
   if (!stagesRes.ok) throw new Error('Fout bij laden stages');
-  const stages = await stagesRes.json();
+  // 1. Get the full response object
+  const stagesResult = await stagesRes.json();
+  // 2. Extract the actual array from the .data property
+  const stages = stagesResult.data || [];
 
-  const docentenRes = await fetch(`${API_URL}/api/docenten`);
+  const docentenRes = await fetch(`${API_URL}/select-docent`);
   if (!docentenRes.ok) throw new Error('Fout bij laden docenten');
-  beschikbareDocenten = await docentenRes.json();
+  // 3. Do the exact same thing for the docenten array wrapper
+  const docentenResult = await docentenRes.json();
+  beschikbareDocenten = docentenResult.data || [];
 
   zonderDocent = stages
     .filter(s => !s.docent || !s.docent.naam)

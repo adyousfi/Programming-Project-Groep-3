@@ -14,6 +14,9 @@ import behaaldeScoreController from "./objectControllers/behaaldeScoreController
 import competentieController from "./objectControllers/competentieController.js";
 import rubriekController from "./objectControllers/rubriekController.js";
 import userController from "./userControllers/userController.js";
+import docentController from "./userControllers/docentController.js";
+
+
 await run();
 console.log(confirmRelations)
 // Create the router instance using lowercase 'router'
@@ -53,6 +56,7 @@ router.delete("/delete-user/:id", userController.deleteUser);
 //Stages
 router.post("/create-stage",stageController.createStage)
 router.post("/update-stage",stageController.updateStage)
+router.get("/select-stage",stageController.selectStage)
 
 //Bedrijven
 router.post("/assign-bedrijftomentor",bedrijfController.linkBedrijfToStageMentor)
@@ -74,9 +78,11 @@ router.post("/create-competentie",competentieController.createCompetentie)
 //Rubriek
 router.post("/create-rubriek",rubriekController.createRubriek)
 
+//Docenten
+router.get("/select-docent", docentController.selectDocent)
 
 
-const PORT = 3000;
+const PORT = 3001;
 
 app.listen(PORT, () => {
     console.log(`Server is successfully running on http://localhost:${PORT}`);

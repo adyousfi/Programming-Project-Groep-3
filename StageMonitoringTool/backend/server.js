@@ -13,6 +13,7 @@ import Bedrijf from '../db/objectModel/bedrijf.js';
 import Stage from '../db/objectModel/stage.js';
 import Docent from '../db/userModel/docent.js';
 import StageDocument from '../db/objectModel/stageDocument.js';
+import {sequelize} from '../db/dbConnection.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

@@ -46,7 +46,16 @@ const seedDatabase = async () => {
  
     // 2. Clear existing data and recreate the tables fresh
     // WARNING: This drops tables. Use { alter: true } or omit if you don't want to lose current data.
+
+    // Temporarily turn off foreign key safety guards
+    await sequelize.query('SET FOREIGN_KEY_CHECKS = 0;');
+
+    // Now Sequelize can wipe and recreate all tables cleanly with your new CASCADE rules
     await sequelize.sync({ force: true });
+
+    // Turn the safety guards back on
+    await sequelize.query('SET FOREIGN_KEY_CHECKS = 1;');    
+    
     console.log("Tables reset cleanly.");
  
     console.log("Starting user database seeding...");

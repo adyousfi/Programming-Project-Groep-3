@@ -32,10 +32,10 @@ Docent.belongsTo(User, { foreignKey: 'user_id', onDelete: 'CASCADE' });
 Stagementor.belongsTo(User, { foreignKey: 'user_id', onDelete: 'CASCADE' });
 
 //Stagecommisie
-Stagecommisie.belongsTo(User, {foreignKey: 'user_id'});
+Stagecommisie.belongsTo(User, {foreignKey: 'user_id',onDelete: 'CASCADE'});
 
 //Admins
-Admin.belongsTo(User, {foreignKey: 'user_id'});
+Admin.belongsTo(User, {foreignKey: 'user_id',onDelete: 'CASCADE'});
 
 //Bedrijf & Mentor
 Stagementor.belongsTo(Bedrijf, { foreignKey: 'bedrijf_id', onDelete: 'CASCADE' });
@@ -44,15 +44,15 @@ Stagementor.belongsTo(Bedrijf, { foreignKey: 'bedrijf_id', onDelete: 'CASCADE' }
 Bedrijf.hasMany(Stagementor, { foreignKey: 'bedrijf_id',onDelete: 'CASCADE'});
 
 //Stage Relaties
-Stage.belongsTo(Docent, { foreignKey: 'docent_id', onDelete: 'NO ACTION' });
-Stage.belongsTo(Student, { foreignKey: 'student_id', onDelete: 'NO ACTION' });
-Stage.belongsTo(Bedrijf, { foreignKey: 'bedrijf_id', onDelete: 'NO ACTION' });
-Stage.belongsTo(Stagementor, { foreignKey: 'stagementor_id', onDelete: 'NO ACTION' });
+Stage.belongsTo(Docent, { foreignKey: 'docent_id', onDelete: 'CASCADE' });
+Stage.belongsTo(Student, { foreignKey: 'user_id', onDelete: 'CASCADE' });
+Stage.belongsTo(Bedrijf, { foreignKey: 'bedrijf_id', onDelete: 'CASCADE' });
+Stage.belongsTo(Stagementor, { foreignKey: 'stagementor_id', onDelete: 'CASCADE' });
 Stage.hasMany(Behaaldescore, { foreignKey: 'stage_id', onDelete: 'CASCADE' });
 //Logboek & Opmerking Relaties
-Opmerkinglogboek.hasMany(Logboek, { foreignKey: 'opmerkinglogboek_id' });
-Logboek.belongsTo(Opmerkinglogboek, { foreignKey: 'opmerkinglogboek_id', onDelete: 'SET NULL'});
+Opmerkinglogboek.hasMany(Logboek, { foreignKey: 'opmerkinglogboek_id', onDelete: 'CASCADE' });
+Logboek.belongsTo(Opmerkinglogboek, { foreignKey: 'opmerkinglogboek_id', onDelete: 'CASCADE'});
 
 //behaaldescore
-Behaaldescore.belongsTo(Stage, { foreignKey: 'stage_id' });
+Behaaldescore.belongsTo(Stage, { foreignKey: 'stage_id',onDelete: 'CASCADE'});
 export const confirmRelations = "relations are made";
