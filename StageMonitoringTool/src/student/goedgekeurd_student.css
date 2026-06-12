@@ -342,7 +342,19 @@
 /* Active cards (when document validated) */
 .coming-soon-card.active-card {
     opacity: 1;
-    cursor: default;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.coming-soon-card.active-card:hover {
+    border-color: #3b82f6;
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.15);
+}
+
+.coming-soon-card.disabled-card {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
 }
 
 .coming-soon-icon.active-icon {

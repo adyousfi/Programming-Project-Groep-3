@@ -22,7 +22,7 @@ export function renderGoedgekeurdStudent(container, userName = 'Jan Janssens', s
                         <a href="?role=stagedetails" class="sidebar-nav-item">Stagedetails</a>
                         <a href="?role=documenten" class="sidebar-nav-item">Documenten</a>
                         <a href="${docValidated ? '?role=logboek' : '#'}" class="sidebar-nav-item${docValidated ? '' : ' disabled'}">Logboek</a>
-                        <a href="${docValidated ? '#' : '#'}" class="sidebar-nav-item${docValidated ? '' : ' disabled'}">Evaluatie</a>
+                        <a href="#" class="sidebar-nav-item disabled">Evaluatie</a>
                     </nav>
                 </div>
                 <div class="sidebar-bottom">
@@ -109,18 +109,18 @@ export function renderGoedgekeurdStudent(container, userName = 'Jan Janssens', s
                 <!-- Actie Kaarten Sectie -->
                 <section class="coming-soon-section">
                     <div class="coming-soon-cards">
-                        <div class="coming-soon-card${docValidated ? ' active-card' : ''}">
+                        <a href="${docValidated ? '?role=logboek' : '#'}" class="coming-soon-card${docValidated ? ' active-card' : ''}${docValidated ? '' : ' disabled-card'}">
                             <div class="coming-soon-icon${docValidated ? ' active-icon' : ''}">&#128203;</div>
                             <div class="coming-soon-content">
                                 <h3 class="coming-soon-title${docValidated ? ' active-title' : ''}">Logboek Invullen</h3>
                                 <p class="coming-soon-sub${docValidated ? ' active-sub' : ''}">Vul je dagelijkse activiteiten in</p>
                             </div>
-                        </div>
-                        <div class="coming-soon-card${docValidated ? ' active-card' : ''}">
-                            <div class="coming-soon-icon${docValidated ? ' active-icon' : ''}">&#128202;</div>
+                        </a>
+                        <div class="coming-soon-card disabled-card">
+                            <div class="coming-soon-icon">&#128202;</div>
                             <div class="coming-soon-content">
-                                <h3 class="coming-soon-title${docValidated ? ' active-title' : ''}">Evaluaties</h3>
-                                <p class="coming-soon-sub${docValidated ? ' active-sub' : ''}">Bekijk je voortgang en feedback</p>
+                                <h3 class="coming-soon-title">Evaluaties</h3>
+                                <p class="coming-soon-sub">Bekijk je voortgang en feedback</p>
                             </div>
                         </div>
                     </div>

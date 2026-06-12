@@ -42,10 +42,10 @@ export async function renderDocumenten(container) {
                     </div>
                     <nav class="sidebar-nav">
                         <a href="?role=goedgekeurd_student" class="sidebar-nav-item">Overzicht</a>
-                        <a href="#" class="sidebar-nav-item">Stagedetails</a>
+                        <a href="?role=stagedetails" class="sidebar-nav-item">Stagedetails</a>
                         <a href="?role=documenten" class="sidebar-nav-item active">Documenten</a>
                         <a href="${docValidated ? '?role=logboek' : '#'}" class="sidebar-nav-item${docValidated ? '' : ' disabled'}">Logboek</a>
-                        <a href="#" class="sidebar-nav-item${docValidated ? '' : ' disabled'}">Evaluatie</a>
+                        <a href="#" class="sidebar-nav-item disabled">Evaluatie</a>
                     </nav>
                 </div>
                 <div class="sidebar-bottom">
