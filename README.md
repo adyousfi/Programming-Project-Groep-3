@@ -59,7 +59,6 @@ Adam YousfiI
 Imane Azehaf
 Jon Hysenaj
 Len Jochmans
-Mohamed Ayadi
 ## 📄 Licentie
 
 Dit project is ontwikkeld voor educatieve doeleinden.
