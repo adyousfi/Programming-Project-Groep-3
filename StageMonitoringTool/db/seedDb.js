@@ -1,6 +1,6 @@
 // db/seed.js
 import { ENUM } from "sequelize";
-import {sequelize} from "./dbConnection.js";
+import { sequelize } from "./dbConnection.js";
 import User, { ROLES } from "./userModel/user.js";
 import { createUserCore } from "./userControllers/userController.js";
 import { createStageCore } from "./objectControllers/stageController.js";
@@ -8,6 +8,16 @@ import { status } from "./objectModel/stage.js";
 import { createBedrijfCore } from "./objectControllers/bedrijfController.js";
 import { createStagementor, linkStagementorToBedrijf } from "./userControllers/stagementorController.js";
 
+// Import models first so associations/foreign keys exist before sync({ force: true })
+import Student from "./userModel/student.js";
+import Stagementor from "./userModel/stagementor.js";
+import Stagecommisie from "./userModel/stagecommisie.js";
+import Admin from "./userModel/admin.js";
+import Docent from "./userModel/docent.js";
+
+import Stage from "./objectModel/stage.js";
+import StageDocument from "./objectModel/stageDocument.js";
+import Bedrijf from "./objectModel/bedrijf.js";
 
 const seedDatabase = async () => {
   try {
