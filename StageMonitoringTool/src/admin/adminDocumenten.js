@@ -16,13 +16,9 @@ async function loadData() {
   const stages = await res.json();
 
   const details = await Promise.all(stages.map(async s => {
-    const [docsRes, stageRes] = await Promise.all([
-      fetch(`/api/documents/stage/${s.id}`, { credentials: 'include' }),
-      fetch(`/api/stages/${s.id}`, { credentials: 'include' }),
-    ]);
+    const docsRes = await fetch(`/api/documents/stage/${s.id}`, { credentials: 'include' });
     const docs = await docsRes.json().catch(() => []);
-    const stageData = await stageRes.json().catch(() => ({}));
-    return { stage: s, docs: Array.isArray(docs) ? docs : [], validated: stageData.document_validated || false };
+    return { stage: s, docs: Array.isArray(docs) ? docs : [], validated: s.document_validated || false };
   }));
 
   teVersturen = [];
@@ -143,7 +139,38 @@ function renderOntvangen(lijst) {
               <td><span class="kp-badge kp-badge--blauw">Ingediend door student</span></td>
               <td class="ad-acties-cel">
                 ${s.studentDoc ? `<a href="/api/documents/${s.studentDoc.id}/download" class="kp-btn kp-btn--downloaden" download>Downloaden</a>` : ''}
+                <button class="kp-btn kp-btn--toewijzen" data-id="${s.id}" data-actie="afchecken">Afchecken</button>
               </td>
+            </tr>
+          `).join('')}
+      </tbody>
+    </table>
+  `;
+}
+
+function renderAfgecheckt(lijst) {
+  return `
+    <h3 class="kp-sectie-titel" style="margin-top:32px;">
+      Afgecheckte studenten (${lijst.length})
+    </h3>
+    <table class="kp-tabel">
+      <thead>
+        <tr>
+          <th>Student</th>
+          <th>Bedrijf</th>
+          <th>Periode</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${lijst.length === 0
+          ? `<tr><td colspan="4" style="padding:16px;color:#6b7280;">Geen afgecheckte studenten.</td></tr>`
+          : lijst.map(s => `
+            <tr>
+              <td>${s.naam || '-'}</td>
+              <td>${s.bedrijf || '-'}</td>
+              <td>${formatPeriode(s.stageDetails?.start, s.stageDetails?.einde)}</td>
+              <td><span class="kp-badge kp-badge--groen">Gevalideerd ✓</span></td>
             </tr>
           `).join('')}
       </tbody>
@@ -155,6 +182,7 @@ function herrender() {
   document.getElementById('sectie-te-versturen').innerHTML = renderTeVersturen(teVersturen);
   document.getElementById('sectie-wachten').innerHTML = renderWachtenOpStudent(wachtenOpStudent);
   document.getElementById('sectie-ontvangen').innerHTML = renderOntvangen(ontvangen);
+  document.getElementById('sectie-afgecheckt').innerHTML = renderAfgecheckt(afgecheckt);
   setupKnoppen();
 }
 
@@ -162,6 +190,14 @@ function setupKnoppen() {
   document.querySelectorAll('.kp-btn[data-actie="versturen"]').forEach(btn => {
     btn.addEventListener('click', () => openUploadModal(parseInt(btn.dataset.id)));
   });
+  document.querySelectorAll('.kp-btn[data-actie="afchecken"]').forEach(btn => {
+    btn.addEventListener('click', () => openValidateModal(parseInt(btn.dataset.id)));
+  });
+}
+
+function openValidateModal(stageId) {
+  currentStageId = stageId;
+  document.getElementById('ad-validate-modal').classList.add('active');
 }
 
 function openUploadModal(stageId) {
@@ -204,6 +240,7 @@ export async function renderAdminDocumenten(app) {
         </section>
         <section class="kp-sectie" id="sectie-wachten"></section>
         <section class="kp-sectie" id="sectie-ontvangen"></section>
+        <section class="kp-sectie" id="sectie-afgecheckt"></section>
       </main>
     </div>
 
@@ -228,10 +265,32 @@ export async function renderAdminDocumenten(app) {
       </div>
     </div>
 
+    <!-- Validate Modal -->
+    <div class="kp-modal-overlay" id="ad-validate-modal">
+      <div class="kp-modal" style="text-align:center;">
+        <div style="font-size:36px;margin-bottom:12px;">&#9989;</div>
+        <h2 class="kp-modal-titel">Document valideren?</h2>
+        <p style="font-size:14px;color:#6b7280;margin:0 0 24px;line-height:1.5;">
+          Weet je zeker dat je het ingediende document wilt valideren?
+          Deze actie kan niet ongedaan worden gemaakt.
+        </p>
+        <div class="kp-modal-acties" style="justify-content:center;">
+          <button class="kp-btn kp-btn--wijzigen" id="ad-validate-annuleren">Annuleren</button>
+          <button class="kp-btn kp-btn--toewijzen ad-btn--valideer" id="ad-validate-confirm">Valideer</button>
+        </div>
+      </div>
+    </div>
+
     <!-- Upload Toast -->
     <div class="ad-toast ad-toast--upload" id="ad-toast-upload" style="display:none;">
       <span class="ad-toast-icon">&#128228;</span>
       <span class="ad-toast-text">Contract succesvol verstuurd naar student!</span>
+    </div>
+
+    <!-- Valideer Toast -->
+    <div class="ad-toast" id="ad-toast" style="display:none;">
+      <span class="ad-toast-icon">&#10003;</span>
+      <span class="ad-toast-text">Document succesvol gevalideerd!</span>
     </div>
 
   `;
@@ -325,6 +384,44 @@ export async function renderAdminDocumenten(app) {
       uploadBtn.disabled = false;
       uploadBtn.textContent = 'Versturen';
     }
+  });
+
+  // VALIDATE MODAL
+  const validateModal = document.getElementById('ad-validate-modal');
+  const toast = document.getElementById('ad-toast');
+
+  validateModal.addEventListener('click', e => { if (e.target === validateModal) validateModal.classList.remove('active'); });
+  document.getElementById('ad-validate-annuleren').addEventListener('click', () => {
+    validateModal.classList.remove('active');
+  });
+
+  document.getElementById('ad-validate-confirm').addEventListener('click', async () => {
+    const confirmBtn = document.getElementById('ad-validate-confirm');
+    confirmBtn.disabled = true;
+    confirmBtn.textContent = 'Bezig...';
+    validateModal.classList.remove('active');
+    try {
+      const res = await fetch(`/api/stages/${currentStageId}/validate-document`, {
+        method: 'PUT',
+        credentials: 'include',
+      });
+      if (res.ok) {
+        const idx = ontvangen.findIndex(s => s.id === currentStageId);
+        if (idx !== -1) {
+          const [stage] = ontvangen.splice(idx, 1);
+          afgecheckt.push(stage);
+        }
+        herrender();
+        toast.style.display = 'flex';
+        setTimeout(() => { toast.style.display = 'none'; }, 3000);
+      } else {
+        alert('Fout bij valideren');
+      }
+    } catch {
+      alert('Geen verbinding met de server');
+    }
+    confirmBtn.disabled = false;
+    confirmBtn.textContent = 'Valideer';
   });
 
   // INIT

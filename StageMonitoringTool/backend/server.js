@@ -244,6 +244,7 @@ app.get('/api/stages/goedgekeurd', async (req, res) => {
       id: s.stage_id,
       naam: s.student?.User ? `${s.student.User.last_name.toUpperCase()} ${s.student.User.first_name}` : 'Onbekend',
       bedrijf: s.bedrijf?.naam || '',
+      document_validated: s.document_validated || false,
     })));
   } catch (err) {
     console.error(err);
@@ -331,6 +332,7 @@ app.get('/api/stages/:id', async (req, res) => {
       rawStatus: stage.status,
       datum: stage.createdAt ? new Date(stage.createdAt).toLocaleDateString('nl-BE') : '',
       feedback: stage.feedback || null,
+      document_validated: stage.document_validated || false,
     });
   } catch (error) {
     console.error('Error fetching stage:', error);
