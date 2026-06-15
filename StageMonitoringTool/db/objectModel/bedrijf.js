@@ -20,6 +20,10 @@ const Bedrijf = sequelize.define("Bedrijf", {
         type:DataTypes.STRING,
         allowNull:true,
     },
+    email:{
+        type:DataTypes.STRING,
+        allowNull:true,
+    }
 
     },
     {

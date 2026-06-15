@@ -16,18 +16,17 @@ const createDocent = async (docent_id, user_id) =>
 
 const selectDocent = async (req, res, next) => {
 	try {
-		const docent = await Docent.findAll({
-			include: [{ model: User, as: 'User' }]
-		});
-        return res.status(200).json({
-            msg: "Docenten selected successfully",
-            data: docent
-        });
-	} catch (error) {
-		console.error("Error selecting users: ", error);
-		return res.status(500).json({
-			msg: "something went wrong while selecting users"
-		});
-	}
+    const docenten = await Docent.findAll({
+      include: [{ model: User, as: 'User' }]
+    });
+    return res.json(docenten.map(d => ({
+      user_id: d.user_id,
+      first_name: d.User.first_name,
+      last_name: d.User.last_name,
+    })));
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ msg: 'Fout bij ophalen docenten' });
+  }
 }
 export default {createDocent, selectDocent};
