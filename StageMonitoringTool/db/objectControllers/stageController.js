@@ -298,5 +298,48 @@ const selectStageByStudentId = async (req, res, next) => {
         return res.status(500).json({ msg: 'Fout bij ophalen van stage' });
       }
     };
+// Raw select for internal usage (e.g. koppeldocent page)
+const selectStageRaw = async (req, res, next) => {
+    try {
+        const stages = await Stage.findAll({
+          include: [
+            { model: Student, as: 'student', include: [{ model: User, as: 'User' }] },
+            { model: Stagementor, as: 'mentor', include: [{ model: User, as: 'User' }] },
+            { model: Bedrijf, as: 'bedrijf' },
+            { model: Docent, as: 'docent', include: [{ model: User, as: 'User' }] },
+          ]
+        });
+        return res.status(200).json({
+            msg: "Stages selected successfully",
+            data: stages
+        });
+    } catch (error) {
+        console.error("Error selecting stages: ", error);
+        return res.status(500).json({
+            msg: "something went wrong while selecting stages"
+        });
+    }
+};
 
-export default { createStage, updateStage, selectStage, getApprovedStages, selectStageByStudentId, selectStageById };
+// Raw update for internal usage (e.g. koppeldocent page)
+const updateStageRaw = async (req, res, next) => {
+    try {
+        const { stage_id, student_id, docent_id, stagementor_id, bedrijf_id } = req.body;
+
+        await Stage.update(
+            { student_id, docent_id, stagementor_id, bedrijf_id },
+            { where: { stage_id: stage_id } }
+        );
+
+        return res.status(200).json({
+            msg: "Stage updated successfully"
+        });
+    } catch (error) {
+        console.error("Error updating stage: ", error);
+        return res.status(500).json({
+            msg: "something went wrong while updating stage"
+        });
+    }
+};
+
+export default { createStage, updateStage, selectStage, getApprovedStages, selectStageByStudentId, selectStageById, selectStageRaw, updateStageRaw };

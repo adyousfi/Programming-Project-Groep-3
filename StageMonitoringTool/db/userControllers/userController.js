@@ -204,4 +204,4 @@ const logoutUser = (req, res, next) => {
     res.json({ success: true });
 };
 
-export default { createUser, selectUser, updateUser, deleteUser, loginUser, checkLogin, logoutUser ,logoutUser};
+export default { createUser, selectUser, updateUser, deleteUser, loginUser, checkLogin, logoutUser };

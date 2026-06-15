@@ -2,7 +2,7 @@ import './koppeldocent.css';
 import { renderAdmin } from './admin.js';
 import { renderAdminDocumenten } from './adminDocumenten.js'; // check pad!
 
-const API_URL = 'http://localhost:3001';
+const API_URL = '';
 
 let zonderDocent = [];
 let gekoppeld = [];

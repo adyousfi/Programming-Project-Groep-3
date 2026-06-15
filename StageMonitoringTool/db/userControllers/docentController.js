@@ -29,4 +29,21 @@ const selectDocent = async (req, res, next) => {
     return res.status(500).json({ msg: 'Fout bij ophalen docenten' });
   }
 }
-export default {createDocent, selectDocent};
+
+// Raw select for internal usage (e.g. koppeldocent page)
+const selectDocentRaw = async (req, res, next) => {
+	try {
+    const docenten = await Docent.findAll({
+      include: [{ model: User, as: 'User' }]
+    });
+    return res.status(200).json({
+      msg: "Docenten selected successfully",
+      data: docenten
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ msg: 'Fout bij ophalen docenten' });
+  }
+}
+
+export default {createDocent, selectDocent, selectDocentRaw};
