@@ -28,7 +28,6 @@ const Stage = sequelize.define("stage", {
     stageaanvraag_id: {
         type: DataTypes.INTEGER,
         allowNull: true,
-        comment: "FK - Reference to stageaanvraag"
     },
     student_id: {
         type: DataTypes.INTEGER,
@@ -41,7 +40,7 @@ const Stage = sequelize.define("stage", {
     admin_id: {
         type: DataTypes.INTEGER,
         allowNull: true,
-        comment: "FK - Reference to admin"
+
     },
     stagementor_id: {
         type: DataTypes.INTEGER,
@@ -72,13 +71,11 @@ const Stage = sequelize.define("stage", {
     feedback: {
         type: DataTypes.TEXT,
         allowNull: true,
-        comment: "Feedback from stagecommissie"
     },
     document_validated: {
         type: DataTypes.BOOLEAN,
         allowNull: false,
         defaultValue: false,
-        comment: "True when admin has validated the student's submitted document"
     },
     },
     {
