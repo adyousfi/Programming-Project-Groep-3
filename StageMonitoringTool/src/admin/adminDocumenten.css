@@ -1,58 +1,72 @@
-.ad-upload-card,
-.ad-history-card {
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  padding: 28px;
-  margin-bottom: 24px;
-  max-width: 640px;
+/* ---- badge extra kleuren ---- */
+.kp-badge--blauw {
+  background: #dbeafe;
+  color: #1e40af;
 }
 
-.ad-card-title {
-  font-size: 17px;
-  font-weight: 600;
-  color: #111827;
-  margin: 0 0 6px;
+.kp-badge--wachten {
+  background: #fef9c3;
+  color: #854d0e;
 }
 
-.ad-card-sub {
-  font-size: 14px;
-  color: #6b7280;
-  margin: 0 0 24px;
+/* ---- wachten sectie header ---- */
+.kp-sectie-titel--wachten {
+  color: #a16207;
 }
 
-.ad-form {
+.kp-thead--wachten tr {
+  background: #fefce8;
+  border-bottom: 1px solid #fde047;
+}
+
+.kp-rij--wachten {
+  background: #fefce8;
+}
+
+/* ---- upload toast kleur (blauw) ---- */
+.ad-toast--upload {
+  background: #2563eb;
+}
+
+/* ---- acties cel: buttons naast elkaar ---- */
+.ad-acties-cel {
   display: flex;
-  flex-direction: column;
-  gap: 20px;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
 }
 
-.ad-form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+/* ---- groen downloaden-knop ---- */
+.kp-btn--downloaden {
+  background: #198754;
+  color: #ffffff;
+  border: none;
+  text-decoration: none;
+  display: inline-block;
 }
 
-.ad-label {
-  font-size: 14px;
-  font-weight: 500;
-  color: #374151;
+.kp-btn--downloaden:hover {
+  background: #157347;
 }
 
-.ad-select {
-  padding: 10px 12px;
-  border: 1.5px solid #e5e7eb;
-  border-radius: 8px;
-  font-size: 14px;
-  color: #111827;
-  outline: none;
-  background: #fff;
+/* ---- groen valideer-knop ---- */
+.ad-btn--valideer {
+  background: #198754;
+}
+.ad-btn--valideer:hover {
+  background: #157347;
+}
+.ad-btn--valideer:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
 }
 
-.ad-select:focus {
-  border-color: #2563eb;
+/* ---- upload modal breder ---- */
+.ad-upload-modal-body {
+  max-width: 520px;
 }
 
+/* ---- upload zone in modal ---- */
 .ad-upload-zone {
   border: 2px dashed #d1d5db;
   border-radius: 10px;
@@ -61,6 +75,7 @@
   cursor: pointer;
   transition: border-color 0.15s, background 0.15s;
   background: #f9fafb;
+  margin-bottom: 12px;
 }
 
 .ad-upload-zone:hover,
@@ -99,6 +114,7 @@
   background: #f0fdf4;
   border: 1px solid #bbf7d0;
   border-radius: 8px;
+  margin-bottom: 12px;
 }
 
 .ad-selected-name {
@@ -125,166 +141,7 @@
   color: #dc2626;
 }
 
-.ad-submit-btn {
-  padding: 12px 20px;
-  background: #2563eb;
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  font-size: 15px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background 0.15s;
-  align-self: flex-start;
-}
-
-.ad-submit-btn:disabled {
-  background: #9ca3af;
-  cursor: not-allowed;
-}
-
-.ad-submit-btn:not(:disabled):hover {
-  background: #1d4ed8;
-}
-
-.ad-history-label {
-  font-size: 13px;
-  font-weight: 600;
-  color: #6b7280;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  margin: 0 0 10px;
-}
-
-.ad-history-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 12px 0;
-  border-bottom: 1px solid #f3f4f6;
-}
-
-.ad-history-item:last-child {
-  border-bottom: none;
-}
-
-.ad-doc-icon {
-  font-size: 20px;
-}
-
-.ad-doc-name {
-  flex: 1;
-  font-size: 14px;
-  color: #111827;
-  font-weight: 500;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.ad-doc-date {
-  font-size: 13px;
-  color: #9ca3af;
-  white-space: nowrap;
-}
-
-.ad-download-btn {
-  padding: 6px 14px;
-  background: #fff;
-  border: 1.5px solid #2563eb;
-  color: #2563eb;
-  border-radius: 6px;
-  font-size: 13px;
-  font-weight: 500;
-  text-decoration: none;
-  white-space: nowrap;
-  transition: background 0.15s;
-}
-
-.ad-download-btn:hover {
-  background: #eff6ff;
-}
-
-/* Modal */
-.ad-modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.4);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 100;
-}
-
-.ad-modal {
-  background: #fff;
-  border-radius: 12px;
-  padding: 32px;
-  max-width: 400px;
-  width: 90%;
-  text-align: center;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
-}
-
-.ad-modal-icon {
-  font-size: 36px;
-  margin-bottom: 12px;
-}
-
-.ad-modal-title {
-  font-size: 18px;
-  font-weight: 600;
-  color: #111827;
-  margin: 0 0 8px;
-}
-
-.ad-modal-text {
-  font-size: 14px;
-  color: #6b7280;
-  margin: 0 0 24px;
-  line-height: 1.5;
-}
-
-.ad-modal-actions {
-  display: flex;
-  gap: 12px;
-  justify-content: center;
-}
-
-.ad-modal-btn {
-  padding: 10px 24px;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  border: none;
-  transition: background 0.15s;
-}
-
-.ad-modal-btn-cancel {
-  background: #f3f4f6;
-  color: #374151;
-}
-
-.ad-modal-btn-cancel:hover {
-  background: #e5e7eb;
-}
-
-.ad-modal-btn-confirm {
-  background: #198754;
-  color: #fff;
-}
-
-.ad-modal-btn-confirm:hover {
-  background: #157347;
-}
-
-.ad-modal-btn-confirm:disabled {
-  background: #9ca3af;
-  cursor: not-allowed;
-}
-
-/* Success Toast */
+/* ---- success toast ---- */
 .ad-toast {
   position: fixed;
   bottom: 24px;
@@ -309,5 +166,5 @@
 
 @keyframes ad-toast-in {
   from { opacity: 0; transform: translateY(12px); }
-  to { opacity: 1; transform: translateY(0); }
+  to   { opacity: 1; transform: translateY(0); }
 }
