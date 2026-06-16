@@ -21,7 +21,8 @@ const sequelize = new Sequelize(process.env.DB, process.env.USER, process.env.PA
 //     dialectOptions: {
 //       options: {
 //         encrypt: true,                             // CRITICAL: Azure SQL requires this
-//         trustServerCertificate: false              // Set to true only if using self-signed certs in dev
+//         trustServerCertificate: true,              // Set to true only if using self-signed certs in dev
+//         connectTimeout: 60000
 //       }
 //     },
 //   }
@@ -41,8 +42,8 @@ const run = async () => {
     //drops all the tables
     // await sequelize.sync({ force: false });
     // console.log('Tables have been reset and created successfully!');
-    //doesn't drop the tables
-    await sequelize.sync({ alter: true });
+    // //doesn't drop the tables
+    await sequelize.sync({alter: true});
  
   } catch (error) {
     console.error('Unable to connect to the database or create tables:', error);
