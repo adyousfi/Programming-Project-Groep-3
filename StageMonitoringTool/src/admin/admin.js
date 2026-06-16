@@ -1,6 +1,8 @@
 import './admin.css';
 import { renderKoppelingen } from './koppeldocent.js';
 import { renderAdminDocumenten } from './adminDocumenten.js';
+import { renderCompetenties } from './competenties.js';
+
 
 
 const API_URL = 'http://localhost:3000';
@@ -253,7 +255,7 @@ export function renderAdmin(app) {
     // Competenties: fallback (if not implemented, don't break navigation)
     navCompetenties.addEventListener('click', (e) => {
       e.preventDefault();
-      renderAdmin(app);
+      renderCompetenties(app);
     });
 
     // Add delete button listeners
