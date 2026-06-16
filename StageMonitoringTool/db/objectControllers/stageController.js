@@ -33,15 +33,21 @@ const createStage = async (req, res, next) => {
 
     const bedrijf = await Bedrijf.create({ naam: bedrijfNaam, address: bedrijfAdres });
 
-    const mentorUser = await User.create({
-      first_name: mentorNaam,
-      last_name: '',
-      email: mentorEmail,
-      password: 'pending',
-      role: 'stagementor',
-      phone: 'no phone'
-    });
-    await Stagementor.create({ user_id: mentorUser.user_id, bedrijf_id: bedrijf.bedrijf_id });
+    let mentorUser = await User.findOne({ where: { email: mentorEmail } });
+    if (!mentorUser) {
+      mentorUser = await User.create({
+        first_name: mentorNaam,
+        last_name: '',
+        email: mentorEmail,
+        password: 'pending',
+        role: 'stagementor',
+        phone: 'no phone'
+      });
+    }
+    const existingStagementor = await Stagementor.findByPk(mentorUser.user_id);
+    if (!existingStagementor) {
+      await Stagementor.create({ user_id: mentorUser.user_id, bedrijf_id: bedrijf.bedrijf_id });
+    }
 
     const stage = await Stage.create({
       student_id,
