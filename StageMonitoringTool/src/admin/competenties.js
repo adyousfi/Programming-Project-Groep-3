@@ -3,11 +3,11 @@ import { renderAdmin } from './admin.js';
 import { renderKoppelingen } from './koppeldocent.js';
 import { renderAdminDocumenten } from './adminDocumenten.js';
 
-/* ✅ TEST DATA (kan je later vervangen door API) */
+/* ✅ TEST DATA */
 async function getCompetenties() {
   return [
-    { id: 1, code: 'D1', titel: 'Projectbeheer' },
-    { id: 2, code: 'D2', titel: 'IT-oplossingen' }
+    { id: 1, code: 'D1', titel: 'Projectbeheer', omschrijving: 'Planning en organisatie', gewicht: 1 },
+    { id: 2, code: 'D2', titel: 'IT-oplossingen', omschrijving: 'Software ontwikkeling', gewicht: 2 }
   ];
 }
 
@@ -18,17 +18,15 @@ async function getRubriekenByCompetentieId(id) {
   ];
 }
 
-/* ✅ MAIN RENDER */
+/* ✅ MAIN */
 export async function renderCompetenties(app) {
 
   app.innerHTML = `<p>Laden...</p>`;
-
   const competenties = await getCompetenties();
 
   let html = `
     <div class="app">
 
-      <!-- SIDEBAR -->
       <aside class="sidebar">
         <div class="sidebar-header">
           <h1>Administratie</h1>
@@ -36,10 +34,10 @@ export async function renderCompetenties(app) {
         </div>
 
         <nav class="sidebar-nav">
-  <button id="navGebruikers" class="nav-item">Gebruikers</button>
-  <button id="navKoppelingen" class="nav-item">Koppelingen</button>
-  <button id="navDocumenten" class="nav-item">Documenten</button>
-  <button id="navCompetenties" class="nav-item active">Competenties</button>
+          <button id="navGebruikers" class="nav-item">Gebruikers</button>
+          <button id="navKoppelingen" class="nav-item">Koppelingen</button>
+          <button id="navDocumenten" class="nav-item">Documenten</button>
+          <button id="navCompetenties" class="nav-item active">Competenties</button>
         </nav>
 
         <div class="sidebar-footer">
@@ -48,21 +46,17 @@ export async function renderCompetenties(app) {
         </div>
       </aside>
 
-      <!-- MAIN -->
       <main class="main">
 
         <div class="header">
           <div>
             <h2>Competenties beheren</h2>
-            <p class="subtitle">
-              Pas competenties en weegfactoren aan
-            </p>
+            <p class="subtitle">Pas competenties aan</p>
           </div>
           <button class="btn-primary">+ Competentie toevoegen</button>
         </div>
   `;
 
-  /* ✅ LOOP competenties */
   for (const comp of competenties) {
 
     const rubrieken = await getRubriekenByCompetentieId(comp.id);
@@ -70,10 +64,14 @@ export async function renderCompetenties(app) {
     html += `
       <div class="card">
 
-        <!-- HEADER -->
         <div class="competentie-header">
           <h3>${comp.code} - ${comp.titel}</h3>
-          <button class="btn-outline edit-comp-btn" data-id="${comp.id}">
+          <button class="btn-outline edit-comp-btn"
+            data-id="${comp.id}"
+            data-code="${comp.code}"
+            data-titel="${comp.titel}"
+            data-omschrijving="${comp.omschrijving}"
+            data-gewicht="${comp.gewicht}">
             Bewerken
           </button>
         </div>
@@ -98,7 +96,11 @@ export async function renderCompetenties(app) {
           <td>${rubriek.omschrijving}</td>
           <td>${rubriek.score}</td>
           <td>
-            <button class="btn-outline edit-rubriek-btn" data-id="${rubriek.id}">
+            <button class="btn-outline edit-rubriek-btn"
+              data-id="${rubriek.id}"
+              data-titel="${rubriek.titel}"
+              data-omschrijving="${rubriek.omschrijving}"
+              data-score="${rubriek.score}">
               Bewerken
             </button>
           </td>
@@ -113,94 +115,139 @@ export async function renderCompetenties(app) {
     `;
   }
 
-  /* ✅ MODAL */
   html += `
       </main>
     </div>
 
+    <!-- ✅ MODAL -->
     <div id="editModal" class="modal-overlay">
-      <div class="modal">
-        <h3>Item bewerken</h3>
-
-        <input id="editInput" placeholder="Nieuwe naam">
-
-        <div class="modal-actions">
-          <button class="btn-primary" id="saveEdit">Opslaan</button>
-          <button class="btn-outline" id="closeModal">Annuleren</button>
-        </div>
-      </div>
+      <div class="modal" id="modalContent"></div>
     </div>
   `;
 
   app.innerHTML = html;
 
   /* ✅ NAVIGATIE */
-// NAVIGATIE
+  document.getElementById('navGebruikers').onclick = () => renderAdmin(app);
+  document.getElementById('navKoppelingen').onclick = () => renderKoppelingen(app);
+  document.getElementById('navDocumenten').onclick = () => renderAdminDocumenten(app);
 
-document.getElementById('navGebruikers').addEventListener('click', (e) => {
-  e.preventDefault();
-  renderAdmin(app);
-});
-
-document.getElementById('navKoppelingen').addEventListener('click', (e) => {
-  e.preventDefault();
-  renderKoppelingen(app);
-});
-
-document.getElementById('navDocumenten')?.addEventListener('click', (e) => {
-  e.preventDefault();
-  renderAdminDocumenten(app);
-});
-
-// deze is current page → mag blijven of opnieuw renderen
-document.getElementById('navCompetenties').addEventListener('click', (e) => {
-  e.preventDefault();
-  renderCompetenties(app);
-});
-
-  /* ✅ MODAL LOGIC */
+  /* ✅ MODAL */
   const modal = document.getElementById('editModal');
-  const input = document.getElementById('editInput');
+  const modalContent = document.getElementById('modalContent');
 
-  let currentItemId = null;
+  let currentType = null;
+  let currentId = null;
 
-  function openModal(value, id) {
-    input.value = value;
-    currentItemId = id;
+  function openModal(type, data) {
+    currentType = type;
+    currentId = data.id;
+
+    if (type === 'competentie') {
+      modalContent.innerHTML = `
+        <h3>Competentie bewerken</h3>
+
+        <label>Code</label>
+        <input id="editCode" value="${data.code}">
+
+        <label>Titel</label>
+        <input id="editTitel" value="${data.titel}">
+
+        <label>Omschrijving</label>
+        <input id="editOmschrijving" value="${data.omschrijving}">
+
+        <label>Gewicht</label>
+        <input id="editGewicht" type="number" value="${data.gewicht}">
+
+        <div class="modal-actions">
+          <button class="btn-primary" id="saveEdit">Opslaan</button>
+          <button class="btn-outline" id="closeModal">Annuleren</button>
+        </div>
+      `;
+    }
+
+    if (type === 'rubriek') {
+      modalContent.innerHTML = `
+        <h3>Rubriek bewerken</h3>
+
+        <label>Titel</label>
+        <input id="editTitel" value="${data.titel}">
+
+        <label>Omschrijving</label>
+        <input id="editOmschrijving" value="${data.omschrijving}">
+
+        <label>Score</label>
+        <input id="editScore" type="number" value="${data.score}">
+
+        <div class="modal-actions">
+          <button class="btn-primary" id="saveEdit">Opslaan</button>
+          <button class="btn-outline" id="closeModal">Annuleren</button>
+        </div>
+      `;
+    }
+
     modal.classList.add('active');
+
+    document.getElementById('closeModal').onclick = closeModal;
+    document.getElementById('saveEdit').onclick = handleSave;
   }
 
   function closeModal() {
     modal.classList.remove('active');
   }
 
-  document.getElementById('closeModal').onclick = closeModal;
+  function handleSave() {
+    if (currentType === 'competentie') {
+      const updated = {
+        id: currentId,
+        code: document.getElementById('editCode').value,
+        titel: document.getElementById('editTitel').value,
+        omschrijving: document.getElementById('editOmschrijving').value,
+        gewicht: document.getElementById('editGewicht').value
+      };
+      console.log('SAVE COMPETENTIE', updated);
+    }
 
-  document.getElementById('saveEdit').onclick = () => {
-    alert(`Opgeslagen: ${input.value} (id: ${currentItemId})`);
+    if (currentType === 'rubriek') {
+      const updated = {
+        id: currentId,
+        titel: document.getElementById('editTitel').value,
+        omschrijving: document.getElementById('editOmschrijving').value,
+        score: document.getElementById('editScore').value
+      };
+      console.log('SAVE RUBRIEK', updated);
+    }
+
+    alert("Opgeslagen!");
     closeModal();
-  };
+  }
 
-  /* ✅ EDIT EVENTS */
+  /* ✅ EVENTS */
 
-  // competentie edit
   document.querySelectorAll('.edit-comp-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const id = btn.dataset.id;
-      openModal('Competentie aanpassen', id);
-    });
+    btn.onclick = () => {
+      openModal('competentie', {
+        id: btn.dataset.id,
+        code: btn.dataset.code,
+        titel: btn.dataset.titel,
+        omschrijving: btn.dataset.omschrijving,
+        gewicht: btn.dataset.gewicht
+      });
+    };
   });
 
-  // rubriek edit
   document.querySelectorAll('.edit-rubriek-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const id = btn.dataset.id;
-      openModal('Rubriek aanpassen', id);
-    });
+    btn.onclick = () => {
+      openModal('rubriek', {
+        id: btn.dataset.id,
+        titel: btn.dataset.titel,
+        omschrijving: btn.dataset.omschrijving,
+        score: btn.dataset.score
+      });
+    };
   });
 
-  /* ✅ CLOSE op achtergrond click */
-  modal.addEventListener('click', (e) => {
+  modal.onclick = (e) => {
     if (e.target === modal) closeModal();
-  });
+  };
 }

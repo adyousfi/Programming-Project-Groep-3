@@ -310,7 +310,7 @@ document.getElementById('navKoppelingen').addEventListener('click', (e) => {
 
 document.getElementById('navDocumenten')?.addEventListener('click', (e) => {
   e.preventDefault();
-  renderDocumenten(app);
+  renderAdminDocumenten(app);
 });
 
 // deze is current page → mag blijven of opnieuw renderen
