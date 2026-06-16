@@ -164,10 +164,9 @@ function setupStudentButtons(studenten) {
   document.querySelectorAll('.dc-btn[data-id]').forEach(function(btn) {
     btn.addEventListener('click', function() {
       const id = parseInt(btn.dataset.id);
-      const studentId = parseInt(btn.dataset.studentId);
       const student = studenten.find(function(s) { return s.id === id; });
       if (!student) return;
-      import('./student-detail.js').then(function(m) { m.renderStudentDetail(student); });
+      import('./student-detail.js').then(function(m) { m.renderStudentDetail(student, renderMijnStudenten._user); });
     });
   });
 }
@@ -175,6 +174,7 @@ function setupStudentButtons(studenten) {
 export async function renderMijnStudenten(app, user) {
   const container = app || document.querySelector('#app');
   let stages = [];
+  renderMijnStudenten._user = user || null;
 
   if (user && user.user_id) {
     try {
