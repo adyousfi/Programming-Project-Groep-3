@@ -69,9 +69,8 @@ export async function renderCompetenties(app) {
         <div class="header">
           <div>
             <h2>Competenties beheren</h2>
-            <p class="subtitle">Pas competenties aan</p>
           </div>
-          <button class="btn-primary">+ Competentie toevoegen</button>
+          <button class="btn-primary" id="addCompetentieBtn">+ Competentie toevoegen</button>
         </div>
   `;
 
@@ -82,47 +81,53 @@ export async function renderCompetenties(app) {
     html += `
       <div class="card">
 
-          <div class="competentie-header">
-          <h3>${comp.code} - ${comp.titel}</h3>
-          <p class="competentie-omschrijving">${comp.omschrijving}</p>
+        <div class="competentie-header">
+          <h3 class="competentie-titel">${comp.code} - ${comp.titel}</h3>
 
-          <table class="rubriektabel">
-            <thead>
+          <div class="competentie-row">
+            <div class="competentie-info">
+              <p class="competentie-omschrijving">${comp.omschrijving}</p>
+              <p class="competentie-gewicht">Gewicht: ${comp.gewicht}</p>
+            </div>
+
+            <button class="btn-outline edit-comp-btn"
+              data-id="${comp.id}"
+              data-code="${comp.code}"
+              data-titel="${comp.titel}"
+              data-omschrijving="${comp.omschrijving}"
+              data-gewicht="${comp.gewicht}">
+              Competentie bewerken
+            </button>
+          </div>
+        </div>
+
+        <table class="rubriektabel">
+          <thead>
+            <tr>
+              <th>Rubriek titel</th>
+              <th>Score</th>
+              <th>Acties</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rubrieken.map(r => `
               <tr>
-                <th>Rubriek titel</th>
-                <th>Omschrijving</th>
-                <th>Score</th>
-                <th>Acties</th>
+                <td>${r.titel}</td>
+                <td>${r.score}</td>
+                <td>
+                  <button class="btn-outline edit-rubriek-btn"
+                    data-id="${r.id}"
+                    data-titel="${r.titel}"
+                    data-omschrijving="${r.omschrijving}"
+                    data-score="${r.score}">
+                    Bewerken
+                  </button>
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              ${rubrieken.map(r => `
-                <tr>
-                  <td>${r.titel}</td>
-                  <td>${r.omschrijving}</td>
-                  <td>${r.score}</td>
-                  <td>
-                    <button class="btn-outline edit-rubriek-btn"
-                      data-id="${r.id}"
-                      data-titel="${r.titel}"
-                      data-omschrijving="${r.omschrijving}"
-                      data-score="${r.score}">
-                      Bewerken
-                    </button>
-                  </td>
-                </tr>
-              `).join('')}
-            </tbody>
-          </table>
-
-          
-
-
-    `;
-
-    html += `
+            `).join('')}
           </tbody>
         </table>
+
       </div>
     `;
   }
@@ -134,6 +139,11 @@ export async function renderCompetenties(app) {
     <!-- ✅ MODAL -->
     <div id="editModal" class="modal-overlay">
       <div class="modal" id="modalContent"></div>
+    </div>
+
+    <!-- ✅ ADD MODAL -->
+    <div id="addCompetentieModal" class="modal-overlay">
+      <div class="modal" id="addCompetentieContent"></div>
     </div>
   `;
 
@@ -169,7 +179,7 @@ export async function renderCompetenties(app) {
         <input id="editOmschrijving" value="${data.omschrijving}">
 
         <label>Gewicht</label>
-        <input id="editGewicht" type="number" value="${data.gewicht}">
+        <input id="editGewicht" type="number" value="${data.gewicht}" step="1">
 
         <div class="modal-actions">
           <button class="btn-primary" id="saveEdit">Opslaan</button>
@@ -229,10 +239,8 @@ export async function renderCompetenties(app) {
 
       if (currentType === 'rubriek') {
         const payload = {
-          rubriektitel: document.getElementById('editTitel').value,
-          rubriek_beschrijving: document.getElementById('editOmschrijving').value,
-          beschrijving: document.getElementById('editOmschrijving').value,
           score: Number(document.getElementById('editScore').value),
+          beschrijving: document.getElementById('editOmschrijving').value,
         };
 
         const res = await fetch(`${API_URL}/rubrieken/update-rubriek/${currentId}`, {
@@ -281,5 +289,71 @@ export async function renderCompetenties(app) {
 
   modal.onclick = (e) => {
     if (e.target === modal) closeModal();
+  };
+
+  /* ✅ ADD COMPETENTIE */
+  const addModal = document.getElementById('addCompetentieModal');
+  const addContent = document.getElementById('addCompetentieContent');
+
+  function openAddModal() {
+    addContent.innerHTML = `
+      <h3>Competentie toevoegen</h3>
+
+      <label>Code</label>
+      <input id="addCode" />
+
+      <label>Titel</label>
+      <input id="addTitel" />
+
+      <label>Omschrijving</label>
+      <input id="addOmschrijving" />
+
+      <label>Gewicht</label>
+      <input id="addGewicht" type="number" step="1" />
+
+      <div class="modal-actions">
+        <button class="btn-primary" id="addSave">Aanmaken</button>
+        <button class="btn-outline" id="addClose">Annuleren</button>
+      </div>
+    `;
+    addModal.classList.add('active');
+
+    document.getElementById('addClose').onclick = () => {
+      addModal.classList.remove('active');
+    };
+
+    document.getElementById('addSave').onclick = async () => {
+      try {
+        const payload = {
+          code: document.getElementById('addCode').value,
+          title: document.getElementById('addTitel').value,
+          omschrijving: document.getElementById('addOmschrijving').value,
+          gewicht: Number(document.getElementById('addGewicht').value),
+          // 4 rubrieken met standaard teksten/score worden aan backend overgelaten
+        };
+
+        const res = await fetch(`${API_URL}/competenties/create-competentie-met-rubrieken`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+
+        const json = await res.json();
+        if (!res.ok) throw new Error(json?.msg || 'Fout bij aanmaken competentie');
+
+        alert('Competentie aangemaakt!');
+        addModal.classList.remove('active');
+        await renderCompetenties(app);
+      } catch (e) {
+        console.error(e);
+        alert(e?.message || 'Aanmaken mislukt');
+      }
+    };
+  }
+
+  document.getElementById('addCompetentieBtn').onclick = openAddModal;
+
+  addModal.onclick = (e) => {
+    if (e.target === addModal) addModal.classList.remove('active');
   };
 }

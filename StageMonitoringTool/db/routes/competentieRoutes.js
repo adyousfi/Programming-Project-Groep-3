@@ -5,6 +5,8 @@ const router = express.Router();
 
 router.get('/all', competentieController.getAllCompetenties);
 router.post("/create-competentie", competentieController.createCompetentie);
+router.post("/create-competentie-met-rubrieken", competentieController.createCompetentieMetRubrieken);
 router.put('/update-competentie/:competentie_id', competentieController.updateCompetentie);
 
 export default router;
+

@@ -134,20 +134,60 @@ body {
 .competentie-header {
   padding: 14px 16px;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
+  gap: 12px;
   border-bottom: 1px solid #f3f4f6;
 }
 
-.competentie-header h3 {
-  font-size: 16px;
-  font-weight: 600;
+.competentie-titel {
+  display: block;
+  font-size: 24px;
+  font-weight: 700;
+  text-align: center;
+  width: 100%;
+}
+
+.competentie-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.competentie-info {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-align: left;
+}
+
+.competentie-row .btn-outline {
+  flex-shrink: 0;
 }
 
 /* TABLE */
 table {
   width: 100%;
   border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.rubriektabel th:nth-child(1),
+.rubriektabel td:nth-child(1) {
+  width: 55%;
+}
+
+.rubriektabel th:nth-child(2),
+.rubriektabel td:nth-child(2) {
+  width: 20%;
+  text-align: center;
+}
+
+.rubriektabel th:nth-child(3),
+.rubriektabel td:nth-child(3) {
+  width: 25%;
+  text-align: center;
 }
 
 thead {
@@ -167,6 +207,7 @@ tbody td {
   padding: 12px;
   font-size: 13px;
   border-bottom: 1px solid #f3f4f6;
+  word-wrap: break-word;
 }
 
 tbody tr:last-child td {

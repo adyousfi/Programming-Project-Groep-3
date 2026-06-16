@@ -8,15 +8,22 @@ const Rubriek = sequelize.define("Rubriek", {
         primaryKey: true,
         autoIncrement: true,
     },
+
+    competentie_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+    },
+
     score: {
         type: DataTypes.INTEGER, // Bijv: 1 tot 5
-        allowNull: false
+        allowNull: false,
     },
+
     beschrijving: {
         type: DataTypes.TEXT,
-        allowNull: false
-    }
-    // competentie_id komt hier via relaties
+        allowNull: false,
+    },
 });
 
 export default Rubriek;
+
