@@ -100,7 +100,7 @@ if (role === 'student') {
   if (user && user.role === 'docent') {
     renderMijnStudenten(app, user);
   } else {
-    renderMijnStudenten(app);
+    window.location.href = '/';
   }
 } else if (role === 'goedgekeurd_student') {
   const user = await getLoggedInUser();
