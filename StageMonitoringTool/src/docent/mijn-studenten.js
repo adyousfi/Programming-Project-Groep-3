@@ -302,6 +302,7 @@ export async function renderMijnStudenten(app, user) {
       logboek: logboek,
       mijlpalen: bepaalMijlpalen(s.rawStatus, s.stageDetails.start, s.stageDetails.einde),
       laasteLogboek: logboek.laasteLogboek,
+      stageData: s,
     };
   }));
 

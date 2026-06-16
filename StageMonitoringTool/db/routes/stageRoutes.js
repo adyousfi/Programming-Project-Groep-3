@@ -9,6 +9,7 @@ router.get('/', stageController.selectStage);
 router.post('/', stageController.createStage);
 router.get('/goedgekeurd', stageController.getApprovedStages);
 router.get('/docent/:docentId', stageController.selectStageByDocentId);
+router.get('/stagementor/:stagementorId', stageController.selectStageByStagementorId);
 router.get('/:id', stageController.selectStageById);
 router.get('/student/:studentId', stageController.selectStageByStudentId);
 router.put('/:id', stageController.updateStage);
