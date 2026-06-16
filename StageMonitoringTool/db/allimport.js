@@ -12,6 +12,9 @@ import Stage from "./objectModel/stage.js";
 import Logboek from "./objectModel/logboek.js";
 import Opmerkinglogboek from "./objectModel/opmerkingLogboek.js";
 import Behaaldescore from './objectModel/behaaldeScore.js';
+import Evaluatie from "./objectModel/evaluatie.js";
+import Competentie from "./objectModel/competentie.js";
+import Rubriek from "./objectModel/rubriek.js";
 
 //RELATIONS
 
@@ -58,3 +61,27 @@ Logboek.belongsTo(Opmerkinglogboek, { foreignKey: 'opmerkinglogboek_id', onDelet
 //behaaldescore
 Behaaldescore.belongsTo(Stage, { foreignKey: 'stage_id',onDelete: 'CASCADE'});
 export const confirmRelations = "relations are made";
+
+
+// --- Competentie & Rubriek (1-op-N) ---
+// Één competentie heeft 5 rubrieken. Geen tussentabel nodig!
+Competentie.hasMany(Rubriek, { foreignKey: 'competentie_id', onDelete: 'CASCADE' });
+Rubriek.belongsTo(Competentie, { foreignKey: 'competentie_id' });
+
+// --- Evaluatie & Stage ---
+// Ik neem aan dat een Evaluatie aan een Stage hangt
+Stage.hasMany(Evaluatie, { foreignKey: 'stage_id', onDelete: 'CASCADE' });
+Evaluatie.belongsTo(Stage, { foreignKey: 'stage_id' });
+
+// --- Evaluatie & De ingevulde Scores (1-op-N) ---
+// Één evaluatie-formulier bevat meerdere ingevulde scores (11 in jouw geval)
+Evaluatie.hasMany(Behaaldescore, { foreignKey: 'evaluatie_id', onDelete: 'CASCADE' });
+Behaaldescore.belongsTo(Evaluatie, { foreignKey: 'evaluatie_id' });
+
+// --- Behaaldescore & Rubriek / Competentie ---
+// De ingevulde score linkt direct naar WELKE rubriek is gekozen, en voor WELKE competentie
+Competentie.hasMany(Behaaldescore, { foreignKey: 'competentie_id', onDelete: 'NO ACTION' });
+Behaaldescore.belongsTo(Competentie, { foreignKey: 'competentie_id' });
+
+Rubriek.hasMany(Behaaldescore, { foreignKey: 'rubriek_id', onDelete: 'NO ACTION' });
+Behaaldescore.belongsTo(Rubriek, { foreignKey: 'rubriek_id' });
