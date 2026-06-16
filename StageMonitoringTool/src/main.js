@@ -96,7 +96,12 @@ if (role === 'student') {
 } else if (role === 'stagementor') {
   renderMijnStagiairs(app);
 } else if (role === 'docent') {
-  renderMijnStudenten();
+  const user = await getLoggedInUser();
+  if (user && user.role === 'docent') {
+    renderMijnStudenten(app, user);
+  } else {
+    window.location.href = '/';
+  }
 } else if (role === 'goedgekeurd_student') {
   const user = await getLoggedInUser();
   if (user && user.user_id) {

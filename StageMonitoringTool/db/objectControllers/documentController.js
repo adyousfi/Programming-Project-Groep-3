@@ -1,5 +1,8 @@
 import StageDocument from "../objectModel/stageDocument.js";
 import Stage from "../objectModel/stage.js";
+import Student from "../userModel/student.js";
+import User from "../userModel/user.js";
+import { Op } from 'sequelize';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
@@ -32,7 +35,15 @@ export const studentUploadDocument = async (req, res, next) => {
   try {
     const cookieUser = req.cookies.user;
     if (!cookieUser) return res.status(401).json({ msg: 'Niet ingelogd' });
-    const stage = await Stage.findOne({ where: { student_id: cookieUser.user_id }, order: [['createdAt', 'DESC']] });
+    const student = await Student.findByPk(cookieUser.user_id);
+    if (!student) return res.status(404).json({ msg: 'Geen student gevonden' });
+    const stage = await Stage.findOne({
+      where: {
+        student_id: cookieUser.user_id,
+        createdAt: { [Op.gte]: student.createdAt }
+      },
+      order: [['createdAt', 'DESC']]
+    });
     if (!stage) return res.status(404).json({ msg: 'Geen stage gevonden' });
     if (!req.file) return res.status(400).json({ msg: 'Bestand is verplicht' });
     const doc = await StageDocument.create({
@@ -54,7 +65,15 @@ export const getMyDocuments = async (req, res, next) => {
   try {
     const cookieUser = req.cookies.user;
     if (!cookieUser) return res.status(401).json({ msg: 'Niet ingelogd' });
-    const stage = await Stage.findOne({ where: { student_id: cookieUser.user_id }, order: [['createdAt', 'DESC']] });
+    const student = await Student.findByPk(cookieUser.user_id);
+    if (!student) return res.json([]);
+    const stage = await Stage.findOne({
+      where: {
+        student_id: cookieUser.user_id,
+        createdAt: { [Op.gte]: student.createdAt }
+      },
+      order: [['createdAt', 'DESC']]
+    });
     if (!stage) return res.json([]);
     const docs = await StageDocument.findAll({
       where: { stage_id: stage.stage_id },
