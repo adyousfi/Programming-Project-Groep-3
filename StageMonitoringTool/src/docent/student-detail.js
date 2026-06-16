@@ -1,6 +1,8 @@
 import './student-detail.css';
 
 let logboekEntriesCache = [];
+let currentWeekNumber = 1;
+let totalWeeks = 1;
 
 const navItems = [
   { id: 'overzicht',    label: 'Overzicht' },
@@ -126,7 +128,7 @@ async function renderLogboekTab(student) {
     }
   }
 
-  const totalWeeks = startDate && endDate
+  totalWeeks = startDate && endDate
     ? Math.ceil(((endDate - startDate) / (1000 * 60 * 60 * 24) + 1) / 7)
     : 16;
 
@@ -265,6 +267,7 @@ function setupWeekCards(student) {
 }
 
 function renderLogboekDag(student, weekNumber) {
+  currentWeekNumber = weekNumber;
   var startDate = student.startDatum ? new Date(student.startDatum) : null;
   var endDate = student.eindDatum ? new Date(student.eindDatum) : null;
   var dates = getWeekDates(startDate, endDate, weekNumber - 1);
@@ -297,8 +300,16 @@ function renderLogboekDag(student, weekNumber) {
     }
   }
 
+  var prevDisabled = weekNumber <= 1 ? ' disabled' : '';
+  var nextDisabled = weekNumber >= totalWeeks ? ' disabled' : '';
+
   var html = '<div class="sd-tab-content">';
   html += '<a href="#" class="sd-logboek-terug" id="sd-logboek-terug">← Terug naar overzicht</a>';
+  html += '<div class="sd-logboek-nav">';
+  html += '<button class="sd-logboek-nav-btn" id="sd-logboek-prev"' + prevDisabled + '>&#8592; Vorige week</button>';
+  html += '<span class="sd-logboek-nav-info">Week ' + weekNumber + ' / ' + totalWeeks + '</span>';
+  html += '<button class="sd-logboek-nav-btn" id="sd-logboek-next"' + nextDisabled + '>&#8594; Volgende week</button>';
+  html += '</div>';
   html += '<h2 class="sd-logboek-title">Week ' + weekNumber + '</h2>';
   html += '<p class="sd-logboek-sub">' + dates.start + ' t/m ' + dates.end + '</p>';
   html += '<div class="sd-logboek-dagen">';
@@ -334,5 +345,13 @@ function renderLogboekDag(student, weekNumber) {
       document.querySelector('#sd-content').innerHTML = html;
       setupWeekCards(student);
     });
+  });
+
+  document.querySelector('#sd-logboek-prev').addEventListener('click', function() {
+    if (currentWeekNumber > 1) renderLogboekDag(student, currentWeekNumber - 1);
+  });
+
+  document.querySelector('#sd-logboek-next').addEventListener('click', function() {
+    if (currentWeekNumber < totalWeeks) renderLogboekDag(student, currentWeekNumber + 1);
   });
 }
