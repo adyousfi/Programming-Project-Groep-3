@@ -9,8 +9,6 @@ import Admin from "./userModel/admin.js";
 import Docent from "./userModel/docent.js";
 import Bedrijf from "./objectModel/bedrijf.js";
 import bedrijfController from "./objectControllers/bedrijfController.js";
-import Competentie from "./objectModel/competentie.js";
-import Rubriek from "./objectModel/rubriek.js";
  
 const dummyUsers = [
     // --- STUDENTS ---
@@ -37,9 +35,7 @@ const dummyUsers = [
     { first_name: "Prof. Arthur", last_name: "Devries", email: "arthur.docent@school.com", password: "hashedpassword123", role: ROLES.DOCENT, phone: "0460111111" },
     { first_name: "Prof. Elena", last_name: "Dumont", email: "elena.docent@school.com", password: "hashedpassword123", role: ROLES.DOCENT, phone: "0460222222" },
     { first_name: "Prof. Bram", last_name: "Vermeulen", email: "bram.docent@school.com", password: "hashedpassword123", role: ROLES.DOCENT, phone: "0460333333" }
-];
- 
- 
+]; 
 const seedDatabase = async () => {
   try {
     // 1. Ensure connection is alive
@@ -49,14 +45,14 @@ const seedDatabase = async () => {
     // 2. Clear existing data and recreate the tables fresh
     // WARNING: This drops tables. Use { alter: true } or omit if you don't want to lose current data.
 
-    // Temporarily turn off foreign key safety guards
-    await sequelize.query('SET FOREIGN_KEY_CHECKS = 0;');
+    // // Temporarily turn off foreign key safety guards
+    // await sequelize.query('SET FOREIGN_KEY_CHECKS = 0;');
 
     // Now Sequelize can wipe and recreate all tables cleanly with your new CASCADE rules
     await sequelize.sync({ force: true });
 
     // Turn the safety guards back on
-    await sequelize.query('SET FOREIGN_KEY_CHECKS = 1;');    
+    // await sequelize.query('SET FOREIGN_KEY_CHECKS = 1;');    
     
     console.log("Tables reset cleanly.");
  
