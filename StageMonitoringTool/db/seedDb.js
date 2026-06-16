@@ -9,6 +9,8 @@ import Admin from "./userModel/admin.js";
 import Docent from "./userModel/docent.js";
 import Bedrijf from "./objectModel/bedrijf.js";
 import bedrijfController from "./objectControllers/bedrijfController.js";
+import Competentie from "./objectModel/competentie.js";
+import Rubriek from "./objectModel/rubriek.js";
  
 const dummyUsers = [
     // --- STUDENTS ---
@@ -95,7 +97,7 @@ const seedDatabase = async () => {
           { naam: "Horeca Partner", address: "Brussel" }
       ]);
  
-      console.log("Seeding stages...");
+    console.log("Seeding stages...");
       await Stage.bulkCreate([
     {
         student_id: 1,       // Alex (Student)
@@ -129,7 +131,61 @@ const seedDatabase = async () => {
     }
 ]);
    
-    console.log("Successfully seeded 5 users into the database!");
+
+
+    console.log("Seeding competenties (competenties + rubrieken)...");
+
+    const competenties = await Competentie.bulkCreate([
+      {
+        code: 'D1',
+        titel: 'Projectbeheer',
+        omschrijving: 'Planning en organisatie',
+        gewicht_percentage: 10,
+      },
+      {
+        code: 'D2',
+        titel: 'IT-oplossingen',
+        omschrijving: 'Software ontwikkeling',
+        gewicht_percentage: 20,
+      },
+    ]);
+
+    // Rubrieken zijn 1-op-N met Competentie
+    const rubriekenPayload = [];
+    for (const comp of competenties) {
+      if (comp.code === 'D1') {
+        rubriekenPayload.push(
+          {
+            competentie_id: comp.competentie_id,
+            score: 4,
+            beschrijving: 'Kan plannen (voorbereiding en organisatie).',
+          },
+          {
+            competentie_id: comp.competentie_id,
+            score: 5,
+            beschrijving: 'Analyseert goed (inzichten en kwaliteitsbewaking).',
+          }
+        );
+      }
+      if (comp.code === 'D2') {
+        rubriekenPayload.push(
+          {
+            competentie_id: comp.competentie_id,
+            score: 4,
+            beschrijving: 'Ontwikkelt bruikbare IT-oplossingen (implementatie).',
+          },
+          {
+            competentie_id: comp.competentie_id,
+            score: 5,
+            beschrijving: 'Integreert en test correct (kwaliteit en betrouwbaarheid).',
+          }
+        );
+      }
+    }
+
+    await Rubriek.bulkCreate(rubriekenPayload);
+
+    console.log("Successfully seeded users, competenties and rubrieken!");
    
   } catch (error) {
     console.error("Error seeding database:", error);

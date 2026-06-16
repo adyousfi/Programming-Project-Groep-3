@@ -3,24 +3,42 @@ import { renderAdmin } from './admin.js';
 import { renderKoppelingen } from './koppeldocent.js';
 import { renderAdminDocumenten } from './adminDocumenten.js';
 
-/* ✅ TEST DATA */
-async function getCompetenties() {
-  return [
-    { id: 1, code: 'D1', titel: 'Projectbeheer', omschrijving: 'Planning en organisatie', gewicht: 1 },
-    { id: 2, code: 'D2', titel: 'IT-oplossingen', omschrijving: 'Software ontwikkeling', gewicht: 2 }
-  ];
+const API_URL = 'http://localhost:3000/api';
+
+function mapCompetentie(dbRow) {
+  return {
+    id: dbRow.competentie_id,
+    code: dbRow.code,
+    titel: dbRow.titel,
+    omschrijving: dbRow.omschrijving,
+    gewicht: dbRow.gewicht_percentage,
+  };
 }
 
-async function getRubriekenByCompetentieId(id) {
-  return [
-    { id: id * 10 + 1, titel: 'Planning', omschrijving: 'Kan plannen', score: 4 },
-    { id: id * 10 + 2, titel: 'Analyse', omschrijving: 'Analyseert goed', score: 5 }
-  ];
+function mapRubriek(dbRow) {
+  return {
+    id: dbRow.rubriek_id,
+    // rubriektitel/rubriek_beschrijving bestaan niet in model; beschrijving is wat we opslaan
+    titel: dbRow.beschrijving,
+    omschrijving: dbRow.beschrijving,
+    score: dbRow.score,
+  };
+}
+
+async function getCompetenties() {
+  const res = await fetch(`${API_URL}/competenties/all`);
+  const json = await res.json();
+  return (json.data || []).map(mapCompetentie);
+}
+
+async function getRubriekenByCompetentieId(competentieId) {
+  const res = await fetch(`${API_URL}/rubrieken/by-competentie/${competentieId}`);
+  const json = await res.json();
+  return (json.data || []).map(mapRubriek);
 }
 
 /* ✅ MAIN */
 export async function renderCompetenties(app) {
-
   app.innerHTML = `<p>Laden...</p>`;
   const competenties = await getCompetenties();
 
@@ -64,49 +82,43 @@ export async function renderCompetenties(app) {
     html += `
       <div class="card">
 
-        <div class="competentie-header">
+          <div class="competentie-header">
           <h3>${comp.code} - ${comp.titel}</h3>
-          <button class="btn-outline edit-comp-btn"
-            data-id="${comp.id}"
-            data-code="${comp.code}"
-            data-titel="${comp.titel}"
-            data-omschrijving="${comp.omschrijving}"
-            data-gewicht="${comp.gewicht}">
-            Bewerken
-          </button>
-        </div>
+          <p class="competentie-omschrijving">${comp.omschrijving}</p>
 
-        <table>
-          <thead>
-            <tr>
-              <th>Rubriek</th>
-              <th>Omschrijving</th>
-              <th>Score</th>
-              <th>Acties</th>
-            </tr>
-          </thead>
+          <table class="rubriektabel">
+            <thead>
+              <tr>
+                <th>Rubriek titel</th>
+                <th>Omschrijving</th>
+                <th>Score</th>
+                <th>Acties</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${rubrieken.map(r => `
+                <tr>
+                  <td>${r.titel}</td>
+                  <td>${r.omschrijving}</td>
+                  <td>${r.score}</td>
+                  <td>
+                    <button class="btn-outline edit-rubriek-btn"
+                      data-id="${r.id}"
+                      data-titel="${r.titel}"
+                      data-omschrijving="${r.omschrijving}"
+                      data-score="${r.score}">
+                      Bewerken
+                    </button>
+                  </td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
 
-          <tbody>
+          
+
+
     `;
-
-    for (const rubriek of rubrieken) {
-      html += `
-        <tr>
-          <td>${rubriek.titel}</td>
-          <td>${rubriek.omschrijving}</td>
-          <td>${rubriek.score}</td>
-          <td>
-            <button class="btn-outline edit-rubriek-btn"
-              data-id="${rubriek.id}"
-              data-titel="${rubriek.titel}"
-              data-omschrijving="${rubriek.omschrijving}"
-              data-score="${rubriek.score}">
-              Bewerken
-            </button>
-          </td>
-        </tr>
-      `;
-    }
 
     html += `
           </tbody>
@@ -196,30 +208,50 @@ export async function renderCompetenties(app) {
     modal.classList.remove('active');
   }
 
-  function handleSave() {
-    if (currentType === 'competentie') {
-      const updated = {
-        id: currentId,
-        code: document.getElementById('editCode').value,
-        titel: document.getElementById('editTitel').value,
-        omschrijving: document.getElementById('editOmschrijving').value,
-        gewicht: document.getElementById('editGewicht').value
-      };
-      console.log('SAVE COMPETENTIE', updated);
-    }
+  async function handleSave() {
+    try {
+      if (currentType === 'competentie') {
+        const payload = {
+          code: document.getElementById('editCode').value,
+          title: document.getElementById('editTitel').value,
+          omschrijving: document.getElementById('editOmschrijving').value,
+          gewicht: Number(document.getElementById('editGewicht').value),
+        };
 
-    if (currentType === 'rubriek') {
-      const updated = {
-        id: currentId,
-        titel: document.getElementById('editTitel').value,
-        omschrijving: document.getElementById('editOmschrijving').value,
-        score: document.getElementById('editScore').value
-      };
-      console.log('SAVE RUBRIEK', updated);
-    }
+        const res = await fetch(`${API_URL}/competenties/update-competentie/${currentId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json?.msg || 'Fout bij opslaan competentie');
+      }
 
-    alert("Opgeslagen!");
-    closeModal();
+      if (currentType === 'rubriek') {
+        const payload = {
+          rubriektitel: document.getElementById('editTitel').value,
+          rubriek_beschrijving: document.getElementById('editOmschrijving').value,
+          beschrijving: document.getElementById('editOmschrijving').value,
+          score: Number(document.getElementById('editScore').value),
+        };
+
+        const res = await fetch(`${API_URL}/rubrieken/update-rubriek/${currentId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json?.msg || 'Fout bij opslaan rubriek');
+      }
+
+      alert('Opgeslagen!');
+      closeModal();
+      // Re-render to show updated data
+      await renderCompetenties(app);
+    } catch (e) {
+      console.error(e);
+      alert(e?.message || 'Opslaan mislukt');
+    }
   }
 
   /* ✅ EVENTS */
