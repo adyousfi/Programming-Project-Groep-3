@@ -3,6 +3,6 @@ import behaaldeScoreController from '../objectControllers/behaaldeScoreControlle
 
 const router = express.Router();
 
-router.post("/createbehaaldescore", behaaldeScoreController.createBehaaldescore);
+router.post("/create-behaaldescore", behaaldeScoreController.createBehaaldeScore);
 
 export default router;
