@@ -1,4 +1,5 @@
 import './student-detail.css';
+import '../student/stagedetails.css';
 
 let logboekEntriesCache = [];
 let currentWeekNumber = 1;
@@ -201,8 +202,71 @@ async function renderLogboekTab(student) {
   return html;
 }
 
+function renderStagedetailsTab(student) {
+  const sd = student.stageData || {};
+  const bedrijfNaam = sd.bedrijf?.naam || student.bedrijf || '–';
+  const bedrijfAdres = sd.bedrijf?.adres || '–';
+  const mentorNaam = sd.stagementor?.naam || student.mentor || '–';
+  const mentorEmail = sd.stagementor?.email || '–';
+  const docentNaam = sd.docent?.naam || 'Niet toegewezen';
+  const omschrijving = sd.stageDetails?.omschrijving || 'Geen omschrijving beschikbaar';
+
+  let startDatum = '–';
+  let eindDatum = '–';
+  if (sd.stageDetails?.start) {
+    startDatum = new Date(sd.stageDetails.start).toLocaleDateString('nl-BE', { day: 'numeric', month: 'short', year: 'numeric' });
+  }
+  if (sd.stageDetails?.einde) {
+    eindDatum = new Date(sd.stageDetails.einde).toLocaleDateString('nl-BE', { day: 'numeric', month: 'short', year: 'numeric' });
+  }
+
+  const statusClass = sd.rawStatus === 'GOEDGEKEURD' ? 'status-goedgekeurd'
+    : sd.rawStatus === 'AANVRAAG' ? 'status-in_afwachting'
+    : sd.rawStatus === 'AFGEKEURD' ? 'status-afgekeurd'
+    : 'status-goedgekeurd';
+  const statusLabel = sd.rawStatus === 'GOEDGEKEURD' ? 'Goedgekeurd'
+    : sd.rawStatus === 'AANVRAAG' ? 'In afwachting'
+    : sd.rawStatus === 'AFGEKEURD' ? 'Afgekeurd'
+    : sd.rawStatus || 'Onbekend';
+
+  return `
+    <div class="sd-tab-content">
+      <span class="status-badge ${statusClass}">${statusLabel}</span>
+      <div class="details-card">
+        <div class="detail-section">
+          <h3 class="detail-label">Student</h3>
+          <p class="detail-value">${student.naam || '–'}</p>
+        </div>
+        <div class="detail-section">
+          <h3 class="detail-label">Bedrijf</h3>
+          <p class="detail-value">${bedrijfNaam}</p>
+          <p class="detail-sub">${bedrijfAdres}</p>
+        </div>
+        <div class="detail-section">
+          <h3 class="detail-label">Stagementor</h3>
+          <p class="detail-value">${mentorNaam}</p>
+          <p class="detail-sub">${mentorEmail}</p>
+        </div>
+        <div class="detail-section">
+          <h3 class="detail-label">Toegewezen EhB-docent</h3>
+          <p class="detail-value">${docentNaam}</p>
+        </div>
+        <div class="detail-section">
+          <h3 class="detail-label">Periode</h3>
+          <p class="detail-value">${startDatum} t/m ${eindDatum}</p>
+        </div>
+        <div class="detail-section">
+          <h3 class="detail-label">Omschrijving van de opdracht</h3>
+          <p class="detail-sub">${omschrijving}</p>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
 async function renderTabContent(tab, student) {
   if (tab === 'overzicht') return renderOverzicht(student);
+  if (tab === 'stagedetails') return renderStagedetailsTab(student);
   if (tab === 'logboek') return await renderLogboekTab(student);
   return `<div class="sd-tab-content"></div>`;
 }

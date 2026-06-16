@@ -18,8 +18,6 @@ const createStage = async (req, res, next) => {
       periodeStart, periodeEind
     } = req.body;
 
-    console.log('DEBUG createStage req.body:', JSON.stringify(req.body, null, 2));
-
     const cookieUser = req.cookies.user;
     if (!cookieUser) return res.status(401).json({ msg: 'Niet ingelogd' });
 
@@ -35,15 +33,26 @@ const createStage = async (req, res, next) => {
 
     const bedrijf = await Bedrijf.create({ naam: bedrijfNaam, address: bedrijfAdres });
 
-    const mentorUser = await User.create({
-      first_name: mentorVoornaam || '',
-      last_name: mentorAchternaam || '',
-      email: mentorEmail,
-      password: 'pending',
-      role: 'stagementor',
-      phone: 'no phone'
-    });
-    await Stagementor.create({ user_id: mentorUser.user_id, bedrijf_id: bedrijf.bedrijf_id });
+    let mentorUser = await User.findOne({ where: { email: mentorEmail } });
+    if (!mentorUser) {
+      mentorUser = await User.create({
+        first_name: mentorVoornaam || '',
+        last_name: mentorAchternaam || '',
+        email: mentorEmail,
+        password: 'pending',
+        role: 'stagementor',
+        phone: 'no phone'
+      });
+    } else {
+      await mentorUser.update({
+        first_name: mentorVoornaam || mentorUser.first_name,
+        last_name: mentorAchternaam || mentorUser.last_name,
+      });
+    }
+    const existingStagementor = await Stagementor.findByPk(mentorUser.user_id);
+    if (!existingStagementor) {
+      await Stagementor.create({ user_id: mentorUser.user_id, bedrijf_id: bedrijf.bedrijf_id });
+    }
 
     const stage = await Stage.create({
       student_id,
@@ -419,4 +428,60 @@ const selectStageByDocentId = async (req, res, next) => {
   }
 };
 
-export default { createStage, updateStage, selectStage, getApprovedStages, selectStageByStudentId, selectStageById, selectStageByDocentId, selectStageRaw, updateStageRaw };
+const selectStageByStagementorId = async (req, res, next) => {
+  try {
+    const stages = await Stage.findAll({
+      where: { stagementor_id: req.params.stagementorId },
+      include: [
+        { model: Student, as: 'student', include: [{ model: User, as: 'User' }] },
+        { model: Stagementor, as: 'mentor', include: [{ model: User, as: 'User' }] },
+        { model: Bedrijf, as: 'bedrijf' },
+        { model: Docent, as: 'docent', include: [{ model: User, as: 'User' }] },
+      ],
+      order: [['createdAt', 'DESC']]
+    });
+
+    const result = stages.map(s => {
+      const studentUser = s.student ? s.student.User : null;
+      const mentorUser = s.mentor ? s.mentor.User : null;
+      const docentUser = s.docent ? s.docent.User : null;
+
+      return {
+        id: s.stage_id,
+        studentId: s.student_id,
+        naam: studentUser ? `${studentUser.last_name.toUpperCase()} ${studentUser.first_name}` : '',
+        studentEmail: studentUser ? studentUser.email : '',
+        bedrijf: {
+          naam: s.bedrijf ? s.bedrijf.naam : '',
+          adres: s.bedrijf ? s.bedrijf.address : '',
+        },
+        stagementor: {
+          naam: mentorUser ? `${mentorUser.first_name} ${mentorUser.last_name}` : '',
+          email: mentorUser ? mentorUser.email : '',
+        },
+        docent: {
+          naam: docentUser ? `${docentUser.first_name} ${docentUser.last_name}` : '',
+          email: docentUser ? docentUser.email : '',
+          user_id: s.docent_id || null,
+        },
+        stageDetails: {
+          omschrijving: s.omschrijving_opdracht || '',
+          start: s.begin_datum || '',
+          einde: s.eind_datum || '',
+        },
+        status: mapStageStatus(s.status),
+        rawStatus: s.status,
+        document_validated: s.document_validated || false,
+        datum: s.createdAt ? new Date(s.createdAt).toLocaleDateString('nl-BE') : '',
+        createdAt: s.createdAt,
+      };
+    });
+
+    return res.json(result);
+  } catch (error) {
+    console.error('Error fetching stages for stagementor:', error);
+    return res.status(500).json({ msg: 'Fout bij ophalen van stages' });
+  }
+};
+
+export default { createStage, updateStage, selectStage, getApprovedStages, selectStageByStudentId, selectStageById, selectStageByDocentId, selectStageByStagementorId, selectStageRaw, updateStageRaw };

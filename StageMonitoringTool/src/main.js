@@ -94,7 +94,8 @@ if (role === 'student') {
 } else if (role === 'stagecommisie') {
   renderAanvragen();
 } else if (role === 'stagementor') {
-  renderMijnStagiairs(app);
+  const user = await getLoggedInUser();
+  renderMijnStagiairs(app, user);
 } else if (role === 'docent') {
   const user = await getLoggedInUser();
   if (user && user.role === 'docent') {
