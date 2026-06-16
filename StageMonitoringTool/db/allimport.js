@@ -16,72 +16,66 @@ import Evaluatie from "./objectModel/evaluatie.js";
 import Competentie from "./objectModel/competentie.js";
 import Rubriek from "./objectModel/rubriek.js";
 
-//RELATIONS
+// ==========================================
+// RELATIONS
+// ==========================================
 
-//Users
-User.hasOne(Admin, {foreignKey: 'admin_id',onDelete: 'CASCADE'});
-User.hasOne(Docent, {foreignKey: 'docent_id',onDelete: 'CASCADE'});
-User.hasOne(Stagecommisie, {foreignKey: 'stagecommisie_id',onDelete: 'CASCADE'});
-User.hasOne(Stagementor, {foreignKey: 'user_id',onDelete: 'CASCADE'});
-User.hasOne(Student, {foreignKey: 'user_id',onDelete: 'CASCADE'});
+// --- Users & Sub-rollen (1-op-1) ---
+// GEFIXED: Foreign keys moeten exact matchen met de belongsTo hieronder (allemaal user_id)
+User.hasOne(Admin, { foreignKey: 'user_id', onDelete: 'CASCADE' });
+User.hasOne(Docent, { foreignKey: 'user_id', onDelete: 'CASCADE' });
+User.hasOne(Stagecommisie, { foreignKey: 'user_id', onDelete: 'CASCADE' });
+User.hasOne(Stagementor, { foreignKey: 'user_id', onDelete: 'CASCADE' });
+User.hasOne(Student, { foreignKey: 'user_id', onDelete: 'CASCADE' });
 
-//Studenten
+// Inverse relaties voor de sub-rollen
 Student.belongsTo(User, { as: 'User', foreignKey: 'user_id', onDelete: 'CASCADE' });
-
-//Docenten
 Docent.belongsTo(User, { as: 'User', foreignKey: 'user_id', onDelete: 'CASCADE' });
-
-//Stagementors
 Stagementor.belongsTo(User, { as: 'User', foreignKey: 'user_id', onDelete: 'CASCADE' });
+Stagecommisie.belongsTo(User, { foreignKey: 'user_id', onDelete: 'CASCADE' });
+Admin.belongsTo(User, { foreignKey: 'user_id', onDelete: 'CASCADE' });
 
-//Stagecommisie
-Stagecommisie.belongsTo(User, {foreignKey: 'user_id',onDelete: 'CASCADE'});
+// --- Bedrijf & Mentor (1-op-N) ---
+// GEFIXED: Als een bedrijf sluit, zetten we de mentor op SET NULL in plaats van de hele user te CASCADEN
+Stagementor.belongsTo(Bedrijf, { foreignKey: 'bedrijf_id', onDelete: 'SET NULL' });
+Bedrijf.hasMany(Stagementor, { foreignKey: 'bedrijf_id', onDelete: 'SET NULL' });
 
-//Admins
-Admin.belongsTo(User, {foreignKey: 'user_id',onDelete: 'CASCADE'});
-
-//Bedrijf & Mentor
-Stagementor.belongsTo(Bedrijf, { foreignKey: 'bedrijf_id', onDelete: 'CASCADE' });
-
-//Bedrijf
-Bedrijf.hasMany(Stagementor, { foreignKey: 'bedrijf_id',onDelete: 'CASCADE'});
-
-//Stage Relaties
-Stage.belongsTo(Docent, { as: 'docent', foreignKey: 'docent_id', onDelete: 'CASCADE' });
+// --- Stage Relaties ---
+// GEFIXED: Alleen Student behoudt CASCADE. De rest gaat naar SET NULL om MSSQL-cycles te voorkomen
 Stage.belongsTo(Student, { as: 'student', foreignKey: 'student_id', onDelete: 'CASCADE' });
-Stage.belongsTo(Bedrijf, { as: 'bedrijf', foreignKey: 'bedrijf_id', onDelete: 'CASCADE' });
-Stage.belongsTo(Stagementor, { as: 'mentor', foreignKey: 'stagementor_id', onDelete: 'CASCADE' });
-Stage.hasMany(Behaaldescore, { foreignKey: 'stage_id', onDelete: 'CASCADE' });
-Stage.hasMany(Logboek, { foreignKey: 'stage_id', onDelete: 'CASCADE' });
-Logboek.belongsTo(Stage, { foreignKey: 'stage_id' });
-//Logboek & Opmerking Relaties
-Opmerkinglogboek.hasMany(Logboek, { foreignKey: 'opmerkinglogboek_id', onDelete: 'CASCADE' });
-Logboek.belongsTo(Opmerkinglogboek, { foreignKey: 'opmerkinglogboek_id', onDelete: 'CASCADE'});
+Stage.belongsTo(Docent, { as: 'docent', foreignKey: 'docent_id', onDelete: 'NO ACTION' });
+Stage.belongsTo(Bedrijf, { as: 'bedrijf', foreignKey: 'bedrijf_id', onDelete: 'NO ACTION' });
+Stage.belongsTo(Stagementor, { as: 'mentor', foreignKey: 'stagementor_id', onDelete: 'NO ACTION' });
 
-//behaaldescore
-Behaaldescore.belongsTo(Stage, { foreignKey: 'stage_id',onDelete: 'CASCADE'});
-export const confirmRelations = "relations are made";
-
-
-// --- Competentie & Rubriek (1-op-N) ---
-// Één competentie heeft 5 rubrieken. Geen tussentabel nodig!
-Competentie.hasMany(Rubriek, { foreignKey: 'competentie_id', onDelete: 'CASCADE' });
-Rubriek.belongsTo(Competentie, { foreignKey: 'competentie_id' });
-
-// --- Evaluatie & Stage ---
-// Ik neem aan dat een Evaluatie aan een Stage hangt
+// --- Evaluatie & Stage (1-op-N) ---
 Stage.hasMany(Evaluatie, { foreignKey: 'stage_id', onDelete: 'CASCADE' });
 Evaluatie.belongsTo(Stage, { foreignKey: 'stage_id' });
 
+// --- Logboek & Opmerkingen ---
+Stage.hasMany(Logboek, { foreignKey: 'stage_id', onDelete: 'CASCADE' });
+Logboek.belongsTo(Stage, { foreignKey: 'stage_id' });
+
+Opmerkinglogboek.hasMany(Logboek, { foreignKey: 'opmerkinglogboek_id', onDelete: 'CASCADE' });
+Logboek.belongsTo(Opmerkinglogboek, { foreignKey: 'opmerkinglogboek_id', onDelete: 'CASCADE' });
+
 // --- Evaluatie & De ingevulde Scores (1-op-N) ---
-// Één evaluatie-formulier bevat meerdere ingevulde scores (11 in jouw geval)
 Evaluatie.hasMany(Behaaldescore, { foreignKey: 'evaluatie_id', onDelete: 'CASCADE' });
 Behaaldescore.belongsTo(Evaluatie, { foreignKey: 'evaluatie_id' });
 
+// --- Stage & Behaaldescore ---
+// GEFIXED: Zet op NO ACTION om het conflict met de route (Stage -> Evaluatie -> Behaaldescore) te omzeilen
+Stage.hasMany(Behaaldescore, { foreignKey: 'stage_id', onDelete: 'NO ACTION' });
+Behaaldescore.belongsTo(Stage, { foreignKey: 'stage_id', onDelete: 'NO ACTION' });
+
+// --- Competentie & Rubriek (1-op-N) ---
+Competentie.hasMany(Rubriek, { foreignKey: 'competentie_id', onDelete: 'CASCADE' });
+Rubriek.belongsTo(Competentie, { foreignKey: 'competentie_id' });
+
 // --- Behaaldescore & Rubriek / Competentie ---
-// De ingevulde score linkt direct naar WELKE rubriek is gekozen, en voor WELKE competentie
 Competentie.hasMany(Behaaldescore, { foreignKey: 'competentie_id', onDelete: 'NO ACTION' });
 Behaaldescore.belongsTo(Competentie, { foreignKey: 'competentie_id' });
 
 Rubriek.hasMany(Behaaldescore, { foreignKey: 'rubriek_id', onDelete: 'NO ACTION' });
 Behaaldescore.belongsTo(Rubriek, { foreignKey: 'rubriek_id' });
+
+export const confirmRelations = "relations are made";
