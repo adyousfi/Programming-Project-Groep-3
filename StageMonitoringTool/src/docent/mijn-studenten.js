@@ -1,20 +1,101 @@
 import './mijn-studenten.css';
 
+let testDateOverride = null;
+let lastApp = null;
+let lastUser = null;
+
+function getNow() {
+  return testDateOverride || new Date();
+}
+
 function berekenVoortgang(startDatum, eindDatum) {
   if (!startDatum || !eindDatum) return null;
   const start = new Date(startDatum);
   const eind = new Date(eindDatum);
-  const nu = new Date();
-  const totaalMs = eind - start;
-  const verstrekenMs = nu - start;
-  const totaalWeken = Math.ceil(totaalMs / (7 * 24 * 60 * 60 * 1000));
-  const verstrekenWeken = Math.max(0, Math.floor(verstrekenMs / (7 * 24 * 60 * 60 * 1000)));
-  const dagenOver = Math.max(0, Math.ceil((eind - nu) / (24 * 60 * 60 * 1000)));
+  const nu = getNow();
+  const totaalDagen = Math.ceil((eind - start) / (1000 * 60 * 60 * 24)) + 1;
+  const totaalWeken = Math.max(1, Math.ceil(totaalDagen / 7));
+  const verstrekenDagen = Math.max(0, Math.floor((nu - start) / (1000 * 60 * 60 * 24)));
+  const verstrekenWeken = Math.floor(verstrekenDagen / 7);
+  const dagenOver = Math.max(0, Math.ceil((eind - nu) / (1000 * 60 * 60 * 24)));
   return {
     weken: verstrekenWeken,
     totaal: totaalWeken,
     dagenOver: dagenOver,
   };
+}
+
+function berekenLogboekProgress(stageId, startDatum, eindDatum) {
+  const empty = { ingediend: 0, totaal: 0, goedgekeurd: 0, laasteLogboek: null };
+  if (!startDatum || !eindDatum || !stageId) return empty;
+
+  const start = new Date(startDatum);
+  const eind = new Date(eindDatum);
+  const nu = getNow();
+
+  const totaalDagen = Math.ceil((eind - start) / (1000 * 60 * 60 * 24)) + 1;
+  const totalWeeks = Math.max(1, Math.ceil(totaalDagen / 7));
+
+  function getWeekDates(weekIndex) {
+    const weekStart = new Date(start);
+    weekStart.setDate(start.getDate() + weekIndex * 7);
+    while (weekStart.getDay() === 0 || weekStart.getDay() === 6) {
+      weekStart.setDate(weekStart.getDate() + 1);
+    }
+    const weekEnd = new Date(weekStart);
+    let count = 1;
+    while (count < 5) {
+      weekEnd.setDate(weekEnd.getDate() + 1);
+      if (weekEnd.getDay() !== 0 && weekEnd.getDay() !== 6) count++;
+    }
+    if (eind && weekEnd > eind) {
+      weekEnd.setTime(eind.getTime());
+    }
+    return { startDateObj: new Date(weekStart), endDateObj: new Date(weekEnd) };
+  }
+
+  return fetch('/api/logboek/stage/' + stageId, { credentials: 'include' })
+    .then(function(res) { return res.json(); })
+    .then(function(entries) {
+      if (!Array.isArray(entries)) return empty;
+
+      let submittedWeeks = 0;
+      let goedgekeurdWeeks = 0;
+      let laasteLogboek = null;
+
+      for (let w = 0; w < totalWeeks; w++) {
+        const dates = getWeekDates(w);
+        const weekEntries = entries.filter(function(e) {
+          if (!e.datum) return false;
+          const d = new Date(e.datum);
+          return d >= dates.startDateObj && d <= dates.endDateObj;
+        });
+        if (weekEntries.length > 0) {
+          const allIngevuld = weekEntries.every(function(e) { return e.status === 'INGEVULD'; });
+          if (allIngevuld) submittedWeeks++;
+        }
+      }
+
+      var filledEntries = entries.filter(function(e) { return e.status === 'INGEVULD' && e.datum; });
+      if (filledEntries.length > 0) {
+        filledEntries.sort(function(a, b) { return new Date(b.datum) - new Date(a.datum); });
+        laasteLogboek = new Date(filledEntries[0].datum).toLocaleDateString('nl-BE', { day: 'numeric', month: 'short', year: 'numeric' });
+      }
+
+      return {
+        ingediend: submittedWeeks,
+        totaal: totalWeeks,
+        goedgekeurd: submittedWeeks,
+        laasteLogboek: laasteLogboek,
+      };
+    })
+    .catch(function() { return empty; });
+}
+
+function normalizeDate(d) {
+  const n = new Date(d);
+  n.setHours(0, 0, 0, 0);
+  return n;
 }
 
 function bepaalMijlpalen(rawStatus, startDatum, eindDatum) {
@@ -27,7 +108,7 @@ function bepaalMijlpalen(rawStatus, startDatum, eindDatum) {
 
   let isTussentijds = false;
   if (startDatum && eindDatum) {
-    const nu = new Date();
+    const nu = getNow();
     const start = new Date(startDatum);
     const eind = new Date(eindDatum);
     const midpoint = new Date((start.getTime() + eind.getTime()) / 2);
@@ -37,7 +118,7 @@ function bepaalMijlpalen(rawStatus, startDatum, eindDatum) {
   return [
     { label: 'Voorstel goedgekeurd', gedaan: isGoedgekeurd },
     { label: 'Overeenkomst ondertekend', gedaan: isDocumentIngediend },
-    { label: 'Stage gestart', gedaan: startDatum ? new Date(startDatum) <= new Date() : false },
+    { label: 'Stage gestart', gedaan: startDatum ? normalizeDate(startDatum) <= normalizeDate(getNow()) : false },
     { label: 'Tussentijdse evaluatie', gedaan: isTussentijds },
     { label: 'Finale evaluatie', gedaan: isKlaar },
   ];
@@ -185,6 +266,8 @@ export async function renderMijnStudenten(app, user) {
   const container = app || document.querySelector('#app');
   let stages = [];
   renderMijnStudenten._user = user || null;
+  lastApp = app;
+  lastUser = user;
 
   if (user && user.user_id) {
     try {
@@ -196,9 +279,10 @@ export async function renderMijnStudenten(app, user) {
     }
   }
 
-  const studenten = stages.map(function(s) {
+  const studenten = await Promise.all(stages.map(async function(s) {
     const frontendStatus = mapFrontendStatus(s.rawStatus);
     const voortgang = berekenVoortgang(s.stageDetails.start, s.stageDetails.einde);
+    const logboek = await berekenLogboekProgress(s.id, s.stageDetails.start, s.stageDetails.einde);
     return {
       id: s.id,
       studentId: s.studentId,
@@ -212,11 +296,11 @@ export async function renderMijnStudenten(app, user) {
       rawStatus: s.rawStatus,
       nieuwLogboek: 0,
       voortgang: voortgang,
-      logboek: { ingediend: 0, totaal: voortgang ? voortgang.totaal : 0, goedgekeurd: 0 },
+      logboek: logboek,
       mijlpalen: bepaalMijlpalen(s.rawStatus, s.stageDetails.start, s.stageDetails.einde),
-      laasteLogboek: null,
+      laasteLogboek: logboek.laasteLogboek,
     };
-  });
+  }));
 
   const actief    = studenten.filter(function(s) { return s.status === 'lopend'; });
   const afgelopen = studenten.filter(function(s) { return s.status === 'afgelopen'; });
@@ -247,8 +331,36 @@ export async function renderMijnStudenten(app, user) {
         </div>
       </main>
     </div>
+
+    <div class="test-date-picker">
+      <label class="test-date-label">Test datum:</label>
+      <input type="date" id="test-date-input" class="test-date-input" value="${testDateOverride ? testDateOverride.toISOString().split('T')[0] : ''}">
+      <button class="test-date-apply" id="test-date-apply">Zet</button>
+      <button class="test-date-reset" id="test-date-reset">Reset</button>
+    </div>
   `;
 
   setupFilter(studenten);
   setupStudentButtons(studenten);
+
+  var testInput = document.getElementById('test-date-input');
+  var testApply = document.getElementById('test-date-apply');
+  var testReset = document.getElementById('test-date-reset');
+
+  if (testApply) {
+    testApply.addEventListener('click', function() {
+      if (testInput.value) {
+        testDateOverride = new Date(testInput.value + 'T00:00:00');
+        renderMijnStudenten(lastApp, lastUser);
+      }
+    });
+  }
+
+  if (testReset) {
+    testReset.addEventListener('click', function() {
+      testDateOverride = null;
+      testInput.value = '';
+      renderMijnStudenten(lastApp, lastUser);
+    });
+  }
 }
