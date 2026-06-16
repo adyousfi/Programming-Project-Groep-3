@@ -183,7 +183,7 @@ function renderKaarten(lijst) {
     const logboekPercent = s.logboek && s.logboek.totaal > 0 ? Math.round((s.logboek.ingediend / s.logboek.totaal) * 100) : 0;
 
     return `
-      <div class="dc-card">
+      <div class="dc-card dc-card--clickable" data-student-id="${s.id}">
         <div class="dc-card-top">
           <div>
             <h2 class="dc-card-naam">${s.naam}</h2>
@@ -252,9 +252,10 @@ function setupFilter(studenten) {
 }
 
 function setupStudentButtons(studenten) {
-  document.querySelectorAll('.dc-btn[data-id]').forEach(function(btn) {
-    btn.addEventListener('click', function() {
-      const id = parseInt(btn.dataset.id);
+  document.querySelectorAll('.dc-card--clickable').forEach(function(card) {
+    card.addEventListener('click', function(e) {
+      if (e.target.closest('.dc-btn')) return;
+      const id = parseInt(card.dataset.studentId);
       const student = studenten.find(function(s) { return s.id === id; });
       if (!student) return;
       import('./student-detail.js').then(function(m) { m.renderStudentDetail(student, renderMijnStudenten._user); });
@@ -290,6 +291,8 @@ export async function renderMijnStudenten(app, user) {
       email: s.studentEmail,
       bedrijf: s.bedrijf.naam || 'Onbekend bedrijf',
       mentor: s.stagementor.naam || 'Geen mentor',
+      startDatum: s.stageDetails.start || null,
+      eindDatum: s.stageDetails.einde || null,
       periodeStart: s.stageDetails.start ? new Date(s.stageDetails.start).toLocaleDateString('nl-BE', { day: 'numeric', month: 'short', year: 'numeric' }) : '–',
       periodeEind: s.stageDetails.einde ? new Date(s.stageDetails.einde).toLocaleDateString('nl-BE', { day: 'numeric', month: 'short', year: 'numeric' }) : '–',
       status: frontendStatus,

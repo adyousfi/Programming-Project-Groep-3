@@ -239,3 +239,171 @@
   color: #6b7280;
   margin: 0;
 }
+
+/* Logboek Tab */
+.sd-logboek-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 4px 0;
+}
+
+.sd-logboek-sub {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin: 0 0 20px 0;
+}
+
+.sd-logboek-terug {
+  display: inline-block;
+  font-size: 0.875rem;
+  color: #2563eb;
+  text-decoration: none;
+  margin-bottom: 16px;
+}
+
+.sd-logboek-terug:hover {
+  text-decoration: underline;
+}
+
+.sd-logboek-weeks {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sd-logboek-week-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 16px 20px;
+  cursor: pointer;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.sd-logboek-week-card:hover {
+  border-color: #93c5fd;
+  box-shadow: 0 2px 6px rgba(59, 130, 246, 0.1);
+}
+
+.sd-logboek-week-left {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sd-logboek-week-name {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: #1f2937;
+}
+
+.sd-logboek-week-dates {
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+.sd-logboek-week-right {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.sd-logboek-week-progress-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  min-width: 140px;
+}
+
+.sd-logboek-week-count {
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.sd-logboek-week-bar {
+  width: 100%;
+  height: 6px;
+  background: #e5e7eb;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.sd-logboek-week-bar-fill {
+  height: 100%;
+  background: #2563eb;
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.sd-logboek-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 9999px;
+  font-size: 0.7rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.sd-logboek-badge--validated {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.sd-logboek-badge--pending {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+
+/* Logboek Dag Details */
+.sd-logboek-dagen {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sd-logboek-dag-card {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.sd-logboek-dag-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: #f9fafb;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.sd-logboek-dag-datum {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #1f2937;
+}
+
+.sd-logboek-dag-body {
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sd-logboek-dag-field strong {
+  font-size: 0.8rem;
+  color: #374151;
+  display: block;
+  margin-bottom: 2px;
+}
+
+.sd-logboek-dag-field p {
+  font-size: 0.85rem;
+  color: #6b7280;
+  margin: 0;
+}
