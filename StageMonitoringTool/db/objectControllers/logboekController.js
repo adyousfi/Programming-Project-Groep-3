@@ -1,8 +1,27 @@
 import Logboek from "../objectModel/logboek.js";
+import Stage from "../objectModel/stage.js";
 import { sequelize } from "../dbConnection.js";
 
 const getLogboekByStage = async (req, res, next) => {
     try {
+        const cookieUser = req.cookies.user;
+        if (!cookieUser) return res.status(401).json({ msg: 'Niet ingelogd' });
+
+        const stage = await Stage.findByPk(req.params.stageId);
+        if (!stage) return res.status(404).json({ msg: 'Stage niet gevonden' });
+
+        if (cookieUser.role === 'docent') {
+            if (String(cookieUser.user_id) !== String(stage.docent_id)) {
+                return res.status(403).json({ msg: 'Geen toegang tot dit logboek' });
+            }
+        } else if (cookieUser.role === 'student') {
+            if (String(cookieUser.user_id) !== String(stage.student_id)) {
+                return res.status(403).json({ msg: 'Geen toegang tot dit logboek' });
+            }
+        } else {
+            return res.status(403).json({ msg: 'Geen toegang' });
+        }
+
         const entries = await Logboek.findAll({
             where: { stage_id: req.params.stageId },
             order: [['datum', 'ASC']],
@@ -10,6 +29,37 @@ const getLogboekByStage = async (req, res, next) => {
         return res.json(entries);
     } catch (err) {
         console.error('Error fetching logboek:', err);
+        return res.status(500).json({ msg: 'Fout bij ophalen logboek' });
+    }
+};
+
+const getLogboekById = async (req, res, next) => {
+    try {
+        const cookieUser = req.cookies.user;
+        if (!cookieUser) return res.status(401).json({ msg: 'Niet ingelogd' });
+
+        const logboek = await Logboek.findByPk(req.params.logboek_id);
+        if (!logboek) return res.status(404).json({ msg: 'Logboek niet gevonden' });
+
+        const stage = await Stage.findByPk(logboek.stage_id);
+        if (!stage) return res.status(404).json({ msg: 'Stage niet gevonden' });
+
+        if (cookieUser.role !== 'docent' || String(cookieUser.user_id) !== String(stage.docent_id)) {
+            return res.status(403).json({ msg: 'Geen toegang tot dit logboek' });
+        }
+
+        return res.json({
+            logboek_id: logboek.logboek_id,
+            stage_id: logboek.stage_id,
+            datum: logboek.datum,
+            uitgevoerdeTaken: logboek.uitgevoerdeTaken,
+            reflectie: logboek.reflectie,
+            leerpunten: logboek.leerpunten,
+            status: logboek.status,
+            checkmark: logboek.checkmark,
+        });
+    } catch (err) {
+        console.error('Error fetching logboek by id:', err);
         return res.status(500).json({ msg: 'Fout bij ophalen logboek' });
     }
 };
@@ -140,4 +190,4 @@ const assignOpmerkingToLogboek = async (req, res, next) => {
     }
 };
 
-export default { getLogboekByStage, upsertLogboek, submitWeek, createLogboek, assignOpmerkingToLogboek };
+export default { getLogboekByStage, getLogboekById, upsertLogboek, submitWeek, createLogboek, assignOpmerkingToLogboek };

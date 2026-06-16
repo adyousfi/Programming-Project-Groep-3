@@ -1,39 +1,31 @@
 import './mijn-stagiairs.css';
 
-// Dit bestand maakt de pagina "Mijn Stagiairs".
-// De code gebruikt gewone JavaScript om HTML in de app te plaatsen.
+let _userName = 'Stagementor';
+let _allStagiairs = [];
 
-// Lijst met voorbeeldstudenten.
-// Elk object in deze array is 1 stagiair met alle gegevens die later op de pagina gebruikt worden.
-const stagiairs = [
-  {
-    naam: 'Jan Janssens',
-    functie: 'Frontend Developer',
-    email: 'jan.janssens@student.ehb.be',
-    bedrijf: 'TechCorp Belgium',
-    bedrijfFunctie: 'Frontend Developer',
-    start: '3 feb',
-    einde: '30 mei',
-    totalWeeks: 16,
-    currentWeek: 2,
-    badges: [
-      { type: 'warning', label: '2 logboeken te controleren' },
-      { type: 'danger', label: 'Handtekening vereist' },
-    ],
-  },
-  {
-    naam: 'Sarah Vermeulen',
-    functie: 'UX Designer',
-    email: 'sarah.vermeulen@student.ehb.be',
-    bedrijf: 'DesignHub',
-    bedrijfFunctie: 'UX Designer',
-    start: '1 mrt',
-    einde: '30 jun',
-    totalWeeks: 17,
-    currentWeek: 5,
+function mapApiStageToStagiair(s) {
+  const start = s.stageDetails?.start;
+  const einde = s.stageDetails?.einde;
+  const totalWeeks = start && einde
+    ? Math.max(1, Math.ceil((new Date(einde) - new Date(start)) / (7 * 24 * 60 * 60 * 1000)))
+    : 0;
+  const verstrekenWeken = start
+    ? Math.max(0, Math.floor((new Date() - new Date(start)) / (7 * 24 * 60 * 60 * 1000)))
+    : 0;
+  return {
+    naam: s.naam || 'Onbekend',
+    functie: s.stageDetails?.omschrijving?.slice(0, 40) || '–',
+    email: s.studentEmail || '',
+    bedrijf: s.bedrijf?.naam || '–',
+    bedrijfFunctie: '–',
+    start: start ? new Date(start).toLocaleDateString('nl-BE', { day: 'numeric', month: 'short' }) : '–',
+    einde: einde ? new Date(einde).toLocaleDateString('nl-BE', { day: 'numeric', month: 'short' }) : '–',
+    totalWeeks,
+    currentWeek: Math.min(verstrekenWeken, totalWeeks),
     badges: [],
-  },
-];
+    stageData: s,
+  };
+}
 
 // Lijst met competenties waarop de stagiair beoordeeld wordt.
 // key wordt gebruikt om scores/feedback op te slaan.
@@ -102,7 +94,7 @@ function sidebarHtml(activePage) {
         </nav>
       </div>
       <div class="sm-sidebar-bottom">
-        <span class="sm-user-name">Mieke Peeters</span>
+        <span class="sm-user-name">${_userName}</span>
         <a class="sm-logout" href="#">Uitloggen</a>
       </div>
     </aside>
@@ -158,29 +150,30 @@ function renderStagementorPage(app) {
           </nav>
         </div>
         <div class="sm-sidebar-bottom">
-          <span class="sm-user-name">Mieke Peeters</span>
+          <span class="sm-user-name">${_userName}</span>
           <a class="sm-logout" href="#">Uitloggen</a>
         </div>
       </aside>
       <main class="sm-main">
         <header class="sm-main-header">
           <h1 class="sm-main-title">Mijn Stagiairs</h1>
-          <p class="sm-welcome">Welkom, Mieke Peeters</p>
+          <p class="sm-welcome">Welkom, ${_userName}</p>
         </header>
         <section class="sm-content">
           <div class="sm-stagiair-list">
-            ${stagiairs.map(renderStagiairKaart).join('')}
+            ${_allStagiairs.length > 0
+              ? _allStagiairs.map(renderStagiairKaart).join('')
+              : '<p style="color:#6b7280;padding:16px;">Geen stagiairs gevonden.</p>'}
           </div>
         </section>
       </main>
     </div>
   `;
 
-  // Geeft elke knop "Student Bekijken" een klikactie.
   document.querySelectorAll('.sm-button').forEach((btn) => {
     btn.addEventListener('click', () => {
       const idx = Number(btn.dataset.index);
-      renderStudentDetail(app, stagiairs[idx]);
+      renderStudentDetail(app, _allStagiairs[idx]);
     });
   });
 }
@@ -215,9 +208,25 @@ function attachNav(app, stagiair) {
 
 
 
-// Toont de pagina "Stagedetails".
-// Hier staat vaste info zoals student, bedrijf, stagementor, docent en opdrachtomschrijving.
 function renderStageDetailsPage(app, stagiair) {
+  const sd = stagiair.stageData || {};
+  const bedrijfNaam = sd.bedrijf?.naam || stagiair.bedrijf || '–';
+  const bedrijfAdres = sd.bedrijf?.adres || '–';
+  const mentorNaam = sd.stagementor?.naam || '–';
+  const docentNaam = sd.docent?.naam || 'Niet toegewezen';
+  const omschrijving = sd.stageDetails?.omschrijving || 'Geen omschrijving beschikbaar';
+  const startDatum = sd.stageDetails?.start
+    ? new Date(sd.stageDetails.start).toLocaleDateString('nl-BE', { day: 'numeric', month: 'short', year: 'numeric' })
+    : stagiair.start || '–';
+  const eindDatum = sd.stageDetails?.einde
+    ? new Date(sd.stageDetails.einde).toLocaleDateString('nl-BE', { day: 'numeric', month: 'short', year: 'numeric' })
+    : stagiair.einde || '–';
+  const rawStatus = sd.rawStatus || '';
+  const statusLabel = rawStatus === 'GOEDGEKEURD' ? 'Goedgekeurd'
+    : rawStatus === 'AANVRAAG' ? 'In afwachting'
+    : rawStatus === 'AFGEKEURD' ? 'Afgekeurd'
+    : rawStatus || 'Onbekend';
+
   app.innerHTML = `
     <div class="sm-layout">
       ${sidebarHtml('stagedetails')}
@@ -226,54 +235,40 @@ function renderStageDetailsPage(app, stagiair) {
         <div class="sm-detail-top">
           <div>
             <h1 class="sm-detail-title">Stagedetails</h1>
-
-            <span class="sm-stage-status">
-              Goedgekeurd
-            </span>
+            <span class="sm-stage-status">${statusLabel}</span>
           </div>
-
           <a href="#" id="sm-back-stagedetails" class="sm-detail-back">
             ← Terug naar stagiairs
           </a>
         </div>
 
         <div class="sm-stage-card">
-
           <div class="sm-stage-section">
             <h3>Student</h3>
-            <p>${stagiair.naam}</p>
-            <span>${stagiair.email}</span>
+            <p>${escapeHtml(stagiair.naam)}</p>
+            <span>${escapeHtml(stagiair.email)}</span>
           </div>
-
           <div class="sm-stage-section">
             <h3>Bedrijf</h3>
-            <p>${stagiair.bedrijf}</p>
+            <p>${escapeHtml(bedrijfNaam)}</p>
+            <span>${escapeHtml(bedrijfAdres)}</span>
           </div>
-
           <div class="sm-stage-section">
             <h3>Stagementor</h3>
-            <p>Mieke Peeters</p>
+            <p>${escapeHtml(mentorNaam)}</p>
           </div>
-
           <div class="sm-stage-section">
             <h3>EhB-docent</h3>
-            <p>Dr. Sophie Janssen</p>
+            <p>${escapeHtml(docentNaam)}</p>
           </div>
-
           <div class="sm-stage-section">
             <h3>Periode</h3>
-            <p>3 feb 2026 t/m 30 mei 2026</p>
+            <p>${escapeHtml(startDatum)} t/m ${escapeHtml(eindDatum)}</p>
           </div>
-
           <div class="sm-stage-section">
             <h3>Omschrijving van de opdracht</h3>
-            <p>
-              De stagiair zal werken aan het ontwikkelen van frontend applicaties
-              met React en TypeScript. Focus op moderne webontwikkeling en
-              samenwerking in een professioneel team.
-            </p>
+            <p>${escapeHtml(omschrijving)}</p>
           </div>
-
         </div>
       </main>
     </div>
@@ -701,8 +696,22 @@ function renderDocumentenPage(app, stagiair) {
 
 
 
-// Startfunctie van dit bestand.
-// Een ander bestand kan renderMijnStagiairs(app) aanroepen om deze pagina te tonen.
-export function renderMijnStagiairs(app) {
+export async function renderMijnStagiairs(app, user) {
+  _userName = user
+    ? (user.last_name ? `${user.last_name.toUpperCase()} ${user.first_name}` : user.first_name || 'Stagementor')
+    : 'Stagementor';
+
+  if (user && user.user_id) {
+    try {
+      const res = await fetch(`/api/stages/stagementor/${user.user_id}`, { credentials: 'include' });
+      const data = await res.json();
+      if (Array.isArray(data)) {
+        _allStagiairs = data.map(mapApiStageToStagiair);
+      }
+    } catch (err) {
+      console.error('Fout bij ophalen stagiairs:', err);
+    }
+  }
+
   renderStagementorPage(app);
 }
