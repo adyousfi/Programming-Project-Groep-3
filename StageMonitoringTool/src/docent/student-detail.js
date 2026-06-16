@@ -251,10 +251,28 @@ export async function renderStudentDetail(student, user) {
       document.querySelector('#sd-content').innerHTML = '<p class="sd-tab-content">Laden...</p>';
       document.querySelector('#sd-content').innerHTML = await renderTabContent(item.dataset.tab, student);
       setupWeekCards(student);
+      if (item.dataset.tab === 'overzicht') setupActieCards(student);
     });
   });
 
   document.querySelector('#sd-content').innerHTML = await renderTabContent('overzicht', student);
+  setupActieCards(student);
+}
+
+function setupActieCards(student) {
+  document.querySelectorAll('.sd-actie-card').forEach(function(card) {
+    card.addEventListener('click', async function() {
+      var actie = card.dataset.actie;
+      if (actie === 'logboek') {
+        document.querySelectorAll('.sd-nav-item').forEach(function(i) { i.classList.remove('active'); });
+        var logboekTab = document.querySelector('.sd-nav-item[data-tab="logboek"]');
+        if (logboekTab) logboekTab.classList.add('active');
+        document.querySelector('#sd-content').innerHTML = '<p class="sd-tab-content">Laden...</p>';
+        document.querySelector('#sd-content').innerHTML = await renderTabContent('logboek', student);
+        setupWeekCards(student);
+      }
+    });
+  });
 }
 
 function setupWeekCards(student) {
