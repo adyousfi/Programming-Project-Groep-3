@@ -55,9 +55,15 @@ export async function renderStageformulier(container) {
                         <h3 class="section-title">Stagementor / Werkbegeleider</h3>
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="mentor-naam">Naam *</label>
-                                <input type="text" id="mentor-naam" value="">
+                                <label for="mentor-voornaam">Voornaam *</label>
+                                <input type="text" id="mentor-voornaam" value="">
                             </div>
+                            <div class="form-group">
+                                <label for="mentor-achternaam">Achternaam *</label>
+                                <input type="text" id="mentor-achternaam" value="">
+                            </div>
+                        </div>
+                        <div class="form-row">
                             <div class="form-group">
                                 <label for="mentor-email">E-mail *</label>
                                 <input type="email" id="mentor-email" value="">
@@ -169,7 +175,8 @@ export async function renderStageformulier(container) {
             container.querySelector('#student-nummer').value = `20${randNum(20, 99)}${randNum(1000, 9999)}`;
             container.querySelector('#bedrijf-naam').value = pick(bedrijven);
             container.querySelector('#bedrijf-adres').value = `${pick(straten)} ${randNum(1, 200)}, ${pick(steden)}`;
-            container.querySelector('#mentor-naam').value = `${mentorVoornaam} ${mentorAchternaam}`;
+            container.querySelector('#mentor-voornaam').value = mentorVoornaam;
+            container.querySelector('#mentor-achternaam').value = mentorAchternaam;
             container.querySelector('#mentor-email').value = `${mentorVoornaam.toLowerCase()}.${mentorAchternaam.toLowerCase()}@${pick(['techsolutions.be', 'webstudio.be', 'innovation.be', 'cloudtech.be'])}`;
             container.querySelector('#opdracht-omschrijving').value = pick(omschrijvingen);
 
@@ -235,7 +242,8 @@ export async function renderStageformulier(container) {
                 studentNummer: container.querySelector('#student-nummer').value.trim(),
                 bedrijfNaam: container.querySelector('#bedrijf-naam').value.trim(),
                 bedrijfAdres: container.querySelector('#bedrijf-adres').value.trim(),
-                mentorNaam: container.querySelector('#mentor-naam').value.trim(),
+                mentorVoornaam: container.querySelector('#mentor-voornaam').value.trim(),
+                mentorAchternaam: container.querySelector('#mentor-achternaam').value.trim(),
                 mentorEmail: container.querySelector('#mentor-email').value.trim(),
                 opdrachtOmschrijving: container.querySelector('#opdracht-omschrijving').value.trim(),
                 periodeStart: container.querySelector('#periode-start').value,

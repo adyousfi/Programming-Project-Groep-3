@@ -7,6 +7,9 @@ export async function renderAanpassen(container, userName = '[Studentnaam]', sta
     const bedrijfNaam = stageData?.bedrijf?.naam || '';
     const bedrijfAdres = stageData?.bedrijf?.adres || '';
     const mentorNaam = stageData?.stagementor?.naam || '';
+    const mentorParts = mentorNaam.split(' ');
+    const mentorVoornaam = mentorParts[0] || '';
+    const mentorAchternaam = mentorParts.slice(1).join(' ') || '';
     const mentorEmail = stageData?.stagementor?.email || '';
     const omschrijving = stageData?.stageDetails?.omschrijving || '';
     const startDatum = stageData?.stageDetails?.start ? stageData.stageDetails.start.split('T')[0] : '';
@@ -46,9 +49,15 @@ export async function renderAanpassen(container, userName = '[Studentnaam]', sta
                         <h3 class="aanpassen-section-title">Stagementor</h3>
                         <div class="aanpassen-form-row">
                             <div class="aanpassen-form-group">
-                                <label for="aanpassen-mentor-naam">Naam</label>
-                                <input type="text" id="aanpassen-mentor-naam" value="${mentorNaam}">
+                                <label for="aanpassen-mentor-voornaam">Voornaam</label>
+                                <input type="text" id="aanpassen-mentor-voornaam" value="${mentorVoornaam}">
                             </div>
+                            <div class="aanpassen-form-group">
+                                <label for="aanpassen-mentor-achternaam">Achternaam</label>
+                                <input type="text" id="aanpassen-mentor-achternaam" value="${mentorAchternaam}">
+                            </div>
+                        </div>
+                        <div class="aanpassen-form-row">
                             <div class="aanpassen-form-group">
                                 <label for="aanpassen-mentor-email">E-mail</label>
                                 <input type="email" id="aanpassen-mentor-email" value="${mentorEmail}">
@@ -130,14 +139,15 @@ export async function renderAanpassen(container, userName = '[Studentnaam]', sta
         const updatedData = {
             bedrijfNaam: container.querySelector('#aanpassen-bedrijf-naam').value.trim(),
             bedrijfAdres: container.querySelector('#aanpassen-bedrijf-adres').value.trim(),
-            mentorNaam: container.querySelector('#aanpassen-mentor-naam').value.trim(),
+            mentorVoornaam: container.querySelector('#aanpassen-mentor-voornaam').value.trim(),
+            mentorAchternaam: container.querySelector('#aanpassen-mentor-achternaam').value.trim(),
             mentorEmail: container.querySelector('#aanpassen-mentor-email').value.trim(),
             opdrachtOmschrijving: container.querySelector('#aanpassen-omschrijving').value.trim(),
             periodeStart: container.querySelector('#aanpassen-start').value,
             periodeEind: container.querySelector('#aanpassen-eind').value,
         };
 
-        if (!updatedData.bedrijfNaam || !updatedData.mentorNaam || !updatedData.mentorEmail || !updatedData.opdrachtOmschrijving) {
+        if (!updatedData.bedrijfNaam || !updatedData.mentorVoornaam || !updatedData.mentorAchternaam || !updatedData.mentorEmail || !updatedData.opdrachtOmschrijving) {
             alert('Vul alle verplichte velden in.');
             btn.disabled = false;
             btn.textContent = 'Aangepast Voorstel Indienen';

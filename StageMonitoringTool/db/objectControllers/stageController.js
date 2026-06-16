@@ -13,10 +13,12 @@ const createStage = async (req, res, next) => {
     const {
       studentNaam, studentNummer,
       bedrijfNaam, bedrijfAdres,
-      mentorNaam, mentorEmail,
+      mentorVoornaam, mentorAchternaam, mentorEmail,
       opdrachtOmschrijving,
       periodeStart, periodeEind
     } = req.body;
+
+    console.log('DEBUG createStage req.body:', JSON.stringify(req.body, null, 2));
 
     const cookieUser = req.cookies.user;
     if (!cookieUser) return res.status(401).json({ msg: 'Niet ingelogd' });
@@ -34,8 +36,8 @@ const createStage = async (req, res, next) => {
     const bedrijf = await Bedrijf.create({ naam: bedrijfNaam, address: bedrijfAdres });
 
     const mentorUser = await User.create({
-      first_name: mentorNaam,
-      last_name: '',
+      first_name: mentorVoornaam || '',
+      last_name: mentorAchternaam || '',
       email: mentorEmail,
       password: 'pending',
       role: 'stagementor',
@@ -65,7 +67,7 @@ const createStage = async (req, res, next) => {
 
 const updateStage = async (req, res, next) => {
   try {
-    const { status, feedback, bedrijfNaam, bedrijfAdres, mentorNaam, mentorEmail, omschrijving_opdracht, begin_datum, eind_datum } = req.body;
+    const { status, feedback, bedrijfNaam, bedrijfAdres, mentorVoornaam, mentorAchternaam, mentorEmail, omschrijving_opdracht, begin_datum, eind_datum } = req.body;
 
     const stage = await Stage.findByPk(req.params.id, {
       include: [
@@ -88,9 +90,14 @@ const updateStage = async (req, res, next) => {
     if (bedrijfNaam && stage.bedrijf) {
       await stage.bedrijf.update({ naam: bedrijfNaam, address: bedrijfAdres || stage.bedrijf.address });
     }
-    if (mentorNaam && stage.mentor) {
+    if ((mentorVoornaam || mentorAchternaam) && stage.mentor) {
       const mentorUser = await User.findByPk(stage.mentor.user_id);
-      if (mentorUser) await mentorUser.update({ first_name: mentorNaam });
+      if (mentorUser) {
+        const updateFields = {};
+        if (mentorVoornaam) updateFields.first_name = mentorVoornaam;
+        if (mentorAchternaam) updateFields.last_name = mentorAchternaam;
+        await mentorUser.update(updateFields);
+      }
     }
     if (mentorEmail && stage.mentor) {
       const mentorUser = await User.findByPk(stage.mentor.user_id);
