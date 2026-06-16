@@ -5,5 +5,5 @@ import { runRelationTest } from "./testrelation.js";
 
 await run();
 console.log(confirmRelations)
-//await seedDatabase();
+await seedDatabase();
 await runRelationTest();
