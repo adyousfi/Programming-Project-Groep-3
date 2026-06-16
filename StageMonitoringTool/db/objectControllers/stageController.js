@@ -250,8 +250,14 @@ const selectStageById = async (req, res, next) => {
 
 const selectStageByStudentId = async (req, res, next) => {
   try {
+    const student = await Student.findByPk(req.params.studentId);
+    if (!student) return res.json({ found: false });
+
     const stage = await Stage.findOne({
-      where: { student_id: req.params.studentId },
+      where: {
+        student_id: req.params.studentId,
+        createdAt: { [Op.gte]: student.createdAt }
+      },
       include: [
         { model: Student, as: 'student', include: [{ model: User, as: 'User' }] },
         { model: Stagementor, as: 'mentor', include: [{ model: User, as: 'User' }] },
