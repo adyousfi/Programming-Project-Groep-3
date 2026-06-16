@@ -1,4 +1,6 @@
 import './aanpassen.css';
+import flatpickr from 'flatpickr';
+import 'flatpickr/dist/flatpickr.min.css';
 
 export async function renderAanpassen(container, userName = '[Studentnaam]', stageData = null) {
     const feedback = stageData?.feedback || 'Geen feedback opgegeven door de stagecommissie.';
@@ -66,11 +68,11 @@ export async function renderAanpassen(container, userName = '[Studentnaam]', sta
                         <div class="aanpassen-form-row">
                             <div class="aanpassen-form-group">
                                 <label for="aanpassen-start">Startdatum</label>
-                                <input type="date" id="aanpassen-start" value="${startDatum}">
+                                <input type="text" id="aanpassen-start" placeholder="Kies een datum" readonly>
                             </div>
                             <div class="aanpassen-form-group">
                                 <label for="aanpassen-eind">Einddatum</label>
-                                <input type="date" id="aanpassen-eind" value="${eindDatum}">
+                                <input type="text" id="aanpassen-eind" placeholder="Kies een datum" readonly>
                             </div>
                         </div>
                     </div>
@@ -87,6 +89,34 @@ export async function renderAanpassen(container, userName = '[Studentnaam]', sta
     container.querySelector('#aanpassen-close').addEventListener('click', () => {
         window.location.href = '/?role=student';
     });
+
+    var startInput = container.querySelector('#aanpassen-start');
+    var eindInput = container.querySelector('#aanpassen-eind');
+
+    function isWeekend(date) {
+        return date.getDay() === 0 || date.getDay() === 6;
+    }
+
+    if (startInput) {
+        flatpickr(startInput, {
+            disable: [isWeekend],
+            dateFormat: 'Y-m-d',
+            defaultDate: startDatum || undefined,
+            onDayCreate: function(dObj, dStr, fp, dayElem) {
+                var dow = dayElem.dateObj.getDay();
+                if (dow === 0 || dow === 6) {
+                    dayElem.classList.add('weekend-disabled');
+                }
+            }
+        });
+    }
+
+    if (eindInput) {
+        flatpickr(eindInput, {
+            dateFormat: 'Y-m-d',
+            defaultDate: eindDatum || undefined,
+        });
+    }
 
     container.querySelector('#aanpassen-cancel').addEventListener('click', () => {
         window.location.href = '/?role=student';

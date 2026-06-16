@@ -175,3 +175,18 @@
     resize: vertical;
     min-height: 80px;
 }
+
+/* Flatpickr weekend styling */
+.flatpickr-day.weekend-disabled {
+    background: #f3f4f6 !important;
+    border-color: #e5e7eb !important;
+    color: #9ca3af !important;
+    cursor: not-allowed !important;
+    text-decoration: line-through;
+}
+
+.flatpickr-day.weekend-disabled:hover {
+    background: #f3f4f6 !important;
+    border-color: #e5e7eb !important;
+    color: #9ca3af !important;
+}
