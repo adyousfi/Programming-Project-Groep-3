@@ -3,7 +3,7 @@ import { renderKoppelingen } from './koppeldocent.js';
 import { renderAdminDocumenten } from './adminDocumenten.js';
 
 
-const API_URL = '';
+const API_URL = 'http://localhost:3000';
 
 const roleDisplayMap = {
   'student': 'Student',

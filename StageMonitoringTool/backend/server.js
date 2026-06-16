@@ -1,10 +1,10 @@
 import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
+import multer from 'multer';
 import { run } from '../db/dbConnection.js';
-import '../db/allimport.js'; // Ensure relations are loaded
+import '../db/allimport.js';
 
-// Import Routers
 import userRoutes from '../db/routes/userRoutes.js';
 import stageRoutes from '../db/routes/stageRoutes.js';
 import documentRoutes from '../db/routes/documentRoutes.js';
@@ -15,6 +15,7 @@ import opmerkingLogboekRoutes from '../db/routes/opmerkingLogboekRoutes.js';
 import behaaldeScoreRoutes from '../db/routes/behaaldeScoreRoutes.js';
 import competentieRoutes from '../db/routes/competentieRoutes.js';
 import rubriekRoutes from '../db/routes/rubriekRoutes.js';
+
 const app = express();
 
 app.use(express.json());
@@ -36,18 +37,26 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 
-// Mount Routers
 app.use('/', userRoutes);
 app.use('/api/stages', stageRoutes);
 app.use('/api/documents', documentRoutes);
 app.use('/api/docenten', docentRoutes);
 app.use('/api/bedrijven', bedrijfRoutes);
-app.use('/api/logboeken', logboekRoutes);
+app.use('/api/logboek', logboekRoutes);
 app.use('/api/opmerkingen-logboek', opmerkingLogboekRoutes);
 app.use('/api/behaalde-scores', behaaldeScoreRoutes);
 app.use('/api/competenties', competentieRoutes);
 app.use('/api/rubrieken', rubriekRoutes);
-app.use('/api/docenten', docentRoutes);
+
+app.use((err, req, res, next) => {
+  if (err instanceof multer.MulterError) {
+    return res.status(400).json({ msg: err.message });
+  }
+  if (err.message && err.message.includes('Bestandstype')) {
+    return res.status(400).json({ msg: err.message });
+  }
+  next(err);
+});
 
 async function start() {
   await run();

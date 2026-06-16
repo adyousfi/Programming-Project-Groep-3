@@ -1,5 +1,10 @@
 import './mijn-stagiairs.css';
 
+// Dit bestand maakt de pagina "Mijn Stagiairs".
+// De code gebruikt gewone JavaScript om HTML in de app te plaatsen.
+
+// Lijst met voorbeeldstudenten.
+// Elk object in deze array is 1 stagiair met alle gegevens die later op de pagina gebruikt worden.
 const stagiairs = [
   {
     naam: 'Jan Janssens',
@@ -30,6 +35,9 @@ const stagiairs = [
   },
 ];
 
+// Lijst met competenties waarop de stagiair beoordeeld wordt.
+// key wordt gebruikt om scores/feedback op te slaan.
+// title en description worden op het scherm getoond.
 const competenties = [
   { key: 'planningsproces', title: 'Beheersing van het planningsproces', description: 'De student kan zelfstandig een planning opstellen en opvolgen.' },
   { key: 'it-oplossingen', title: 'Ontwerpen IT-oplossingen', description: 'De student kan IT-oplossingen ontwerpen op basis van een probleemanalyse.' },
@@ -39,19 +47,41 @@ const competenties = [
 ];
 
 // storage helpers
+// Deze functies bewaren en lezen gegevens in localStorage.
+// localStorage is opslag in de browser, dus de gegevens blijven bewaard na refresh.
+
+// Controleert of een week al afgevinkt is.
 function smIsWeekAfgevinkt(email, week) { try { return localStorage.getItem(`sm_afgevinkt_${email}_${week}`) === '1'; } catch { return false; } }
+
+// Slaat op dat een week afgevinkt is.
 function smSetWeekAfgevinkt(email, week) { try { localStorage.setItem(`sm_afgevinkt_${email}_${week}`, '1'); } catch {} }
+
+// Haalt de opmerking van een week op.
 function smGetWeekComment(email, week) { try { return localStorage.getItem(`sm_comment_${email}_${week}`) || ''; } catch { return ''; } }
+
+// Slaat de opmerking van een week op.
 function smSaveWeekComment(email, week, text) { try { localStorage.setItem(`sm_comment_${email}_${week}`, text); } catch {} }
+
+// Haalt een opgeslagen evaluatiescore op.
 function smGetEvaluationScore(email, type, c) { try { return localStorage.getItem(`sm_eval_score_${email}_${type}_${c}`) || ''; } catch { return ''; } }
+
+// Slaat een evaluatiescore op.
 function smSaveEvaluationScore(email, type, c, s) { try { localStorage.setItem(`sm_eval_score_${email}_${type}_${c}`, String(s)); } catch {} }
+
+// Haalt opgeslagen feedback op.
 function smGetEvaluationFeedback(email, type, c) { try { return localStorage.getItem(`sm_eval_feedback_${email}_${type}_${c}`) || ''; } catch { return ''; } }
+
+// Slaat feedback op.
 function smSaveEvaluationFeedback(email, type, c, t) { try { localStorage.setItem(`sm_eval_feedback_${email}_${type}_${c}`, t); } catch {} }
 
+// Maakt tekst veilig voordat ze in HTML geplaatst wordt.
+// Dit voorkomt problemen met speciale tekens zoals <, >, " en '.
 function escapeHtml(s) {
   return String(s).replace(/[&<<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }
 
+// Bouwt de zijbalk van de detailpagina's.
+// activePage bepaalt welk menu-item de class "active" krijgt.
 function sidebarHtml(activePage) {
   const items = [
     { key: 'overzicht', label: 'Overzicht' },
@@ -79,11 +109,15 @@ function sidebarHtml(activePage) {
   `;
 }
 
+// Maakt een badge aan voor waarschuwingen.
+// Bijvoorbeeld: geel voor warning en rood voor danger.
 function renderBadge(b) {
   const cls = b.type === 'danger' ? 'sm-badge--danger' : 'sm-badge--warning';
   return `<span class="sm-badge ${cls}">${escapeHtml(b.label)}</span>`;
 }
 
+// Maakt de HTML voor 1 stagiairkaart.
+// s is de stagiair, index is de positie in de stagiairs-array.
 function renderStagiairKaart(s, index) {
   return `
     <article class="sm-stagiair-card">
@@ -108,6 +142,8 @@ function renderStagiairKaart(s, index) {
   `;
 }
 
+// Toont de startpagina met alle stagiairs.
+// app is het element waarin de volledige pagina wordt geplaatst.
 function renderStagementorPage(app) {
   app.innerHTML = `
     <div class="sm-layout">
@@ -140,6 +176,7 @@ function renderStagementorPage(app) {
     </div>
   `;
 
+  // Geeft elke knop "Student Bekijken" een klikactie.
   document.querySelectorAll('.sm-button').forEach((btn) => {
     btn.addEventListener('click', () => {
       const idx = Number(btn.dataset.index);
@@ -148,6 +185,8 @@ function renderStagementorPage(app) {
   });
 }
 
+// Koppelt de zijbalknavigatie aan de juiste pagina's.
+// Elke klik toont een ander onderdeel van dezelfde stagiair.
 function attachNav(app, stagiair) {
   document.querySelectorAll('.sm-nav-item').forEach((item) => {
     item.addEventListener('click', (e) => {
@@ -156,6 +195,9 @@ function attachNav(app, stagiair) {
 
       if (page === 'overzicht') {
         renderStudentDetail(app, stagiair);
+
+      } else if (page === 'stagedetails') {
+        renderStageDetailsPage(app, stagiair);
 
       } else if (page === 'documenten') {
         renderDocumentenPage(app, stagiair);
@@ -171,7 +213,89 @@ function attachNav(app, stagiair) {
 }
 
 
+
+
+// Toont de pagina "Stagedetails".
+// Hier staat vaste info zoals student, bedrijf, stagementor, docent en opdrachtomschrijving.
+function renderStageDetailsPage(app, stagiair) {
+  app.innerHTML = `
+    <div class="sm-layout">
+      ${sidebarHtml('stagedetails')}
+
+      <main class="sm-main sm-main--detail">
+        <div class="sm-detail-top">
+          <div>
+            <h1 class="sm-detail-title">Stagedetails</h1>
+
+            <span class="sm-stage-status">
+              Goedgekeurd
+            </span>
+          </div>
+
+          <a href="#" id="sm-back-stagedetails" class="sm-detail-back">
+            ← Terug naar stagiairs
+          </a>
+        </div>
+
+        <div class="sm-stage-card">
+
+          <div class="sm-stage-section">
+            <h3>Student</h3>
+            <p>${stagiair.naam}</p>
+            <span>${stagiair.email}</span>
+          </div>
+
+          <div class="sm-stage-section">
+            <h3>Bedrijf</h3>
+            <p>${stagiair.bedrijf}</p>
+          </div>
+
+          <div class="sm-stage-section">
+            <h3>Stagementor</h3>
+            <p>Mieke Peeters</p>
+          </div>
+
+          <div class="sm-stage-section">
+            <h3>EhB-docent</h3>
+            <p>Dr. Sophie Janssen</p>
+          </div>
+
+          <div class="sm-stage-section">
+            <h3>Periode</h3>
+            <p>3 feb 2026 t/m 30 mei 2026</p>
+          </div>
+
+          <div class="sm-stage-section">
+            <h3>Omschrijving van de opdracht</h3>
+            <p>
+              De stagiair zal werken aan het ontwikkelen van frontend applicaties
+              met React en TypeScript. Focus op moderne webontwikkeling en
+              samenwerking in een professioneel team.
+            </p>
+          </div>
+
+        </div>
+      </main>
+    </div>
+  `;
+
+  // Deze klikactie zorgt dat de terugknop opnieuw het studentdetail opent.
+  document
+    .querySelector('#sm-back-stagedetails')
+    .addEventListener('click', (e) => {
+      e.preventDefault();
+      renderStudentDetail(app, stagiair);
+    });
+
+  attachNav(app, stagiair);
+}
+
+
+// Toont het detailoverzicht van 1 stagiair.
+// Dit is de pagina na het klikken op "Student Bekijken".
 function renderStudentDetail(app, stagiair) {
+  // Berekent hoeveel procent van de stageweken al bezig/ingevuld is.
+  // Dit percentage wordt gebruikt voor de blauwe voortgangsbalk.
   const progressPct = Math.round((stagiair.currentWeek / stagiair.totalWeeks) * 100);
   app.innerHTML = `
     <div class="sm-layout">
@@ -221,8 +345,14 @@ function renderStudentDetail(app, stagiair) {
     </div>
   `;
 
+  // Terug naar het overzicht met alle stagiairs.
   document.querySelector('#sm-back').addEventListener('click', (e) => { e.preventDefault(); renderStagementorPage(app); });
+
+  // Activeert de links in de zijbalk.
   attachNav(app, stagiair);
+
+  // Zorgt dat de actiekaarten klikbaar zijn.
+  // data-action bepaalt welke pagina geopend wordt.
   document.querySelectorAll('.sm-action-card').forEach((card) => {
     card.addEventListener('click', () => {
       const action = card.dataset.action;
@@ -232,9 +362,14 @@ function renderStudentDetail(app, stagiair) {
   });
 }
 
+// Toont de evaluatiepagina.
+// activeTab is standaard "tussentijds", maar kan ook "finale" zijn.
 function renderEvaluatiePage(app, stagiair, activeTab = 'tussentijds') {
+ // Mogelijke scores die op de scorekaarten verschijnen.
  const scores = [1, 2, 3, 4, 5];
 
+// Beschrijvingen per score.
+// Bij finale evaluatie zijn de teksten iets anders dan bij tussentijdse evaluatie.
 const descriptions =
   activeTab === 'finale'
     ? {
@@ -256,8 +391,11 @@ const descriptions =
 
 
 
+  // Teksten voor de kop van de pagina.
   const pageTitle = 'Evaluatie';
   const pageSubtitle = 'Evalueer de stagiair op basis van competenties';
+
+  // Teksten die veranderen afhankelijk van de gekozen tab.
   const blockTitle = activeTab === 'finale' ? 'Finale beoordeling' : 'Tussentijdse bespreking';
   const blockDesc = activeTab === 'finale'
     ? 'Geef per competentie een finale score en feedback. De student geeft ook zelf een score — de docent ziet beide en bepaalt het definitieve punt.'
@@ -316,9 +454,12 @@ ${competenties.map((comp) => `
     </div>
   `;
 
+  // Terug naar het detailoverzicht van deze stagiair.
   document.querySelector('#sm-back-evaluatie').addEventListener('click', (e) => { e.preventDefault(); renderStudentDetail(app, stagiair); });
   attachNav(app, stagiair);
 
+  // Selecteert opnieuw de score die eerder werd opgeslagen.
+  // Daarna krijgt elke scorekaart een klikactie.
   document.querySelectorAll('.sm-score-card').forEach((card) => {
     const existing = smGetEvaluationScore(stagiair.email, activeTab, card.dataset.competentie);
     if (existing && existing === card.dataset.score) card.classList.add('selected');
@@ -330,10 +471,12 @@ ${competenties.map((comp) => `
     });
   });
 
+  // Wisselt tussen "Tussentijdse evaluatie" en "Finale evaluatie".
   document.querySelectorAll('.sm-eval-tab').forEach((tab) => {
     tab.addEventListener('click', () => renderEvaluatiePage(app, stagiair, tab.dataset.tab));
   });
 
+  // Slaat alle gekozen scores en feedbackvelden op in localStorage.
   document.querySelector('#sm-eval-save').addEventListener('click', () => {
     document.querySelectorAll('.sm-eval-score-cards').forEach((container) => {
       const compKey = container.dataset.competentie;
@@ -347,7 +490,9 @@ ${competenties.map((comp) => `
   });
 }
 
+// Toont het overzicht van alle logboekweken.
 function renderLogboekOverview(app, stagiair) {
+  // Maakt automatisch een lijst met weken op basis van totalWeeks.
   const weeks = Array.from({ length: stagiair.totalWeeks }, (_, i) => {
     const weekNum = i + 1;
     const afgevinkt = smIsWeekAfgevinkt(stagiair.email, weekNum);
@@ -390,14 +535,21 @@ function renderLogboekOverview(app, stagiair) {
     </div>
   `;
 
+  // Terug naar het detailoverzicht van de stagiair.
   document.querySelector('#sm-back-logboek').addEventListener('click', (e) => { e.preventDefault(); renderStudentDetail(app, stagiair); });
   attachNav(app, stagiair);
+
+  // Elke weekkaart opent de detailpagina van die specifieke week.
   document.querySelectorAll('.sm-week-card').forEach((card) => {
     card.addEventListener('click', () => renderWeekDetail(app, stagiair, Number(card.dataset.week)));
   });
 }
 
+// Toont de details van 1 logboekweek.
+// weekNum bepaalt welke week je bekijkt.
 function renderWeekDetail(app, stagiair, weekNum) {
+  // Voorbeelddata voor de werkdagen.
+  // In een echte app zou dit normaal uit een database of API komen.
   const days = [
     { name: 'Maandag', date: '3 feb', status: 'Ingediend', tasks: 'Vandaag heb ik gewerkt aan het opzetten van de ontwikkelomgeving en kennismaking met het team. We hebben een kickoff meeting gehad waar de projectdoelen werden toegelicht.', reflection: 'Ik heb geleerd hoe belangrijk goede communicatie is binnen een team. Het was interessant om te zien hoe professionele projecten worden opgezet.', problems: 'Geen bijzondere problemen. Wel veel nieuwe informatie in korte tijd.' },
     { name: 'Dinsdag', date: '4 feb', status: 'Ingediend', tasks: 'Afronding van de bugfix en deployment naar test omgeving. Retrospective meeting met het team over de afgelopen sprint.', reflection: 'Eerste week succesvol afgerond. Ik voel me meer onderdeel van het team en begrijp de workflow beter.', problems: 'Geen bijzondere problemen meer. Goede eerste week gehad.' },
@@ -405,7 +557,10 @@ function renderWeekDetail(app, stagiair, weekNum) {
     { name: 'Donderdag', date: '6 feb', status: 'Nog niet ingediend', tasks: '', reflection: '', problems: '' },
     { name: 'Vrijdag', date: '7 feb', status: 'Nog niet ingediend', tasks: '', reflection: '', problems: '' },
   ];
+  // Controleert of de mentor deze week al heeft goedgekeurd.
   const afgevinkt = smIsWeekAfgevinkt(stagiair.email, weekNum);
+
+  // Haalt de eerder opgeslagen mentoropmerking op.
   const comment = smGetWeekComment(stagiair.email, weekNum);
 
   app.innerHTML = `
@@ -458,17 +613,24 @@ function renderWeekDetail(app, stagiair, weekNum) {
     </div>
   `;
 
+  // Terug naar het weekoverzicht.
   document.querySelector('#sm-back-week').addEventListener('click', (e) => { e.preventDefault(); renderLogboekOverview(app, stagiair); });
+
+  // Terug naar het detailoverzicht van de stagiair.
   document.querySelector('#sm-back-stagiairs').addEventListener('click', (e) => { e.preventDefault(); renderStudentDetail(app, stagiair); });
   attachNav(app, stagiair);
 
+  // Slaat de tekst uit het opmerkingenveld op.
   document.querySelector('#sm-save-comment').addEventListener('click', () => {
     const val = document.querySelector('#sm-comment').value.trim();
     smSaveWeekComment(stagiair.email, weekNum, val);
     alert(val ? 'Opmerking opgeslagen.' : 'Opmerking verwijderd.');
   });
 
+  // Zoekt de knop waarmee de mentor de week kan afvinken.
   const afvinkBtn = document.querySelector('#sm-afvink');
+
+  // Alleen als de week nog niet afgevinkt is, krijgt de knop een klikactie.
   if (afvinkBtn && !afgevinkt) {
     afvinkBtn.addEventListener('click', () => {
       smSetWeekAfgevinkt(stagiair.email, weekNum);
@@ -480,6 +642,8 @@ function renderWeekDetail(app, stagiair, weekNum) {
     });
   }
 }
+// Toont de documentenpagina.
+// Op dit moment staat hier vooral de stageovereenkomst.
 function renderDocumentenPage(app, stagiair) {
   app.innerHTML = `
     <div class="sm-layout">
@@ -524,6 +688,7 @@ function renderDocumentenPage(app, stagiair) {
     </div>
   `;
 
+  // Terug naar het detailoverzicht van de stagiair.
   document
     .querySelector('#sm-back-documenten')
     .addEventListener('click', (e) => {
@@ -535,6 +700,9 @@ function renderDocumentenPage(app, stagiair) {
 }
 
 
+
+// Startfunctie van dit bestand.
+// Een ander bestand kan renderMijnStagiairs(app) aanroepen om deze pagina te tonen.
 export function renderMijnStagiairs(app) {
   renderStagementorPage(app);
 }

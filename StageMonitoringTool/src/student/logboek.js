@@ -1,32 +1,63 @@
 import './logboek.css';
 
-export function renderLogboek(container, userName = 'Student', stageData = null) {
+export async function renderLogboek(container, userName = 'Student', stageData = null) {
     const startDate = stageData?.stageDetails?.start ? new Date(stageData.stageDetails.start) : null;
     const endDate = stageData?.stageDetails?.einde ? new Date(stageData.stageDetails.einde) : null;
+
+    let logboekEntries = [];
+    if (stageData?.id) {
+        try {
+            const res = await fetch(`/api/logboek/stage/${stageData.id}`, { credentials: 'include' });
+            logboekEntries = await res.json();
+        } catch (err) {
+            console.error('Error fetching logboek:', err);
+        }
+    }
 
     function formatDate(d) {
         return d.toLocaleDateString('nl-BE', { day: 'numeric', month: 'short' });
     }
 
+    function toDateStr(d) {
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+
     function getWeekDates(weekIndex) {
-        if (!startDate) return { start: '?', end: '?', days: 5 };
+        if (!startDate) return { start: '?', end: '?', days: 5, startDateObj: null, endDateObj: null };
         const weekStart = new Date(startDate);
         weekStart.setDate(startDate.getDate() + weekIndex * 7);
+        while (weekStart.getDay() === 0 || weekStart.getDay() === 6) {
+            weekStart.setDate(weekStart.getDate() + 1);
+        }
         const weekEnd = new Date(weekStart);
-        weekEnd.setDate(weekStart.getDate() + 4);
+        let weekdayCount = 1;
+        while (weekdayCount < 5) {
+            weekEnd.setDate(weekEnd.getDate() + 1);
+            if (weekEnd.getDay() !== 0 && weekEnd.getDay() !== 6) {
+                weekdayCount++;
+            }
+        }
 
-        let days = 5;
         if (endDate && weekEnd > endDate) {
             weekEnd.setTime(endDate.getTime());
-            const dayOfWeek = weekEnd.getDay();
-            const diff = weekEnd.getDate() - weekStart.getDate() + 1;
-            days = Math.max(1, Math.min(5, diff));
+            let count = 0;
+            const temp = new Date(weekStart);
+            while (temp <= weekEnd) {
+                if (temp.getDay() !== 0 && temp.getDay() !== 6) count++;
+                temp.setDate(temp.getDate() + 1);
+            }
+            weekdayCount = Math.max(1, count);
         }
 
         return {
             start: formatDate(weekStart),
             end: formatDate(weekEnd),
-            days
+            days: weekdayCount,
+            startDateObj: new Date(weekStart),
+            endDateObj: new Date(weekEnd)
         };
     }
 
@@ -36,13 +67,35 @@ export function renderLogboek(container, userName = 'Student', stageData = null)
 
     const weeks = Array.from({ length: Math.max(1, totalWeeks) }, (_, i) => {
         const dates = getWeekDates(i);
+
+        let daysFilled = 0;
+        let allIngevuld = false;
+        let hasEntries = false;
+
+        if (dates.startDateObj) {
+            const weekEntries = logboekEntries.filter(e => {
+                if (!e.datum) return false;
+                const entryDate = new Date(e.datum);
+                return entryDate >= dates.startDateObj && entryDate <= dates.endDateObj;
+            });
+
+            hasEntries = weekEntries.length > 0;
+            const filledEntries = weekEntries.filter(e => e.status === 'DEELSINGEVULD' || e.status === 'INGEVULD');
+            daysFilled = filledEntries.length;
+            allIngevuld = weekEntries.length > 0 && weekEntries.every(e => e.status === 'INGEVULD');
+        }
+
+        let status = 'not_submitted';
+        if (allIngevuld) status = 'submitted';
+        else if (hasEntries) status = 'in_progress';
+
         return {
             number: i + 1,
             start: dates.start,
             end: dates.end,
-            daysFilled: 0,
+            daysFilled,
             totalDays: dates.days,
-            status: 'not_submitted'
+            status
         };
     });
 
@@ -76,8 +129,10 @@ export function renderLogboek(container, userName = 'Student', stageData = null)
                     ${weeks.map(w => {
                         const progress = (w.daysFilled / w.totalDays) * 100;
                         let statusBadge = '';
-                        if (w.status === 'validated') {
-                            statusBadge = '<span class="logboek-badge logboek-badge-validated">Afgevinkt door mentor</span>';
+                        if (w.status === 'submitted') {
+                            statusBadge = '<span class="logboek-badge logboek-badge-validated">Ingediend</span>';
+                        } else if (w.status === 'in_progress') {
+                            statusBadge = '<span class="logboek-badge logboek-badge-pending">Bezig</span>';
                         } else {
                             statusBadge = '<span class="logboek-badge logboek-badge-pending">Nog niet ingediend</span>';
                         }

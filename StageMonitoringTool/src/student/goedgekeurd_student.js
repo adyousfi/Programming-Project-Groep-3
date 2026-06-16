@@ -1,12 +1,61 @@
 import './goedgekeurd_student.css';
 
-export function renderGoedgekeurdStudent(container, userName = 'Jan Janssens', stageData = null) {
+export async function renderGoedgekeurdStudent(container, userName = 'Jan Janssens', stageData = null) {
     const bedrijfNaam = stageData?.bedrijf?.naam || 'Onbekend';
     const bedrijfAdres = stageData?.bedrijf?.adres || '';
     const startDatum = stageData?.stageDetails?.start ? new Date(stageData.stageDetails.start).toLocaleDateString('nl-BE', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Nog niet vastgelegd';
     const eindDatum = stageData?.stageDetails?.einde ? new Date(stageData.stageDetails.einde).toLocaleDateString('nl-BE', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Nog niet vastgelegd';
     const omschrijving = stageData?.stageDetails?.omschrijving || '';
     const docValidated = stageData?.document_validated || false;
+
+    const startDate = stageData?.stageDetails?.start ? new Date(stageData.stageDetails.start) : null;
+    const endDate = stageData?.stageDetails?.einde ? new Date(stageData.stageDetails.einde) : null;
+
+    let totalWeeks = 16;
+    let submittedWeeks = 0;
+
+    if (startDate && endDate) {
+        const totalDays = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
+        totalWeeks = Math.max(1, Math.ceil(totalDays / 7));
+    }
+
+    if (stageData?.id) {
+        try {
+            const res = await fetch(`/api/logboek/stage/${stageData.id}`, { credentials: 'include' });
+            const entries = await res.json();
+            if (Array.isArray(entries)) {
+                const submittedDates = entries
+                    .filter(e => e.status === 'INGEVULD' && e.datum)
+                    .map(e => new Date(e.datum));
+
+                const submittedWeekNumbers = new Set();
+                for (const d of submittedDates) {
+                    for (let w = 0; w < totalWeeks; w++) {
+                        const weekStart = new Date(startDate);
+                        weekStart.setDate(startDate.getDate() + w * 7);
+                        while (weekStart.getDay() === 0 || weekStart.getDay() === 6) {
+                            weekStart.setDate(weekStart.getDate() + 1);
+                        }
+                        const weekEnd = new Date(weekStart);
+                        let count = 1;
+                        while (count < 4) {
+                            weekEnd.setDate(weekEnd.getDate() + 1);
+                            if (weekEnd.getDay() !== 0 && weekEnd.getDay() !== 6) count++;
+                        }
+                        if (d >= weekStart && d <= weekEnd) {
+                            submittedWeekNumbers.add(w);
+                            break;
+                        }
+                    }
+                }
+                submittedWeeks = submittedWeekNumbers.size;
+            }
+        } catch (err) {
+            console.error('Error fetching logboek:', err);
+        }
+    }
+
+    const logboekProgress = totalWeeks > 0 ? (submittedWeeks / totalWeeks) * 100 : 0;
 
     container.innerHTML = `
         <div class="goedgekeurd-layout">
@@ -59,7 +108,7 @@ export function renderGoedgekeurdStudent(container, userName = 'Jan Janssens', s
                         <div class="step${docValidated ? ' next-active' : ''}">
                             <div class="step-circle step-icon-logboek">${docValidated ? '&#128203;' : '4'}</div>
                             <span class="step-label">Logboek</span>
-                            <span class="step-sub">${docValidated ? '0/16 weken' : 'Gepland'}</span>
+                            <span class="step-sub">${docValidated ? `${submittedWeeks}/${totalWeeks} weken` : 'Gepland'}</span>
                         </div>
                         <div class="step-line"></div>
                         <div class="step">
@@ -88,9 +137,9 @@ export function renderGoedgekeurdStudent(container, userName = 'Jan Janssens', s
                             <span class="info-card-icon">&#128203;</span>
                         </div>
                         <div class="info-card-content">
-                            <span class="info-card-main"><span class="logboek-count">0</span> / 16 weken</span>
+                            <span class="info-card-main"><span class="logboek-count">${submittedWeeks}</span> / ${totalWeeks} weken</span>
                             <div class="logboek-progress-bar">
-                                <div class="logboek-progress-fill"></div>
+                                <div class="logboek-progress-fill" style="width: ${logboekProgress}%"></div>
                             </div>
                         </div>
                     </div>
@@ -113,7 +162,7 @@ export function renderGoedgekeurdStudent(container, userName = 'Jan Janssens', s
                             <div class="coming-soon-icon${docValidated ? ' active-icon' : ''}">&#128203;</div>
                             <div class="coming-soon-content">
                                 <h3 class="coming-soon-title${docValidated ? ' active-title' : ''}">Logboek Invullen</h3>
-                                <p class="coming-soon-sub${docValidated ? ' active-sub' : ''}">Vul je dagelijkse activiteiten in</p>
+                                <p class="coming-soon-sub${docValidated ? ' active-sub' : ''}">${submittedWeeks}/${totalWeeks} weken ingevuld</p>
                             </div>
                         </a>
                         <div class="coming-soon-card disabled-card">

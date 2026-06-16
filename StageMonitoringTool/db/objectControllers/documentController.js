@@ -8,7 +8,6 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const uploadsDir = path.join(__dirname, '..', '..', 'uploads');
 
-// ✅ Admin upload document
 export const adminUploadDocument = async (req, res, next) => {
   try {
     const cookieUser = req.cookies.user;
@@ -29,7 +28,6 @@ export const adminUploadDocument = async (req, res, next) => {
   }
 };
 
-// ✅ Student upload document
 export const studentUploadDocument = async (req, res, next) => {
   try {
     const cookieUser = req.cookies.user;
@@ -44,6 +42,7 @@ export const studentUploadDocument = async (req, res, next) => {
       stored_name: req.file.filename,
       uploaded_by: cookieUser.user_id,
     });
+    await stage.update({ status: 'DOCUMENTGEUPLOADED', document_validated: false });
     return res.status(201).json({ msg: 'Document ingediend', document_id: doc.document_id });
   } catch (err) {
     console.error(err);
@@ -51,7 +50,6 @@ export const studentUploadDocument = async (req, res, next) => {
   }
 };
 
-// ✅ GET documenten voor ingelogde student
 export const getMyDocuments = async (req, res, next) => {
   try {
     const cookieUser = req.cookies.user;
@@ -74,7 +72,6 @@ export const getMyDocuments = async (req, res, next) => {
   }
 };
 
-// ✅ GET documenten voor een stage (admin)
 export const getStageDocuments = async (req, res, next) => {
   try {
     const docs = await StageDocument.findAll({
@@ -93,7 +90,6 @@ export const getStageDocuments = async (req, res, next) => {
   }
 };
 
-// ✅ Download document
 export const downloadDocument = async (req, res, next) => {
   try {
     const doc = await StageDocument.findByPk(req.params.id);
