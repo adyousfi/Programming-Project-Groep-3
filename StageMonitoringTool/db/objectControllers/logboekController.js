@@ -4,6 +4,24 @@ import { sequelize } from "../dbConnection.js";
 
 const getLogboekByStage = async (req, res, next) => {
     try {
+        const cookieUser = req.cookies.user;
+        if (!cookieUser) return res.status(401).json({ msg: 'Niet ingelogd' });
+
+        const stage = await Stage.findByPk(req.params.stageId);
+        if (!stage) return res.status(404).json({ msg: 'Stage niet gevonden' });
+
+        if (cookieUser.role === 'docent') {
+            if (String(cookieUser.user_id) !== String(stage.docent_id)) {
+                return res.status(403).json({ msg: 'Geen toegang tot dit logboek' });
+            }
+        } else if (cookieUser.role === 'student') {
+            if (String(cookieUser.user_id) !== String(stage.student_id)) {
+                return res.status(403).json({ msg: 'Geen toegang tot dit logboek' });
+            }
+        } else {
+            return res.status(403).json({ msg: 'Geen toegang' });
+        }
+
         const entries = await Logboek.findAll({
             where: { stage_id: req.params.stageId },
             order: [['datum', 'ASC']],
