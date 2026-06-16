@@ -349,4 +349,60 @@ const updateStageRaw = async (req, res, next) => {
   }
 };
 
-export default { createStage, updateStage, selectStage, getApprovedStages, selectStageByStudentId, selectStageById, selectStageRaw, updateStageRaw };
+const selectStageByDocentId = async (req, res, next) => {
+  try {
+    const stages = await Stage.findAll({
+      where: { docent_id: req.params.docentId },
+      include: [
+        { model: Student, as: 'student', include: [{ model: User, as: 'User' }] },
+        { model: Stagementor, as: 'mentor', include: [{ model: User, as: 'User' }] },
+        { model: Bedrijf, as: 'bedrijf' },
+        { model: Docent, as: 'docent', include: [{ model: User, as: 'User' }] },
+      ],
+      order: [['createdAt', 'DESC']]
+    });
+
+    const result = stages.map(s => {
+      const studentUser = s.student ? s.student.User : null;
+      const mentorUser = s.mentor ? s.mentor.User : null;
+      const docentUser = s.docent ? s.docent.User : null;
+
+      return {
+        id: s.stage_id,
+        studentId: s.student_id,
+        naam: studentUser ? `${studentUser.last_name.toUpperCase()} ${studentUser.first_name}` : '',
+        studentEmail: studentUser ? studentUser.email : '',
+        bedrijf: {
+          naam: s.bedrijf ? s.bedrijf.naam : '',
+          adres: s.bedrijf ? s.bedrijf.address : '',
+        },
+        stagementor: {
+          naam: mentorUser ? `${mentorUser.first_name} ${mentorUser.last_name}` : '',
+          email: mentorUser ? mentorUser.email : '',
+        },
+        docent: {
+          naam: docentUser ? `${docentUser.first_name} ${docentUser.last_name}` : '',
+          email: docentUser ? docentUser.email : '',
+          user_id: s.docent_id || null,
+        },
+        stageDetails: {
+          omschrijving: s.omschrijving_opdracht || '',
+          start: s.begin_datum || '',
+          einde: s.eind_datum || '',
+        },
+        status: mapStageStatus(s.status),
+        rawStatus: s.status,
+        document_validated: s.document_validated || false,
+        datum: s.createdAt ? new Date(s.createdAt).toLocaleDateString('nl-BE') : '',
+        createdAt: s.createdAt,
+      };
+    });
+
+    return res.json(result);
+  } catch (error) {
+    console.error('Error fetching stages for docent:', error);
+    return res.status(500).json({ msg: 'Fout bij ophalen van stages' });
+  }
+};
+
+export default { createStage, updateStage, selectStage, getApprovedStages, selectStageByStudentId, selectStageById, selectStageByDocentId, selectStageRaw, updateStageRaw };
