@@ -1,7 +1,7 @@
 import Behaaldescore from "../objectModel/behaaldeScore.js"
 import { sequelize } from "../dbConnection.js"
 
-const createBehaaldescore = async(req,res,next) =>{
+const createBehaaldeScore = async(req,res,next) =>{
 
     const {
         stage_id,
@@ -30,4 +30,4 @@ const createBehaaldescore = async(req,res,next) =>{
     }
 }
 
-export default {createBehaaldescore};
+export default {createBehaaldeScore};

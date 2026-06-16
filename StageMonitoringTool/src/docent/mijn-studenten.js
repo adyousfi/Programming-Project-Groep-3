@@ -1,5 +1,46 @@
 import './mijn-studenten.css';
-import { studentenMockdata as studenten } from '../data/mockdata.js';
+
+function berekenVoortgang(startDatum, eindDatum) {
+  if (!startDatum || !eindDatum) return null;
+  const start = new Date(startDatum);
+  const eind = new Date(eindDatum);
+  const nu = new Date();
+  const totaalMs = eind - start;
+  const verstrekenMs = nu - start;
+  const totaalWeken = Math.ceil(totaalMs / (7 * 24 * 60 * 60 * 1000));
+  const verstrekenWeken = Math.max(0, Math.floor(verstrekenMs / (7 * 24 * 60 * 60 * 1000)));
+  const dagenOver = Math.max(0, Math.ceil((eind - nu) / (24 * 60 * 60 * 1000)));
+  return {
+    weken: verstrekenWeken,
+    totaal: totaalWeken,
+    dagenOver: dagenOver,
+  };
+}
+
+function bepaalMijlpalen(rawStatus) {
+  const stappen = [
+    { label: 'Voorstel goedgekeurd', key: 'GOEDGEKEURD' },
+    { label: 'Overeenkomst ondertekend', key: 'GOEDGEKEURD' },
+    { label: 'Stage gestart', key: 'GOEDGEKEURD' },
+    { label: 'Tussentijdse evaluatie', key: 'DOCUMENTGEUPLOADED' },
+    { label: 'Finale evaluatie', key: 'KLAAR' },
+  ];
+  const volgorde = ['AANVRAAG', 'GOEDGEKEURD', 'DOCUMENTGEUPLOADED', 'KLAAR'];
+  const huidigeIndex = volgorde.indexOf(rawStatus);
+  return stappen.map(function(s) {
+    const stapIndex = volgorde.indexOf(s.key);
+    return { label: s.label, gedaan: stapIndex <= huidigeIndex && huidigeIndex >= 0 };
+  });
+}
+
+function mapFrontendStatus(rawStatus) {
+  if (rawStatus === 'AANVRAAG') return 'in_afwachting';
+  if (rawStatus === 'KLAAR') return 'afgelopen';
+  if (rawStatus === 'GOEDGEKEURD' || rawStatus === 'DOCUMENTGEUPLOADED') return 'lopend';
+  if (rawStatus === 'AFGEKEURD') return 'afgekeurd';
+  if (rawStatus === 'AANPASSINGENVEREISD') return 'aanpassingen';
+  return 'lopend';
+}
 
 function renderMijlpalen(lijst) {
   return lijst.map(function(m, i) {
@@ -9,7 +50,7 @@ function renderMijlpalen(lijst) {
     return `
       <div class="dc-mijlpaal">
         <div class="dc-mijlpaal-cirkel dc-mijlpaal-cirkel--${m.gedaan ? 'gedaan' : 'open'}">
-          ${m.gedaan ? '✓' : i + 1}
+          ${m.gedaan ? '&#10003;' : i + 1}
         </div>
         <span class="dc-mijlpaal-label">${m.label}</span>
       </div>
@@ -24,7 +65,6 @@ function renderKaartAfwachting(s) {
       <div class="dc-card-top">
         <div>
           <h2 class="dc-card-naam">${s.naam}</h2>
-          <p class="dc-card-functie">${s.functie}</p>
           <p class="dc-card-bedrijf">${s.bedrijf}</p>
         </div>
         <span class="dc-badge dc-badge--afwachting">In afwachting van commissie</span>
@@ -48,15 +88,14 @@ function renderKaartAfwachting(s) {
 function renderKaarten(lijst) {
   return lijst.map(function(s) {
     if (s.status === 'in_afwachting') return renderKaartAfwachting(s);
-    const periodePercent = Math.round((s.voortgang.weken / s.voortgang.totaal) * 100);
-    const logboekPercent = Math.round((s.logboek.ingediend / s.logboek.totaal) * 100);
+    const periodePercent = s.voortgang ? Math.round((s.voortgang.weken / s.voortgang.totaal) * 100) : 0;
+    const logboekPercent = s.logboek && s.logboek.totaal > 0 ? Math.round((s.logboek.ingediend / s.logboek.totaal) * 100) : 0;
 
     return `
       <div class="dc-card">
         <div class="dc-card-top">
           <div>
             <h2 class="dc-card-naam">${s.naam}</h2>
-            <p class="dc-card-functie">${s.functie}</p>
             <p class="dc-card-bedrijf">${s.bedrijf}</p>
           </div>
           <div class="dc-badges">
@@ -74,23 +113,23 @@ function renderKaarten(lijst) {
             <div class="dc-voortgang-bar-wrap">
               <div class="dc-voortgang-bar dc-voortgang-bar--periode" style="width: ${periodePercent}%"></div>
             </div>
-            <span class="dc-voortgang-info">${s.voortgang.weken} / ${s.voortgang.totaal} weken${s.voortgang.dagenOver > 0 ? ` · nog ${s.voortgang.dagenOver} dagen` : ''}</span>
+            <span class="dc-voortgang-info">${s.voortgang ? s.voortgang.weken + ' / ' + s.voortgang.totaal + ' weken' + (s.voortgang.dagenOver > 0 ? ' · nog ' + s.voortgang.dagenOver + ' dagen' : '') : 'Geen data'}</span>
           </div>
           <div class="dc-voortgang-rij">
             <span class="dc-voortgang-label">Logboek</span>
             <div class="dc-voortgang-bar-wrap">
               <div class="dc-voortgang-bar dc-voortgang-bar--logboek" style="width: ${logboekPercent}%"></div>
             </div>
-            <span class="dc-voortgang-info">${s.logboek.ingediend} / ${s.logboek.totaal} weken ingediend · ${s.logboek.goedgekeurd} goedgekeurd</span>
+            <span class="dc-voortgang-info">${s.logboek ? s.logboek.ingediend + ' / ' + s.logboek.totaal + ' weken ingediend · ' + s.logboek.goedgekeurd + ' goedgekeurd' : 'Geen logboeken'}</span>
           </div>
         </div>
         <div class="dc-mijlpalen">
           ${renderMijlpalen(s.mijlpalen)}
         </div>
         <div class="dc-card-footer">
-          <span class="dc-laatste-logboek">Laatste logboek: ${s.laasteLogboek}</span>
+          <span class="dc-laatste-logboek">${s.laasteLogboek ? 'Laatste logboek: ' + s.laasteLogboek : 'Nog geen logboeken'}</span>
           ${s.eindpunt ? `<span class="dc-badge dc-badge--eindpunt">Eindpunt: ${s.eindpunt}</span>` : ''}
-          <button class="dc-btn" data-id="${s.id}">Student Bekijken</button>
+          <button class="dc-btn" data-id="${s.id}" data-student-id="${s.studentId}">Student Bekijken</button>
         </div>
       </div>
     `;
@@ -127,16 +166,53 @@ function setupStudentButtons(studenten) {
       const id = parseInt(btn.dataset.id);
       const student = studenten.find(function(s) { return s.id === id; });
       if (!student) return;
-      import('./student-detail.js').then(function(m) { m.renderStudentDetail(student); });
+      import('./student-detail.js').then(function(m) { m.renderStudentDetail(student, renderMijnStudenten._user); });
     });
   });
 }
 
-export function renderMijnStudenten() {
+export async function renderMijnStudenten(app, user) {
+  const container = app || document.querySelector('#app');
+  let stages = [];
+  renderMijnStudenten._user = user || null;
+
+  if (user && user.user_id) {
+    try {
+      const res = await fetch('/api/stages/docent/' + user.user_id, { credentials: 'include' });
+      const data = await res.json();
+      if (Array.isArray(data)) stages = data;
+    } catch (err) {
+      console.error('Fout bij ophalen stages:', err);
+    }
+  }
+
+  const studenten = stages.map(function(s) {
+    const frontendStatus = mapFrontendStatus(s.rawStatus);
+    const voortgang = berekenVoortgang(s.stageDetails.start, s.stageDetails.einde);
+    return {
+      id: s.id,
+      studentId: s.studentId,
+      naam: s.naam,
+      email: s.studentEmail,
+      bedrijf: s.bedrijf.naam || 'Onbekend bedrijf',
+      mentor: s.stagementor.naam || 'Geen mentor',
+      periodeStart: s.stageDetails.start ? new Date(s.stageDetails.start).toLocaleDateString('nl-BE', { day: 'numeric', month: 'short', year: 'numeric' }) : '–',
+      periodeEind: s.stageDetails.einde ? new Date(s.stageDetails.einde).toLocaleDateString('nl-BE', { day: 'numeric', month: 'short', year: 'numeric' }) : '–',
+      status: frontendStatus,
+      rawStatus: s.rawStatus,
+      nieuwLogboek: 0,
+      voortgang: voortgang,
+      logboek: { ingediend: 0, totaal: voortgang ? voortgang.totaal : 0, goedgekeurd: 0 },
+      mijlpalen: bepaalMijlpalen(s.rawStatus),
+      laasteLogboek: null,
+    };
+  });
+
   const actief    = studenten.filter(function(s) { return s.status === 'lopend'; });
   const afgelopen = studenten.filter(function(s) { return s.status === 'afgelopen'; });
+  const displayName = user ? (user.last_name ? user.last_name.toUpperCase() + ' ' + user.first_name : user.first_name || 'Docent') : 'Docent';
 
-  document.querySelector('#app').innerHTML = `
+  container.innerHTML = `
     <div class="dc-layout">
       <aside class="dc-sidebar">
         <div class="dc-sidebar-top">
@@ -149,15 +225,15 @@ export function renderMijnStudenten() {
           </nav>
         </div>
         <div class="dc-sidebar-bottom">
-          <span class="dc-user-name">Prof. Sarah Claes</span>
+          <span class="dc-user-name">Prof. ${displayName}</span>
           <a href="/" class="dc-logout">Uitloggen</a>
         </div>
       </aside>
       <main class="dc-main">
         <h1 class="dc-main-title">Mijn Studenten</h1>
-        <p class="dc-main-sub">Welkom, Prof. Sarah Claes</p>
+        <p class="dc-main-sub">Welkom, Prof. ${displayName}</p>
         <div class="dc-kaarten">
-          ${renderKaarten(actief)}
+          ${studenten.length > 0 ? renderKaarten(actief) : '<p>Geen actieve stages gevonden.</p>'}
         </div>
       </main>
     </div>

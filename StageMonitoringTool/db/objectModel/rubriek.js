@@ -1,23 +1,22 @@
 import { sequelize } from "../dbConnection.js";
-import { DataTypes,Deferrable } from "sequelize";
+import { DataTypes } from "sequelize";
 
-const Rubriek = sequelize.define("Rubriek",{
-    rubriek_id:{
+const Rubriek = sequelize.define("Rubriek", {
+    rubriek_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
         primaryKey: true,
         autoIncrement: true,
     },
-    competentie_id:{
-        type: DataTypes.INTEGER
+    score: {
+        type: DataTypes.INTEGER, // Bijv: 1 tot 5
+        allowNull: false
     },
-    rubriektitel:{
-        type:DataTypes.STRING
-    },
-    rubriek_beschrijving:{
-        type: DataTypes.STRING
+    beschrijving: {
+        type: DataTypes.TEXT,
+        allowNull: false
     }
-
-})
+    // competentie_id komt hier via relaties
+});
 
 export default Rubriek;

@@ -4,6 +4,7 @@ import cookieParser from 'cookie-parser';
 import multer from 'multer';
 import { run } from '../db/dbConnection.js';
 import '../db/allimport.js';
+import seedDatabase from '../db/seedDb.js';
 
 import userRoutes from '../db/routes/userRoutes.js';
 import stageRoutes from '../db/routes/stageRoutes.js';
@@ -15,6 +16,7 @@ import opmerkingLogboekRoutes from '../db/routes/opmerkingLogboekRoutes.js';
 import behaaldeScoreRoutes from '../db/routes/behaaldeScoreRoutes.js';
 import competentieRoutes from '../db/routes/competentieRoutes.js';
 import rubriekRoutes from '../db/routes/rubriekRoutes.js';
+import evaluatieRoutes from '../db/routes/evaluatieRoutes.js';
 
 const app = express();
 
@@ -47,6 +49,7 @@ app.use('/api/opmerkingen-logboek', opmerkingLogboekRoutes);
 app.use('/api/behaalde-scores', behaaldeScoreRoutes);
 app.use('/api/competenties', competentieRoutes);
 app.use('/api/rubrieken', rubriekRoutes);
+app.use('/api/evaluaties', evaluatieRoutes);
 
 app.use((err, req, res, next) => {
   if (err instanceof multer.MulterError) {
@@ -60,6 +63,7 @@ app.use((err, req, res, next) => {
 
 async function start() {
   await run();
+  // await seedDatabase();
   app.listen(3000, () => {
     console.log('✅ Server running on 3000');
   });

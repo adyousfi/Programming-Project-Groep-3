@@ -37,7 +37,6 @@ function renderOverzicht(student) {
         <div class="sd-stat-card">
           <p class="sd-stat-label">Bedrijf</p>
           <p class="sd-stat-value">${student.bedrijf}</p>
-          <p class="sd-stat-sub">${student.functie}</p>
         </div>
       </div>
 
@@ -79,7 +78,9 @@ function renderTabContent(tab, student) {
   return `<div class="sd-tab-content"></div>`;
 }
 
-export function renderStudentDetail(student) {
+export function renderStudentDetail(student, user) {
+  const displayName = user ? (user.last_name ? user.last_name.toUpperCase() + ' ' + user.first_name : user.first_name || 'Docent') : 'Docent';
+
   document.querySelector('#app').innerHTML = `
     <div class="sd-layout">
       <aside class="sd-sidebar">
@@ -91,7 +92,7 @@ export function renderStudentDetail(student) {
           </nav>
         </div>
         <div class="sd-sidebar-bottom">
-          <span class="sd-user-name">Prof. Sarah Claes</span>
+          <span class="sd-user-name">Prof. ${displayName}</span>
           <a href="/" class="sd-logout">Uitloggen</a>
         </div>
       </aside>
@@ -111,7 +112,7 @@ export function renderStudentDetail(student) {
 
   document.querySelector('#sd-terug').addEventListener('click', function(e) {
     e.preventDefault();
-    import('./mijn-studenten.js').then(function(m) { m.renderMijnStudenten(); });
+    import('./mijn-studenten.js').then(function(m) { m.renderMijnStudenten(document.querySelector('#app'), user); });
   });
 
   document.querySelectorAll('.sd-nav-item').forEach(function(item) {
