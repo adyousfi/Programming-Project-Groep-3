@@ -58,7 +58,7 @@ if (role === 'student') {
           renderWachten(app, displayName);
           break;
         case 'goedgekeurd':
-          renderGoedgekeurdStudent(app, displayName, stageData);
+          await renderGoedgekeurdStudent(app, displayName, stageData);
           break;
         case 'aanpassingen':
           renderFeedback(app, user, stageData);
@@ -102,9 +102,9 @@ if (role === 'student') {
   if (user && user.user_id) {
     const displayName = user.last_name ? `${user.last_name.toUpperCase()} ${user.first_name}` : user.first_name;
     const stageData = await getStudentStage(user.user_id);
-    renderGoedgekeurdStudent(app, displayName, stageData.found ? stageData : null);
+    await renderGoedgekeurdStudent(app, displayName, stageData.found ? stageData : null);
   } else {
-    renderGoedgekeurdStudent(app);
+    await renderGoedgekeurdStudent(app);
   }
 } else if (role === 'documenten') {
   await renderDocumenten(app);
@@ -124,9 +124,9 @@ if (role === 'student') {
   if (user && user.user_id) {
     const displayName = user.last_name ? `${user.last_name.toUpperCase()} ${user.first_name}` : user.first_name;
     const stageData = await getStudentStage(user.user_id);
-    renderLogboek(app, displayName, stageData.found ? stageData : null);
+    await renderLogboek(app, displayName, stageData.found ? stageData : null);
   } else {
-    renderLogboek(app);
+    await renderLogboek(app);
   }
 } else if (role === 'logboek_dag') {
   const weekNumber = parseInt(new URLSearchParams(window.location.search).get('week')) || 1;
@@ -134,9 +134,9 @@ if (role === 'student') {
   if (user && user.user_id) {
     const displayName = user.last_name ? `${user.last_name.toUpperCase()} ${user.first_name}` : user.first_name;
     const stageData = await getStudentStage(user.user_id);
-    renderLogboekDag(app, displayName, stageData.found ? stageData : null, weekNumber);
+    await renderLogboekDag(app, displayName, stageData.found ? stageData : null, weekNumber);
   } else {
-    renderLogboekDag(app, 'Student', null, weekNumber);
+    await renderLogboekDag(app, 'Student', null, weekNumber);
   }
 } else {
   app.style.display = 'none';

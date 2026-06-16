@@ -23,7 +23,14 @@ function sameDay(d1, d2) {
         && d1.getDate() === d2.getDate();
 }
 
-export function renderLogboekDag(container, userName = 'Student', stageData = null, weekNumber = 1) {
+function toDateStr(d) {
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+
+export async function renderLogboekDag(container, userName = 'Student', stageData = null, weekNumber = 1) {
     lastUserName = userName || lastUserName;
     lastStageData = stageData || lastStageData;
     lastWeekNumber = weekNumber || lastWeekNumber;
@@ -31,10 +38,30 @@ export function renderLogboekDag(container, userName = 'Student', stageData = nu
     const endDate = stageData?.stageDetails?.einde ? new Date(stageData.stageDetails.einde) : null;
     const today = getNow();
 
+    let logboekEntries = [];
+    if (stageData?.id) {
+        try {
+            const res = await fetch(`/api/logboek/stage/${stageData.id}`, { credentials: 'include' });
+            logboekEntries = await res.json();
+        } catch (err) {
+            console.error('Error fetching logboek:', err);
+        }
+    }
+
     function getDayDateObj(weekIndex, dayIndex) {
         if (!startDate) return null;
         const d = new Date(startDate);
-        d.setDate(startDate.getDate() + weekIndex * 7 + dayIndex);
+        d.setDate(startDate.getDate() + weekIndex * 7);
+        while (d.getDay() === 0 || d.getDay() === 6) {
+            d.setDate(d.getDate() + 1);
+        }
+        let count = 0;
+        while (count < dayIndex) {
+            d.setDate(d.getDate() + 1);
+            if (d.getDay() !== 0 && d.getDay() !== 6) {
+                count++;
+            }
+        }
         return d;
     }
 
@@ -57,38 +84,76 @@ export function renderLogboekDag(container, userName = 'Student', stageData = nu
         return 'future';
     }
 
+    function getEntryForDay(weekIndex, dayIndex) {
+        const d = getDayDateObj(weekIndex, dayIndex);
+        if (!d) return null;
+        const dateStr = toDateStr(d);
+        return logboekEntries.find(e => {
+            if (!e.datum) return false;
+            const entryDate = toDateStr(new Date(e.datum));
+            return entryDate === dateStr;
+        }) || null;
+    }
+
     const weekIndex = weekNumber - 1;
     const weekStart = getDayDateStr(weekIndex, 0);
 
-    const weekEndDate = new Date(startDate);
-    if (startDate) {
-        weekEndDate.setDate(startDate.getDate() + weekIndex * 7 + 4);
-        if (endDate && weekEndDate > endDate) {
-            weekEndDate.setTime(endDate.getTime());
-        }
-    }
-    const weekEnd = startDate ? weekEndDate.toLocaleDateString('nl-BE', { day: 'numeric', month: 'short' }) : '?';
-
     const visibleDays = DAYS.filter((_, i) => isDayInStage(weekIndex, i));
+    const lastDayIndex = visibleDays.length - 1;
 
-    function getFormHTML(dayIndex) {
+    const weekEndDate = getDayDateObj(weekIndex, lastDayIndex);
+    if (endDate && weekEndDate && weekEndDate > endDate) {
+        weekEndDate.setTime(endDate.getTime());
+    }
+    const weekEnd = weekEndDate ? weekEndDate.toLocaleDateString('nl-BE', { day: 'numeric', month: 'short' }) : '?';
+
+    function getFormHTML(dayIndex, entry) {
+        const taken = entry ? entry.uitgevoerdeTaken || '' : '';
+        const reflectie = entry ? entry.reflectie || '' : '';
+        const leerpunten = entry ? entry.leerpunten || '' : '';
         return `
             <div class="logboek-dag-card-form">
                 <div class="logboek-dag-field">
                     <label class="logboek-dag-label">Beschrijving van uitgevoerde taken <span class="logboek-dag-required">*</span></label>
-                    <textarea class="logboek-dag-textarea" placeholder="Wat heb je vandaag gedaan?" rows="4" required></textarea>
+                    <textarea class="logboek-dag-textarea" placeholder="Wat heb je vandaag gedaan?" rows="4" required>${taken}</textarea>
                 </div>
                 <div class="logboek-dag-field">
                     <label class="logboek-dag-label">Reflectie <span class="logboek-dag-required">*</span></label>
-                    <textarea class="logboek-dag-textarea" placeholder="Wat heb je geleerd?" rows="4" required></textarea>
+                    <textarea class="logboek-dag-textarea" placeholder="Wat heb je geleerd?" rows="4" required>${reflectie}</textarea>
                 </div>
                 <div class="logboek-dag-field">
                     <label class="logboek-dag-label">Problemen of leerpunten <span class="logboek-dag-required">*</span></label>
-                    <textarea class="logboek-dag-textarea" placeholder="Welke uitdagingen kwam je tegen?" rows="4" required></textarea>
+                    <textarea class="logboek-dag-textarea" placeholder="Welke uitdagingen kwam je tegen?" rows="4" required>${leerpunten}</textarea>
                 </div>
                 <div class="logboek-dag-card-bottom">
                     <button class="logboek-dag-save-btn" data-day="${dayIndex}" type="button">Dag opslaan</button>
                     <button class="logboek-dag-absent-btn" data-day="${dayIndex}" type="button">Afwezig?</button>
+                </div>
+            </div>
+        `;
+    }
+
+    function getFilledHTML(entry, isAbsent) {
+        const taken = entry ? entry.uitgevoerdeTaken || '' : '';
+        const reflectie = entry ? entry.reflectie || '' : '';
+        const leerpunten = entry ? entry.leerpunten || '' : '';
+        return `
+            <div class="logboek-dag-card-form">
+                <div class="logboek-dag-field">
+                    <label class="logboek-dag-label">Beschrijving van uitgevoerde taken</label>
+                    <textarea class="logboek-dag-textarea" rows="4" disabled>${taken}</textarea>
+                </div>
+                <div class="logboek-dag-field">
+                    <label class="logboek-dag-label">Reflectie</label>
+                    <textarea class="logboek-dag-textarea" rows="4" disabled>${reflectie}</textarea>
+                </div>
+                <div class="logboek-dag-field">
+                    <label class="logboek-dag-label">Problemen of leerpunten</label>
+                    <textarea class="logboek-dag-textarea" rows="4" disabled>${leerpunten}</textarea>
+                </div>
+                <div class="logboek-dag-card-bottom">
+                    <button class="logboek-dag-save-btn" disabled>Opgeslagen</button>
+                    <button class="logboek-dag-absent-btn" disabled>${isAbsent ? 'Afwezig' : 'Afwezig?'}</button>
                 </div>
             </div>
         `;
@@ -149,16 +214,32 @@ export function renderLogboekDag(container, userName = 'Student', stageData = nu
                     ${visibleDays.map((day, i) => {
                         const dayIndex = i;
                         const dayDate = getDayDateStr(weekIndex, dayIndex);
+                        const dayDateObj = getDayDateObj(weekIndex, dayIndex);
+                        const dayName = dayDateObj
+                            ? dayDateObj.toLocaleDateString('nl-BE', { weekday: 'long' }).replace(/^./, c => c.toUpperCase())
+                            : day.name;
                         const dayStatus = getDayStatus(weekIndex, dayIndex);
+                        const entry = getEntryForDay(weekIndex, dayIndex);
+                        const isSaved = entry && (entry.status === 'DEELSINGEVULD' || entry.status === 'INGEVULD');
+                        const isAbsent = entry && entry.uitgevoerdeTaken === 'AFWEZIG';
 
                         let badgeClass = 'badge-locked';
                         let badgeText = 'Nog niet beschikbaar';
                         let contentHTML = getLockedHTML();
+                        let cardClass = 'locked';
+                        let dataFilled = 'false';
 
-                        if (dayStatus === 'today') {
+                        if (isSaved) {
+                            badgeClass = 'badge-filled';
+                            badgeText = 'Ingevuld';
+                            contentHTML = getFilledHTML(entry, isAbsent);
+                            cardClass = 'unlocked';
+                            dataFilled = 'true';
+                        } else if (dayStatus === 'today') {
                             badgeClass = 'badge-available';
                             badgeText = 'Beschikbaar';
-                            contentHTML = getFormHTML(dayIndex);
+                            contentHTML = getFormHTML(dayIndex, entry);
+                            cardClass = 'unlocked';
                         } else if (dayStatus === 'future') {
                             badgeClass = 'badge-locked';
                             badgeText = 'Nog niet beschikbaar';
@@ -166,10 +247,10 @@ export function renderLogboekDag(container, userName = 'Student', stageData = nu
                         }
 
                         return `
-                            <div class="logboek-dag-card${dayStatus === 'today' ? ' unlocked' : ' locked'}" data-day="${dayIndex}" data-filled="false">
+                            <div class="logboek-dag-card ${cardClass}" data-day="${dayIndex}" data-filled="${dataFilled}">
                                 <div class="logboek-dag-card-header">
                                     <div class="logboek-dag-card-left">
-                                        <span class="logboek-dag-card-name">${day.name}</span>
+                                        <span class="logboek-dag-card-name">${dayName}</span>
                                         <span class="logboek-dag-card-date">${dayDate}</span>
                                     </div>
                                     <span class="logboek-dag-card-badge ${badgeClass}">${badgeText}</span>
@@ -204,13 +285,26 @@ export function renderLogboekDag(container, userName = 'Student', stageData = nu
         </div>
     `;
 
-    initLogboekDagHandlers(visibleDays.length);
+    initLogboekDagHandlers(visibleDays.length, stageData, weekIndex, getDayDateObj, logboekEntries);
 }
 
-function initLogboekDagHandlers(totalDays) {
+function initLogboekDagHandlers(totalDays, stageData, weekIndex, getDayDateObj, logboekEntries) {
     const cards = document.querySelectorAll('.logboek-dag-card');
     const submitBtn = document.getElementById('week-indienen');
     const filledCountEl = document.getElementById('filled-count');
+    const stageId = stageData?.id;
+
+    const weekAllIngevuld = Array.from({ length: totalDays }, (_, i) => {
+        const d = getDayDateObj(weekIndex, i);
+        if (!d) return false;
+        const dateStr = toDateStr(d);
+        return logboekEntries.some(e => e.datum && toDateStr(new Date(e.datum)) === dateStr && e.status === 'INGEVULD');
+    }).every(Boolean);
+
+    if (submitBtn && weekAllIngevuld) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Reeds ingediend';
+    }
 
     function updateFilledCount() {
         let count = 0;
@@ -243,7 +337,7 @@ function initLogboekDagHandlers(totalDays) {
     function attachSaveHandler(card) {
         const saveBtn = card.querySelector('.logboek-dag-save-btn');
         if (saveBtn) {
-            saveBtn.addEventListener('click', () => {
+            saveBtn.addEventListener('click', async () => {
                 const form = card.querySelector('.logboek-dag-card-form');
                 if (!form) return;
                 const textareas = form.querySelectorAll('textarea');
@@ -256,8 +350,45 @@ function initLogboekDagHandlers(totalDays) {
                     }
                 });
                 if (!allFilled) return;
+
                 const dayIndex = parseInt(saveBtn.dataset.day);
-                markDayFilled(card, dayIndex, false);
+                const entryDate = getDayDateObj(weekIndex, dayIndex);
+                if (!entryDate || !stageId) return;
+                const datum = toDateStr(entryDate);
+
+                const textValues = [];
+                textareas.forEach(ta => textValues.push(ta.value.trim()));
+
+                saveBtn.disabled = true;
+                saveBtn.textContent = 'Opslaan...';
+
+                try {
+                    const res = await fetch('/api/logboek', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        credentials: 'include',
+                        body: JSON.stringify({
+                            stage_id: stageId,
+                            datum,
+                            uitgevoerdeTaken: textValues[0],
+                            reflectie: textValues[1],
+                            leerpunten: textValues[2],
+                            status: 'DEELSINGEVULD'
+                        })
+                    });
+                    if (res.ok) {
+                        markDayFilled(card, dayIndex, false);
+                    } else {
+                        saveBtn.disabled = false;
+                        saveBtn.textContent = 'Dag opslaan';
+                        alert('Fout bij opslaan. Probeer opnieuw.');
+                    }
+                } catch (err) {
+                    console.error('Error saving logboek entry:', err);
+                    saveBtn.disabled = false;
+                    saveBtn.textContent = 'Dag opslaan';
+                    alert('Server fout bij opslaan.');
+                }
             });
         }
 
@@ -282,8 +413,31 @@ function initLogboekDagHandlers(totalDays) {
                     if (e.target === modal) closeModal();
                 }
 
-                function confirmAbsence() {
+                async function confirmAbsence() {
                     closeModal();
+
+                    const entryDate = getDayDateObj(weekIndex, dayIndex);
+                    if (!entryDate || !stageId) return;
+                    const datum = toDateStr(entryDate);
+
+                    try {
+                        await fetch('/api/logboek', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            credentials: 'include',
+                            body: JSON.stringify({
+                                stage_id: stageId,
+                                datum,
+                                uitgevoerdeTaken: 'AFWEZIG',
+                                reflectie: '',
+                                leerpunten: '',
+                                status: 'DEELSINGEVULD'
+                            })
+                        });
+                    } catch (err) {
+                        console.error('Error saving absence:', err);
+                    }
+
                     markDayFilled(card, dayIndex, true);
                 }
 
@@ -301,8 +455,41 @@ function initLogboekDagHandlers(totalDays) {
     });
 
     if (submitBtn) {
-        submitBtn.addEventListener('click', () => {
-            alert('Week succesvol ingediend!');
+        submitBtn.addEventListener('click', async () => {
+            if (!stageId) return;
+
+            const firstDayDate = getDayDateObj(weekIndex, 0);
+            const lastDayDate = getDayDateObj(weekIndex, totalDays - 1);
+            if (!firstDayDate || !lastDayDate) return;
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Indienen...';
+
+            try {
+                const res = await fetch('/api/logboek/submit-week', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        stage_id: stageId,
+                        weekStart: toDateStr(firstDayDate),
+                        weekEnd: toDateStr(lastDayDate)
+                    })
+                });
+                if (res.ok) {
+                    alert('Week succesvol ingediend!');
+                    window.location.href = '?role=logboek';
+                } else {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Week Indienen';
+                    alert('Fout bij indienen. Probeer opnieuw.');
+                }
+            } catch (err) {
+                console.error('Error submitting week:', err);
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Week Indienen';
+                alert('Server fout bij indienen.');
+            }
         });
     }
 
@@ -310,24 +497,6 @@ function initLogboekDagHandlers(totalDays) {
     const testInput = document.getElementById('test-date-input');
     const testApply = document.getElementById('test-date-apply');
     const testReset = document.getElementById('test-date-reset');
-    const renderFn = () => {
-        const container = document.getElementById('logboek-dag-cards');
-        if (container && container.closest('.logboek-dag-layout')) {
-            const mainEl = container.closest('.logboek-dag-main');
-            const backLink = mainEl?.querySelector('.logboek-dag-back');
-            const headerEl = mainEl?.querySelector('.logboek-dag-header');
-            const infoEl = mainEl?.querySelector('.logboek-dag-info');
-            const url = new URL(window.location.href);
-            const week = parseInt(url.searchParams.get('week')) || 1;
-            const appEl = document.getElementById('app');
-            if (appEl) {
-                const role = url.searchParams.get('role');
-                import('./logboek-dag.js').then(m => {
-                    m.renderLogboekDag(appEl, undefined, undefined, week);
-                });
-            }
-        }
-    };
 
     if (testApply) {
         testApply.addEventListener('click', () => {
@@ -351,4 +520,6 @@ function initLogboekDagHandlers(totalDays) {
             });
         });
     }
+
+    updateFilledCount();
 }

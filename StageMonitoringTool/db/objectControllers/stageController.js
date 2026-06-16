@@ -6,6 +6,7 @@ import Student from "../userModel/student.js";
 import User from "../userModel/user.js";
 import Bedrijf from "../objectModel/bedrijf.js";
 import Docent from "../userModel/docent.js";
+import { Op } from "sequelize";
 
 const createStage = async (req, res, next) => {
   try {
@@ -24,7 +25,6 @@ const createStage = async (req, res, next) => {
     if (!studentProfile) return res.status(400).json({ msg: 'Geen studentprofiel gevonden' });
     const student_id = studentProfile.user_id;
 
-    // Delete old stages and their documents so admin always sees only the latest
     const oldStages = await Stage.findAll({ where: { student_id } });
     for (const old of oldStages) {
       await StageDocument.destroy({ where: { stage_id: old.stage_id } });
@@ -102,10 +102,20 @@ const updateStage = async (req, res, next) => {
     console.error('Error updating stage:', error);
     return res.status(500).json({ msg: 'Fout bij bijwerken van stage' });
   }
-}; 
+};
+
+const mapStageStatus = (status) => {
+  return status?.toLowerCase() === 'aanvraag' ? 'in_afwachting'
+    : status?.toLowerCase() === 'goedgekeurd' ? 'goedgekeurd'
+    : status?.toLowerCase() === 'afgekeurd' ? 'afgekeurd'
+    : status?.toLowerCase() === 'aanpassingenvereisd' ? 'aanpassingen'
+    : status?.toLowerCase() === 'documentgeuploaded' ? 'goedgekeurd'
+    : status?.toLowerCase() === 'klaar' ? 'goedgekeurd'
+    : status;
+};
 
 const selectStage = async (req, res, next) => {
-    try {
+  try {
     const stages = await Stage.findAll({
       include: [
         { model: Student, as: 'student', include: [{ model: User, as: 'User' }] },
@@ -148,11 +158,7 @@ const selectStage = async (req, res, next) => {
           einde: s.eind_datum || '',
           urenPerWeek: '',
         },
-        status: s.status?.toLowerCase() === 'aanvraag' ? 'in_afwachting'
-          : s.status?.toLowerCase() === 'goedgekeurd' ? 'goedgekeurd'
-          : s.status?.toLowerCase() === 'afgekeurd' ? 'afgekeurd'
-          : s.status?.toLowerCase() === 'aanpassingenvereisd' ? 'aanpassingen'
-          : s.status,
+        status: mapStageStatus(s.status),
         datum: s.createdAt ? new Date(s.createdAt).toLocaleDateString('nl-BE') : '',
         historiek: null,
       };
@@ -165,10 +171,10 @@ const selectStage = async (req, res, next) => {
   }
 };
 
-//GET GOEDKEURDE STAGES
-const getApprovedStages = async (req, res, next) => {try {
+const getApprovedStages = async (req, res, next) => {
+  try {
     const stages = await Stage.findAll({
-      where: { status: 'GOEDGEKEURD' },
+      where: { status: { [Op.in]: ['GOEDGEKEURD', 'DOCUMENTGEUPLOADED'] } },
       include: [
         { model: Student, as: 'student', include: [{ model: User, as: 'User' }] },
         { model: Bedrijf, as: 'bedrijf' },
@@ -178,6 +184,11 @@ const getApprovedStages = async (req, res, next) => {try {
       id: s.stage_id,
       naam: s.student?.User ? `${s.student.User.last_name.toUpperCase()} ${s.student.User.first_name}` : 'Onbekend',
       bedrijf: s.bedrijf?.naam || '',
+      stageDetails: {
+        start: s.begin_datum,
+        einde: s.eind_datum,
+      },
+      document_validated: s.document_validated || false,
     })));
   } catch (err) {
     console.error(err);
@@ -185,9 +196,8 @@ const getApprovedStages = async (req, res, next) => {try {
   }
 };
 
-//SELECT STAGE BY ID
 const selectStageById = async (req, res, next) => {
-    try {
+  try {
     const stage = await Stage.findByPk(req.params.id, {
       include: [
         { model: Student, as: 'student', include: [{ model: User, as: 'User' }] },
@@ -226,14 +236,11 @@ const selectStageById = async (req, res, next) => {
         start: stage.begin_datum || '',
         einde: stage.eind_datum || '',
       },
-      status: stage.status?.toLowerCase() === 'aanvraag' ? 'in_afwachting'
-        : stage.status?.toLowerCase() === 'goedgekeurd' ? 'goedgekeurd'
-        : stage.status?.toLowerCase() === 'afgekeurd' ? 'afgekeurd'
-        : stage.status?.toLowerCase() === 'aanpassingenvereisd' ? 'aanpassingen'
-        : stage.status,
+      status: mapStageStatus(stage.status),
       rawStatus: stage.status,
       datum: stage.createdAt ? new Date(stage.createdAt).toLocaleDateString('nl-BE') : '',
       feedback: stage.feedback || null,
+      document_validated: stage.document_validated || false,
     });
   } catch (error) {
     console.error('Error fetching stage:', error);
@@ -241,105 +248,99 @@ const selectStageById = async (req, res, next) => {
   }
 };
 
-//GET STAGE BY STUDENT ID
 const selectStageByStudentId = async (req, res, next) => {
-    try {
-        const stage = await Stage.findOne({
-          where: { student_id: req.params.studentId },
-          include: [
-            { model: Student, as: 'student', include: [{ model: User, as: 'User' }] },
-            { model: Stagementor, as: 'mentor', include: [{ model: User, as: 'User' }] },
-            { model: Bedrijf, as: 'bedrijf' },
-            { model: Docent, as: 'docent', include: [{ model: User, as: 'User' }] },
-          ],
-          order: [['createdAt', 'DESC']]
-        });
-    
-        if (!stage) return res.json({ found: false });
-    
-        const studentUser = stage.student ? stage.student.User : null;
-        const mentorUser = stage.mentor ? stage.mentor.User : null;
-        const docentUser = stage.docent ? stage.docent.User : null;
-    
-        return res.json({
-          found: true,
-          id: stage.stage_id,
-          naam: studentUser ? `${studentUser.first_name} ${studentUser.last_name}` : '',
-          studentEmail: studentUser ? studentUser.email : '',
-          studentNummer: stage.student ? stage.student.studentnummer : '',
-          bedrijf: {
-            naam: stage.bedrijf ? stage.bedrijf.naam : '',
-            adres: stage.bedrijf ? stage.bedrijf.address : '',
-          },
-          stagementor: {
-            naam: mentorUser ? `${mentorUser.first_name} ${mentorUser.last_name}` : '',
-            email: mentorUser ? mentorUser.email : '',
-          },
-          docent: {
-            naam: docentUser ? `Prof. ${docentUser.first_name} ${docentUser.last_name}` : '',
-          },
-          stageDetails: {
-            omschrijving: stage.omschrijving_opdracht || '',
-            start: stage.begin_datum || '',
-            einde: stage.eind_datum || '',
-          },
-          status: stage.status?.toLowerCase() === 'aanvraag' ? 'in_afwachting'
-            : stage.status?.toLowerCase() === 'goedgekeurd' ? 'goedgekeurd'
-            : stage.status?.toLowerCase() === 'afgekeurd' ? 'afgekeurd'
-            : stage.status?.toLowerCase() === 'aanpassingenvereisd' ? 'aanpassingen'
-            : stage.status,
-          rawStatus: stage.status,
-          datum: stage.createdAt ? new Date(stage.createdAt).toLocaleDateString('nl-BE') : '',
-          feedback: stage.feedback || null,
-          document_validated: stage.document_validated || false,
-        });
-      } catch (error) {
-        console.error('Error fetching student stage:', error);
-        return res.status(500).json({ msg: 'Fout bij ophalen van stage' });
-      }
-    };
-// Raw select for internal usage (e.g. koppeldocent page)
-const selectStageRaw = async (req, res, next) => {
-    try {
-        const stages = await Stage.findAll({
-          include: [
-            { model: Student, as: 'student', include: [{ model: User, as: 'User' }] },
-            { model: Stagementor, as: 'mentor', include: [{ model: User, as: 'User' }] },
-            { model: Bedrijf, as: 'bedrijf' },
-            { model: Docent, as: 'docent', include: [{ model: User, as: 'User' }] },
-          ]
-        });
-        return res.status(200).json({
-            msg: "Stages selected successfully",
-            data: stages
-        });
-    } catch (error) {
-        console.error("Error selecting stages: ", error);
-        return res.status(500).json({
-            msg: "something went wrong while selecting stages"
-        });
-    }
+  try {
+    const stage = await Stage.findOne({
+      where: { student_id: req.params.studentId },
+      include: [
+        { model: Student, as: 'student', include: [{ model: User, as: 'User' }] },
+        { model: Stagementor, as: 'mentor', include: [{ model: User, as: 'User' }] },
+        { model: Bedrijf, as: 'bedrijf' },
+        { model: Docent, as: 'docent', include: [{ model: User, as: 'User' }] },
+      ],
+      order: [['createdAt', 'DESC']]
+    });
+
+    if (!stage) return res.json({ found: false });
+
+    const studentUser = stage.student ? stage.student.User : null;
+    const mentorUser = stage.mentor ? stage.mentor.User : null;
+    const docentUser = stage.docent ? stage.docent.User : null;
+
+    return res.json({
+      found: true,
+      id: stage.stage_id,
+      naam: studentUser ? `${studentUser.first_name} ${studentUser.last_name}` : '',
+      studentEmail: studentUser ? studentUser.email : '',
+      studentNummer: stage.student ? stage.student.studentnummer : '',
+      bedrijf: {
+        naam: stage.bedrijf ? stage.bedrijf.naam : '',
+        adres: stage.bedrijf ? stage.bedrijf.address : '',
+      },
+      stagementor: {
+        naam: mentorUser ? `${mentorUser.first_name} ${mentorUser.last_name}` : '',
+        email: mentorUser ? mentorUser.email : '',
+      },
+      docent: {
+        naam: docentUser ? `Prof. ${docentUser.first_name} ${docentUser.last_name}` : '',
+      },
+      stageDetails: {
+        omschrijving: stage.omschrijving_opdracht || '',
+        start: stage.begin_datum || '',
+        einde: stage.eind_datum || '',
+      },
+      status: mapStageStatus(stage.status),
+      rawStatus: stage.status,
+      datum: stage.createdAt ? new Date(stage.createdAt).toLocaleDateString('nl-BE') : '',
+      feedback: stage.feedback || null,
+      document_validated: stage.document_validated || false,
+    });
+  } catch (error) {
+    console.error('Error fetching student stage:', error);
+    return res.status(500).json({ msg: 'Fout bij ophalen van stage' });
+  }
 };
 
-// Raw update for internal usage (e.g. koppeldocent page)
+const selectStageRaw = async (req, res, next) => {
+  try {
+    const stages = await Stage.findAll({
+      include: [
+        { model: Student, as: 'student', include: [{ model: User, as: 'User' }] },
+        { model: Stagementor, as: 'mentor', include: [{ model: User, as: 'User' }] },
+        { model: Bedrijf, as: 'bedrijf' },
+        { model: Docent, as: 'docent', include: [{ model: User, as: 'User' }] },
+      ]
+    });
+    return res.status(200).json({
+      msg: "Stages selected successfully",
+      data: stages
+    });
+  } catch (error) {
+    console.error("Error selecting stages: ", error);
+    return res.status(500).json({
+      msg: "something went wrong while selecting stages"
+    });
+  }
+};
+
 const updateStageRaw = async (req, res, next) => {
-    try {
-        const { stage_id, student_id, docent_id, stagementor_id, bedrijf_id } = req.body;
+  try {
+    const { stage_id, student_id, docent_id, stagementor_id, bedrijf_id } = req.body;
 
-        await Stage.update(
-            { student_id, docent_id, stagementor_id, bedrijf_id },
-            { where: { stage_id: stage_id } }
-        );
+    await Stage.update(
+      { student_id, docent_id, stagementor_id, bedrijf_id },
+      { where: { stage_id: stage_id } }
+    );
 
-        return res.status(200).json({
-            msg: "Stage updated successfully"
-        });
-    } catch (error) {
-        console.error("Error updating stage: ", error);
-        return res.status(500).json({
-            msg: "something went wrong while updating stage"
-        });
-    }
+    return res.status(200).json({
+      msg: "Stage updated successfully"
+    });
+  } catch (error) {
+    console.error("Error updating stage: ", error);
+    return res.status(500).json({
+      msg: "something went wrong while updating stage"
+    });
+  }
 };
 
 export default { createStage, updateStage, selectStage, getApprovedStages, selectStageByStudentId, selectStageById, selectStageRaw, updateStageRaw };
