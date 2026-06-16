@@ -17,20 +17,20 @@ function berekenVoortgang(startDatum, eindDatum) {
   };
 }
 
-function bepaalMijlpalen(rawStatus) {
-  const stappen = [
-    { label: 'Voorstel goedgekeurd', key: 'GOEDGEKEURD' },
-    { label: 'Overeenkomst ondertekend', key: 'GOEDGEKEURD' },
-    { label: 'Stage gestart', key: 'GOEDGEKEURD' },
-    { label: 'Tussentijdse evaluatie', key: 'DOCUMENTGEUPLOADED' },
-    { label: 'Finale evaluatie', key: 'KLAAR' },
-  ];
+function bepaalMijlpalen(rawStatus, documentValidated) {
   const volgorde = ['AANVRAAG', 'GOEDGEKEURD', 'DOCUMENTGEUPLOADED', 'KLAAR'];
   const huidigeIndex = volgorde.indexOf(rawStatus);
-  return stappen.map(function(s) {
-    const stapIndex = volgorde.indexOf(s.key);
-    return { label: s.label, gedaan: stapIndex <= huidigeIndex && huidigeIndex >= 0 };
-  });
+
+  const isGoedgekeurd = huidigeIndex >= volgorde.indexOf('GOEDGEKEURD');
+  const isKlaar = rawStatus === 'KLAAR';
+
+  return [
+    { label: 'Voorstel goedgekeurd', gedaan: isGoedgekeurd },
+    { label: 'Overeenkomst ondertekend', gedaan: isGoedgekeurd },
+    { label: 'Stage gestart', gedaan: isGoedgekeurd },
+    { label: 'Tussentijdse evaluatie', gedaan: !!documentValidated },
+    { label: 'Finale evaluatie', gedaan: isKlaar },
+  ];
 }
 
 function mapFrontendStatus(rawStatus) {
@@ -203,7 +203,7 @@ export async function renderMijnStudenten(app, user) {
       nieuwLogboek: 0,
       voortgang: voortgang,
       logboek: { ingediend: 0, totaal: voortgang ? voortgang.totaal : 0, goedgekeurd: 0 },
-      mijlpalen: bepaalMijlpalen(s.rawStatus),
+      mijlpalen: bepaalMijlpalen(s.rawStatus, s.document_validated),
       laasteLogboek: null,
     };
   });
