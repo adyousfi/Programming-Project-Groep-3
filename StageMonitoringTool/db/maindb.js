@@ -1,4 +1,3 @@
-import express from 'express';
 import seedDatabase from "./seedDb.js";
 import { run, sequelize } from "./dbConnection.js";
 import { confirmRelations } from "./allimport.js";

@@ -49,6 +49,8 @@ Stage.belongsTo(Student, { as: 'student', foreignKey: 'student_id', onDelete: 'C
 Stage.belongsTo(Bedrijf, { as: 'bedrijf', foreignKey: 'bedrijf_id', onDelete: 'CASCADE' });
 Stage.belongsTo(Stagementor, { as: 'mentor', foreignKey: 'stagementor_id', onDelete: 'CASCADE' });
 Stage.hasMany(Behaaldescore, { foreignKey: 'stage_id', onDelete: 'CASCADE' });
+Stage.hasMany(Logboek, { foreignKey: 'stage_id', onDelete: 'CASCADE' });
+Logboek.belongsTo(Stage, { foreignKey: 'stage_id' });
 //Logboek & Opmerking Relaties
 Opmerkinglogboek.hasMany(Logboek, { foreignKey: 'opmerkinglogboek_id', onDelete: 'CASCADE' });
 Logboek.belongsTo(Opmerkinglogboek, { foreignKey: 'opmerkinglogboek_id', onDelete: 'CASCADE'});

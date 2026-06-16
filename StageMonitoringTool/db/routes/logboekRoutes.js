@@ -3,6 +3,9 @@ import logboekController from '../objectControllers/logboekController.js';
 
 const router = express.Router();
 
+router.get("/stage/:stageId", logboekController.getLogboekByStage);
+router.post("/", logboekController.upsertLogboek);
+router.post("/submit-week", logboekController.submitWeek);
 router.post("/create-logboek", logboekController.createLogboek);
 router.post("/assignopmerking-logboek", logboekController.assignOpmerkingToLogboek);
 
