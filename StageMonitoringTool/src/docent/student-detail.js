@@ -1,4 +1,5 @@
 import './student-detail.css';
+import '../student/stagedetails.css';
 
 const navItems = [
   { id: 'overzicht',    label: 'Overzicht' },
@@ -73,8 +74,68 @@ function renderOverzicht(student) {
   `;
 }
 
+function renderStagedetailsTab(student) {
+  const sd = student.stageData || {};
+  const bedrijfNaam = sd.bedrijf?.naam || student.bedrijf || '–';
+  const bedrijfAdres = sd.bedrijf?.adres || '–';
+  const mentorNaam = sd.stagementor?.naam || student.mentor || '–';
+  const mentorEmail = sd.stagementor?.email || '–';
+  const docentNaam = sd.docent?.naam || 'Niet toegewezen';
+  const omschrijving = sd.stageDetails?.omschrijving || 'Geen omschrijving beschikbaar';
+  const startDatum = sd.stageDetails?.start
+    ? new Date(sd.stageDetails.start).toLocaleDateString('nl-BE', { day: 'numeric', month: 'short', year: 'numeric' })
+    : student.periodeStart || '–';
+  const eindDatum = sd.stageDetails?.einde
+    ? new Date(sd.stageDetails.einde).toLocaleDateString('nl-BE', { day: 'numeric', month: 'short', year: 'numeric' })
+    : student.periodeEind || '–';
+  const rawStatus = sd.rawStatus || student.rawStatus || '';
+  const statusClass = rawStatus === 'GOEDGEKEURD' ? 'status-goedgekeurd'
+    : rawStatus === 'AANVRAAG' ? 'status-in_afwachting'
+    : rawStatus === 'AFGEKEURD' ? 'status-afgekeurd'
+    : 'status-goedgekeurd';
+  const statusLabel = rawStatus === 'GOEDGEKEURD' ? 'Goedgekeurd'
+    : rawStatus === 'AANVRAAG' ? 'In afwachting'
+    : rawStatus === 'AFGEKEURD' ? 'Afgekeurd'
+    : rawStatus || 'Onbekend';
+
+  return `
+    <div class="sd-tab-content">
+      <span class="status-badge ${statusClass}">${statusLabel}</span>
+      <div class="details-card">
+        <div class="detail-section">
+          <h3 class="detail-label">Student</h3>
+          <p class="detail-value">${student.naam || '–'}</p>
+        </div>
+        <div class="detail-section">
+          <h3 class="detail-label">Bedrijf</h3>
+          <p class="detail-value">${bedrijfNaam}</p>
+          <p class="detail-sub">${bedrijfAdres}</p>
+        </div>
+        <div class="detail-section">
+          <h3 class="detail-label">Stagementor</h3>
+          <p class="detail-value">${mentorNaam}</p>
+          <p class="detail-sub">${mentorEmail}</p>
+        </div>
+        <div class="detail-section">
+          <h3 class="detail-label">Toegewezen EhB-docent</h3>
+          <p class="detail-value">${docentNaam}</p>
+        </div>
+        <div class="detail-section">
+          <h3 class="detail-label">Periode</h3>
+          <p class="detail-value">${startDatum} t/m ${eindDatum}</p>
+        </div>
+        <div class="detail-section">
+          <h3 class="detail-label">Omschrijving van de opdracht</h3>
+          <p class="detail-sub">${omschrijving}</p>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
 function renderTabContent(tab, student) {
   if (tab === 'overzicht') return renderOverzicht(student);
+  if (tab === 'stagedetails') return renderStagedetailsTab(student);
   return `<div class="sd-tab-content"></div>`;
 }
 

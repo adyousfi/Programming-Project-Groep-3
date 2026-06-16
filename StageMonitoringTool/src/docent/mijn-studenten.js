@@ -205,6 +205,7 @@ export async function renderMijnStudenten(app, user) {
       logboek: { ingediend: 0, totaal: voortgang ? voortgang.totaal : 0, goedgekeurd: 0 },
       mijlpalen: bepaalMijlpalen(s.rawStatus),
       laasteLogboek: null,
+      stageData: s,
     };
   });
 
