@@ -98,6 +98,10 @@ export async function renderLogboekDag(container, userName = 'Student', stageDat
     const weekIndex = weekNumber - 1;
     const weekStart = getDayDateStr(weekIndex, 0);
 
+    const totalWeeks = startDate && endDate
+        ? Math.ceil(((endDate - startDate) / (1000 * 60 * 60 * 24) + 1) / 7)
+        : 16;
+
     const visibleDays = DAYS.filter((_, i) => isDayInStage(weekIndex, i));
     const lastDayIndex = visibleDays.length - 1;
 
@@ -199,6 +203,12 @@ export async function renderLogboekDag(container, userName = 'Student', stageDat
 
             <main class="logboek-dag-main">
                 <a href="?role=logboek" class="logboek-dag-back">&larr; Terug naar weekoverzicht</a>
+
+                <div class="logboek-dag-nav">
+                    <button class="logboek-dag-nav-btn" id="logboek-dag-prev" ${weekNumber <= 1 ? 'disabled' : ''}>&#8592; Vorige week</button>
+                    <span class="logboek-dag-nav-info">Week ${weekNumber} / ${totalWeeks}</span>
+                    <button class="logboek-dag-nav-btn" id="logboek-dag-next" ${weekNumber >= totalWeeks ? 'disabled' : ''}>&#8594; Volgende week</button>
+                </div>
 
                 <div class="logboek-dag-header">
                     <div>
@@ -497,6 +507,35 @@ function initLogboekDagHandlers(totalDays, stageData, weekIndex, getDayDateObj, 
     const testInput = document.getElementById('test-date-input');
     const testApply = document.getElementById('test-date-apply');
     const testReset = document.getElementById('test-date-reset');
+
+    // Week navigation
+    const prevBtn = document.getElementById('logboek-dag-prev');
+    const nextBtn = document.getElementById('logboek-dag-next');
+
+    if (prevBtn) {
+        prevBtn.addEventListener('click', () => {
+            if (lastWeekNumber > 1) {
+                const app = document.getElementById('app');
+                import('./logboek-dag.js').then(m => {
+                    m.renderLogboekDag(app, lastUserName, lastStageData, lastWeekNumber - 1);
+                });
+            }
+        });
+    }
+
+    if (nextBtn) {
+        nextBtn.addEventListener('click', () => {
+            const maxWeeks = lastStageData?.stageDetails?.start && lastStageData?.stageDetails?.einde
+                ? Math.ceil(((new Date(lastStageData.stageDetails.einde) - new Date(lastStageData.stageDetails.start)) / (1000 * 60 * 60 * 24) + 1) / 7)
+                : 16;
+            if (lastWeekNumber < maxWeeks) {
+                const app = document.getElementById('app');
+                import('./logboek-dag.js').then(m => {
+                    m.renderLogboekDag(app, lastUserName, lastStageData, lastWeekNumber + 1);
+                });
+            }
+        });
+    }
 
     if (testApply) {
         testApply.addEventListener('click', () => {

@@ -357,6 +357,13 @@ const updateStageRaw = async (req, res, next) => {
 
 const selectStageByDocentId = async (req, res, next) => {
   try {
+    const cookieUser = req.cookies.user;
+    if (!cookieUser) return res.status(401).json({ msg: 'Niet ingelogd' });
+    if (cookieUser.role !== 'docent') return res.status(403).json({ msg: 'Geen toegang' });
+    if (String(cookieUser.user_id) !== String(req.params.docentId)) {
+      return res.status(403).json({ msg: 'Geen toegang tot deze gegevens' });
+    }
+
     const stages = await Stage.findAll({
       where: { docent_id: req.params.docentId },
       include: [
