@@ -1,10 +1,15 @@
 import './aanpassen.css';
+import flatpickr from 'flatpickr';
+import 'flatpickr/dist/flatpickr.min.css';
 
 export async function renderAanpassen(container, userName = '[Studentnaam]', stageData = null) {
     const feedback = stageData?.feedback || 'Geen feedback opgegeven door de stagecommissie.';
     const bedrijfNaam = stageData?.bedrijf?.naam || '';
     const bedrijfAdres = stageData?.bedrijf?.adres || '';
     const mentorNaam = stageData?.stagementor?.naam || '';
+    const mentorParts = mentorNaam.split(' ');
+    const mentorVoornaam = mentorParts[0] || '';
+    const mentorAchternaam = mentorParts.slice(1).join(' ') || '';
     const mentorEmail = stageData?.stagementor?.email || '';
     const omschrijving = stageData?.stageDetails?.omschrijving || '';
     const startDatum = stageData?.stageDetails?.start ? stageData.stageDetails.start.split('T')[0] : '';
@@ -44,9 +49,15 @@ export async function renderAanpassen(container, userName = '[Studentnaam]', sta
                         <h3 class="aanpassen-section-title">Stagementor</h3>
                         <div class="aanpassen-form-row">
                             <div class="aanpassen-form-group">
-                                <label for="aanpassen-mentor-naam">Naam</label>
-                                <input type="text" id="aanpassen-mentor-naam" value="${mentorNaam}">
+                                <label for="aanpassen-mentor-voornaam">Voornaam</label>
+                                <input type="text" id="aanpassen-mentor-voornaam" value="${mentorVoornaam}">
                             </div>
+                            <div class="aanpassen-form-group">
+                                <label for="aanpassen-mentor-achternaam">Achternaam</label>
+                                <input type="text" id="aanpassen-mentor-achternaam" value="${mentorAchternaam}">
+                            </div>
+                        </div>
+                        <div class="aanpassen-form-row">
                             <div class="aanpassen-form-group">
                                 <label for="aanpassen-mentor-email">E-mail</label>
                                 <input type="email" id="aanpassen-mentor-email" value="${mentorEmail}">
@@ -66,11 +77,11 @@ export async function renderAanpassen(container, userName = '[Studentnaam]', sta
                         <div class="aanpassen-form-row">
                             <div class="aanpassen-form-group">
                                 <label for="aanpassen-start">Startdatum</label>
-                                <input type="date" id="aanpassen-start" value="${startDatum}">
+                                <input type="text" id="aanpassen-start" placeholder="Kies een datum" readonly>
                             </div>
                             <div class="aanpassen-form-group">
                                 <label for="aanpassen-eind">Einddatum</label>
-                                <input type="date" id="aanpassen-eind" value="${eindDatum}">
+                                <input type="text" id="aanpassen-eind" placeholder="Kies een datum" readonly>
                             </div>
                         </div>
                     </div>
@@ -88,6 +99,34 @@ export async function renderAanpassen(container, userName = '[Studentnaam]', sta
         window.location.href = '/?role=student';
     });
 
+    var startInput = container.querySelector('#aanpassen-start');
+    var eindInput = container.querySelector('#aanpassen-eind');
+
+    function isWeekend(date) {
+        return date.getDay() === 0 || date.getDay() === 6;
+    }
+
+    if (startInput) {
+        flatpickr(startInput, {
+            disable: [isWeekend],
+            dateFormat: 'Y-m-d',
+            defaultDate: startDatum || undefined,
+            onDayCreate: function(dObj, dStr, fp, dayElem) {
+                var dow = dayElem.dateObj.getDay();
+                if (dow === 0 || dow === 6) {
+                    dayElem.classList.add('weekend-disabled');
+                }
+            }
+        });
+    }
+
+    if (eindInput) {
+        flatpickr(eindInput, {
+            dateFormat: 'Y-m-d',
+            defaultDate: eindDatum || undefined,
+        });
+    }
+
     container.querySelector('#aanpassen-cancel').addEventListener('click', () => {
         window.location.href = '/?role=student';
     });
@@ -100,14 +139,15 @@ export async function renderAanpassen(container, userName = '[Studentnaam]', sta
         const updatedData = {
             bedrijfNaam: container.querySelector('#aanpassen-bedrijf-naam').value.trim(),
             bedrijfAdres: container.querySelector('#aanpassen-bedrijf-adres').value.trim(),
-            mentorNaam: container.querySelector('#aanpassen-mentor-naam').value.trim(),
+            mentorVoornaam: container.querySelector('#aanpassen-mentor-voornaam').value.trim(),
+            mentorAchternaam: container.querySelector('#aanpassen-mentor-achternaam').value.trim(),
             mentorEmail: container.querySelector('#aanpassen-mentor-email').value.trim(),
             opdrachtOmschrijving: container.querySelector('#aanpassen-omschrijving').value.trim(),
             periodeStart: container.querySelector('#aanpassen-start').value,
             periodeEind: container.querySelector('#aanpassen-eind').value,
         };
 
-        if (!updatedData.bedrijfNaam || !updatedData.mentorNaam || !updatedData.mentorEmail || !updatedData.opdrachtOmschrijving) {
+        if (!updatedData.bedrijfNaam || !updatedData.mentorVoornaam || !updatedData.mentorAchternaam || !updatedData.mentorEmail || !updatedData.opdrachtOmschrijving) {
             alert('Vul alle verplichte velden in.');
             btn.disabled = false;
             btn.textContent = 'Aangepast Voorstel Indienen';

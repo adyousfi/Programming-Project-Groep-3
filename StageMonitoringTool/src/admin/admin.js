@@ -58,6 +58,7 @@ export function renderAdmin(app) {
                 <th>E-mailadres</th>
                 <th>Telefoon</th>
                 <th>Rol</th>
+                <th>Status</th>
                 <th>Acties</th>
               </tr>
             </thead>
@@ -221,9 +222,12 @@ export function renderAdmin(app) {
         <td>${user.email}</td>
         <td>${user.phone || '-'}</td>
         <td><span class="role-badge">${roleDisplayMap[user.role] || user.role}</span></td>
+        <td><span class="status-badge status-badge--${user.is_active !== false ? 'actief' : 'inactief'}">${user.is_active !== false ? 'Actief' : 'Inactief'}</span></td>
         <td class="actions">
           <button class="btn-edit" data-id="${user.user_id}">Bewerken</button>
-          <button class="btn-deactivate" data-id="${user.user_id}">Deactiveren</button>
+          <button class="btn-toggle-active ${user.is_active !== false ? 'btn-deactivate' : 'btn-activate'}" data-id="${user.user_id}" data-active="${user.is_active !== false}">
+            ${user.is_active !== false ? 'Deactiveren' : 'Activeren'}
+          </button>
         </td>
       </tr>
     `).join('');
@@ -258,28 +262,23 @@ export function renderAdmin(app) {
       renderCompetenties(app);
     });
 
-    // Add delete button listeners
-    document.querySelectorAll('.btn-deactivate').forEach(btn => {
-      btn.addEventListener('click', () => deleteUser(btn.dataset.id));
+    document.querySelectorAll('.btn-toggle-active').forEach(btn => {
+      btn.addEventListener('click', () => toggleUserActive(btn.dataset.id));
     });
   }
 
-  // Delete user
-  async function deleteUser(userId) {
-    if (!confirm('Weet je zeker dat je deze gebruiker wilt verwijderen?')) return;
+  async function toggleUserActive(userId) {
+    const user = allUsers.find(u => u.user_id == userId);
+    const actie = user && user.is_active !== false ? 'deactiveren' : 'activeren';
+    if (!confirm(`Weet je zeker dat je dit account wilt ${actie}?`)) return;
 
     try {
-      const response = await fetch(`${API_URL}/delete-user/${userId}`, {
-        method: 'DELETE'
-      });
-
+      const response = await fetch(`${API_URL}/toggle-user-active/${userId}`, { method: 'PATCH' });
       const result = await response.json();
-
       if (response.ok) {
-        alert('Gebruiker succesvol verwijderd!');
         loadUsers();
       } else {
-        alert('Fout bij het verwijderen: ' + (result.msg || 'Onbekende fout'));
+        alert('Fout: ' + (result.msg || 'Onbekende fout'));
       }
     } catch (error) {
       console.error('Error:', error);
@@ -317,6 +316,7 @@ export function renderAdmin(app) {
     document.getElementById('edit-telefoon').value = user.phone || '';
     document.getElementById('edit-wachtwoord').value = '';
     document.getElementById('edit-rol').value = user.role;
+    document.getElementById('edit-status').value = user.is_active !== false ? 'actief' : 'inactief';
 
     editModal.classList.add('active');
   }
@@ -377,7 +377,8 @@ export function renderAdmin(app) {
       email: document.getElementById('email').value,
       phone: document.getElementById('telefoon').value || 'no phone',
       password: document.getElementById('wachtwoord').value,
-      role: document.getElementById('rol').value
+      role: document.getElementById('rol').value,
+      is_active: document.getElementById('status').value === 'actief',
     };
 
     try {
@@ -414,7 +415,8 @@ export function renderAdmin(app) {
       email: document.getElementById('edit-email').value,
       phone: document.getElementById('edit-telefoon').value || 'no phone',
       password: document.getElementById('edit-wachtwoord').value,
-      role: document.getElementById('edit-rol').value
+      role: document.getElementById('edit-rol').value,
+      is_active: document.getElementById('edit-status').value === 'actief',
     };
 
     try {

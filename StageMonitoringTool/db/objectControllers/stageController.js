@@ -13,7 +13,7 @@ const createStage = async (req, res, next) => {
     const {
       studentNaam, studentNummer,
       bedrijfNaam, bedrijfAdres,
-      mentorNaam, mentorEmail,
+      mentorVoornaam, mentorAchternaam, mentorEmail,
       opdrachtOmschrijving,
       periodeStart, periodeEind
     } = req.body;
@@ -36,12 +36,18 @@ const createStage = async (req, res, next) => {
     let mentorUser = await User.findOne({ where: { email: mentorEmail } });
     if (!mentorUser) {
       mentorUser = await User.create({
-        first_name: mentorNaam,
-        last_name: '',
+        first_name: mentorVoornaam || '',
+        last_name: mentorAchternaam || '',
         email: mentorEmail,
         password: 'pending',
         role: 'stagementor',
-        phone: 'no phone'
+        phone: 'no phone',
+        is_active: false,
+      });
+    } else {
+      await mentorUser.update({
+        first_name: mentorVoornaam || mentorUser.first_name,
+        last_name: mentorAchternaam || mentorUser.last_name,
       });
     }
     const existingStagementor = await Stagementor.findByPk(mentorUser.user_id);
@@ -71,7 +77,7 @@ const createStage = async (req, res, next) => {
 
 const updateStage = async (req, res, next) => {
   try {
-    const { status, feedback, bedrijfNaam, bedrijfAdres, mentorNaam, mentorEmail, omschrijving_opdracht, begin_datum, eind_datum } = req.body;
+    const { status, feedback, bedrijfNaam, bedrijfAdres, mentorVoornaam, mentorAchternaam, mentorEmail, omschrijving_opdracht, begin_datum, eind_datum } = req.body;
 
     const stage = await Stage.findByPk(req.params.id, {
       include: [
@@ -94,9 +100,14 @@ const updateStage = async (req, res, next) => {
     if (bedrijfNaam && stage.bedrijf) {
       await stage.bedrijf.update({ naam: bedrijfNaam, address: bedrijfAdres || stage.bedrijf.address });
     }
-    if (mentorNaam && stage.mentor) {
+    if ((mentorVoornaam || mentorAchternaam) && stage.mentor) {
       const mentorUser = await User.findByPk(stage.mentor.user_id);
-      if (mentorUser) await mentorUser.update({ first_name: mentorNaam });
+      if (mentorUser) {
+        const updateFields = {};
+        if (mentorVoornaam) updateFields.first_name = mentorVoornaam;
+        if (mentorAchternaam) updateFields.last_name = mentorAchternaam;
+        await mentorUser.update(updateFields);
+      }
     }
     if (mentorEmail && stage.mentor) {
       const mentorUser = await User.findByPk(stage.mentor.user_id);

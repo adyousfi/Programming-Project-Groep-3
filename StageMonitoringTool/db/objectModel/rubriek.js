@@ -16,12 +16,12 @@ const Rubriek = sequelize.define("Rubriek", {
 
     score: {
         type: DataTypes.INTEGER, // Bijv: 1 tot 5
-        allowNull: false,
+        allowNull: true,
     },
 
     beschrijving: {
         type: DataTypes.TEXT,
-        allowNull: false,
+        allowNull: true,
     },
 });
 
