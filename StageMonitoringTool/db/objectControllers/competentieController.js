@@ -1,4 +1,5 @@
 import Competentie from "../objectModel/competentie.js";
+import Rubriek from "../objectModel/rubriek.js";
 import { sequelize } from "../dbConnection.js";
 
 const createCompetentie  = async(req,res,next) =>{
@@ -140,5 +141,25 @@ const createCompetentieMetRubrieken = async (req, res, next) => {
   }
 };
 
-export default { createCompetentie, getAllCompetenties, updateCompetentie, createCompetentieMetRubrieken };
+const getAllCompetentiesMetRubrieken = async (req, res, next) => {
+  try {
+    const competenties = await Competentie.findAll({
+      include: [{
+        model: Rubriek,
+        as: 'Rubrieks',
+        attributes: ['rubriek_id', 'competentie_id', 'code', 'volgnummer', 'score', 'beschrijving'],
+      }],
+      order: [['competentie_id', 'ASC']],
+    });
+    return res.status(200).json({
+      msg: 'Competenties met rubrieken opgehaald',
+      data: competenties,
+    });
+  } catch (error) {
+    console.error('Error fetching competenties with rubrieken:', error);
+    return res.status(500).json({ msg: 'Something went wrong while fetching competenties with rubrieken' });
+  }
+};
+
+export default { createCompetentie, getAllCompetenties, getAllCompetentiesMetRubrieken, updateCompetentie, createCompetentieMetRubrieken };
 

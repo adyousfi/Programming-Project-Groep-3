@@ -315,7 +315,7 @@ export async function renderStudentDetail(student, user) {
       document.querySelector('#sd-content').innerHTML = '<p class="sd-tab-content">Laden...</p>';
       document.querySelector('#sd-content').innerHTML = await renderTabContent(item.dataset.tab, student);
       setupWeekCards(student);
-        if (item.dataset.tab === 'overzicht') setupActieCards(student);
+        if (item.dataset.tab === 'overzicht') setupActieCards(student, user);
 
         // Als je via een andere flow al in evaluatie wil zitten via hash.
         // (Docent: kies student -> klik Evaluatie; verwacht evaluatie UI)
@@ -327,10 +327,10 @@ export async function renderStudentDetail(student, user) {
 
 
   document.querySelector('#sd-content').innerHTML = await renderTabContent('overzicht', student);
-  setupActieCards(student);
+  setupActieCards(student, user);
 }
 
-function setupActieCards(student) {
+function setupActieCards(student, user) {
   document.querySelectorAll('.sd-actie-card').forEach(function(card) {
     card.addEventListener('click', async function() {
       var actie = card.dataset.actie;
@@ -341,12 +341,10 @@ function setupActieCards(student) {
 
         document.querySelector('#sd-content').innerHTML = '<p class="sd-tab-content">Laden...</p>';
         import('./evaluatie.js').then((m) => {
-          // Docent kiest student -> evaluatie interface
-          // eslint-disable-next-line no-undef
-          m.renderEvaluatieDocent(document.querySelector('#app'), (window.__currentDocentUser || null));
-
+          m.renderEvaluatieDocent(document.querySelector('#app'), user, student);
         });
       }
+
 
       if (actie === 'logboek') {
         document.querySelectorAll('.sd-nav-item').forEach(function(i) { i.classList.remove('active'); });

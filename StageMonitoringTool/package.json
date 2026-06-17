@@ -10,6 +10,7 @@
     "testdbMysql": "node db/testConnection/testdbMysql",
     "startdb": "node db/maindb.js",
     "start": "concurrently \"node backend/server.js\" \"vite\"",
+    "seed": "node db/seed.js",
     "dev": "vite",
     "server": "node server.js",
     "build": "vite build",

@@ -52,6 +52,8 @@ app.use('/api/behaalde-scores', behaaldeScoreRoutes);
 app.use('/api/competenties', competentieRoutes);
 app.use('/api/rubrieken', rubriekRoutes);
 app.use('/api/evaluaties', evaluatieRoutes);
+console.log('✅ eval routes mounted');
+
 
 app.use((err, req, res, next) => {
   if (err instanceof multer.MulterError) {

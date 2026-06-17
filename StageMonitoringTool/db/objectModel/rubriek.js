@@ -14,8 +14,18 @@ const Rubriek = sequelize.define("Rubriek", {
         allowNull: false,
     },
 
+    code: {
+        type: DataTypes.STRING,
+        allowNull: true,
+    },
+
+    volgnummer: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+    },
+
     score: {
-        type: DataTypes.INTEGER, // Bijv: 1 tot 5
+        type: DataTypes.INTEGER,
         allowNull: true,
     },
 
