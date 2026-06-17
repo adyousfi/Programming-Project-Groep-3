@@ -48,6 +48,11 @@ const User = sequelize.define("User", {
         allowNull:true,
         defaultValue: "no phone"
     },
+    is_active: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: true,
+    },
     },
     {
         timestamps: true,

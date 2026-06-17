@@ -41,7 +41,8 @@ const createStage = async (req, res, next) => {
         email: mentorEmail,
         password: 'pending',
         role: 'stagementor',
-        phone: 'no phone'
+        phone: 'no phone',
+        is_active: false,
       });
     } else {
       await mentorUser.update({
