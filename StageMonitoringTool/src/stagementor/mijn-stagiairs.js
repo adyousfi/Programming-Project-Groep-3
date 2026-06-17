@@ -44,15 +44,31 @@ function getWeekDates(startDate, endDate, weekIndex) {
   };
 }
 
-function mapApiStageToStagiair(s) {
+function mapApiStageToStagiair(s, logboekEntries = []) {
   const start = s.stageDetails?.start;
   const einde = s.stageDetails?.einde;
   const totalWeeks = start && einde
     ? Math.max(1, Math.ceil((new Date(einde) - new Date(start)) / (7 * 24 * 60 * 60 * 1000)))
     : 0;
-  const verstrekenWeken = start
-    ? Math.max(0, Math.floor((new Date() - new Date(start)) / (7 * 24 * 60 * 60 * 1000)))
-    : 0;
+
+  let submittedWeeks = 0;
+  if (start && einde && logboekEntries.length > 0) {
+    const startDateObj = new Date(start);
+    const endDateObj = new Date(einde);
+    for (let i = 0; i < totalWeeks; i++) {
+      const dates = getWeekDates(startDateObj, endDateObj, i);
+      if (!dates.startDateObj) continue;
+      const weekEntries = logboekEntries.filter(e => {
+        if (!e.datum) return false;
+        const entryDate = new Date(e.datum);
+        return entryDate >= dates.startDateObj && entryDate <= dates.endDateObj;
+      });
+      if (weekEntries.length > 0 && weekEntries.every(e => e.status === 'INGEVULD' || e.status === 'DEELSINGEVULD')) {
+        submittedWeeks++;
+      }
+    }
+  }
+
   return {
     naam: s.naam || 'Onbekend',
     functie: s.stageDetails?.omschrijving?.slice(0, 40) || '–',
@@ -62,7 +78,7 @@ function mapApiStageToStagiair(s) {
     start: start ? new Date(start).toLocaleDateString('nl-BE', { day: 'numeric', month: 'short' }) : '–',
     einde: einde ? new Date(einde).toLocaleDateString('nl-BE', { day: 'numeric', month: 'short' }) : '–',
     totalWeeks,
-    currentWeek: Math.min(verstrekenWeken, totalWeeks),
+    submittedWeeks,
     badges: [],
     stageData: s,
   };
@@ -330,9 +346,8 @@ function renderStageDetailsPage(app, stagiair) {
 // Toont het detailoverzicht van 1 stagiair.
 // Dit is de pagina na het klikken op "Student Bekijken".
 function renderStudentDetail(app, stagiair) {
-  // Berekent hoeveel procent van de stageweken al bezig/ingevuld is.
-  // Dit percentage wordt gebruikt voor de blauwe voortgangsbalk.
-  const progressPct = Math.round((stagiair.currentWeek / stagiair.totalWeeks) * 100);
+  // Berekent hoeveel procent van de stageweken al is ingediend.
+  const progressPct = stagiair.totalWeeks > 0 ? Math.round((stagiair.submittedWeeks / stagiair.totalWeeks) * 100) : 0;
   app.innerHTML = `
     <div class="sm-layout">
       ${sidebarHtml('overzicht')}
@@ -352,7 +367,7 @@ function renderStudentDetail(app, stagiair) {
           </div>
           <div class="sm-detail-card">
             <p class="sm-detail-card-label">Logboek Status</p>
-            <p class="sm-detail-card-value">${stagiair.currentWeek} / ${stagiair.totalWeeks} weken</p>
+            <p class="sm-detail-card-value">${stagiair.submittedWeeks} / ${stagiair.totalWeeks} weken</p>
             <div class="sm-progress"><div class="sm-progress-bar" style="width:${progressPct}%"></div></div>
           </div>
           <div class="sm-detail-card">
@@ -566,11 +581,11 @@ async function renderLogboekOverview(app, stagiair) {
       const filledEntries = weekEntries.filter(e => e.status === 'DEELSINGEVULD' || e.status === 'INGEVULD');
       daysFilled = filledEntries.length;
       allIngevuld = weekEntries.length > 0 && weekEntries.every(e => e.status === 'INGEVULD');
-      allGevinkt = allIngevuld && weekEntries.every(e => e.gevinkt_door_student);
+      allGevinkt = allIngevuld && weekEntries.every(e => e.gevinkt_door_stagementor);
     }
 
     let status = 'not_submitted';
-    if (allGevinkt) status = 'afgevinkt_door_student';
+    if (allGevinkt) status = 'afgevinkt_door_stagementor';
     else if (allIngevuld) status = 'submitted';
     else if (hasEntries) status = 'in_progress';
 
@@ -593,7 +608,7 @@ async function renderLogboekOverview(app, stagiair) {
             const pct = w.total > 0 ? (w.filled / w.total) * 100 : 0;
             let statusClass = 'sm-status--pending';
             let statusText = 'Nog niet ingediend';
-            if (w.status === 'afgevinkt_door_student') {
+            if (w.status === 'afgevinkt_door_stagementor') {
               statusClass = 'sm-status--ok';
               statusText = 'Afgevinkt door stagementor';
             } else if (w.status === 'submitted') {
@@ -638,7 +653,17 @@ async function renderWeekDetail(app, stagiair, weekNum) {
   const startDate = sd.stageDetails?.start ? new Date(sd.stageDetails.start) : null;
   const endDate = sd.stageDetails?.einde ? new Date(sd.stageDetails.einde) : null;
 
-  const logboekEntries = _logboekEntriesCache;
+  let logboekEntries = [];
+  if (sd.id) {
+    try {
+      const res = await fetch(`/api/logboek/stage/${sd.id}`, { credentials: 'include' });
+      logboekEntries = await res.json();
+      if (!Array.isArray(logboekEntries)) logboekEntries = [];
+    } catch (err) {
+      console.error('Error fetching logboek:', err);
+    }
+  }
+  _logboekEntriesCache = logboekEntries;
 
   function getWeekDateObj(weekIndex, dayIndex) {
     if (!startDate) return null;
@@ -669,13 +694,20 @@ async function renderWeekDetail(app, stagiair, weekNum) {
     if (endDate && dayDate > endDate) break;
 
     const dateStr = dayDate.toLocaleDateString('nl-BE', { day: 'numeric', month: 'short' });
-    const dateKey = dayDate.toISOString().split('T')[0];
+    const y = dayDate.getFullYear();
+    const m = String(dayDate.getMonth() + 1).padStart(2, '0');
+    const d = String(dayDate.getDate()).padStart(2, '0');
+    const dateKey = `${y}-${m}-${d}`;
     const entry = logboekEntries.find(e => {
       if (!e.datum) return false;
-      return new Date(e.datum).toISOString().split('T')[0] === dateKey;
+      const ed = new Date(e.datum);
+      const ey = ed.getFullYear();
+      const em = String(ed.getMonth() + 1).padStart(2, '0');
+      const eday = String(ed.getDate()).padStart(2, '0');
+      return `${ey}-${em}-${eday}` === dateKey;
     });
 
-    const isGevinkt = entry && entry.gevinkt_door_student;
+    const isGevinkt = entry && entry.gevinkt_door_stagementor;
     const isIngevuld = entry && (entry.status === 'INGEVULD' || entry.status === 'DEELSINGEVULD');
     let status = 'Nog niet ingediend';
     if (isGevinkt) status = 'Afgevinkt door stagementor';
@@ -715,7 +747,7 @@ async function renderWeekDetail(app, stagiair, weekNum) {
                   <h3 class="sm-week-day-name">${d.name}</h3>
                   <p class="sm-week-day-date">${d.date}</p>
                 </div>
-                <span class="sm-status-pill ${d.status === 'Ingediend' ? 'sm-status--ok' : 'sm-status--pending'}">${d.status === 'Ingediend' ? '✓ Ingediend' : 'Nog niet ingediend'}</span>
+                <span class="sm-status-pill ${d.status === 'Ingediend' || d.status === 'Afgevinkt door stagementor' ? 'sm-status--ok' : 'sm-status--pending'}">${d.status === 'Ingediend' ? '✓ Ingediend' : d.status === 'Afgevinkt door stagementor' ? '✓ Afgevinkt' : 'Nog niet ingediend'}</span>
               </div>
               <div class="sm-week-section">
                 <h4 class="sm-week-section-title">Beschrijving van uitgevoerde taken</h4>
@@ -736,6 +768,7 @@ async function renderWeekDetail(app, stagiair, weekNum) {
           <p id="sm-afvink-message" class="${afgevinkt ? 'sm-afvink-message--success' : 'sm-afvink-message--idle'}">${afgevinkt ? 'Deze week is afgevinkt en opgeslagen.' : 'Klik op Week Afvinken om deze week te bevestigen.'}</p>
         </div>
         ` : ''}
+        ${allDaysIngevuld ? `
         <div class="sm-week-comment-card">
           <label class="sm-week-comment-label" for="sm-comment">Opmerking bij Week ${weekNum}</label>
           <textarea id="sm-comment" class="sm-week-comment" placeholder="Schrijf hier je opmerkingen...">${escapeHtml(comment)}</textarea>
@@ -743,6 +776,7 @@ async function renderWeekDetail(app, stagiair, weekNum) {
             <button id="sm-save-comment" class="sm-button">Opmerking Opslaan</button>
           </div>
         </div>
+        ` : ''}
       </main>
     </div>
   `;
@@ -755,11 +789,14 @@ async function renderWeekDetail(app, stagiair, weekNum) {
   attachNav(app, stagiair);
 
   // Slaat de tekst uit het opmerkingenveld op.
-  document.querySelector('#sm-save-comment').addEventListener('click', () => {
-    const val = document.querySelector('#sm-comment').value.trim();
-    smSaveWeekComment(stagiair.email, weekNum, val);
-    alert(val ? 'Opmerking opgeslagen.' : 'Opmerking verwijderd.');
-  });
+  const saveCommentBtn = document.querySelector('#sm-save-comment');
+  if (saveCommentBtn) {
+    saveCommentBtn.addEventListener('click', () => {
+      const val = document.querySelector('#sm-comment').value.trim();
+      smSaveWeekComment(stagiair.email, weekNum, val);
+      alert(val ? 'Opmerking opgeslagen.' : 'Opmerking verwijderd.');
+    });
+  }
 
   // Zoekt de knop waarmee de mentor de week kan afvinken.
   const afvinkBtn = document.querySelector('#sm-afvink');
@@ -767,6 +804,9 @@ async function renderWeekDetail(app, stagiair, weekNum) {
   // Alleen als de week nog niet afgevinkt is, krijgt de knop een klikactie.
   if (afvinkBtn && !afgevinkt) {
     afvinkBtn.addEventListener('click', async () => {
+      const confirmed = confirm('Weet je zeker dat je deze week wilt afvinken?');
+      if (!confirmed) return;
+
       afvinkBtn.disabled = true;
       afvinkBtn.textContent = 'Bezig...';
 
@@ -817,13 +857,16 @@ async function renderWeekDetail(app, stagiair, weekNum) {
 
         if (res.ok) {
           smSetWeekAfgevinkt(stagiair.email, weekNum);
-          afvinkBtn.textContent = 'Week Afgevinkt';
-          afvinkBtn.disabled = true;
-          afvinkBtn.classList.add('sm-afgevinkt');
-          const m = document.querySelector('#sm-afvink-message');
-          if (m) { m.textContent = 'Deze week is afgevinkt en opgeslagen.'; m.classList.remove('sm-afvink-message--idle'); m.classList.add('sm-afvink-message--success'); }
-          // Refresh the week detail to show updated statuses
-          renderWeekDetail(app, stagiair, weekNum);
+          // Re-fetch logboek entries so the cache has updated gevinkt_door_stagementor values
+          if (sd.id) {
+            try {
+              const refreshed = await fetch(`/api/logboek/stage/${sd.id}`, { credentials: 'include' });
+              const refreshedData = await refreshed.json();
+              if (Array.isArray(refreshedData)) _logboekEntriesCache = refreshedData;
+            } catch (_) {}
+          }
+          // Refresh the cache then go back to week overview
+          renderLogboekOverview(app, stagiair);
         } else {
           const err = await res.json();
           afvinkBtn.disabled = false;
@@ -908,7 +951,18 @@ export async function renderMijnStagiairs(app, user) {
       const res = await fetch(`/api/stages/stagementor/${user.user_id}`, { credentials: 'include' });
       const data = await res.json();
       if (Array.isArray(data)) {
-        _allStagiairs = data.map(mapApiStageToStagiair);
+        const stagiairsWithLogboek = await Promise.all(data.map(async (s) => {
+          let logboekEntries = [];
+          if (s.id) {
+            try {
+              const logRes = await fetch(`/api/logboek/stage/${s.id}`, { credentials: 'include' });
+              logboekEntries = await logRes.json();
+              if (!Array.isArray(logboekEntries)) logboekEntries = [];
+            } catch (_) {}
+          }
+          return mapApiStageToStagiair(s, logboekEntries);
+        }));
+        _allStagiairs = stagiairsWithLogboek;
       }
     } catch (err) {
       console.error('Fout bij ophalen stagiairs:', err);

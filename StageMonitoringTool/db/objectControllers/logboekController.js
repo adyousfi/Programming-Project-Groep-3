@@ -61,7 +61,7 @@ const getLogboekById = async (req, res, next) => {
             leerpunten: logboek.leerpunten,
             status: logboek.status,
             checkmark: logboek.checkmark,
-            gevinkt_door_student: logboek.gevinkt_door_student,
+            gevinkt_door_stagementor: logboek.gevinkt_door_stagementor,
         });
     } catch (err) {
         console.error('Error fetching logboek by id:', err);
@@ -203,11 +203,11 @@ const afvinkWeekDoorStudent = async (req, res, next) => {
         const allIngevuld = entries.every(e => e.status === 'INGEVULD');
         if (!allIngevuld) return res.status(400).json({ msg: 'Niet alle dagen zijn ingevuld' });
 
-        const alreadyAfgevinkt = entries.every(e => e.gevinkt_door_student);
+        const alreadyAfgevinkt = entries.every(e => e.gevinkt_door_stagementor);
         if (alreadyAfgevinkt) return res.status(400).json({ msg: 'Week is al afgevinkt door student' });
 
         await Logboek.update(
-            { gevinkt_door_student: true },
+            { gevinkt_door_stagementor: true },
             {
                 where: {
                     stage_id,

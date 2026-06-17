@@ -150,7 +150,7 @@ async function renderLogboekTab(student) {
       const filledEntries = weekEntries.filter(function(e) { return e.status === 'DEELSINGEVULD' || e.status === 'INGEVULD'; });
       daysFilled = filledEntries.length;
       allIngevuld = weekEntries.length > 0 && weekEntries.every(function(e) { return e.status === 'INGEVULD'; });
-      allGevinkt = allIngevuld && weekEntries.every(function(e) { return e.gevinkt_door_student; });
+      allGevinkt = allIngevuld && weekEntries.every(function(e) { return e.gevinkt_door_stagementor; });
     }
 
     let status = 'not_submitted';
@@ -177,7 +177,7 @@ async function renderLogboekTab(student) {
     var progress = w.totalDays > 0 ? (w.daysFilled / w.totalDays) * 100 : 0;
     var statusBadge = '';
     if (w.status === 'afgevinkt') {
-      statusBadge = '<span class="sd-logboek-badge sd-logboek-badge--validated">Afgevinkt door student</span>';
+      statusBadge = '<span class="sd-logboek-badge sd-logboek-badge--validated">Afgevinkt door stagementor</span>';
     } else if (w.status === 'submitted') {
       statusBadge = '<span class="sd-logboek-badge sd-logboek-badge--validated">Ingediend</span>';
     } else if (w.status === 'in_progress') {
@@ -383,7 +383,7 @@ function renderLogboekDag(student, weekNumber) {
           reflectie: entry ? entry.reflectie || '' : '',
           leerpunten: entry ? entry.leerpunten || '' : '',
           status: entry ? entry.status : 'NIETINGEVULD',
-          gevinkt: entry ? !!entry.gevinkt_door_student : false
+          gevinkt: entry ? !!entry.gevinkt_door_stagementor : false
         });
       }
       dag.setDate(dag.getDate() + 1);
@@ -405,18 +405,11 @@ function renderLogboekDag(student, weekNumber) {
   html += '<h2 class="sd-logboek-title">Week ' + weekNumber + '</h2>';
   html += '<p class="sd-logboek-sub">' + dates.start + ' t/m ' + dates.end + '</p>';
 
-  if (allDaysIngevuld && !weekGevinkt) {
-    html += '<button class="sd-logboek-afvink-btn" id="sd-week-afvinken">Week Afvinken</button>';
-  } else if (weekGevinkt) {
-    html += '<p class="sd-logboek-gevinkt-label">Afgevinkt door student</p>';
-  }
-
   html += '<div class="sd-logboek-dagen">';
 
   dagen.forEach(function(d) {
     var statusLabel = '';
-    if (d.gevinkt) statusLabel = '<span class="sd-logboek-badge sd-logboek-badge--validated">Afgevinkt door student</span>';
-    else if (d.status === 'INGEVULD') statusLabel = '<span class="sd-logboek-badge sd-logboek-badge--validated">Ingevuld</span>';
+    if (d.status === 'INGEVULD') statusLabel = '<span class="sd-logboek-badge sd-logboek-badge--validated">Ingevuld</span>';
     else if (d.status === 'DEELSINGEVULD') statusLabel = '<span class="sd-logboek-badge sd-logboek-badge--pending">Deels ingevuld</span>';
     else statusLabel = '<span class="sd-logboek-badge sd-logboek-badge--pending">Niet ingevuld</span>';
 
@@ -454,49 +447,4 @@ function renderLogboekDag(student, weekNumber) {
   document.querySelector('#sd-logboek-next').addEventListener('click', function() {
     if (currentWeekNumber < totalWeeks) renderLogboekDag(student, currentWeekNumber + 1);
   });
-
-  var afvinkBtn = document.querySelector('#sd-week-afvinken');
-  if (afvinkBtn) {
-    afvinkBtn.addEventListener('click', async function() {
-      var firstDayDate = dates.startDateObj;
-      var lastDayDate = dates.endDateObj;
-      if (!firstDayDate || !lastDayDate || !student.id) return;
-
-      function toDateString(d) {
-        var year = d.getFullYear();
-        var month = String(d.getMonth() + 1).padStart(2, '0');
-        var day = String(d.getDate()).padStart(2, '0');
-        return year + '-' + month + '-' + day;
-      }
-
-      afvinkBtn.disabled = true;
-      afvinkBtn.textContent = 'Bezig...';
-
-      try {
-        var res = await fetch('/api/logboek/afvink-week-student', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
-          body: JSON.stringify({
-            stage_id: student.id,
-            weekStart: toDateString(firstDayDate),
-            weekEnd: toDateString(lastDayDate)
-          })
-        });
-        if (res.ok) {
-          renderLogboekDag(student, currentWeekNumber);
-        } else {
-          var err = await res.json();
-          afvinkBtn.disabled = false;
-          afvinkBtn.textContent = 'Week Afvinken';
-          alert(err.msg || 'Fout bij afvinken.');
-        }
-      } catch (err) {
-        console.error('Error afvinken week:', err);
-        afvinkBtn.disabled = false;
-        afvinkBtn.textContent = 'Week Afvinken';
-        alert('Server fout bij afvinken.');
-      }
-    });
-  }
 }

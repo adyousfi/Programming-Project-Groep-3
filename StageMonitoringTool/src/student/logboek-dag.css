@@ -254,6 +254,12 @@
     border: 1px solid #b6d4fe;
 }
 
+.badge-gevinkt {
+    background-color: #d1e7dd;
+    color: #0f5132;
+    border: 1px solid #badbcc;
+}
+
 /* Form */
 .logboek-dag-card-form {
     padding: 1.25rem;

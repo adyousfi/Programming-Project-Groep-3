@@ -41,7 +41,7 @@ const Logboek = sequelize.define("Logboek", {
     reflectie:{
         type: DataTypes.STRING
     },
-    gevinkt_door_student:{
+    gevinkt_door_stagementor:{
         type: DataTypes.BOOLEAN,
         allowNull:false,
         defaultValue: false,
