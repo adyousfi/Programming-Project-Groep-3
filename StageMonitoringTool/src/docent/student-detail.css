@@ -445,3 +445,38 @@
   color: #6b7280;
   font-weight: 500;
 }
+
+/* Week Afvinken Button */
+.sd-logboek-afvink-btn {
+  display: inline-block;
+  padding: 8px 20px;
+  margin-bottom: 16px;
+  border: none;
+  border-radius: 6px;
+  background: #10b981;
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.sd-logboek-afvink-btn:hover:not(:disabled) {
+  background: #059669;
+}
+
+.sd-logboek-afvink-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.sd-logboek-gevinkt-label {
+  display: inline-block;
+  padding: 8px 16px;
+  margin-bottom: 16px;
+  border-radius: 6px;
+  background: #d1fae5;
+  color: #065f46;
+  font-size: 0.85rem;
+  font-weight: 600;
+}

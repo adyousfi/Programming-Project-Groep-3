@@ -41,6 +41,11 @@ const Logboek = sequelize.define("Logboek", {
     reflectie:{
         type: DataTypes.STRING
     },
+    gevinkt_door_stagementor:{
+        type: DataTypes.BOOLEAN,
+        allowNull:false,
+        defaultValue: false,
+    },
     status:{
         type: DataTypes.ENUM(Object.values(status)),
         allowNull:false,
