@@ -13,7 +13,7 @@ export function renderDocumentenIngedient(container, userName = 'Jan Janssens') 
                     </div>
                     <nav class="sidebar-nav">
                         <a href="?role=goedgekeurd_student" class="sidebar-nav-item">Overzicht</a>
-                        <a href="#" class="sidebar-nav-item">Stagedetails</a>
+                        <a href="?role=stagedetails" class="sidebar-nav-item">Stagedetails</a>
                         <a href="?role=documenten" class="sidebar-nav-item active">Documenten</a>
                         <a href="#" class="sidebar-nav-item disabled">Logboek</a>
                         <a href="#" class="sidebar-nav-item disabled">Evaluatie</a>
@@ -32,34 +32,43 @@ export function renderDocumentenIngedient(container, userName = 'Jan Janssens') 
 
                 <div class="ingedient-card">
                     <div class="ingedient-icon">&#10003;</div>
-                    <h2 class="ingedient-title">Document succesvol ingediend!</h2>
-                    <p class="ingedient-text">Je stageovereenkomst is succesvol geuploadd en ingediend.</p>
+                    <h2 class="ingedient-title">Stageovereenkomst succesvol geüpload!</h2>
+                    <p class="ingedient-text">Je document is ontvangen en wacht op controle en goedkeuring van de administrator.</p>
 
                     <hr class="ingedient-divider">
 
-                    <div class="ingedient-status">
-                        <h3 class="ingedient-status-title">Volgende stappen</h3>
-                        <p class="ingedient-text">Voordat je stageovereenkomst compleet is, moeten de volgende personen ook hun handtekening zetten:</p>
-                        <ul class="ingedient-list">
-                            <li class="ingedient-list-item">
-                                <span class="ingedient-person-icon">&#128100;</span>
-                                <div>
-                                    <strong>Docent (Begeleider)</strong>
-                                    <p class="ingedient-person-sub">Je EhB docent moet het document reviewen en ondertekenen.</p>
-                                </div>
-                            </li>
-                            <li class="ingedient-list-item">
-                                <span class="ingedient-person-icon">&#128100;</span>
-                                <div>
-                                    <strong>Stagementor (Werkbegeleider)</strong>
-                                    <p class="ingedient-person-sub">Je mentor bij het bedrijf moet het document eveneens ondertekenen.</p>
-                                </div>
-                            </li>
-                        </ul>
+                    <h3 class="ingedient-status-title">Wat gebeurt er nu?</h3>
+
+                    <div class="ingedient-timeline">
+                        <div class="ingedient-step ingedient-step--done">
+                            <div class="ingedient-step-icon">&#10003;</div>
+                            <div class="ingedient-step-body">
+                                <strong>Document ingediend</strong>
+                                <p>Je stageovereenkomst is succesvol geüpload naar het systeem.</p>
+                            </div>
+                        </div>
+                        <div class="ingedient-step-connector ingedient-step-connector--done"></div>
+
+                        <div class="ingedient-step ingedient-step--pending">
+                            <div class="ingedient-step-icon">&#8987;</div>
+                            <div class="ingedient-step-body">
+                                <strong>Admin valideert je document</strong>
+                                <p>De administrator controleert je stageovereenkomst. Je ontvangt hier een melding "Gevalideerd" zodra dit goedgekeurd is.</p>
+                            </div>
+                        </div>
+                        <div class="ingedient-step-connector"></div>
+
+                        <div class="ingedient-step ingedient-step--locked">
+                            <div class="ingedient-step-icon">&#128274;</div>
+                            <div class="ingedient-step-body">
+                                <strong>Stage van start &amp; logboek invullen</strong>
+                                <p>Eens je document goedgekeurd is en je stage begint, kan je dagelijks je logboek invullen via het platform.</p>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="ingedient-note">
-                        <p>Je ontvangt een melding zodra alle partijen het document hebben ondertekend.</p>
+                        <p>&#128276; Je ontvangt een melding zodra de administrator je document heeft goedgekeurd.</p>
                     </div>
                 </div>
 
