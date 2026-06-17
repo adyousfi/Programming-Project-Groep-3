@@ -161,7 +161,13 @@
 .sm-eval-feedback:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12); }
 
 /* Opslaan van evaluatie en succesbericht. */
-.sm-eval-actions { margin-top: 10px; }
+.sm-eval-actions {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
 .sm-eval-save-message { margin-top: 14px; color: #16a34a; font-weight: 700; }
 .hidden { display: none; }
 

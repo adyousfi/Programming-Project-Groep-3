@@ -343,11 +343,18 @@ function setupActieCards(student, user) {
         var evalTab = document.querySelector('.sd-nav-item[data-tab="evaluatie"]');
         if (evalTab) evalTab.classList.add('active');
 
+        // Zorg dat we in het evaluatie-scherm starten met de juiste tab/rol.
         document.querySelector('#sd-content').innerHTML = '<p class="sd-tab-content">Laden...</p>';
         import('./evaluatie.js').then((m) => {
+          // renderEvaluatieDocent geeft intern de tussentijdse evaluatie weer.
           m.renderEvaluatieDocent(document.querySelector('#app'), user, student);
         });
+
+        // In evaluatie.js hangen tab-knoppen (tussentijds/finale) zichzelf correct,
+        // maar we willen ook direct dat overzicht/logboek callbacks werken.
+        // (Daarvoor gebruiken we de bestaande nav click listeners.)
       }
+
 
 
       if (actie === 'logboek') {
