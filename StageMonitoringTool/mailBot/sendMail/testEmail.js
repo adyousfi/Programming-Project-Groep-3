@@ -1,9 +1,9 @@
 // send-test.js
-const transporter = require('./mailer'); // Importeer de transporter uit mailer.js
+import transporter from '../mailConnection.js';
 
 // Definieer de e-mailopties
 const mailOptions = {
-  from: '"Je Naam of Bedrijf" <jouw-email@voorbeeld.nl>', // Afzender (moet vaak matchen met de auth user)
+  from: '"Je Naam of Bedrijf" <stageatehb@gmail.com>', // Afzender (moet vaak matchen met de auth user)
   to: 'hysenaj.jon@hotmail.com',                         // Ontvanger
   subject: 'Dit is een test e-mail!',                  // Onderwerp
   text: 'Hallo! Dit is een simpele tekstversie van de mail.', // Tekstversie

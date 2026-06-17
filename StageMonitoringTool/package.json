@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "sendTestEmail": "node mailBot/sendMail/testEmail.js",
     "testServer": "node backend/server.js",
     "testExpress": "node express/express.js",
     "testdbAzure": "node db/testConnection/testdbAzure",
