@@ -374,6 +374,11 @@ async function renderEvaluatiePage(app, stagiair, activeTab = 'tussentijds', eva
       if (!container) return;
       container.querySelectorAll('.sm-score-card').forEach((b) => b.classList.remove('selected'));
       card.classList.add('selected');
+      // Remove error border when score is selected
+      const comp = card.closest('.sm-eval-competentie');
+      if (comp) comp.classList.remove('sm-eval-competentie--error');
+      const msg = document.querySelector('#sm-eval-save-message');
+      if (msg) msg.classList.remove('sm-eval-save-message--error');
     });
   });
 
@@ -381,6 +386,26 @@ async function renderEvaluatiePage(app, stagiair, activeTab = 'tussentijds', eva
   async function saveDocentEvaluatie(isSubmit = false) {
     const saveBtn = document.querySelector('#sm-eval-save');
     const submitBtn = document.querySelector('#sm-eval-submit');
+
+    // Validation: check all competenties have a score selected
+    if (isSubmit) {
+      let allFilled = true;
+      document.querySelectorAll('.sm-eval-competentie').forEach((el) => {
+        const hasScore = el.querySelector('.sm-score-card.selected');
+        if (!hasScore) {
+          el.classList.add('sm-eval-competentie--error');
+          allFilled = false;
+        }
+      });
+      if (!allFilled) {
+        const msg = document.querySelector('#sm-eval-save-message');
+        if (msg) { msg.textContent = 'Vul alle competenties in voordat je kunt indienen.'; msg.classList.remove('hidden'); msg.classList.add('sm-eval-save-message--error'); }
+        saveBtn && (saveBtn.disabled = false);
+        submitBtn && (submitBtn.disabled = false);
+        return;
+      }
+    }
+
     saveBtn && (saveBtn.disabled = true);
     submitBtn && (submitBtn.disabled = true);
 
@@ -430,7 +455,7 @@ async function renderEvaluatiePage(app, stagiair, activeTab = 'tussentijds', eva
         const valueEl = resultColumn.querySelector('div[style*="font-size:30px"]');
         if (valueEl) {
           if (total !== null && total !== undefined && !Number.isNaN(Number(total))) {
-            valueEl.textContent = `${Number(total).toFixed(1)}%`;
+            valueEl.textContent = `${(Number(total) / 5).toFixed(1)}/20`;
           } else {
             valueEl.textContent = '--';
           }
@@ -442,7 +467,7 @@ async function renderEvaluatiePage(app, stagiair, activeTab = 'tussentijds', eva
         if (msg) {
           const total = json?.totalPercentage;
           if (total !== null && total !== undefined && !Number.isNaN(Number(total))) {
-            msg.textContent = `Evaluatie succesvol ingediend. Totaalscore: ${Number(total).toFixed(1)}%`;
+            msg.textContent = `Evaluatie succesvol ingediend. Totaalscore: ${(Number(total) / 5).toFixed(1)}/20`;
           } else {
             msg.textContent = 'Evaluatie succesvol ingediend.';
           }
@@ -453,11 +478,17 @@ async function renderEvaluatiePage(app, stagiair, activeTab = 'tussentijds', eva
         document.querySelectorAll('.sm-eval-feedback').forEach((t) => { t.disabled = true; });
         if (submitBtn) submitBtn.disabled = true;
         if (saveBtn) saveBtn.disabled = true;
+        // Navigate back to overzicht after short delay
+        setTimeout(() => {
+          if (_currentStudent && _currentUser) {
+            import('./student-detail.js').then((m) => { m.renderStudentDetail(_currentStudent, _currentUser); });
+          }
+        }, 1500);
       } else {
         if (msg) {
           const total = json?.totalPercentage;
           if (total !== null && total !== undefined && !Number.isNaN(Number(total))) {
-            msg.textContent = `Evaluatie opgeslagen. Totaalscore: ${Number(total).toFixed(1)}%`;
+            msg.textContent = `Evaluatie opgeslagen. Totaalscore: ${(Number(total) / 5).toFixed(1)}/20`;
           } else {
             msg.textContent = 'Evaluatie opgeslagen.';
           }

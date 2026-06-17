@@ -205,7 +205,7 @@ async function renderEvaluatiePage(app, stagiair, activeTab = 'tussentijds', eva
     const sumScores = evaluatieData.reduce((acc, e) => {
       const s = e?.score_student;
       if (s === null || s === undefined) return acc;
-      return acc + (Number(s) / 5) * 100;
+      return acc + (Number(s) / 5) * 20;
     }, 0);
     return Math.round((sumScores / N) * 10) / 10;
   })();
@@ -236,7 +236,7 @@ async function renderEvaluatiePage(app, stagiair, activeTab = 'tussentijds', eva
             <div id="sm-eval-result-column" style="position:sticky;top:16px;border:1px solid #e5e7eb;border-radius:12px;padding:14px;background:#fff;">
               <div style="font-size:13px;color:#6b7280;margin-bottom:8px;">Uitkomst</div>
               <div style="font-size:30px;font-weight:800;letter-spacing:-0.02em;color:#111827;">
-                ${initTotalPercentage !== null ? `${initTotalPercentage.toFixed(1)}%` : '--'}
+                ${initTotalPercentage !== null ? `${initTotalPercentage.toFixed(1)}/20` : '--'}
               </div>
               <div style="font-size:13px;color:#6b7280;margin-top:6px;">
                 Gebaseerd op je scores per competentie
@@ -290,6 +290,10 @@ async function renderEvaluatiePage(app, stagiair, activeTab = 'tussentijds', eva
       if (!container) return;
       container.querySelectorAll('.sm-score-card').forEach((b) => b.classList.remove('selected'));
       card.classList.add('selected');
+      const comp = card.closest('.sm-eval-competentie');
+      if (comp) comp.classList.remove('sm-eval-competentie--error');
+      const msg = document.querySelector('#sm-eval-save-message');
+      if (msg) msg.classList.remove('sm-eval-save-message--error');
     });
   });
 
@@ -297,6 +301,26 @@ async function renderEvaluatiePage(app, stagiair, activeTab = 'tussentijds', eva
   async function saveStudentEvaluatie(isSubmit = false) {
     const saveBtn = document.querySelector('#sm-eval-save');
     const submitBtn = document.querySelector('#sm-eval-submit');
+
+    // Validation: check all competenties have a score selected
+    if (isSubmit) {
+      let allFilled = true;
+      document.querySelectorAll('.sm-eval-competentie').forEach((el) => {
+        const hasScore = el.querySelector('.sm-score-card.selected');
+        if (!hasScore) {
+          el.classList.add('sm-eval-competentie--error');
+          allFilled = false;
+        }
+      });
+      if (!allFilled) {
+        const msg = document.querySelector('#sm-eval-save-message');
+        if (msg) { msg.textContent = 'Vul alle competenties in voordat je kunt indienen.'; msg.classList.remove('hidden'); msg.classList.add('sm-eval-save-message--error'); }
+        saveBtn && (saveBtn.disabled = false);
+        submitBtn && (submitBtn.disabled = false);
+        return;
+      }
+    }
+
     saveBtn && (saveBtn.disabled = true);
     submitBtn && (submitBtn.disabled = true);
 
@@ -339,7 +363,7 @@ async function renderEvaluatiePage(app, stagiair, activeTab = 'tussentijds', eva
         const valueEl = resultColumn.querySelector('div[style*="font-size:30px"]');
         if (valueEl) {
           if (total !== null && total !== undefined && !Number.isNaN(Number(total))) {
-            valueEl.textContent = `${Number(total).toFixed(1)}%`;
+            valueEl.textContent = `${(Number(total) / 5).toFixed(1)}/20`;
           } else {
             valueEl.textContent = '--';
           }
@@ -356,6 +380,8 @@ async function renderEvaluatiePage(app, stagiair, activeTab = 'tussentijds', eva
         document.querySelectorAll('.sm-eval-feedback').forEach((t) => { t.disabled = true; });
         if (submitBtn) submitBtn.disabled = true;
         if (saveBtn) saveBtn.disabled = true;
+        // Navigate back to overzicht after short delay
+        setTimeout(() => { window.location.href = '?role=goedgekeurd_student'; }, 1500);
       } else {
         if (msg) {
           msg.textContent = 'Evaluatie opgeslagen.';

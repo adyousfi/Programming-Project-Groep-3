@@ -338,3 +338,12 @@
   color: #6b7280;
   font-size: 14px;
 }
+
+/* Disabled/greyed-out state after indienen */
+.sm-score-card:disabled { opacity: 0.4; cursor: not-allowed; pointer-events: none; }
+.sm-eval-feedback:disabled { opacity: 0.5; background: #f3f4f6; cursor: not-allowed; }
+.sm-button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* Red border for incomplete competenties */
+.sm-eval-competentie--error { border: 2px solid #ef4444; border-radius: 12px; padding: 14px; margin-bottom: 30px; }
+.sm-eval-save-message--error { color: #dc2626; }
