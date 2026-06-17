@@ -20,6 +20,7 @@ import evaluatieRoutes from '../db/routes/evaluatieRoutes.js';
 
 const app = express();
 
+// await seedDatabase();
 app.use(express.json());
 app.use(cookieParser());
 
@@ -63,7 +64,6 @@ app.use((err, req, res, next) => {
 
 async function start() {
   await run();
-  // await seedDatabase();
   app.listen(3000, () => {
     console.log('✅ Server running on 3000');
   });

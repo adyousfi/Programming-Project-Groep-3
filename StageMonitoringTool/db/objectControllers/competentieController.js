@@ -10,11 +10,12 @@ const createCompetentie  = async(req,res,next) =>{
     } = req.body
     try{
         const competentie = await Competentie.create({
-            code:code,
-            title:title,
-            omschrijving:omschrijving,
-            gewicht:gewicht
+            code: code,
+            titel: title,
+            omschrijving: omschrijving,
+            gewicht_percentage: gewicht
         })
+
 
         return res.status(200).json({
             msg: "Competentie created successfully",
@@ -30,4 +31,114 @@ const createCompetentie  = async(req,res,next) =>{
 
 }
 
-export default {createCompetentie};
+const getAllCompetenties = async (req, res, next) => {
+  try {
+    const competenties = await Competentie.findAll();
+    return res.status(200).json({
+      msg: 'Competenties opgehaald',
+      data: competenties,
+    });
+  } catch (error) {
+    console.error('Error fetching competenties:', error);
+    return res.status(500).json({ msg: 'something went wrong while fetching competenties' });
+  }
+};
+
+const updateCompetentie = async (req, res, next) => {
+  const { competentie_id } = req.params;
+  const { code, title, omschrijving, gewicht } = req.body;
+
+    console.log('[updateCompetentie] competentie_id:', competentie_id);
+  console.log('[updateCompetentie] req.body:', req.body);
+
+  try {
+    console.log('[updateCompetentie] update payload:', { code, titel: title, omschrijving, gewicht_percentage: gewicht });
+
+const competentie = await Competentie.findByPk(competentie_id);
+    if (!competentie) return res.status(404).json({ msg: 'Competentie niet gevonden' });
+
+    await competentie.update({
+      code,
+      titel: title,
+      omschrijving,
+      gewicht_percentage: gewicht,
+    });
+
+
+    return res.status(200).json({ msg: 'Competentie bijgewerkt', data: competentie });
+  } catch (error) {
+    console.error('Error updating competentie:', error);
+    return res.status(500).json({
+      msg: 'something went wrong while updating competentie',
+      debug: error?.message ?? String(error),
+      name: error?.name,
+      stack: error?.stack,
+    });
+  }
+};
+
+const createCompetentieMetRubrieken = async (req, res, next) => {
+  const { code, title, omschrijving, gewicht, rubrieken } = req.body;
+
+  if (!code || !title || !omschrijving || gewicht === undefined) {
+    return res.status(400).json({ msg: 'code, title, omschrijving en gewicht zijn verplicht' });
+  }
+
+  // Default 5 rubrieken
+  const defaultRubrieken = [
+    { score: 1, beschrijving: 'Rubriek 1' },
+    { score: 2, beschrijving: 'Rubriek 2' },
+    { score: 3, beschrijving: 'Rubriek 3' },
+    { score: 4, beschrijving: 'Rubriek 4' },
+    { score: 5, beschrijving: 'Rubriek 5' },
+  ];
+
+
+  const toCreate = Array.isArray(rubrieken) && rubrieken.length ? rubrieken : defaultRubrieken;
+
+  const t = await sequelize.transaction();
+  try {
+    const competentie = await Competentie.create(
+      {
+        code,
+        titel: title,
+        omschrijving,
+        gewicht_percentage: gewicht,
+      },
+      { transaction: t }
+    );
+
+    // Maak rubrieken met competentie_id
+    const Rubriek = (await import('../objectModel/rubriek.js')).default;
+
+    const createdRubrieken = await Promise.all(
+      toCreate.map((r) =>
+        Rubriek.create(
+          {
+            competentie_id: competentie.competentie_id,
+            score: Number(r.score),
+            beschrijving: r.beschrijving ?? r.titel ?? r.omschrijving ?? '',
+          },
+          { transaction: t }
+        )
+      )
+    );
+
+    await t.commit();
+
+    return res.status(200).json({
+      msg: 'Competentie aangemaakt met rubrieken',
+      data: { competentie, rubrieken: createdRubrieken },
+    });
+  } catch (error) {
+    await t.rollback();
+    console.error('Error creating competentie with rubrieken:', error);
+    return res.status(500).json({
+      msg: 'something went wrong while creating competentie',
+      debug: error?.message ?? String(error),
+    });
+  }
+};
+
+export default { createCompetentie, getAllCompetenties, updateCompetentie, createCompetentieMetRubrieken };
+
