@@ -20,7 +20,8 @@ import evaluatieRoutes from '../db/routes/evaluatieRoutes.js';
 
 const app = express();
 
-// await seedDatabase();
+await seedDatabase();
+
 app.use(express.json());
 app.use(cookieParser());
 
