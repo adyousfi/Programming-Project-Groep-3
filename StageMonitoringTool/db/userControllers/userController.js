@@ -1,12 +1,14 @@
 import { ROLES } from "../userModel/user.js";
 import { sequelize } from "../dbConnection.js";
 import createUserMail from "../../mailBot/sendMail/userCreate.js";
+import createActivationMail from "../../mailBot/sendMail/activeUser.js";
 import User from "../userModel/user.js";
 import Docent from "../userModel/docent.js";
 import Stagecommisie from "../userModel/stagecommisie.js";
 import Admin from "../userModel/admin.js";
 import Student from "../userModel/student.js";
 import Stagementor from "../userModel/stagementor.js";
+import Stage from "../objectModel/stage.js";
 
 const createUser = async (req, res, next) => {
     const { first_name, last_name, email, password, role, phone } = req.body;
@@ -39,7 +41,7 @@ const createUser = async (req, res, next) => {
         default:
             console.log(`No sub-profile table created for role: ${role}`);
     }
-        await createUserMail(user.email, user.first_name, user.password);
+        await createUserMail(email, first_name, password, role);
         return res.status(200).json({
             msg: "User created successfully",
             data: user
@@ -145,7 +147,11 @@ const toggleUserActive = async (req, res, next) => {
         const user = await User.findByPk(id);
         if (!user) return res.status(404).json({ msg: 'Gebruiker niet gevonden' });
         await user.update({ is_active: !user.is_active });
+        if(user.is_active){
+            await createActivationMail(user.email, user.first_name, user.password, user.role);
+        }
         return res.status(200).json({ msg: user.is_active ? 'Account geactiveerd' : 'Account gedeactiveerd', is_active: user.is_active });
+        
     } catch (error) {
         console.error('Error toggling user active:', error);
         return res.status(500).json({ msg: 'Er is iets misgegaan' });
