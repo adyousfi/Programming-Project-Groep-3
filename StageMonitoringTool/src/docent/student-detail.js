@@ -8,7 +8,6 @@ let totalWeeks = 1;
 const navItems = [
   { id: 'overzicht',    label: 'Overzicht' },
   { id: 'stagedetails', label: 'Stagedetails' },
-  { id: 'documenten',   label: 'Documenten' },
   { id: 'logboek',      label: 'Logboek' },
   { id: 'evaluatie',    label: 'Evaluatie' },
 ];
