@@ -312,16 +312,20 @@ async function renderEvaluatiePage(app, stagiair, activeTab = 'tussentijds', eva
               <div class="sm-eval-feedback-grid">
                 <div class="sm-eval-feedback-card sm-eval-feedback-card--student">
                   <span class="sm-eval-feedback-card-label">STUDENT</span>
-                  ${bestaande?.feedback_student
-                    ? `<p class="sm-eval-feedback-card-text">${escapeHtml(bestaande.feedback_student)}</p>`
+                  ${bestaande?.feedback_student || bestaande?.score_student != null
+                    ? bestaande?.feedback_student
+                      ? `<p class="sm-eval-feedback-card-text">${escapeHtml(bestaande.feedback_student)}</p>`
+                      : ''
                     : `<p class="sm-eval-feedback-card-pending">De student heeft nog geen evaluatie ingevuld.</p>`
                   }
                   <span class="sm-eval-feedback-card-score">${bestaande?.score_student != null ? `Score: ${bestaande.score_student} / 5` : 'Score: --'}</span>
                 </div>
                 <div class="sm-eval-feedback-card sm-eval-feedback-card--mentor">
                   <span class="sm-eval-feedback-card-label sm-eval-feedback-card-label--mentor">MENTOR</span>
-                  ${bestaande?.feedback_mentor
-                    ? `<p class="sm-eval-feedback-card-text">${escapeHtml(bestaande.feedback_mentor)}</p>`
+                  ${bestaande?.feedback_mentor || bestaande?.score_mentor != null
+                    ? bestaande?.feedback_mentor
+                      ? `<p class="sm-eval-feedback-card-text">${escapeHtml(bestaande.feedback_mentor)}</p>`
+                      : ''
                     : `<p class="sm-eval-feedback-card-pending">De stagementor heeft nog geen evaluatie ingevuld.</p>`
                   }
                   <span class="sm-eval-feedback-card-score sm-eval-feedback-card-score--mentor">${bestaande?.score_mentor != null ? `Score: ${bestaande.score_mentor} / 5` : 'Score: --'}</span>

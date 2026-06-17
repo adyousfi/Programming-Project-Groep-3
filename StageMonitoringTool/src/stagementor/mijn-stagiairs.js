@@ -123,6 +123,41 @@ function smGetEvaluationFeedback(email, type, c) { try { return localStorage.get
 // Slaat feedback op.
 function smSaveEvaluationFeedback(email, type, c, t) { try { localStorage.setItem(`sm_eval_feedback_${email}_${type}_${c}`, t); } catch {} }
 
+// API helpers for evaluatie (backed by database, not localStorage)
+let _competentiesCache = null;
+
+async function fetchEvaluatieStatus(stageId, type_evaluatie) {
+  const res = await fetch(
+    `/api/evaluaties/status?stage_id=${encodeURIComponent(stageId)}&type_evaluatie=${encodeURIComponent(type_evaluatie)}`,
+    { credentials: 'include' }
+  );
+  if (!res.ok) throw new Error(`Failed to fetch evaluatie status: ${res.status}`);
+  return res.json();
+}
+
+async function registreerEvaluatie(stageId, type_evaluatie) {
+  const res = await fetch('/api/evaluaties/create-per-competentie', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify({ stage_id: stageId, type_evaluatie }),
+  });
+  if (!res.ok) {
+    const text = await res.text().catch(() => '');
+    throw new Error(`Failed to register evaluaties: ${res.status} ${text}`);
+  }
+  return res.json();
+}
+
+async function fetchCompetentiesMetRubrieken() {
+  if (_competentiesCache) return _competentiesCache;
+  const res = await fetch('/api/competenties/all-met-rubrieken', { credentials: 'include' });
+  if (!res.ok) throw new Error(`Failed to fetch competenties: ${res.status}`);
+  const json = await res.json();
+  _competentiesCache = json.data;
+  return _competentiesCache;
+}
+
 // Maakt tekst veilig voordat ze in HTML geplaatst wordt.
 // Dit voorkomt problemen met speciale tekens zoals <, >, " en '.
 function escapeHtml(s) {
@@ -414,130 +449,81 @@ function renderStudentDetail(app, stagiair) {
 
 // Toont de evaluatiepagina.
 // activeTab is standaard "tussentijds", maar kan ook "finale" zijn.
-function renderEvaluatiePage(app, stagiair, activeTab = 'tussentijds') {
- // Mogelijke scores die op de scorekaarten verschijnen.
- const scores = [1, 2, 3, 4, 5];
+async function renderEvaluatiePage(app, stagiair, activeTab = 'tussentijds') {
+  const stageId = stagiair.stageData?.id;
+  if (!stageId) { renderStudentDetail(app, stagiair); return; }
+  app.innerHTML = `<div class="sm-layout">${sidebarHtml('evaluatie')}<main class="sm-main sm-main--detail"><p style="padding:24px;color:#6b7280;">Evaluatie laden...</p></main></div>`;
+  try {
+    const status = await fetchEvaluatieStatus(stageId, activeTab);
+    if (!status.bestaat) { renderEvaluatieRegistreerScreen(app, stagiair, activeTab); }
+    else { await renderEvaluatieScoreScreen(app, stagiair, activeTab, status.evaluaties); }
+  } catch (err) {
+    console.error(err);
+    app.innerHTML = `<div class="sm-layout">${sidebarHtml('evaluatie')}<main class="sm-main sm-main--detail"><div class="sm-detail-top"><div><h1 class="sm-detail-title">Evaluatie</h1><p class="sm-detail-subtitle">Fout bij het laden</p></div><a id="sm-back-evaluatie" class="sm-detail-back" href="#">← Terug naar stagiairs</a></div><div class="sm-eval-block"><div class="sm-eval-block-header"><h3>Verbinding mislukt</h3><p>Kan de evaluatie-informatie niet ophalen.</p></div><div class="sm-eval-actions"><button id="sm-eval-retry" class="sm-button">Opnieuw proberen</button></div></div></main></div>`;
+    document.querySelector('#sm-back-evaluatie')?.addEventListener('click', (e) => { e.preventDefault(); renderStudentDetail(app, stagiair); });
+    document.querySelector('#sm-eval-retry')?.addEventListener('click', () => renderEvaluatiePage(app, stagiair, activeTab));
+  }
+}
 
-// Beschrijvingen per score.
-// Bij finale evaluatie zijn de teksten iets anders dan bij tussentijdse evaluatie.
-const descriptions =
-  activeTab === 'finale'
-    ? {
-        1: '{c} is op het einde van de stage onvoldoende beheerst; het eindniveau wordt niet gehaald.',
-        2: '{c} blijft net onder het verwachte eindniveau; er zijn nog duidelijke tekortkomingen.',
-        3: '{c} wordt op eindniveau voldoende beheerst, maar met beperkte zelfstandigheid.',
-        4: '{c} wordt op eindniveau goed beheerst, met zelfstandig en consistent werk.',
-        5: '{c} wordt op eindniveau uitstekend beheerst, met initiatief, reflectie en meerwaarde voor het team.',
-      }
-    : {
-        1: '{c} is niet of onvoldoende aangetoond binnen de verwachtingen van de stage.',
-        2: '{c} is nipt aanwezig; belangrijke aspecten ontbreken of zijn nog onzeker.',
-        3: '{c} wordt voldoende uitgevoerd, maar nog niet volledig zelfstandig of consistent.',
-        4: '{c} wordt correct uitgevoerd, met af en toe lichte begeleiding of bijsturing nodig.',
-        5: '{c} wordt zelfstandig en boven de verwachtingen uitgevoerd, met initiatief en reflectie.',
-      };
-
-
-
-
-
-  // Teksten voor de kop van de pagina.
-  const pageTitle = 'Evaluatie';
-  const pageSubtitle = 'Evalueer de stagiair op basis van competenties';
-
-  // Teksten die veranderen afhankelijk van de gekozen tab.
-  const blockTitle = activeTab === 'finale' ? 'Finale beoordeling' : 'Tussentijdse bespreking';
-  const blockDesc = activeTab === 'finale'
-    ? 'Geef per competentie een finale score en feedback. De student geeft ook zelf een score — de docent ziet beide en bepaalt het definitieve punt.'
-    : 'Geef per competentie een score en feedback. De student geeft ook zelf een score — de docent ziet beide en bepaalt het finale punt.';
-
-  app.innerHTML = `
-    <div class="sm-layout">
-      ${sidebarHtml('evaluatie')}
-      <main class="sm-main sm-main--detail">
-        <div class="sm-detail-top">
-          <div>
-            <h1 class="sm-detail-title">${pageTitle}</h1>
-            <p class="sm-detail-subtitle">${pageSubtitle}</p>
-          </div>
-          <a id="sm-back-evaluatie" class="sm-detail-back" href="#">← Terug naar stagiairs</a>
-        </div>
-        <div class="sm-eval-tabs">
-          <button class="sm-eval-tab ${activeTab === 'tussentijds' ? 'active' : ''}" data-tab="tussentijds">Tussentijdse evaluatie</button>
-          <button class="sm-eval-tab ${activeTab === 'finale' ? 'active' : ''}" data-tab="finale">Finale evaluatie</button>
-        </div>
-        <div class="sm-eval-block">
-          <div class="sm-eval-block-header">
-            <h3>${blockTitle}</h3>
-            <p>${blockDesc}</p>
-          </div> 
-
-${competenties.map((comp) => `
-  <div class="sm-eval-competentie">
-       
-              <h3 style="margin:0 0 6px;font-size:20px;font-weight:700;color:#111827;">${escapeHtml(comp.title)}</h3>
-              <p style="margin:0 0 16px;color:#6b7280;">${escapeHtml(comp.description)}</p>
-              <div>
-                <span class="sm-score-title">Hoe scoor je deze competentie? Klik op een score (1 = laag, 5 = hoog)</span>
-                <div class="sm-eval-score-cards" data-competentie="${comp.key}">
-                  ${scores.map((score) => `
-                    <button type="button" class="sm-score-card sm-score-card--${score}" data-score="${score}" data-competentie="${comp.key}">
-                      <span class="sm-score-card-number">${score}</span>
-                      <span class="sm-score-card-text">${descriptions[score].replace('{c}', escapeHtml(comp.title))}</span>
-                    </button>
-                  `).join('')}
-                </div>
-              </div>
-              <div class="sm-eval-mentor-panel">
-                <h4>Jouw beoordeling (mentor)</h4>
-                <label class="sm-eval-feedback-label" for="feedback-${comp.key}">Feedback</label>
-                <textarea id="feedback-${comp.key}" class="sm-eval-feedback" placeholder="Beschrijf je feedback over de vorderingen van de student...">${escapeHtml(smGetEvaluationFeedback(stagiair.email, activeTab, comp.key))}</textarea>
-              </div>
-            </div>
-          `).join('')}
-          <div class="sm-eval-actions">
-            <button id="sm-eval-save" class="sm-button">Beoordeling Opslaan</button>
-          </div>
-          <p id="sm-eval-save-message" class="sm-eval-save-message hidden">Evaluatie opgeslagen.</p>
-        </div>
-      </main>
-    </div>
-  `;
-
-  // Terug naar het detailoverzicht van deze stagiair.
-  document.querySelector('#sm-back-evaluatie').addEventListener('click', (e) => { e.preventDefault(); renderStudentDetail(app, stagiair); });
+function renderEvaluatieRegistreerScreen(app, stagiair, activeTab) {
+  const isFinale = activeTab === 'finale';
+  const titel = isFinale ? 'Finale evaluatie' : 'Tussentijdse evaluatie';
+  const knopLabel = isFinale ? 'Finale evaluatie registreren' : 'Tussentijdse evaluatie registreren';
+  app.innerHTML = `<div class="sm-layout">${sidebarHtml('evaluatie')}<main class="sm-main sm-main--detail"><div class="sm-detail-top"><div><h1 class="sm-detail-title">Evaluatie</h1><p class="sm-detail-subtitle">Evalueer de stagiair als mentor</p></div><a id="sm-back-evaluatie" class="sm-detail-back" href="#">← Terug naar stagiairs</a></div><div class="sm-eval-tabs"><button class="sm-eval-tab ${activeTab === 'tussentijds' ? 'active' : ''}" data-tab="tussentijds">Tussentijdse evaluatie</button><button class="sm-eval-tab ${activeTab === 'finale' ? 'active' : ''}" data-tab="finale">Finale evaluatie</button></div><div class="sm-eval-block"><div class="sm-eval-block-header"><h3>${titel}</h3><p>Registreren om je evaluatie per competentie in te vullen.</p></div><div class="sm-eval-actions"><button id="sm-eval-registreer" class="sm-button">${knopLabel}</button></div><p id="sm-eval-registreer-message" class="sm-eval-save-message hidden"></p></div></main></div>`;
+  document.querySelector('#sm-back-evaluatie')?.addEventListener('click', (e) => { e.preventDefault(); renderStudentDetail(app, stagiair); });
   attachNav(app, stagiair);
+  document.querySelectorAll('.sm-eval-tab').forEach((tab) => { tab.addEventListener('click', () => renderEvaluatiePage(app, stagiair, tab.dataset.tab)); });
+  const btn = document.querySelector('#sm-eval-registreer');
+  const msg = document.querySelector('#sm-eval-registreer-message');
+  btn?.addEventListener('click', async () => {
+    btn.disabled = true; btn.textContent = 'Registreren...';
+    try { const result = await registreerEvaluatie(stagiair.stageData?.id, activeTab); await renderEvaluatieScoreScreen(app, stagiair, activeTab, result.data); }
+    catch (err) { console.error(err); btn.disabled = false; btn.textContent = knopLabel; if (msg) { msg.textContent = 'Registreren mislukt, probeer opnieuw.'; msg.classList.remove('hidden'); } }
+  });
+}
 
-  // Selecteert opnieuw de score die eerder werd opgeslagen.
-  // Daarna krijgt elke scorekaart een klikactie.
-  document.querySelectorAll('.sm-score-card').forEach((card) => {
-    const existing = smGetEvaluationScore(stagiair.email, activeTab, card.dataset.competentie);
-    if (existing && existing === card.dataset.score) card.classList.add('selected');
-    card.addEventListener('click', () => {
-      const container = card.closest('.sm-eval-score-cards');
-      if (!container) return;
-      container.querySelectorAll('.sm-score-card').forEach((b) => b.classList.remove('selected'));
-      card.classList.add('selected');
+async function renderEvaluatieScoreScreen(app, stagiair, activeTab, evaluatieData = []) {
+  const scores = [1, 2, 3, 4, 5];
+  const competenties = await fetchCompetentiesMetRubrieken();
+  const dataByCode = Object.fromEntries(evaluatieData.map((e) => [e.competentie_code, e]));
+  const desc = activeTab === 'finale'
+    ? { 1: '{c} is onvoldoende beheerst.', 2: '{c} blijft onder eindniveau.', 3: '{c} voldoende, beperkte zelfstandigheid.', 4: '{c} goed beheerst, zelfstandig werk.', 5: '{c} uitstekend, met initiatief en reflectie.' }
+    : { 1: '{c} niet aangetoond.', 2: '{c} nipt aanwezig.', 3: '{c} voldoende, nog niet zelfstandig.', 4: '{c} correct, lichte begeleiding.', 5: '{c} zelfstandig, boven verwachting.' };
+  const blockTitle = activeTab === 'finale' ? 'Finale beoordeling' : 'Tussentijdse bespreking';
+  const initTotal = (() => { const ids = Array.from(new Set(evaluatieData.map(e => e?.competentie_id).filter(Boolean))); const N = ids.length; if (!N) return null; return Math.round((evaluatieData.reduce((a, e) => { const s = e?.score_mentor; return s == null ? a : a + (Number(s) / 5) * 100; }, 0) / N) * 10) / 10; })();
+
+  app.innerHTML = `<div class="sm-layout">${sidebarHtml('evaluatie')}<main class="sm-main sm-main--detail"><div class="sm-detail-top"><div><h1 class="sm-detail-title">Evaluatie</h1><p class="sm-detail-subtitle">Evalueer de stagiair als mentor</p></div><a id="sm-back-evaluatie" class="sm-detail-back" href="#">← Terug naar stagiairs</a></div><div class="sm-eval-tabs"><button class="sm-eval-tab ${activeTab === 'tussentijds' ? 'active' : ''}" data-tab="tussentijds">Tussentijdse evaluatie</button><button class="sm-eval-tab ${activeTab === 'finale' ? 'active' : ''}" data-tab="finale">Finale evaluatie</button></div><div class="sm-eval-block" style="display:grid;grid-template-columns:1fr 320px;gap:16px;align-items:start;"><div><div class="sm-eval-block-header"><h3>${blockTitle}</h3><p>Geef per competentie een score en feedback.</p><p style="margin-top:6px;color:#6b7280;">Datum: <strong>${new Date().toLocaleDateString('nl-BE')}</strong></p></div><div id="sm-eval-result-column" style="position:sticky;top:16px;border:1px solid #e5e7eb;border-radius:12px;padding:14px;background:#fff;"><div style="font-size:13px;color:#6b7280;margin-bottom:8px;">Uitkomst</div><div style="font-size:30px;font-weight:800;color:#111827;">${initTotal != null ? initTotal.toFixed(1) + '%' : '--'}</div><div style="font-size:13px;color:#6b7280;margin-top:6px;">Gebaseerd op je mentor-scores</div></div>${competenties.map((comp) => { const b = dataByCode[comp.code]; return `<div class="sm-eval-competentie" data-competentie-id="${comp.competentie_id}" data-competentie-code="${comp.code}"><h3 style="margin:0 0 6px;font-size:20px;font-weight:700;color:#111827;">${escapeHtml(comp.titel)}</h3><p style="margin:0 0 16px;color:#6b7280;">${escapeHtml(comp.omschrijving)}</p><div><span class="sm-score-title">Hoe scoor je deze competentie? Klik op een score (1 = laag, 5 = hoog)</span><div class="sm-eval-score-cards">${scores.map((sc) => `<button type="button" class="sm-score-card sm-score-card--${sc} ${b?.score_mentor === sc ? 'selected' : ''}" data-score="${sc}" data-competentie="${comp.competentie_id}" data-competentie-code="${comp.code}"><span class="sm-score-card-number">${sc}</span><span class="sm-score-card-text">${desc[sc].replace('{c}', escapeHtml(comp.titel))}</span></button>`).join('')}</div></div><div class="sm-eval-mentor-panel"><h4>Feedback (mentor)</h4><label class="sm-eval-feedback-label" for="feedback-${comp.competentie_id}">Feedback</label><textarea id="feedback-${comp.competentie_id}" class="sm-eval-feedback" placeholder="Beschrijf je feedback...">${escapeHtml(b?.feedback_mentor ?? '')}</textarea></div></div>`; }).join('')}<div class="sm-eval-actions"><button id="sm-eval-save" class="sm-button">Beoordeling Opslaan</button><button id="sm-eval-submit" class="sm-button" style="margin-left:10px;">Indienen</button></div><p id="sm-eval-save-message" class="sm-eval-save-message hidden"></p></div></main></div>`;
+
+  document.querySelector('#sm-back-evaluatie')?.addEventListener('click', (e) => { e.preventDefault(); renderStudentDetail(app, stagiair); });
+  attachNav(app, stagiair);
+  document.querySelectorAll('.sm-eval-tab').forEach((tab) => { tab.addEventListener('click', () => renderEvaluatiePage(app, stagiair, tab.dataset.tab)); });
+  document.querySelectorAll('.sm-score-card').forEach((card) => { card.addEventListener('click', () => { const c = card.closest('.sm-eval-score-cards'); if (!c) return; c.querySelectorAll('.sm-score-card').forEach((b) => b.classList.remove('selected')); card.classList.add('selected'); }); });
+
+  async function saveMentorEvaluatie(isSubmit = false) {
+    const saveBtn = document.querySelector('#sm-eval-save');
+    const submitBtn = document.querySelector('#sm-eval-submit');
+    saveBtn && (saveBtn.disabled = true); submitBtn && (submitBtn.disabled = true);
+    const stageId = stagiair.stageData?.id;
+    const updates = Array.from(document.querySelectorAll('.sm-eval-competentie')).map((el) => {
+      const code = el.dataset.competentieCode;
+      const sel = el.querySelector('.sm-score-card.selected');
+      const fb = el.querySelector('.sm-eval-feedback')?.value ?? '';
+      return { competentie_code: code, score: null, feedback: null, score_mentor: sel ? Number(sel.dataset.score) : null, feedback_mentor: fb || null };
     });
-  });
-
-  // Wisselt tussen "Tussentijdse evaluatie" en "Finale evaluatie".
-  document.querySelectorAll('.sm-eval-tab').forEach((tab) => {
-    tab.addEventListener('click', () => renderEvaluatiePage(app, stagiair, tab.dataset.tab));
-  });
-
-  // Slaat alle gekozen scores en feedbackvelden op in localStorage.
-  document.querySelector('#sm-eval-save').addEventListener('click', () => {
-    document.querySelectorAll('.sm-eval-score-cards').forEach((container) => {
-      const compKey = container.dataset.competentie;
-      const selected = container.querySelector('.sm-score-card.selected');
-      if (selected) smSaveEvaluationScore(stagiair.email, activeTab, compKey, Number(selected.dataset.score));
-      const fb = document.querySelector(`#feedback-${compKey}`);
-      if (fb) smSaveEvaluationFeedback(stagiair.email, activeTab, compKey, fb.value.trim());
-    });
-    const msg = document.querySelector('#sm-eval-save-message');
-    if (msg) { msg.textContent = 'Evaluatie opgeslagen.'; msg.classList.remove('hidden'); }
-  });
+    try {
+      const res = await fetch(`/api/evaluaties/${stageId}/per-competentie`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, credentials: 'include', body: JSON.stringify({ stage_id: stageId, type_evaluatie: activeTab, updates }) });
+      if (!res.ok) { const t = await res.text().catch(() => ''); throw new Error(`Save failed: ${res.status} ${t}`); }
+      const json = await res.json().catch(() => ({}));
+      const rc = document.querySelector('#sm-eval-result-column');
+      if (rc) { const v = rc.querySelector('div[style*="font-size:30px"]'); if (v) v.textContent = (json?.totalPercentage != null && !Number.isNaN(Number(json.totalPercentage))) ? Number(json.totalPercentage).toFixed(1) + '%' : '--'; }
+      const msg = document.querySelector('#sm-eval-save-message');
+      if (isSubmit) { if (msg) { msg.textContent = 'Evaluatie succesvol ingediend.'; msg.classList.remove('hidden'); } document.querySelectorAll('.sm-score-card').forEach((b) => { b.disabled = true; }); document.querySelectorAll('.sm-eval-feedback').forEach((t) => { t.disabled = true; }); if (submitBtn) submitBtn.disabled = true; if (saveBtn) saveBtn.disabled = true; }
+      else { if (msg) { msg.textContent = 'Evaluatie opgeslagen.'; msg.classList.remove('hidden'); } }
+    } catch (e) { console.error(e); const msg = document.querySelector('#sm-eval-save-message'); if (msg) { msg.textContent = isSubmit ? 'Indienen mislukt.' : 'Opslaan mislukt.'; msg.classList.remove('hidden'); } }
+    finally { if (!isSubmit) { saveBtn && (saveBtn.disabled = false); submitBtn && (submitBtn.disabled = false); } }
+  }
+  document.querySelector('#sm-eval-save')?.addEventListener('click', () => saveMentorEvaluatie(false));
+  document.querySelector('#sm-eval-submit')?.addEventListener('click', () => saveMentorEvaluatie(true));
 }
 
 // Toont het overzicht van alle logboekweken.
