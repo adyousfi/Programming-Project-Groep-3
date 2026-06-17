@@ -42,7 +42,7 @@ export function renderStagedetails(container, userName = 'Jan Janssens', stageDa
                         <a href="?role=stagedetails" class="sidebar-nav-item active">Stagedetails</a>
                         <a href="?role=documenten" class="sidebar-nav-item">Documenten</a>
                         <a href="${docValidated ? '?role=logboek' : '#'}" class="sidebar-nav-item${docValidated ? '' : ' disabled'}">Logboek</a>
-                        <a href="#" class="sidebar-nav-item disabled">Evaluatie</a>
+                        <a href="?role=evaluatie" class="sidebar-nav-item">Evaluatie</a>
                     </nav>
                 </div>
                 <div class="sidebar-bottom">

@@ -115,7 +115,7 @@ export async function renderLogboek(container, userName = 'Student', stageData =
                         <a href="?role=stagedetails" class="sidebar-nav-item">Stagedetails</a>
                         <a href="?role=documenten" class="sidebar-nav-item">Documenten</a>
                         <a href="?role=logboek" class="sidebar-nav-item active">Logboek</a>
-                        <a href="#" class="sidebar-nav-item disabled">Evaluatie</a>
+                        <a href="?role=evaluatie" class="sidebar-nav-item">Evaluatie</a>
                     </nav>
                 </div>
                 <div class="sidebar-bottom">

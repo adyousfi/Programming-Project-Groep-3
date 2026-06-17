@@ -220,11 +220,11 @@ const updateEvaluatiesPerCompetentie = async (req, res, next) => {
     // We hebben rubrieken nodig om score -> rubriek_id te mappen.
     const competentieIds = competenties.map((c) => c.competentie_id);
 
-    const rubrieken = competentieIds.length
+    const rubrieken = (competentieIds.length && uniqueDocentScores.length)
       ? await Rubriek.findAll({
           where: {
             competentie_id: competentieIds,
-            score: uniqueDocentScores.length ? uniqueDocentScores : undefined,
+            score: uniqueDocentScores,
           },
         })
       : [];
@@ -242,6 +242,8 @@ const updateEvaluatiesPerCompetentie = async (req, res, next) => {
         const compCode = u?.competentie_code;
         const docentScore = u?.score;
         const docentFeedback = u?.feedback ?? null;
+        const feedback_student = u?.feedback_student ?? null;
+        const feedback_mentor = u?.feedback_mentor ?? null;
         const score_student = u?.score_student ?? null;
         const score_mentor = u?.score_mentor ?? null;
 
@@ -253,35 +255,43 @@ const updateEvaluatiesPerCompetentie = async (req, res, next) => {
             ? rubriekIndex.get(`${comp.competentie_id}:${docentScore}`)
             : null;
 
-        const [evaluatie, created] = await Evaluatie.findOrCreate({
+        let evaluatie = await Evaluatie.findOne({
           where: {
             stage_id: Number(stageId),
             type_evaluatie,
             competentie_id: comp.competentie_id,
           },
-          defaults: {
+          transaction: t,
+        });
+
+        let created = false;
+        if (!evaluatie) {
+          evaluatie = await Evaluatie.create({
+            stage_id: Number(stageId),
+            type_evaluatie,
+            competentie_id: comp.competentie_id,
             rubriek_id: rubriek?.rubriek_id ?? null,
             datum_evaluatie: new Date(),
             feedback_docent: docentFeedback,
             score_docent: docentScore ?? null,
+            feedback_student,
             score_student,
+            feedback_mentor,
             score_mentor,
-          },
-          transaction: t,
-        });
-
-        if (!created) {
-          await evaluatie.update(
-            {
-              rubriek_id: rubriek?.rubriek_id ?? null,
-              feedback_docent: docentFeedback,
-              datum_evaluatie: new Date(),
-              score_docent: docentScore ?? null,
-              score_student,
-              score_mentor,
-            },
-            { transaction: t }
-          );
+          }, { transaction: t });
+          created = true;
+        } else {
+          const updatesToApply = { datum_evaluatie: new Date() };
+          if (docentScore != null) {
+            updatesToApply.score_docent = docentScore;
+            updatesToApply.rubriek_id = rubriek?.rubriek_id ?? null;
+          }
+          if (docentFeedback != null) updatesToApply.feedback_docent = docentFeedback;
+          if (score_student != null) updatesToApply.score_student = score_student;
+          if (feedback_student != null) updatesToApply.feedback_student = feedback_student;
+          if (score_mentor != null) updatesToApply.score_mentor = score_mentor;
+          if (feedback_mentor != null) updatesToApply.feedback_mentor = feedback_mentor;
+          await evaluatie.update(updatesToApply, { transaction: t });
         }
 
         results.push({

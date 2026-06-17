@@ -1,0 +1,85 @@
+/* Student evaluatie page — uses same sm-* layout as docent evaluatie. */
+
+.sm-layout { display: flex; min-height: 100vh; font-family: system-ui, sans-serif; }
+
+.sm-sidebar { width: 260px; flex-shrink: 0; background: #ffffff; border-right: 1px solid #e5e7eb; display: flex; flex-direction: column; justify-content: space-between; }
+.sm-sidebar-top { padding: 28px 20px 0; }
+.sm-logo { display: flex; flex-direction: column; gap: 4px; padding-bottom: 24px; border-bottom: 1px solid #e5e7eb; margin-bottom: 16px; }
+.sm-logo-title { font-size: 18px; font-weight: 700; color: #111827; }
+.sm-logo-sub { font-size: 13px; color: #6b7280; }
+.sm-nav { display: flex; flex-direction: column; gap: 6px; margin-top: 16px; }
+.sm-nav-item { display: block; padding: 10px 14px; border-radius: 10px; text-decoration: none; color: #374151; font-weight: 500; transition: background 0.15s; cursor: pointer; }
+.sm-nav-item:hover, .sm-nav-item.active { background: #eff6ff; color: #1d4ed8; }
+.sm-sidebar-bottom { padding: 20px; border-top: 1px solid #e5e7eb; display: flex; flex-direction: column; gap: 6px; }
+.sm-user-name { font-size: 14px; font-weight: 600; color: #111827; }
+.sm-logout { font-size: 14px; color: #2563eb; text-decoration: none; cursor: pointer; }
+.sm-logout:hover { text-decoration: underline; }
+
+.sm-main { flex: 1; background: #f8fafc; padding: 28px 32px; }
+.sm-main--detail { padding: 28px 32px; }
+
+.sm-detail-top { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 24px; }
+.sm-detail-top > div { flex: 1; display: flex; flex-direction: column; align-items: flex-start; text-align: left; }
+.sm-detail-title { margin: 0 0 8px; font-size: 32px; font-weight: 800; color: #111827; }
+.sm-detail-subtitle { margin: 8px 0 0; font-size: 14px; color: #6b7280; }
+.sm-detail-back { color: #2563eb; text-decoration: none; font-weight: 600; cursor: pointer; }
+
+.sm-button { border: none; background: #2563eb; color: #ffffff; padding: 12px 20px; border-radius: 10px; font-weight: 600; cursor: pointer; transition: background 0.2s ease; }
+.sm-button:hover { background: #1d4ed8; }
+
+/* Tabs */
+.sm-eval-tabs { display: flex; gap: 0; margin-bottom: 22px; border-bottom: 1px solid #e5e7eb; }
+.sm-eval-tab { border: none; border-bottom: 3px solid transparent; background: transparent; color: #6b7280; padding: 14px 24px; cursor: pointer; font-weight: 600; font-size: 15px; transition: all 0.15s ease; margin-bottom: -1px; }
+.sm-eval-tab.active { border-bottom-color: #2563eb; color: #2563eb; }
+.sm-eval-tab:hover:not(.active) { color: #1d4ed8; }
+
+/* Block */
+.sm-eval-block { background: #ffffff; border: 1px solid #e5e7eb; border-radius: 18px; padding: 28px; margin-bottom: 18px; }
+.sm-eval-block-header h3 { margin: 0 0 8px; font-size: 22px; color: #111827; font-weight: 700; }
+.sm-eval-block-header p { margin: 0 0 20px; color: #6b7280; font-size: 15px; }
+
+/* Competentie */
+.sm-eval-competentie { border-bottom: 1px solid #d1d5db; padding-bottom: 30px; margin-bottom: 30px; }
+.sm-eval-competentie:last-child { border-bottom: none; }
+
+/* Score title */
+.sm-score-title { color: #0b8a3b; font-size: 13px; font-weight: 700; text-transform: uppercase; margin-bottom: 14px; display: block; letter-spacing: 0.03em; }
+
+/* Score cards grid */
+.sm-eval-score-cards { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; padding: 20px; background: #edf8f0; border: 1px solid #9be7b3; border-radius: 14px; }
+
+.sm-score-card { background: #ffffff; border: 2px solid #e5e7eb; border-radius: 12px; padding: 18px; display: flex; flex-direction: column; gap: 12px; cursor: pointer; transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease; text-align: left; min-height: 260px; }
+.sm-score-card:hover { transform: translateY(-1px); }
+.sm-score-card-number { font-size: 54px; font-weight: 700; line-height: 1; }
+.sm-score-card-text { font-size: 13px; color: #374151; line-height: 1.5; }
+
+.sm-score-card--1 { border-color: #ef9a9a; }
+.sm-score-card--2 { border-color: #ffb74d; }
+.sm-score-card--3 { border-color: #80cbc4; }
+.sm-score-card--4 { border-color: #90caf9; }
+.sm-score-card--5 { border-color: #a5d6a7; }
+.sm-score-card--1 .sm-score-card-number { color: #c62828; }
+.sm-score-card--2 .sm-score-card-number { color: #d35400; }
+.sm-score-card--3 .sm-score-card-number { color: #00897b; }
+.sm-score-card--4 .sm-score-card-number { color: #2962ff; }
+.sm-score-card--5 .sm-score-card-number { color: #2e7d32; }
+
+.sm-score-card.selected .sm-score-card-number,
+.sm-score-card.selected .sm-score-card-text { color: white; }
+.sm-score-card--1.selected { background: #c62828; border-color: #c62828; }
+.sm-score-card--2.selected { background: #d35400; border-color: #d35400; }
+.sm-score-card--3.selected { background: #00897b; border-color: #00897b; }
+.sm-score-card--4.selected { background: #2962ff; border-color: #2962ff; }
+.sm-score-card--5.selected { background: #2e7d32; border-color: #2e7d32; }
+
+/* Feedback panel */
+.sm-eval-mentor-panel { background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 14px; padding: 20px; margin-top: 20px; }
+.sm-eval-mentor-panel h4 { color: #0b8a3b; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; margin: 0 0 14px; }
+.sm-eval-feedback-label { display: block; margin-bottom: 10px; font-weight: 700; color: #111827; }
+.sm-eval-feedback { width: 100%; min-height: 120px; background: white; border: 1px solid #d1d5db; border-radius: 12px; padding: 14px 16px; font-size: 15px; font-family: inherit; box-sizing: border-box; resize: vertical; }
+.sm-eval-feedback:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12); }
+
+/* Actions */
+.sm-eval-actions { margin-top: 10px; }
+.sm-eval-save-message { margin-top: 14px; color: #16a34a; font-weight: 700; }
+.hidden { display: none; }

@@ -14,6 +14,7 @@ import { renderDocumentenIngedient } from './student/documenten-ingedient.js';
 import { renderStagedetails } from './student/stagedetails.js';
 import { renderLogboek } from './student/logboek.js';
 import { renderLogboekDag } from './student/logboek-dag.js';
+import { renderEvaluatieStudent } from './student/evaluatie.js';
 import { renderAdmin } from './admin/admin.js';
 
 const app = document.querySelector('#app');
@@ -143,6 +144,14 @@ if (role === 'student') {
     await renderLogboekDag(app, displayName, stageData.found ? stageData : null, weekNumber);
   } else {
     await renderLogboekDag(app, 'Student', null, weekNumber);
+  }
+} else if (role === 'evaluatie') {
+  const user = await getLoggedInUser();
+  if (user && user.user_id) {
+    const stageData = await getStudentStage(user.user_id);
+    await renderEvaluatieStudent(app, user, stageData.found ? stageData : null);
+  } else {
+    await renderEvaluatieStudent(app, null, null);
   }
 } else {
   app.style.display = 'none';
