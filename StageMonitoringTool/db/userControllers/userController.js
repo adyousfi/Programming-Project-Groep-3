@@ -80,6 +80,9 @@ const updateUser = async (req, res, next) => {
         if (password && password.trim() !== '') {
             updateData.password = password;
         }
+        if (req.body.is_active !== undefined) {
+            updateData.is_active = req.body.is_active;
+        }
 
         await user.update(updateData);
 
@@ -135,12 +138,28 @@ const deleteUser = async (req, res, next) => {
     }
 };
 
+const toggleUserActive = async (req, res, next) => {
+    const { id } = req.params;
+    try {
+        const user = await User.findByPk(id);
+        if (!user) return res.status(404).json({ msg: 'Gebruiker niet gevonden' });
+        await user.update({ is_active: !user.is_active });
+        return res.status(200).json({ msg: user.is_active ? 'Account geactiveerd' : 'Account gedeactiveerd', is_active: user.is_active });
+    } catch (error) {
+        console.error('Error toggling user active:', error);
+        return res.status(500).json({ msg: 'Er is iets misgegaan' });
+    }
+};
+
 const loginUser = async (req, res, next) => {
     const { email, password } = req.body;
     try {
         const user = await User.findOne({ where: { email } });
         if (!user || user.password !== password) {
             return res.json({ success: false, message: 'Foute login' });
+        }
+        if (!user.is_active) {
+            return res.json({ success: false, message: 'Je account is nog niet geactiveerd. Contacteer de administrator.' });
         }
         res.cookie('user', {
             user_id: user.user_id,
@@ -191,4 +210,4 @@ const logoutUser = (req, res, next) => {
     res.json({ success: true });
 };
 
-export default { createUser, selectUser, updateUser, deleteUser, loginUser, checkLogin, logoutUser };
+export default { createUser, selectUser, updateUser, deleteUser, loginUser, checkLogin, logoutUser, toggleUserActive };

@@ -16,6 +16,7 @@ router.post('/logout', userController.logoutUser);
 router.get('/select-user', userController.selectUser);
 router.post('/create-user', userController.createUser);
 router.put('/update-user/:id', userController.updateUser);
+router.patch('/toggle-user-active/:id', userController.toggleUserActive);
 router.delete('/delete-user/:id', userController.deleteUser);
 
 router.get('/select-stage', stageController.selectStageRaw);

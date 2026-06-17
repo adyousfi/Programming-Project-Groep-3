@@ -27,6 +27,19 @@ router.put('/:id/docent', async (req, res, next) => {
   }
 });
 
+router.put('/:id/stagementor', async (req, res, next) => {
+  try {
+    const { stagementor_id } = req.body;
+    const stage = await Stage.findByPk(req.params.id);
+    if (!stage) return res.status(404).json({ msg: 'Stage niet gevonden' });
+    await stage.update({ stagementor_id });
+    return res.json({ msg: 'Stagementor gekoppeld' });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ msg: 'Fout bij koppelen stagementor' });
+  }
+});
+
 router.put('/:id/validate-document', adminController.validateStudentDocument);
 
 export default router;

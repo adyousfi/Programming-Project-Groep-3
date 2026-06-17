@@ -308,12 +308,13 @@
   background: white;
   border-radius: 8px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
+  overflow-x: auto;
 }
 
 .user-table {
   width: 100%;
   border-collapse: collapse;
+  min-width: 800px;
 }
 
 .user-table th,
@@ -321,8 +322,14 @@
   padding: 0.5rem 0.75rem;
   text-align: left;
   font-size: 0.875rem;
-  white-space: nowrap;
 }
+
+.user-table td:nth-child(1) { min-width: 130px; }
+.user-table td:nth-child(2) { min-width: 180px; max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.user-table td:nth-child(3) { min-width: 110px; white-space: nowrap; }
+.user-table td:nth-child(4) { min-width: 110px; }
+.user-table td:nth-child(5) { min-width: 80px; }
+.user-table td:nth-child(6) { min-width: 180px; white-space: nowrap; }
 
 .user-table th {
   background: #f9fafb;
@@ -360,9 +367,15 @@
   font-weight: 500;
 }
 
-.status-badge.active {
+.status-badge.active,
+.status-badge--actief {
   background: #dcfce7;
   color: #166534;
+}
+
+.status-badge--inactief {
+  background: #fee2e2;
+  color: #dc2626;
 }
 
 .actions {
@@ -398,6 +411,21 @@
 
 .btn-deactivate:hover {
   background: #fef2f2;
+}
+
+.btn-activate {
+  padding: 0.3rem 0.5rem;
+  background: white;
+  border: 1px solid #16a34a;
+  color: #16a34a;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.btn-activate:hover {
+  background: #f0fdf4;
 }
 
 .loading {
