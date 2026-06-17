@@ -1,6 +1,8 @@
 import './koppeldocent.css';
 import { renderAdmin } from './admin.js';
 import { renderAdminDocumenten } from './adminDocumenten.js'; // check pad!
+import { renderCompetenties } from './competenties.js';
+
 
 const API_URL = 'http://localhost:3000';
 
@@ -294,26 +296,28 @@ export async function renderKoppelingen(app) {
   `;
 
   // ================= NAVIGATIE =================
-  document.getElementById('navGebruikers').addEventListener('click', e => {
-    e.preventDefault();
-    renderAdmin(app);
-  });
+  // NAVIGATIE
 
-  document.getElementById('navKoppelingen').addEventListener('click', e => {
-    e.preventDefault();
-    renderKoppelingen(app);
-  });
+document.getElementById('navGebruikers').addEventListener('click', (e) => {
+  e.preventDefault();
+  renderAdmin(app);
+});
 
-  document.getElementById('navDocumenten').addEventListener('click', e => {
-    e.preventDefault();
-    renderAdminDocumenten(app);
-  });
+document.getElementById('navKoppelingen').addEventListener('click', (e) => {
+  e.preventDefault();
+  renderKoppelingen(app);
+});
 
-  document.getElementById('navCompetenties').addEventListener('click', e => {
-    e.preventDefault();
-    renderAdmin(app); // fallback
-  });
+document.getElementById('navDocumenten')?.addEventListener('click', (e) => {
+  e.preventDefault();
+  renderAdminDocumenten(app);
+});
 
+// deze is current page → mag blijven of opnieuw renderen
+document.getElementById('navCompetenties').addEventListener('click', (e) => {
+  e.preventDefault();
+  renderCompetenties(app);
+});
   // ================= LOGOUT =================
   document.getElementById('kp-logout').addEventListener('click', async () => {
     try {
