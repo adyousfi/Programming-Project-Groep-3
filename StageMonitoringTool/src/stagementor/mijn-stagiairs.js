@@ -135,7 +135,6 @@ function sidebarHtml(activePage) {
   const items = [
     { key: 'overzicht', label: 'Overzicht' },
     { key: 'stagedetails', label: 'Stagedetails' },
-    { key: 'documenten', label: 'Documenten' },
     { key: 'logboek', label: 'Logboek' },
     { key: 'evaluatie', label: 'Evaluatie' },
   ];
