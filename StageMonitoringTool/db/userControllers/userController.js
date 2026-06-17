@@ -1,6 +1,6 @@
 import { ROLES } from "../userModel/user.js";
 import { sequelize } from "../dbConnection.js";
-
+import createUserMail from "../../mailBot/sendMail/userCreate.js";
 import User from "../userModel/user.js";
 import Docent from "../userModel/docent.js";
 import Stagecommisie from "../userModel/stagecommisie.js";
@@ -39,6 +39,7 @@ const createUser = async (req, res, next) => {
         default:
             console.log(`No sub-profile table created for role: ${role}`);
     }
+        await createUserMail(user.email, user.first_name, user.password);
         return res.status(200).json({
             msg: "User created successfully",
             data: user
