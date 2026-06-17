@@ -31,6 +31,11 @@ export async function renderDocumenten(container) {
     const hasAdminDoc = adminDocs.length > 0;
     const hasStudentSubmission = studentDocs.length > 0;
 
+    if (hasStudentSubmission && !docValidated) {
+        window.location.href = '/?role=documenten_ingedient';
+        return;
+    }
+
     container.innerHTML = `
         <div class="documenten-layout">
 

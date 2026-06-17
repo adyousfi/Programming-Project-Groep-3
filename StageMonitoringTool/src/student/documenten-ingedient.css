@@ -200,3 +200,80 @@
     color: #0c5ccc;
     margin: 0;
 }
+
+/* Timeline */
+.ingedient-timeline {
+    display: flex;
+    flex-direction: column;
+    margin: 1.25rem 0;
+}
+
+.ingedient-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+}
+
+.ingedient-step-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+    font-weight: 700;
+}
+
+.ingedient-step--done .ingedient-step-icon {
+    background-color: #d1fae5;
+    color: #065f46;
+}
+
+.ingedient-step--pending .ingedient-step-icon {
+    background-color: #fef3c7;
+    color: #92400e;
+}
+
+.ingedient-step--locked .ingedient-step-icon {
+    background-color: #f3f4f6;
+    color: #9ca3af;
+}
+
+.ingedient-step-body {
+    padding-top: 0.4rem;
+}
+
+.ingedient-step-body strong {
+    display: block;
+    font-size: 0.95rem;
+    color: #111;
+    margin-bottom: 0.2rem;
+}
+
+.ingedient-step--locked .ingedient-step-body strong {
+    color: #6b7280;
+}
+
+.ingedient-step-body p {
+    font-size: 0.82rem;
+    color: #6b7280;
+    margin: 0;
+    line-height: 1.5;
+}
+
+.ingedient-step--locked .ingedient-step-body p {
+    color: #9ca3af;
+}
+
+.ingedient-step-connector {
+    width: 2px;
+    height: 28px;
+    background-color: #e5e7eb;
+    margin-left: 19px;
+}
+
+.ingedient-step-connector--done {
+    background-color: #6ee7b7;
+}
