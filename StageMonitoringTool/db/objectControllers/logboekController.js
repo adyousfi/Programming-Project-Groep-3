@@ -18,6 +18,10 @@ const getLogboekByStage = async (req, res, next) => {
             if (String(cookieUser.user_id) !== String(stage.student_id)) {
                 return res.status(403).json({ msg: 'Geen toegang tot dit logboek' });
             }
+        } else if (cookieUser.role === 'stagementor') {
+            if (String(cookieUser.user_id) !== String(stage.stagementor_id)) {
+                return res.status(403).json({ msg: 'Geen toegang tot dit logboek' });
+            }
         } else {
             return res.status(403).json({ msg: 'Geen toegang' });
         }
@@ -57,6 +61,7 @@ const getLogboekById = async (req, res, next) => {
             leerpunten: logboek.leerpunten,
             status: logboek.status,
             checkmark: logboek.checkmark,
+            gevinkt_door_student: logboek.gevinkt_door_student,
         });
     } catch (err) {
         console.error('Error fetching logboek by id:', err);
@@ -163,6 +168,64 @@ const createLogboek = async (req, res, next) => {
     }
 };
 
+const afvinkWeekDoorStudent = async (req, res, next) => {
+    try {
+        const cookieUser = req.cookies.user;
+        if (!cookieUser) return res.status(401).json({ msg: 'Niet ingelogd' });
+        if (cookieUser.role !== 'student' && cookieUser.role !== 'stagementor') {
+            return res.status(403).json({ msg: 'Geen toegang' });
+        }
+
+        const { stage_id, weekStart, weekEnd } = req.body;
+        if (!stage_id || !weekStart || !weekEnd) return res.status(400).json({ msg: 'stage_id, weekStart en weekEnd zijn verplicht' });
+
+        const stage = await Stage.findByPk(stage_id);
+        if (!stage) return res.status(404).json({ msg: 'Stage niet gevonden' });
+        if (cookieUser.role === 'student' && String(cookieUser.user_id) !== String(stage.student_id)) {
+            return res.status(403).json({ msg: 'Geen toegang tot dit logboek' });
+        }
+        if (cookieUser.role === 'stagementor' && String(cookieUser.user_id) !== String(stage.stagementor_id)) {
+            return res.status(403).json({ msg: 'Geen toegang tot dit logboek' });
+        }
+
+        const entries = await Logboek.findAll({
+            where: {
+                stage_id,
+                [Logboek.sequelize.Sequelize.Op.and]: [
+                    Logboek.sequelize.where(Logboek.sequelize.fn('DATE', Logboek.sequelize.col('datum')), { [Logboek.sequelize.Sequelize.Op.gte]: weekStart }),
+                    Logboek.sequelize.where(Logboek.sequelize.fn('DATE', Logboek.sequelize.col('datum')), { [Logboek.sequelize.Sequelize.Op.lte]: weekEnd }),
+                ],
+            },
+        });
+
+        if (entries.length === 0) return res.status(404).json({ msg: 'Geen logboek entries gevonden voor deze week' });
+
+        const allIngevuld = entries.every(e => e.status === 'INGEVULD');
+        if (!allIngevuld) return res.status(400).json({ msg: 'Niet alle dagen zijn ingevuld' });
+
+        const alreadyAfgevinkt = entries.every(e => e.gevinkt_door_student);
+        if (alreadyAfgevinkt) return res.status(400).json({ msg: 'Week is al afgevinkt door student' });
+
+        await Logboek.update(
+            { gevinkt_door_student: true },
+            {
+                where: {
+                    stage_id,
+                    [Logboek.sequelize.Sequelize.Op.and]: [
+                        Logboek.sequelize.where(Logboek.sequelize.fn('DATE', Logboek.sequelize.col('datum')), { [Logboek.sequelize.Sequelize.Op.gte]: weekStart }),
+                        Logboek.sequelize.where(Logboek.sequelize.fn('DATE', Logboek.sequelize.col('datum')), { [Logboek.sequelize.Sequelize.Op.lte]: weekEnd }),
+                    ],
+                },
+            }
+        );
+
+        return res.json({ msg: 'Week afgevinkt door student', updatedCount: entries.length });
+    } catch (err) {
+        console.error('Error afvinken week door student:', err);
+        return res.status(500).json({ msg: 'Fout bij afvinken week' });
+    }
+};
+
 const assignOpmerkingToLogboek = async (req, res, next) => {
     const {
         stage_id,
@@ -190,4 +253,4 @@ const assignOpmerkingToLogboek = async (req, res, next) => {
     }
 };
 
-export default { getLogboekByStage, getLogboekById, upsertLogboek, submitWeek, createLogboek, assignOpmerkingToLogboek };
+export default { getLogboekByStage, getLogboekById, upsertLogboek, submitWeek, afvinkWeekDoorStudent, createLogboek, assignOpmerkingToLogboek };

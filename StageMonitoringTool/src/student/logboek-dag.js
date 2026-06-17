@@ -215,7 +215,10 @@ export async function renderLogboekDag(container, userName = 'Student', stageDat
                         <h1 class="logboek-dag-title">Week ${weekNumber}</h1>
                         <p class="logboek-dag-dates">${weekStart} t/m ${weekEnd}</p>
                     </div>
-                    <button class="logboek-dag-submit-btn" id="week-indienen" disabled>Week Indienen</button>
+                    <div class="logboek-dag-header-actions">
+                        <button class="logboek-dag-submit-btn" id="week-indienen" disabled>Week Indienen</button>
+                        <button class="logboek-dag-afvink-btn" id="week-afvinken" style="display:none;">Week Afvinken</button>
+                    </div>
                 </div>
 
                 <p class="logboek-dag-info">Vul elke dag van de week in. Je dient het volledige logboek in &eacute;&eacute;n keer per week in bij je mentor. (<span id="filled-count">0</span>/${visibleDays.length} dagen ingevuld)</p>
@@ -232,6 +235,7 @@ export async function renderLogboekDag(container, userName = 'Student', stageDat
                         const entry = getEntryForDay(weekIndex, dayIndex);
                         const isSaved = entry && (entry.status === 'DEELSINGEVULD' || entry.status === 'INGEVULD');
                         const isAbsent = entry && entry.uitgevoerdeTaken === 'AFWEZIG';
+                        const isGevinkt = entry && entry.gevinkt_door_student;
 
                         let badgeClass = 'badge-locked';
                         let badgeText = 'Nog niet beschikbaar';
@@ -239,7 +243,13 @@ export async function renderLogboekDag(container, userName = 'Student', stageDat
                         let cardClass = 'locked';
                         let dataFilled = 'false';
 
-                        if (isSaved) {
+                        if (isGevinkt) {
+                            badgeClass = 'badge-filled';
+                            badgeText = 'Afgevinkt door student';
+                            contentHTML = getFilledHTML(entry, isAbsent);
+                            cardClass = 'unlocked';
+                            dataFilled = 'true';
+                        } else if (isSaved) {
                             badgeClass = 'badge-filled';
                             badgeText = 'Ingevuld';
                             contentHTML = getFilledHTML(entry, isAbsent);
@@ -311,9 +321,21 @@ function initLogboekDagHandlers(totalDays, stageData, weekIndex, getDayDateObj, 
         return logboekEntries.some(e => e.datum && toDateStr(new Date(e.datum)) === dateStr && e.status === 'INGEVULD');
     }).every(Boolean);
 
-    if (submitBtn && weekAllIngevuld) {
-        submitBtn.disabled = true;
-        submitBtn.textContent = 'Reeds ingediend';
+    const weekGevinkt = weekAllIngevuld && Array.from({ length: totalDays }, (_, i) => {
+        const d = getDayDateObj(weekIndex, i);
+        if (!d) return false;
+        const dateStr = toDateStr(d);
+        return logboekEntries.some(e => e.datum && toDateStr(new Date(e.datum)) === dateStr && e.gevinkt_door_student);
+    }).every(Boolean);
+
+    const afvinkBtn = document.getElementById('week-afvinken');
+
+    if (weekGevinkt) {
+        if (submitBtn) { submitBtn.style.display = 'none'; }
+        if (afvinkBtn) { afvinkBtn.style.display = 'inline-block'; afvinkBtn.disabled = true; afvinkBtn.textContent = 'Afgevinkt door student'; }
+    } else if (weekAllIngevuld) {
+        if (submitBtn) { submitBtn.style.display = 'none'; }
+        if (afvinkBtn) { afvinkBtn.style.display = 'inline-block'; afvinkBtn.disabled = false; }
     }
 
     function updateFilledCount() {
@@ -499,6 +521,46 @@ function initLogboekDagHandlers(totalDays, stageData, weekIndex, getDayDateObj, 
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'Week Indienen';
                 alert('Server fout bij indienen.');
+            }
+        });
+    }
+
+    if (afvinkBtn && !weekGevinkt) {
+        afvinkBtn.addEventListener('click', async () => {
+            if (!stageId) return;
+
+            const firstDayDate = getDayDateObj(weekIndex, 0);
+            const lastDayDate = getDayDateObj(weekIndex, totalDays - 1);
+            if (!firstDayDate || !lastDayDate) return;
+
+            afvinkBtn.disabled = true;
+            afvinkBtn.textContent = 'Bezig...';
+
+            try {
+                const res = await fetch('/api/logboek/afvink-week-student', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        stage_id: stageId,
+                        weekStart: toDateStr(firstDayDate),
+                        weekEnd: toDateStr(lastDayDate)
+                    })
+                });
+                if (res.ok) {
+                    alert('Week succesvol afgevinkt!');
+                    window.location.href = '?role=logboek';
+                } else {
+                    const err = await res.json();
+                    afvinkBtn.disabled = false;
+                    afvinkBtn.textContent = 'Week Afvinken';
+                    alert(err.msg || 'Fout bij afvinken. Probeer opnieuw.');
+                }
+            } catch (err) {
+                console.error('Error afvinken week:', err);
+                afvinkBtn.disabled = false;
+                afvinkBtn.textContent = 'Week Afvinken';
+                alert('Server fout bij afvinken.');
             }
         });
     }
