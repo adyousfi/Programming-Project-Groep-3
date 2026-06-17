@@ -20,7 +20,6 @@ function sidebarHtml(activePage) {
   const items = [
     { key: 'overzicht', label: 'Overzicht' },
     { key: 'stagedetails', label: 'Stagedetails' },
-    { key: 'documenten', label: 'Documenten' },
     { key: 'logboek', label: 'Logboek' },
     { key: 'evaluatie', label: 'Evaluatie' },
   ];
@@ -262,7 +261,7 @@ async function renderEvaluatiePage(app, stagiair, activeTab = 'tussentijds', eva
     const sumScores = evaluatieData.reduce((acc, e) => {
       const s = e?.score;
       if (s === null || s === undefined) return acc;
-      return acc + (Number(s) / 5) * 100;
+      return acc + (Number(s) / 5) * 20;
     }, 0);
     const total = sumScores / N;
     return Math.round(total * 10) / 10;
@@ -295,7 +294,7 @@ async function renderEvaluatiePage(app, stagiair, activeTab = 'tussentijds', eva
             <div id="sm-eval-result-column" style="position:sticky;top:16px;border:1px solid #e5e7eb;border-radius:12px;padding:14px;background:#fff;">
               <div style="font-size:13px;color:#6b7280;margin-bottom:8px;">Uitkomst</div>
               <div style="font-size:30px;font-weight:800;letter-spacing:-0.02em;color:#111827;">
-                ${initTotalPercentage !== null ? `${initTotalPercentage.toFixed(1)}%` : '--'}
+                ${initTotalPercentage !== null ? `${initTotalPercentage.toFixed(1)}/20` : '--'}
               </div>
               <div style="font-size:13px;color:#6b7280;margin-top:6px;">
                 Gebaseerd op docent-scores per competentie
