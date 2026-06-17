@@ -176,3 +176,69 @@
   border-bottom: none;
 }
 
+/* Student/mentor feedback panels per competentie. */
+.sm-eval-feedback-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.sm-eval-feedback-card {
+  border-radius: 12px;
+  padding: 18px 20px;
+}
+
+.sm-eval-feedback-card--student {
+  background: #f8fafc;
+  border: 1px solid #e5e7eb;
+}
+
+.sm-eval-feedback-card--mentor {
+  background: #eef6ff;
+  border: 1px solid #bfdbfe;
+}
+
+.sm-eval-feedback-card-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #6b7280;
+  margin-bottom: 10px;
+}
+
+.sm-eval-feedback-card-label--mentor {
+  color: #2563eb;
+}
+
+.sm-eval-feedback-card-text {
+  margin: 0 0 12px;
+  font-size: 14px;
+  color: #374151;
+  line-height: 1.6;
+}
+
+.sm-eval-feedback-card-pending {
+  margin: 0 0 12px;
+  font-size: 14px;
+  color: #9ca3af;
+  font-style: italic;
+}
+
+.sm-eval-feedback-card-score {
+  display: inline-block;
+  padding: 4px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.sm-eval-feedback-card-score--mentor {
+  border-color: #93c5fd;
+  color: #1d4ed8;
+}
+

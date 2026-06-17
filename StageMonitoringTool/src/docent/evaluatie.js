@@ -310,9 +310,24 @@ async function renderEvaluatiePage(app, stagiair, activeTab = 'tussentijds', eva
               <h3 style="margin:0 0 6px;font-size:20px;font-weight:700;color:#111827;">${escapeHtml(comp.titel)}</h3>
               <p style="margin:0 0 16px;color:#6b7280;">${escapeHtml(comp.omschrijving)}</p>
 
-              ${rubrieken.length > 0 ? `
-
-              ` : ''}
+              <div class="sm-eval-feedback-grid">
+                <div class="sm-eval-feedback-card sm-eval-feedback-card--student">
+                  <span class="sm-eval-feedback-card-label">STUDENT</span>
+                  ${bestaande?.feedback_student
+                    ? `<p class="sm-eval-feedback-card-text">${escapeHtml(bestaande.feedback_student)}</p>`
+                    : `<p class="sm-eval-feedback-card-pending">De student heeft nog geen evaluatie ingevuld.</p>`
+                  }
+                  <span class="sm-eval-feedback-card-score">${bestaande?.score_student != null ? `Score: ${bestaande.score_student} / 5` : 'Score: --'}</span>
+                </div>
+                <div class="sm-eval-feedback-card sm-eval-feedback-card--mentor">
+                  <span class="sm-eval-feedback-card-label sm-eval-feedback-card-label--mentor">MENTOR</span>
+                  ${bestaande?.feedback_mentor
+                    ? `<p class="sm-eval-feedback-card-text">${escapeHtml(bestaande.feedback_mentor)}</p>`
+                    : `<p class="sm-eval-feedback-card-pending">De stagementor heeft nog geen evaluatie ingevuld.</p>`
+                  }
+                  <span class="sm-eval-feedback-card-score sm-eval-feedback-card-score--mentor">${bestaande?.score_mentor != null ? `Score: ${bestaande.score_mentor} / 5` : 'Score: --'}</span>
+                </div>
+              </div>
 
               <div>
                 <span class="sm-score-title">Hoe scoor je deze competentie? Klik op een score (1 = laag, 5 = hoog)</span>
@@ -360,7 +375,7 @@ async function renderEvaluatiePage(app, stagiair, activeTab = 'tussentijds', eva
   });
 
   // Save UI
-  async function saveDocentEvaluatie() {
+  async function saveDocentEvaluatie(isSubmit = false) {
     const saveBtn = document.querySelector('#sm-eval-save');
     const submitBtn = document.querySelector('#sm-eval-submit');
     saveBtn && (saveBtn.disabled = true);
@@ -394,12 +409,10 @@ async function renderEvaluatiePage(app, stagiair, activeTab = 'tussentijds', eva
         body: JSON.stringify({
           stage_id: stagiair.stage_id,
           type_evaluatie: activeTab,
-          // docent_id ophalen uit de huidige user (renderEvaluatieDocent geeft dit aan _currentUser)
           docent_id: _currentUser?.user_id ?? _currentUser?.id ?? _currentUser?.docent_id ?? null,
           updates,
         }),
       });
-
 
       if (!res.ok) {
         const text = await res.text().catch(() => '');
@@ -422,29 +435,51 @@ async function renderEvaluatiePage(app, stagiair, activeTab = 'tussentijds', eva
       }
 
       const msg = document.querySelector('#sm-eval-save-message');
-      if (msg) {
-        const total = json?.totalPercentage;
-        if (total !== null && total !== undefined && !Number.isNaN(Number(total))) {
-          msg.textContent = `Evaluatie opgeslagen. Totaalscore: ${Number(total).toFixed(1)}%`;
-        } else {
-          msg.textContent = 'Evaluatie opgeslagen.';
+      if (isSubmit) {
+        if (msg) {
+          const total = json?.totalPercentage;
+          if (total !== null && total !== undefined && !Number.isNaN(Number(total))) {
+            msg.textContent = `Evaluatie succesvol ingediend. Totaalscore: ${Number(total).toFixed(1)}%`;
+          } else {
+            msg.textContent = 'Evaluatie succesvol ingediend.';
+          }
+          msg.classList.remove('hidden');
         }
-        msg.classList.remove('hidden');
+        // Disable all inputs after submission
+        document.querySelectorAll('.sm-score-card').forEach((b) => { b.disabled = true; });
+        document.querySelectorAll('.sm-eval-feedback').forEach((t) => { t.disabled = true; });
+        if (submitBtn) submitBtn.disabled = true;
+        if (saveBtn) saveBtn.disabled = true;
+      } else {
+        if (msg) {
+          const total = json?.totalPercentage;
+          if (total !== null && total !== undefined && !Number.isNaN(Number(total))) {
+            msg.textContent = `Evaluatie opgeslagen. Totaalscore: ${Number(total).toFixed(1)}%`;
+          } else {
+            msg.textContent = 'Evaluatie opgeslagen.';
+          }
+          msg.classList.remove('hidden');
+        }
       }
 
-      // Toon totaalscore ook even als console/debug (optioneel)
-      console.log('Saved evaluatie', { totalPercentage: json?.totalPercentage });
+      console.log('Saved evaluatie', { totalPercentage: json?.totalPercentage, isSubmit });
     } catch (e) {
       console.error(e);
       const msg = document.querySelector('#sm-eval-save-message');
       if (msg) {
-        msg.textContent = 'Opslaan mislukt, probeer opnieuw.';
+        msg.textContent = isSubmit ? 'Indienen mislukt, probeer opnieuw.' : 'Opslaan mislukt, probeer opnieuw.';
         msg.classList.remove('hidden');
       }
     } finally {
-      saveBtn && (saveBtn.disabled = false);
+      if (!isSubmit) {
+        saveBtn && (saveBtn.disabled = false);
+        submitBtn && (submitBtn.disabled = false);
+      }
     }
-  });
+  }
+
+  document.querySelector('#sm-eval-save')?.addEventListener('click', () => saveDocentEvaluatie(false));
+  document.querySelector('#sm-eval-submit')?.addEventListener('click', () => saveDocentEvaluatie(true));
 }
 
 
