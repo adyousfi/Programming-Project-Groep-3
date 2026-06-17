@@ -1,4 +1,6 @@
 import './formulier.css';
+import flatpickr from 'flatpickr';
+import 'flatpickr/dist/flatpickr.min.css';
 
 export async function renderStageformulier(container) {
     let displayName = '';
@@ -53,9 +55,15 @@ export async function renderStageformulier(container) {
                         <h3 class="section-title">Stagementor / Werkbegeleider</h3>
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="mentor-naam">Naam *</label>
-                                <input type="text" id="mentor-naam" value="">
+                                <label for="mentor-voornaam">Voornaam *</label>
+                                <input type="text" id="mentor-voornaam" value="">
                             </div>
+                            <div class="form-group">
+                                <label for="mentor-achternaam">Achternaam *</label>
+                                <input type="text" id="mentor-achternaam" value="">
+                            </div>
+                        </div>
+                        <div class="form-row">
                             <div class="form-group">
                                 <label for="mentor-email">E-mail *</label>
                                 <input type="email" id="mentor-email" value="">
@@ -75,11 +83,11 @@ export async function renderStageformulier(container) {
                         <div class="form-row">
                             <div class="form-group">
                                 <label for="periode-start">Startdatum *</label>
-                                <input type="date" id="periode-start" value="">
+                                <input type="text" id="periode-start" placeholder="Kies een datum" readonly>
                             </div>
                             <div class="form-group">
                                 <label for="periode-eind">Einddatum *</label>
-                                <input type="date" id="periode-eind" value="">
+                                <input type="text" id="periode-eind" placeholder="Kies een datum" readonly>
                             </div>
                         </div>
                     </div>
@@ -105,6 +113,32 @@ export async function renderStageformulier(container) {
 
     if (closeBtn) closeBtn.addEventListener('click', goBack);
     if (cancelBtn) cancelBtn.addEventListener('click', goBack);
+
+    var startInput = container.querySelector('#periode-start');
+    var eindInput = container.querySelector('#periode-eind');
+
+    function isWeekend(date) {
+        return date.getDay() === 0 || date.getDay() === 6;
+    }
+
+    if (startInput) {
+        flatpickr(startInput, {
+            disable: [isWeekend],
+            dateFormat: 'Y-m-d',
+            onDayCreate: function(dObj, dStr, fp, dayElem) {
+                var dow = dayElem.dateObj.getDay();
+                if (dow === 0 || dow === 6) {
+                    dayElem.classList.add('weekend-disabled');
+                }
+            }
+        });
+    }
+
+    if (eindInput) {
+        flatpickr(eindInput, {
+            dateFormat: 'Y-m-d',
+        });
+    }
 
     if (randomBtn) {
         randomBtn.addEventListener('click', () => {
@@ -141,11 +175,15 @@ export async function renderStageformulier(container) {
             container.querySelector('#student-nummer').value = `20${randNum(20, 99)}${randNum(1000, 9999)}`;
             container.querySelector('#bedrijf-naam').value = pick(bedrijven);
             container.querySelector('#bedrijf-adres').value = `${pick(straten)} ${randNum(1, 200)}, ${pick(steden)}`;
-            container.querySelector('#mentor-naam').value = `${mentorVoornaam} ${mentorAchternaam}`;
+            container.querySelector('#mentor-voornaam').value = mentorVoornaam;
+            container.querySelector('#mentor-achternaam').value = mentorAchternaam;
             container.querySelector('#mentor-email').value = `${mentorVoornaam.toLowerCase()}.${mentorAchternaam.toLowerCase()}@${pick(['techsolutions.be', 'webstudio.be', 'innovation.be', 'cloudtech.be'])}`;
             container.querySelector('#opdracht-omschrijving').value = pick(omschrijvingen);
-            container.querySelector('#periode-start').value = `${startJaar}-${String(startMaand).padStart(2, '0')}-${String(startDag).padStart(2, '0')}`;
-            container.querySelector('#periode-eind').value = `${eindJaar}-${String(eindMaand).padStart(2, '0')}-${String(eindDag).padStart(2, '0')}`;
+
+            const startPickr = container.querySelector('#periode-start')._flatpickr;
+            const eindPickr = container.querySelector('#periode-eind')._flatpickr;
+            startPickr.setDate(`${startJaar}-${String(startMaand).padStart(2, '0')}-${String(startDag).padStart(2, '0')}`);
+            eindPickr.setDate(`${eindJaar}-${String(eindMaand).padStart(2, '0')}-${String(eindDag).padStart(2, '0')}`);
 
             // Reset border colors
             container.querySelectorAll('input, textarea').forEach(el => el.style.borderColor = '#ced4da');
@@ -204,7 +242,8 @@ export async function renderStageformulier(container) {
                 studentNummer: container.querySelector('#student-nummer').value.trim(),
                 bedrijfNaam: container.querySelector('#bedrijf-naam').value.trim(),
                 bedrijfAdres: container.querySelector('#bedrijf-adres').value.trim(),
-                mentorNaam: container.querySelector('#mentor-naam').value.trim(),
+                mentorVoornaam: container.querySelector('#mentor-voornaam').value.trim(),
+                mentorAchternaam: container.querySelector('#mentor-achternaam').value.trim(),
                 mentorEmail: container.querySelector('#mentor-email').value.trim(),
                 opdrachtOmschrijving: container.querySelector('#opdracht-omschrijving').value.trim(),
                 periodeStart: container.querySelector('#periode-start').value,
