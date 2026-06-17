@@ -8,7 +8,6 @@ let totalWeeks = 1;
 const navItems = [
   { id: 'overzicht',    label: 'Overzicht' },
   { id: 'stagedetails', label: 'Stagedetails' },
-  { id: 'documenten',   label: 'Documenten' },
   { id: 'logboek',      label: 'Logboek' },
   { id: 'evaluatie',    label: 'Evaluatie' },
 ];
@@ -137,6 +136,7 @@ async function renderLogboekTab(student) {
     const dates = getWeekDates(startDate, endDate, i);
     let daysFilled = 0;
     let allIngevuld = false;
+    let allGevinkt = false;
     let hasEntries = false;
 
     if (dates.startDateObj) {
@@ -149,10 +149,12 @@ async function renderLogboekTab(student) {
       const filledEntries = weekEntries.filter(function(e) { return e.status === 'DEELSINGEVULD' || e.status === 'INGEVULD'; });
       daysFilled = filledEntries.length;
       allIngevuld = weekEntries.length > 0 && weekEntries.every(function(e) { return e.status === 'INGEVULD'; });
+      allGevinkt = allIngevuld && weekEntries.every(function(e) { return e.gevinkt_door_stagementor; });
     }
 
     let status = 'not_submitted';
-    if (allIngevuld) status = 'submitted';
+    if (allGevinkt) status = 'afgevinkt';
+    else if (allIngevuld) status = 'submitted';
     else if (hasEntries) status = 'in_progress';
 
     return {
@@ -173,7 +175,9 @@ async function renderLogboekTab(student) {
   weeks.forEach(function(w) {
     var progress = w.totalDays > 0 ? (w.daysFilled / w.totalDays) * 100 : 0;
     var statusBadge = '';
-    if (w.status === 'submitted') {
+    if (w.status === 'afgevinkt') {
+      statusBadge = '<span class="sd-logboek-badge sd-logboek-badge--validated">Afgevinkt door stagementor</span>';
+    } else if (w.status === 'submitted') {
       statusBadge = '<span class="sd-logboek-badge sd-logboek-badge--validated">Ingediend</span>';
     } else if (w.status === 'in_progress') {
       statusBadge = '<span class="sd-logboek-badge sd-logboek-badge--pending">Bezig</span>';
@@ -380,6 +384,8 @@ function renderLogboekDag(student, weekNumber) {
   });
 
   var dagen = [];
+  var allDaysIngevuld = false;
+  var weekGevinkt = false;
   if (dates.startDateObj) {
     var dag = new Date(dates.startDateObj);
     while (dag <= dates.endDateObj) {
@@ -394,11 +400,14 @@ function renderLogboekDag(student, weekNumber) {
           taken: entry ? entry.uitgevoerdeTaken || '' : '',
           reflectie: entry ? entry.reflectie || '' : '',
           leerpunten: entry ? entry.leerpunten || '' : '',
-          status: entry ? entry.status : 'NIETINGEVULD'
+          status: entry ? entry.status : 'NIETINGEVULD',
+          gevinkt: entry ? !!entry.gevinkt_door_stagementor : false
         });
       }
       dag.setDate(dag.getDate() + 1);
     }
+    allDaysIngevuld = dagen.length > 0 && dagen.every(function(d) { return d.status === 'INGEVULD'; });
+    weekGevinkt = allDaysIngevuld && dagen.every(function(d) { return d.gevinkt; });
   }
 
   var prevDisabled = weekNumber <= 1 ? ' disabled' : '';
@@ -413,6 +422,7 @@ function renderLogboekDag(student, weekNumber) {
   html += '</div>';
   html += '<h2 class="sd-logboek-title">Week ' + weekNumber + '</h2>';
   html += '<p class="sd-logboek-sub">' + dates.start + ' t/m ' + dates.end + '</p>';
+
   html += '<div class="sd-logboek-dagen">';
 
   dagen.forEach(function(d) {
