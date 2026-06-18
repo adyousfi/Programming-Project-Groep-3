@@ -36,6 +36,7 @@ const app = document.querySelector('#app');
     goedgekeurd_student: 'goedgekeurd-student',
     documenten_ingedient: 'documenten-ingediend',
     logboek_dag: 'logboek-dag',
+    set_password: 'set-password',
   };
   const path = routeMap[role] || role;
   const query = params.toString();
@@ -55,7 +56,7 @@ document.addEventListener('click', async (e) => {
     window.location.href = '/login';
     return;
   }
-  const loginPaths = ['/', '/login'];
+  const loginPaths = ['/', '/login', '/set-password'];
   if (loginPaths.includes(window.location.pathname)) return;
   try {
     const res = await fetch('/me', { credentials: 'include' });
@@ -77,7 +78,7 @@ wrapFetch();
 
 /* ─── Initiele auth-check voor niet-login paginas ──── */
 (async function initialAuthCheck() {
-  const loginPaths = ['/', '/login'];
+  const loginPaths = ['/', '/login', '/set-password'];
   if (loginPaths.includes(window.location.pathname)) return;
   try {
     const res = await fetch('/me', { credentials: 'include' });
@@ -220,6 +221,8 @@ if (path === 'dashboard') {
   } else {
     await renderEvaluatieStudent(app, null, null);
   }
+} else if (path === 'set-password') {
+  renderSetPassword(app);
 } else {
   /* onbekend pad of /login → login pagina tonen */
   if (window.location.pathname !== '/login') {

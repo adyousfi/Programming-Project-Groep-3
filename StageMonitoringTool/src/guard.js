@@ -1,7 +1,7 @@
 let cachedUser = null;
 
 export async function requireAuth() {
-  const loginPaths = ['/', '/login'];
+  const loginPaths = ['/', '/login', '/set-password'];
   if (loginPaths.includes(window.location.pathname)) return null;
   if (cachedUser) return cachedUser;
   try {
@@ -40,7 +40,7 @@ export function wrapFetch() {
     if (url === '/me' || url.startsWith('/me?')) {
       return origFetch(input, init);
     }
-    const loginPaths = ['/', '/login'];
+    const loginPaths = ['/', '/login', '/set-password'];
     const currentPath = window.location.pathname;
     if (!loginPaths.includes(currentPath)) {
       try {
