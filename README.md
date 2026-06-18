@@ -23,6 +23,7 @@ Maak vervolgens een `.env` bestand aan in de root van het project en configureer
 DB=
 USER=
 PASSWORD=
+JWT_SECRET = 
 ```
 
 Start tenslotte de applicatie met:
