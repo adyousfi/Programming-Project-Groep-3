@@ -125,8 +125,7 @@ export function renderBeoordelen(aanvraag, userName = 'Stagecommissie') {
 
   document.querySelector('#bd-uitloggen').addEventListener('click', async function() {
     try { await fetch('/logout', { method: 'POST', credentials: 'include' }); } catch {}
-    document.cookie = 'user=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-    window.location.href = '/';
+    window.location.href = '/login';
   });
 
   document.querySelector('#bd-goedkeuren').addEventListener('click', async function() {
@@ -233,7 +232,7 @@ function toonHistoriek(aanvraag, beslissing, feedback, userName = 'Stagecommissi
 
   document.querySelector('#bd-uitloggen').addEventListener('click', async function() {
     try { await fetch('/logout', { method: 'POST', credentials: 'include' }); } catch {}
-    window.location.href = '/';
+    window.location.href = '/login';
   });
 }
 
@@ -274,6 +273,6 @@ export function renderDetails(aanvraag, userName = 'Stagecommissie') {
 
   document.querySelector('#bd-uitloggen').addEventListener('click', async function() {
     try { await fetch('/logout', { method: 'POST', credentials: 'include' }); } catch {}
-    window.location.href = '/';
+    window.location.href = '/login';
   });
 }

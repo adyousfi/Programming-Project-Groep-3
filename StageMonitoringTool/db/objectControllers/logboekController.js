@@ -4,7 +4,7 @@ import { sequelize } from "../dbConnection.js";
 
 const getLogboekByStage = async (req, res, next) => {
     try {
-        const cookieUser = req.cookies.user;
+        const cookieUser = req.user;
         if (!cookieUser) return res.status(401).json({ msg: 'Niet ingelogd' });
 
         const stage = await Stage.findByPk(req.params.stageId);
@@ -39,7 +39,7 @@ const getLogboekByStage = async (req, res, next) => {
 
 const getLogboekById = async (req, res, next) => {
     try {
-        const cookieUser = req.cookies.user;
+        const cookieUser = req.user;
         if (!cookieUser) return res.status(401).json({ msg: 'Niet ingelogd' });
 
         const logboek = await Logboek.findByPk(req.params.logboek_id);
@@ -71,7 +71,7 @@ const getLogboekById = async (req, res, next) => {
 
 const upsertLogboek = async (req, res, next) => {
     try {
-        const cookieUser = req.cookies.user;
+        const cookieUser = req.user;
         if (!cookieUser) return res.status(401).json({ msg: 'Niet ingelogd' });
 
         const { stage_id, datum, uitgevoerdeTaken, reflectie, leerpunten, status } = req.body;
@@ -109,7 +109,7 @@ const upsertLogboek = async (req, res, next) => {
 
 const submitWeek = async (req, res, next) => {
     try {
-        const cookieUser = req.cookies.user;
+        const cookieUser = req.user;
         if (!cookieUser) return res.status(401).json({ msg: 'Niet ingelogd' });
 
         const { stage_id, weekStart, weekEnd } = req.body;
@@ -170,7 +170,7 @@ const createLogboek = async (req, res, next) => {
 
 const afvinkWeekDoorStudent = async (req, res, next) => {
     try {
-        const cookieUser = req.cookies.user;
+        const cookieUser = req.user;
         if (!cookieUser) return res.status(401).json({ msg: 'Niet ingelogd' });
         if (cookieUser.role !== 'student' && cookieUser.role !== 'stagementor') {
             return res.status(403).json({ msg: 'Geen toegang' });

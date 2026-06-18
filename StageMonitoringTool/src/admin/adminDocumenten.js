@@ -538,8 +538,7 @@ export async function renderAdminDocumenten(app) {
   // LOGOUT
   document.getElementById('ad-logout').addEventListener('click', async () => {
     try { await fetch('/logout', { method: 'POST', credentials: 'include' }); } catch {}
-    document.cookie = 'user=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-    window.location.href = '/';
+    window.location.href = '/login';
   });
 
   // ── STUDENT UPLOAD MODAL ───────────────────────────────────────────────────

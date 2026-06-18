@@ -378,7 +378,7 @@ async function renderEvaluatiePage(app, stagiair, activeTab = 'tussentijds', eva
         if (submitBtn) submitBtn.disabled = true;
         if (saveBtn) saveBtn.disabled = true;
         // Navigate back to overzicht after short delay
-        setTimeout(() => { window.location.href = '?role=goedgekeurd_student'; }, 1500);
+        setTimeout(() => { window.location.href = '/goedgekeurd-student'; }, 1500);
       } else {
         if (msg) {
           msg.textContent = 'Evaluatie opgeslagen.';

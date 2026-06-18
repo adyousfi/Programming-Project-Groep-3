@@ -13,7 +13,7 @@ const createAdmin = async (admin_id, user_id) => {
 
 const validateStudentDocument = async (req, res, next) => {
     try {
-        const cookieUser = req.cookies.user;
+        const cookieUser = req.user;
         if (!cookieUser) return res.status(401).json({ msg: 'Niet ingelogd' });
 
         const stage = await Stage.findByPk(req.params.id);

@@ -20,7 +20,7 @@ const uploadsDir = path.join(__dirname, '..', '..', 'uploads');
 
 export const adminUploadDocument = async (req, res, next) => {
   try {
-    const cookieUser = req.cookies.user;
+    const cookieUser = req.user;
     if (!cookieUser) return res.status(401).json({ msg: 'Niet ingelogd' });
     const { stage_id } = req.body;
     if (!stage_id || !req.file) return res.status(400).json({ msg: 'stage_id en bestand zijn verplicht' });
@@ -40,7 +40,7 @@ export const adminUploadDocument = async (req, res, next) => {
 
 export const studentUploadDocument = async (req, res, next) => {
   try {
-    const cookieUser = req.cookies.user;
+    const cookieUser = req.user;
     if (!cookieUser) return res.status(401).json({ msg: 'Niet ingelogd' });
     const student = await Student.findByPk(cookieUser.user_id);
     if (!student) return res.status(404).json({ msg: 'Geen student gevonden' });
@@ -70,7 +70,7 @@ export const studentUploadDocument = async (req, res, next) => {
 
 export const getMyDocuments = async (req, res, next) => {
   try {
-    const cookieUser = req.cookies.user;
+    const cookieUser = req.user;
     if (!cookieUser) return res.status(401).json({ msg: 'Niet ingelogd' });
     const student = await Student.findByPk(cookieUser.user_id);
     if (!student) return res.json([]);
@@ -138,7 +138,7 @@ export const downloadDocument = async (req, res, next) => {
  */
 export const sendContractToBedrijf = async (req, res, next) => {
   try {
-    const cookieUser = req.cookies.user;
+    const cookieUser = req.user;
     if (!cookieUser) return res.status(401).json({ msg: 'Niet ingelogd' });
 
     const { stage_id, bedrijf_email } = req.body;

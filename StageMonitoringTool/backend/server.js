@@ -2,9 +2,11 @@ import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import multer from 'multer';
+import dotenv from 'dotenv';
 import { run } from '../db/dbConnection.js';
 import '../db/allimport.js';
 import seedDatabase from '../db/seedDb.js';
+import authMiddleware from './auth/authMiddleware.js';
 
 import userRoutes from '../db/routes/userRoutes.js';
 import stageRoutes from '../db/routes/stageRoutes.js';
@@ -20,11 +22,14 @@ import evaluatieRoutes from '../db/routes/evaluatieRoutes.js';
 
 const app = express();
 
+dotenv.config();
 await seedDatabase();
 
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use(cookieParser());
+
+app.use('/api', authMiddleware);
 
 app.use(cors({
   origin: (origin, cb) => {

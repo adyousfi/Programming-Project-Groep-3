@@ -117,7 +117,7 @@ export async function renderFeedback(container, user = null, stageData = null) {
     const aanpassenBtn = container.querySelector('#feedback-aanpassen');
     if (aanpassenBtn) {
         aanpassenBtn.addEventListener('click', () => {
-            window.location.search = '?role=aanpassen';
+            window.location.pathname = '/aanpassen';
         });
     }
 }

@@ -2,7 +2,7 @@ import { aanvragenMockdata } from '../data/mockdata.js';
 
 export async function getAllAanvragen() {
   try {
-    const response = await fetch('/api/stages');
+    const response = await fetch('/api/stages', { credentials: 'include' });
     if (response.ok) {
       const stages = await response.json();
       if (Array.isArray(stages) && stages.length > 0) {

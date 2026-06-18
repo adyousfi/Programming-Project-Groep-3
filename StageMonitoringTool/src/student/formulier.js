@@ -107,7 +107,7 @@ export async function renderStageformulier(container) {
     `;
 
     const goBack = () => {
-        window.location.href = '/?role=student';
+        window.location.href = '/dashboard';
     };
 
     const closeBtn = container.querySelector('.form-close-btn');
@@ -275,7 +275,7 @@ export async function renderStageformulier(container) {
                 submitBtn.disabled = false;
                 return;
             }
-            window.location.href = '/?role=wachten';
+            window.location.href = '/wachten';
         });
     }
 }

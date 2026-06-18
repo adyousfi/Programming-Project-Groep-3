@@ -96,7 +96,7 @@ export async function renderStudentDashboard(container, userName = '') {
     const indienenBtn = container.querySelector('.primary-button');
     if (indienenBtn) {
         indienenBtn.addEventListener('click', () => {
-            window.location.search = '?role=stageformulier';
+            window.location.pathname = '/stageformulier';
         });
     }
 }

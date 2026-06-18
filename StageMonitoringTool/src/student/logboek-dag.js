@@ -502,7 +502,7 @@ function initLogboekDagHandlers(totalDays, stageData, weekIndex, getDayDateObj, 
                 });
                 if (res.ok) {
                     alert('Week succesvol ingediend!');
-                    window.location.href = '?role=logboek';
+                    window.location.href = '/logboek';
                 } else {
                     submitBtn.disabled = false;
                     submitBtn.textContent = 'Week Indienen';

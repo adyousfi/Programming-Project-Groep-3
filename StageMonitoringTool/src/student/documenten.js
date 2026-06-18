@@ -43,7 +43,7 @@ export async function renderDocumenten(container) {
     const hasStudentSubmission = studentDocs.length > 0;
 
     if (hasStudentSubmission && !docValidated) {
-        window.location.href = '/?role=documenten_ingedient';
+        window.location.href = '/documenten-ingediend';
         return;
     }
 
@@ -286,6 +286,6 @@ export async function renderDocumenten(container) {
             showError(result.error);
             return;
         }
-        window.location.href = '/?role=documenten_ingedient';
+        window.location.href = '/documenten-ingediend';
     });
 }

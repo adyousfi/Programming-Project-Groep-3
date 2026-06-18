@@ -5,7 +5,7 @@ import { renderCompetenties } from './competenties.js';
 
 
 
-const API_URL = 'http://localhost:3000';
+const API_URL = '';
 
 const roleDisplayMap = {
   'student': 'Student',

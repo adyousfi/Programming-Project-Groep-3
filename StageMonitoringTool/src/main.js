@@ -1,4 +1,5 @@
 import './style.css';
+import { wrapFetch, clearAuthCache } from './guard.js';
 import { renderAanvragen } from './stagecommissie/aanvragen.js';
 import { renderStudentDashboard } from './student/student.js';
 import { renderStageformulier } from './student/formulier.js';
@@ -18,18 +19,79 @@ import { renderEvaluatieStudent } from './student/evaluatie.js';
 import { renderAdmin } from './admin/admin.js';
 
 const app = document.querySelector('#app');
-const role = new URLSearchParams(window.location.search).get('role');
 
+/* ─── URL-lek fix: ?role=... omzetten naar schoon pad ──── */
+(function fixUrl() {
+  const params = new URLSearchParams(window.location.search);
+  const role = params.get('role');
+  if (!role) return;
+  params.delete('role');
+  const routeMap = {
+    student: 'dashboard',
+    stagecommisie: 'stagecommissie',
+    stagementor: 'stagementor',
+    docent: 'docent',
+    admin: 'admin',
+    goedgekeurd_student: 'goedgekeurd-student',
+    documenten_ingedient: 'documenten-ingediend',
+    logboek_dag: 'logboek-dag',
+  };
+  const path = routeMap[role] || role;
+  const query = params.toString();
+  const suffix = query ? `?${query}` : '';
+  window.history.replaceState(null, '', `/${path}${suffix}`);
+})();
+
+/* ─── Globale click guard + logout-hantering ──── */
 document.addEventListener('click', async (e) => {
   const link = e.target.closest('a');
   if (!link) return;
   const text = link.textContent.trim().toLowerCase();
-  if (text !== 'uitloggen') return;
-  e.preventDefault();
-  try { await fetch('/logout', { method: 'POST', credentials: 'include' }); } catch {}
-  window.location.href = '/';
+  if (text === 'uitloggen') {
+    e.preventDefault();
+    clearAuthCache();
+    try { await fetch('/logout', { method: 'POST', credentials: 'include' }); } catch {}
+    window.location.href = '/login';
+    return;
+  }
+  const loginPaths = ['/', '/login'];
+  if (loginPaths.includes(window.location.pathname)) return;
+  try {
+    const res = await fetch('/me', { credentials: 'include' });
+    const data = await res.json();
+    if (!data.loggedIn) {
+      e.preventDefault();
+      clearAuthCache();
+      window.location.href = '/login';
+    }
+  } catch {
+    e.preventDefault();
+    clearAuthCache();
+    window.location.href = '/login';
+  }
 });
 
+/* ─── Globale fetch-wrapper voor request-beveiliging ──── */
+wrapFetch();
+
+/* ─── Initiele auth-check voor niet-login paginas ──── */
+(async function initialAuthCheck() {
+  const loginPaths = ['/', '/login'];
+  if (loginPaths.includes(window.location.pathname)) return;
+  try {
+    const res = await fetch('/me', { credentials: 'include' });
+    const data = await res.json();
+    if (!data.loggedIn) {
+      clearAuthCache();
+      window.location.href = '/login';
+    }
+  } catch {
+    clearAuthCache();
+    window.location.href = '/login';
+  }
+})();
+
+/* ─── Helpers ──── */
 async function getLoggedInUser() {
   try {
     const res = await fetch('/me', { credentials: 'include' });
@@ -46,7 +108,11 @@ async function getStudentStage(studentId) {
   } catch { return { found: false }; }
 }
 
-if (role === 'student') {
+/* ─── Routing via pathname ──── */
+const path = window.location.pathname.slice(1) || 'login';
+const week = parseInt(new URLSearchParams(window.location.search).get('week')) || null;
+
+if (path === 'dashboard') {
   const user = await getLoggedInUser();
   if (user && user.role === 'student') {
     const displayName = user.last_name ? `${user.last_name.toUpperCase()} ${user.first_name}` : user.first_name;
@@ -74,15 +140,15 @@ if (role === 'student') {
   } else {
     renderStudentDashboard(app);
   }
-} else if (role === 'admin') {
+} else if (path === 'admin') {
   renderAdmin(app);
-} else if (role === 'stageformulier') {
+} else if (path === 'stageformulier') {
   renderStageformulier(app);
-} else if (role === 'wachten') {
+} else if (path === 'wachten') {
   renderWachten(app);
-} else if (role === 'feedback') {
+} else if (path === 'feedback') {
   renderFeedback(app);
-} else if (role === 'aanpassen') {
+} else if (path === 'aanpassen') {
   const user = await getLoggedInUser();
   if (user) {
     const stageData = await getStudentStage(user.user_id);
@@ -90,21 +156,21 @@ if (role === 'student') {
   } else {
     renderAanpassen(app);
   }
-} else if (role === 'afkeuring') {
+} else if (path === 'afkeuring') {
   renderAfkeuring(app);
-} else if (role === 'stagecommisie') {
+} else if (path === 'stagecommissie') {
   renderAanvragen();
-} else if (role === 'stagementor') {
+} else if (path === 'stagementor') {
   const user = await getLoggedInUser();
   renderMijnStagiairs(app, user);
-} else if (role === 'docent') {
+} else if (path === 'docent') {
   const user = await getLoggedInUser();
   if (user && user.role === 'docent') {
     renderMijnStudenten(app, user);
   } else {
-    window.location.href = '/';
+    window.location.href = '/login';
   }
-} else if (role === 'goedgekeurd_student') {
+} else if (path === 'goedgekeurd-student') {
   const user = await getLoggedInUser();
   if (user && user.user_id) {
     const displayName = user.last_name ? `${user.last_name.toUpperCase()} ${user.first_name}` : user.first_name;
@@ -113,11 +179,11 @@ if (role === 'student') {
   } else {
     await renderGoedgekeurdStudent(app);
   }
-} else if (role === 'documenten') {
+} else if (path === 'documenten') {
   await renderDocumenten(app);
-} else if (role === 'documenten_ingedient') {
+} else if (path === 'documenten-ingediend') {
   renderDocumentenIngedient(app);
-} else if (role === 'stagedetails') {
+} else if (path === 'stagedetails') {
   const user = await getLoggedInUser();
   if (user && user.user_id) {
     const displayName = user.last_name ? `${user.last_name.toUpperCase()} ${user.first_name}` : user.first_name;
@@ -126,7 +192,7 @@ if (role === 'student') {
   } else {
     renderStagedetails(app);
   }
-} else if (role === 'logboek') {
+} else if (path === 'logboek') {
   const user = await getLoggedInUser();
   if (user && user.user_id) {
     const displayName = user.last_name ? `${user.last_name.toUpperCase()} ${user.first_name}` : user.first_name;
@@ -135,8 +201,8 @@ if (role === 'student') {
   } else {
     await renderLogboek(app);
   }
-} else if (role === 'logboek_dag') {
-  const weekNumber = parseInt(new URLSearchParams(window.location.search).get('week')) || 1;
+} else if (path === 'logboek-dag') {
+  const weekNumber = week || 1;
   const user = await getLoggedInUser();
   if (user && user.user_id) {
     const displayName = user.last_name ? `${user.last_name.toUpperCase()} ${user.first_name}` : user.first_name;
@@ -145,7 +211,7 @@ if (role === 'student') {
   } else {
     await renderLogboekDag(app, 'Student', null, weekNumber);
   }
-} else if (role === 'evaluatie') {
+} else if (path === 'evaluatie') {
   const user = await getLoggedInUser();
   if (user && user.user_id) {
     const stageData = await getStudentStage(user.user_id);
@@ -154,10 +220,15 @@ if (role === 'student') {
     await renderEvaluatieStudent(app, null, null);
   }
 } else {
+  /* onbekend pad of /login → login pagina tonen */
+  if (window.location.pathname !== '/login') {
+    window.history.replaceState(null, '', '/login');
+  }
   app.style.display = 'none';
   document.querySelector('#login-page').style.display = 'flex';
 }
 
+/* ─── Login handler ──── */
 const loginBtn = document.getElementById('btn');
 if (loginBtn) {
   loginBtn.addEventListener('click', async () => {
@@ -187,7 +258,15 @@ if (loginBtn) {
       const data = await res.json();
 
       if (data.success) {
-        window.location.href = `/?role=${encodeURIComponent(data.user.role)}`;
+        const routeMap = {
+          student: 'dashboard',
+          stagecommisie: 'stagecommissie',
+          stagementor: 'stagementor',
+          docent: 'docent',
+          admin: 'admin',
+        };
+        const path = routeMap[data.user.role] || data.user.role;
+        window.location.href = `/${path}`;
       } else {
         msg.style.color      = 'red';
         msg.textContent      = data.message || 'Foute login';

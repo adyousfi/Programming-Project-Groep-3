@@ -4,7 +4,7 @@ import { renderAdminDocumenten } from './adminDocumenten.js'; // check pad!
 import { renderCompetenties } from './competenties.js';
 
 
-const API_URL = 'http://localhost:3000';
+const API_URL = '';
 
 let zonderDocent = [];
 let gekoppeld = [];
@@ -424,10 +424,7 @@ document.getElementById('navCompetenties').addEventListener('click', (e) => {
     try {
       await fetch('/logout', { method: 'POST', credentials: 'include' });
     } catch {}
-
-    document.cookie =
-      'user=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-    window.location.href = '/';
+    window.location.href = '/login';
   });
 
   // ================= MODAL EVENTS =================

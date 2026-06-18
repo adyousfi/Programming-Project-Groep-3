@@ -91,7 +91,7 @@ export function renderAfkeuring(container, userName = '[Studentnaam]', stageData
     const nieuwAanvraagBtn = container.querySelector('#afkeuring-nieuwe-aanvraag');
     if (nieuwAanvraagBtn) {
         nieuwAanvraagBtn.addEventListener('click', () => {
-            window.location.search = '?role=stageformulier';
+            window.location.pathname = '/stageformulier';
         });
     }
 }

@@ -96,7 +96,7 @@ export async function renderAanpassen(container, userName = '[Studentnaam]', sta
     `;
 
     container.querySelector('#aanpassen-close').addEventListener('click', () => {
-        window.location.href = '/?role=student';
+        window.location.href = '/dashboard';
     });
 
     var startInput = container.querySelector('#aanpassen-start');
@@ -128,7 +128,7 @@ export async function renderAanpassen(container, userName = '[Studentnaam]', sta
     }
 
     container.querySelector('#aanpassen-cancel').addEventListener('click', () => {
-        window.location.href = '/?role=student';
+        window.location.href = '/dashboard';
     });
 
     container.querySelector('#aanpassen-submit').addEventListener('click', async () => {
@@ -174,7 +174,7 @@ export async function renderAanpassen(container, userName = '[Studentnaam]', sta
 
             if (!response.ok) throw new Error('Server fout');
 
-            window.location.href = '/?role=student';
+            window.location.href = '/dashboard';
         } catch (err) {
             alert('Er is iets misgegaan bij het indienen: ' + err.message);
             btn.disabled = false;

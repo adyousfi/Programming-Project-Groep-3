@@ -3,7 +3,7 @@ import { renderAdmin } from './admin.js';
 import { renderKoppelingen } from './koppeldocent.js';
 import { renderAdminDocumenten } from './adminDocumenten.js';
 
-const API_URL = 'http://localhost:3000/api';
+const API_URL = '/api';
 
 function mapCompetentie(dbRow) {
   return {

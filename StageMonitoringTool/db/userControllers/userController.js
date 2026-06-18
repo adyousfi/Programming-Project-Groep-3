@@ -9,6 +9,7 @@ import Admin from "../userModel/admin.js";
 import Student from "../userModel/student.js";
 import Stagementor from "../userModel/stagementor.js";
 import Stage from "../objectModel/stage.js";
+import { generateToken, verifyToken } from "../../backend/auth/authMiddleware.js";
 
 const createUser = async (req, res, next) => {
     const { first_name, last_name, email, password, role, phone } = req.body;
@@ -168,24 +169,20 @@ const loginUser = async (req, res, next) => {
         if (!user.is_active) {
             return res.json({ success: false, message: 'Je account is nog niet geactiveerd. Contacteer de administrator.' });
         }
-        res.cookie('user', {
-            user_id: user.user_id,
-            email: user.email,
-            first_name: user.first_name,
-            last_name: user.last_name,
-            role: user.role
-        }, {
+        const token = generateToken(user);
+        res.cookie('token', token, {
             httpOnly: true,
             maxAge: 1000 * 60 * 60,
-            sameSite: 'lax'
+            sameSite: 'lax',
         });
         res.json({
             success: true,
             message: 'Login succesvol',
             user: {
+                user_id: user.user_id,
                 first_name: user.first_name,
                 last_name: user.last_name,
-                role: user.role
+                role: user.role,
             }
         });
     } catch (err) {
@@ -195,25 +192,34 @@ const loginUser = async (req, res, next) => {
 };
 
 const checkLogin = async (req, res, next) => {
-    if (req.cookies.user) {
-        const cookie = req.cookies.user;
-        if (!cookie.last_name && cookie.user_id) {
-            const fullUser = await User.findByPk(cookie.user_id);
-            if (fullUser) {
-                cookie.last_name = fullUser.last_name;
-                cookie.first_name = fullUser.first_name;
-                res.cookie('user', cookie, { httpOnly: true, maxAge: 1000 * 60 * 60, sameSite: 'lax' });
-            }
+    const token = req.cookies?.token;
+    if (!token) {
+        return res.json({ loggedIn: false });
+    }
+    try {
+        const decoded = verifyToken(token);
+        const user = await User.findByPk(decoded.user_id);
+        if (!user) {
+            return res.json({ loggedIn: false });
         }
-        res.json({ loggedIn: true, user: cookie });
-    } else {
-        res.json({ loggedIn: false });
+        res.json({
+            loggedIn: true,
+            user: {
+                user_id: user.user_id,
+                email: user.email,
+                first_name: user.first_name,
+                last_name: user.last_name,
+                role: user.role,
+            }
+        });
+    } catch (err) {
+        return res.json({ loggedIn: false });
     }
 };
 
 const logoutUser = (req, res, next) => {
-    res.clearCookie('user');
-    res.cookie('user', '', { maxAge: 0, httpOnly: true, sameSite: 'lax' });
+    res.clearCookie('token');
+    res.cookie('token', '', { maxAge: 0, httpOnly: true, sameSite: 'lax' });
     res.json({ success: true });
 };
 

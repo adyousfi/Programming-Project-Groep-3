@@ -18,7 +18,7 @@ const createStage = async (req, res, next) => {
       periodeStart, periodeEind
     } = req.body;
 
-    const cookieUser = req.cookies.user;
+    const cookieUser = req.user;
     if (!cookieUser) return res.status(401).json({ msg: 'Niet ingelogd' });
 
     const studentProfile = await Student.findByPk(cookieUser.user_id);
@@ -369,7 +369,7 @@ const updateStageRaw = async (req, res, next) => {
 
 const selectStageByDocentId = async (req, res, next) => {
   try {
-    const cookieUser = req.cookies.user;
+    const cookieUser = req.user;
     if (!cookieUser) return res.status(401).json({ msg: 'Niet ingelogd' });
     if (cookieUser.role !== 'docent') return res.status(403).json({ msg: 'Geen toegang' });
     if (String(cookieUser.user_id) !== String(req.params.docentId)) {
