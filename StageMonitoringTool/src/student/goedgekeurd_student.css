@@ -325,6 +325,7 @@
     font-size: 1rem;
 }
 
+/* Default: keep the step-circle blue for the active step */
 .step.next-active .step-circle {
     background-color: #0d6efd;
     color: #ffffff;
@@ -338,6 +339,23 @@
 .step.next-active .step-sub {
     color: #0d6efd;
 }
+
+/* When logboek is finished (all weeks done), make the logboek icon green */
+.step.completed-logboek .step-circle,
+.step.completed-logboek .step-circle.step-circle--logboek {
+    background-color: #198754;
+    color: #ffffff;
+    border-color: #198754;
+}
+
+.step.completed-logboek .step-label {
+    color: #198754;
+}
+
+.step.completed-logboek .step-sub {
+    color: #198754;
+}
+
 
 /* Active cards (when document validated) */
 .coming-soon-card.active-card {

@@ -160,10 +160,13 @@ async function renderEvaluatiePage(app, stagiair, activeTab = 'tussentijds', eva
     ? 'Geef per competentie een finale score en feedback.'
     : 'Geef per competentie een score en feedback.';
 
-  // Compute total percentage from student's own scores
-  const existingScores = evaluatieData
-    .map((e) => (e?.score_student ?? null))
-    .filter((s) => s !== null && s !== undefined);
+  // Decide which score/feedback to show:
+  // - before docent submitted: show student values
+  // - after docent submitted: show docent values (must not show student's own evaluation)
+  const isDocentView = Boolean(docentSubmitted);
+  const scoreKey = isDocentView ? 'score_docent' : 'score_student';
+  const feedbackKey = isDocentView ? 'feedback_docent' : 'feedback_student';
+
   const uniekeCompetentieN = Array.from(
     new Set(
       evaluatieData
@@ -176,7 +179,7 @@ async function renderEvaluatiePage(app, stagiair, activeTab = 'tussentijds', eva
     const N = uniekeCompetentieN;
     if (!N) return null;
     const sumScores = evaluatieData.reduce((acc, e) => {
-      const s = e?.score_student;
+      const s = e?.[scoreKey];
       if (s === null || s === undefined) return acc;
       return acc + (Number(s) / 5) * 20;
     }, 0);
@@ -216,7 +219,7 @@ async function renderEvaluatiePage(app, stagiair, activeTab = 'tussentijds', eva
                 ${initTotalPercentage !== null ? `${initTotalPercentage.toFixed(1)}/20` : '--'}
               </div>
               <div style="font-size:13px;color:#6b7280;margin-top:6px;">
-                Gebaseerd op je scores per competentie
+                Gebaseerd op ${isDocentView ? 'docent-scores' : 'je scores'} per competentie
               </div>
             </div>
 
@@ -231,7 +234,7 @@ async function renderEvaluatiePage(app, stagiair, activeTab = 'tussentijds', eva
                 <span class="sm-score-title">Hoe scoor je deze competentie? Klik op een score (1 = laag, 5 = hoog)</span>
                 <div class="sm-eval-score-cards">
                   ${scores.map((score) => `
-                    <button type="button" class="sm-score-card sm-score-card--${score} ${bestaande?.score_student === score ? 'selected' : ''}" data-score="${score}" data-competentie="${comp.competentie_id}" data-competentie-code="${comp.code}">
+                    <button type="button" class="sm-score-card sm-score-card--${score} ${bestaande?.[scoreKey] === score ? 'selected' : ''}" data-score="${score}" data-competentie="${comp.competentie_id}" data-competentie-code="${comp.code}">
                       <span class="sm-score-card-number">${score}</span>
                       <span class="sm-score-card-text">${descriptions[score].replace('{c}', escapeHtml(comp.titel))}</span>
                     </button>
@@ -240,9 +243,9 @@ async function renderEvaluatiePage(app, stagiair, activeTab = 'tussentijds', eva
               </div>
 
               <div class="sm-eval-mentor-panel">
-                <h4>Feedback (student)</h4>
+                <h4>Feedback (${isDocentView ? 'docent' : 'student'})</h4>
                 <label class="sm-eval-feedback-label" for="feedback-${comp.competentie_id}">Feedback</label>
-                <textarea id="feedback-${comp.competentie_id}" class="sm-eval-feedback" placeholder="Beschrijf je feedback over deze competentie...">${escapeHtml(bestaande?.feedback_student ?? '')}</textarea>
+                <textarea id="feedback-${comp.competentie_id}" class="sm-eval-feedback" placeholder="Beschrijf je feedback over deze competentie...">${escapeHtml(bestaande?.[feedbackKey] ?? '')}</textarea>
               </div>
             </div>
           `;

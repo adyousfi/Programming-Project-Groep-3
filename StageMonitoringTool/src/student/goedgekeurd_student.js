@@ -143,23 +143,25 @@ export async function renderGoedgekeurdStudent(container, userName = 'Jan Jansse
                             <span class="step-sub">Voltooid</span>
                         </div>
                         <div class="step-line ${docValidated ? 'completed' : ''}"></div>
-                        <div class="step ${docValidated ? 'completed' : 'active'}">
+                        <div class="step${docValidated ? ' completed' : ' active'}">
                             <div class="step-circle">${docValidated ? '&#10003;' : '3'}</div>
                             <span class="step-label">Document</span>
                             <span class="step-sub">${docValidated ? 'Voltooid' : 'Actief'}</span>
                         </div>
                         <div class="step-line"></div>
-                        <div class="step${docValidated ? ' next-active' : ''}">
+                        <div class="step${docValidated ? ' next-active' : ''}${allLogboeksDone ? ' completed-logboek' : ''}">
                             <div class="step-circle step-icon-logboek">${docValidated ? '&#128203;' : '4'}</div>
                             <span class="step-label">Logboek</span>
                             <span class="step-sub">${docValidated ? `${submittedWeeks}/${totalWeeks} weken` : 'Gepland'}</span>
                         </div>
+
                         <div class="step-line"></div>
-                        <div class="step${allLogboeksDone ? ' next-active' : ''}">
-                            <div class="step-circle">5</div>
+                        <div class="step${allLogboeksDone ? ' next-active' : ''}${((evalAvailable && docentSubmitted) || (evalAvailable && studentSubmitted) || (finaleAvailable && finaleDocentSubmitted) || (finaleAvailable && finaleStudentSubmitted)) ? ' completed' : ''}">
+                            <div class="step-circle">${(evalAvailable && docentSubmitted) || (finaleAvailable && finaleDocentSubmitted) ? '&#10003;' : '5'}</div>
                             <span class="step-label">Evaluatie</span>
-                            <span class="step-sub">${allLogboeksDone ? 'Actief' : 'Gepland'}</span>
+                            <span class="step-sub">${(evalAvailable && docentSubmitted) || (finaleAvailable && finaleDocentSubmitted) ? 'Voltooid' : (allLogboeksDone ? 'Actief' : 'Gepland')}</span>
                         </div>
+
                     </div>
                 </div>
 
