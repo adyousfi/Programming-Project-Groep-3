@@ -83,6 +83,12 @@ function attachNav(app, stagiair) {
 
       if (page === 'evaluatie') {
         renderEvaluatieTab(app, stagiair, 'tussentijds');
+      } else if (page === 'overzicht' || page === 'stagedetails' || page === 'logboek') {
+        if (_currentStudent && _currentUser) {
+          import('./student-detail.js').then((m) => {
+            m.renderStudentDetail(_currentStudent, _currentUser, page);
+          });
+        }
       }
     });
   });

@@ -275,8 +275,9 @@ async function renderTabContent(tab, student) {
   return `<div class="sd-tab-content"></div>`;
 }
 
-export async function renderStudentDetail(student, user) {
+export async function renderStudentDetail(student, user, initialTab) {
   const displayName = user ? (user.last_name ? user.last_name.toUpperCase() + ' ' + user.first_name : user.first_name || 'Docent') : 'Docent';
+  const startTab = initialTab || 'overzicht';
 
   document.querySelector('#app').innerHTML = `
     <div class="sd-layout">
@@ -285,7 +286,7 @@ export async function renderStudentDetail(student, user) {
           <span class="sd-logo-title">Stage Monitoring</span>
           <span class="sd-logo-sub">Erasmushogeschool Brussel</span>
           <nav class="sd-nav">
-            ${renderNav('overzicht')}
+            ${renderNav(startTab)}
           </nav>
         </div>
         <div class="sd-sidebar-bottom">
@@ -316,22 +317,26 @@ export async function renderStudentDetail(student, user) {
       e.preventDefault();
       document.querySelectorAll('.sd-nav-item').forEach(function(i) { i.classList.remove('active'); });
       item.classList.add('active');
+
+      if (item.dataset.tab === 'evaluatie') {
+        import('./evaluatie.js').then((m) => {
+          m.renderEvaluatieDocent(document.querySelector('#app'), user, student);
+        });
+        return;
+      }
+
       document.querySelector('#sd-content').innerHTML = '<p class="sd-tab-content">Laden...</p>';
       document.querySelector('#sd-content').innerHTML = await renderTabContent(item.dataset.tab, student);
       setupWeekCards(student);
         if (item.dataset.tab === 'overzicht') setupActieCards(student, user);
 
-        // Als je via een andere flow al in evaluatie wil zitten via hash.
-        // (Docent: kies student -> klik Evaluatie; verwacht evaluatie UI)
-        // Let op: evaluatie interface wordt enkel getoond via de actie-card “Evaluatie”.
-        // (Hash-gedrag hier veroorzaakte errors door ontbrekende variabelen/flow.)
-
     });
   });
 
 
-  document.querySelector('#sd-content').innerHTML = await renderTabContent('overzicht', student);
-  setupActieCards(student, user);
+  document.querySelector('#sd-content').innerHTML = await renderTabContent(startTab, student);
+  if (startTab === 'overzicht') setupActieCards(student, user);
+  if (startTab === 'logboek') setupWeekCards(student);
 }
 
 function setupActieCards(student, user) {

@@ -44,7 +44,7 @@ function getWeekDates(startDate, endDate, weekIndex) {
   };
 }
 
-function mapApiStageToStagiair(s, logboekEntries = [], evalAvailable = false) {
+function mapApiStageToStagiair(s, logboekEntries = [], evalAvailable = false, mentorSubmitted = false) {
   const start = s.stageDetails?.start;
   const einde = s.stageDetails?.einde;
   const totalWeeks = start && einde
@@ -79,7 +79,7 @@ function mapApiStageToStagiair(s, logboekEntries = [], evalAvailable = false) {
     einde: einde ? new Date(einde).toLocaleDateString('nl-BE', { day: 'numeric', month: 'short' }) : '–',
     totalWeeks,
     submittedWeeks,
-    badges: evalAvailable ? [{ type: 'warning', label: 'Tussentijdse evaluatie beschikbaar' }] : [],
+    badges: evalAvailable && !mentorSubmitted ? [{ type: 'warning', label: 'Tussentijdse evaluatie beschikbaar' }] : [],
     stageData: s,
   };
 }
@@ -972,6 +972,7 @@ export async function renderMijnStagiairs(app, user) {
         const stagiairsWithLogboek = await Promise.all(data.map(async (s) => {
           let logboekEntries = [];
           let evalAvailable = false;
+          let mentorSubmitted = false;
           if (s.id) {
             try {
               const logRes = await fetch(`/api/logboek/stage/${s.id}`, { credentials: 'include' });
@@ -983,8 +984,16 @@ export async function renderMijnStagiairs(app, user) {
               const evalData = await evalRes.json();
               evalAvailable = evalData.bestaatDoorDocent === true;
             } catch (_) {}
+            if (evalAvailable) {
+              try {
+                const statusRes = await fetch(`/api/evaluaties/status?stage_id=${s.id}&type_evaluatie=tussentijds`, { credentials: 'include' });
+                const statusData = await statusRes.json();
+                mentorSubmitted = statusData.evaluaties && statusData.evaluaties.length > 0
+                  && statusData.evaluaties.every((e) => e.score_mentor != null);
+              } catch (_) {}
+            }
           }
-          return mapApiStageToStagiair(s, logboekEntries, evalAvailable);
+          return mapApiStageToStagiair(s, logboekEntries, evalAvailable, mentorSubmitted);
         }));
         _allStagiairs = stagiairsWithLogboek;
       }
