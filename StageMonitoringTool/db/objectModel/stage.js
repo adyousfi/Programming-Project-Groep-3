@@ -25,10 +25,7 @@ const Stage = sequelize.define("stage", {
         primaryKey: true,
         autoIncrement: true,
     },
-    stageaanvraag_id: {
-        type: DataTypes.INTEGER,
-        allowNull: true,
-    },
+
     student_id: {
         type: DataTypes.INTEGER,
         allowNull: true,

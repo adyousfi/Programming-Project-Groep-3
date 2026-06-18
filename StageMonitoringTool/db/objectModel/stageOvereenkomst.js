@@ -8,8 +8,6 @@ const Stageovereenkomst = sequelize.define("Stageovereenkomst",{
         primaryKey: true,
         autoIncrement: true
     },
-    stageaanvraag_id:{
-        type: DataTypes.INTEGER,
-    }
+
     
 })
