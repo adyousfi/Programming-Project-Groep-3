@@ -21,7 +21,9 @@ const upload = multer({ storage, limits: { fileSize: 10 * 1024 * 1024 } });
 
 const router = express.Router();
 
-// ✅ Admin upload document
+// ── Existing routes ──────────────────────────────────────────────────────────
+
+// ✅ Admin upload document (student flow)
 router.post('/admin-upload', upload.single('document'), documentController.adminUploadDocument);
 
 // ✅ Student upload document
@@ -35,5 +37,19 @@ router.get('/stage/:stageId', documentController.getStageDocuments);
 
 // ✅ Download document
 router.get('/:id/download', documentController.downloadDocument);
+
+// ── Bedrijf contract signing routes ─────────────────────────────────────────
+
+// ✅ Admin sends contract PDF to bedrijf HR for signing
+router.post('/send-contract', upload.single('document'), documentController.sendContractToBedrijf);
+
+// ✅ Bedrijf HR opens the signing page (no auth — token-based)
+router.get('/sign/:token', documentController.getSigningPage);
+
+// ✅ Bedrijf HR submits signature
+router.post('/sign/:token', documentController.submitSignature);
+
+// ✅ Admin dashboard polls contract status for a stage
+router.get('/contract-status/:stageId', documentController.getContractStatus);
 
 export default router;

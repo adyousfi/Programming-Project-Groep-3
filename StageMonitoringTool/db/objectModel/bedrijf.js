@@ -21,6 +21,11 @@ const Bedrijf = sequelize.define("Bedrijf", {
         allowNull:true,
     },
 
+    hr_email:{
+        type:DataTypes.STRING,
+        allowNull:true,
+    },
+
     },
     {
         timestamps: true,
