@@ -5,6 +5,7 @@ export async function renderDocumenten(container) {
     let adminDocs = [];
     let studentDocs = [];
     let docValidated = false;
+    let stageId = null;
     try {
         const [docsRes, meRes] = await Promise.all([
             fetch('/api/documents/mijn', { credentials: 'include' }),
@@ -25,8 +26,18 @@ export async function renderDocumenten(container) {
             const stageRes = await fetch(`/api/stages/student/${meData.user.user_id}`, { credentials: 'include' });
             const stageData = await stageRes.json();
             docValidated = stageData.document_validated || false;
+            stageId = stageData.id || null;
         }
     } catch {}
+
+    let evalAvailable = false;
+    if (docValidated && stageId) {
+        try {
+            const evalRes = await fetch(`/api/evaluaties/tussentijds-status?stage_id=${stageId}`, { credentials: 'include' });
+            const evalData = await evalRes.json();
+            evalAvailable = evalData.bestaatDoorDocent === true;
+        } catch {}
+    }
 
     const hasAdminDoc = adminDocs.length > 0;
     const hasStudentSubmission = studentDocs.length > 0;
@@ -50,7 +61,7 @@ export async function renderDocumenten(container) {
                         <a href="?role=stagedetails" class="sidebar-nav-item">Stagedetails</a>
                         <a href="?role=documenten" class="sidebar-nav-item active">Documenten</a>
                         <a href="${docValidated ? '?role=logboek' : '#'}" class="sidebar-nav-item${docValidated ? '' : ' disabled'}">Logboek</a>
-                        <a href="?role=evaluatie" class="sidebar-nav-item">Evaluatie</a>
+                        <a href="${docValidated && evalAvailable ? '?role=evaluatie' : '#'}" class="sidebar-nav-item${docValidated && evalAvailable ? '' : ' disabled'}">Evaluatie</a>
                     </nav>
                 </div>
                 <div class="sidebar-bottom">

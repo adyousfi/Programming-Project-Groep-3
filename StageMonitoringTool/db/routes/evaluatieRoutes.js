@@ -8,6 +8,9 @@ router.post("/create-evaluatie", evaluatieController.createEvaluatie);
 // Frontend: check of evaluaties bestaan + toon bestaande per competentie
 router.get('/status', evaluatieController.getEvaluatieStatus);
 
+// Frontend: check of door docent aangemaakte tussentijdse evaluatie bestaat
+router.get('/tussentijds-status', evaluatieController.getTussentijdsStatus);
+
 // Frontend: maak evaluatie-instanties per competentie
 router.post('/create-per-competentie', evaluatieController.createEvaluatiesPerCompetentie);
 

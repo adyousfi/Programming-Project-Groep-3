@@ -39,6 +39,7 @@ export async function renderLogboekDag(container, userName = 'Student', stageDat
     const today = getNow();
 
     let logboekEntries = [];
+    let evalAvailable = false;
     if (stageData?.id) {
         try {
             const res = await fetch(`/api/logboek/stage/${stageData.id}`, { credentials: 'include' });
@@ -46,6 +47,11 @@ export async function renderLogboekDag(container, userName = 'Student', stageDat
         } catch (err) {
             console.error('Error fetching logboek:', err);
         }
+        try {
+            const evalRes = await fetch(`/api/evaluaties/tussentijds-status?stage_id=${stageData.id}`, { credentials: 'include' });
+            const evalData = await evalRes.json();
+            evalAvailable = evalData.bestaatDoorDocent === true;
+        } catch {}
     }
 
     function getDayDateObj(weekIndex, dayIndex) {
@@ -192,7 +198,7 @@ export async function renderLogboekDag(container, userName = 'Student', stageDat
                         <a href="?role=stagedetails" class="sidebar-nav-item">Stagedetails</a>
                         <a href="?role=documenten" class="sidebar-nav-item">Documenten</a>
                         <a href="?role=logboek" class="sidebar-nav-item active">Logboek</a>
-                        <a href="?role=evaluatie" class="sidebar-nav-item">Evaluatie</a>
+                        <a href="${evalAvailable ? '?role=evaluatie' : '#'}" class="sidebar-nav-item${evalAvailable ? '' : ' disabled'}">Evaluatie</a>
                     </nav>
                 </div>
                 <div class="sidebar-bottom">

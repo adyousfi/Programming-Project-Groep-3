@@ -369,3 +369,12 @@
 .coming-soon-sub.active-sub {
     color: #6c757d;
 }
+
+/* Blue dot indicator for new evaluatie */
+.sidebar-dot {
+    color: #3b82f6;
+    font-size: 0.6rem;
+    vertical-align: middle;
+    margin-left: 4px;
+    line-height: 1;
+}

@@ -101,12 +101,41 @@ const getEvaluatieStatus = async (req, res, next) => {
 };
 
 /**
+ * GET: controleer of er een door docent aangemaakte tussentijdse evaluatie bestaat
+ * Query: stage_id
+ * Response: { bestaatDoorDocent: boolean }
+ */
+const getTussentijdsStatus = async (req, res, next) => {
+  try {
+    const { stage_id } = req.query;
+
+    if (!stage_id) {
+      return res.status(400).json({ msg: "stage_id is verplicht" });
+    }
+
+    const evaluaties = await Evaluatie.findAll({
+      where: {
+        stage_id: Number(stage_id),
+        type_evaluatie: 'tussentijds',
+      },
+    });
+
+    const bestaatDoorDocent = evaluaties.some((e) => e.docent_id != null);
+
+    return res.status(200).json({ bestaatDoorDocent });
+  } catch (error) {
+    console.error("Error getTussentijdsStatus: ", error);
+    return res.status(500).json({ msg: "Something went wrong" });
+  }
+};
+
+/**
  * POST: maak evaluatie records per competentie voor gegeven stage/type
- * Body: { stage_id: number, type_evaluatie: 'tussentijds'|'finale' }
+ * Body: { stage_id: number, type_evaluatie: 'tussentijds'|'finale', docent_id?: number }
  */
 const createEvaluatiesPerCompetentie = async (req, res, next) => {
   try {
-    const { stage_id, type_evaluatie } = req.body;
+    const { stage_id, type_evaluatie, docent_id } = req.body;
 
     if (!stage_id || !type_evaluatie) {
       return res.status(400).json({ msg: "stage_id en type_evaluatie zijn verplicht" });
@@ -145,6 +174,7 @@ const createEvaluatiesPerCompetentie = async (req, res, next) => {
             feedback_docent: null,
             feedback_student: null,
             feedback_mentor: null,
+            docent_id: docent_id ?? null,
           },
           { transaction: t }
         );
@@ -343,6 +373,7 @@ const updateEvaluatiesPerCompetentie = async (req, res, next) => {
 export default {
   createEvaluatie,
   getEvaluatieStatus,
+  getTussentijdsStatus,
   createEvaluatiesPerCompetentie,
   updateEvaluatiesPerCompetentie,
 };

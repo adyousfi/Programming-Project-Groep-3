@@ -1,6 +1,6 @@
 import './stagedetails.css';
 
-export function renderStagedetails(container, userName = 'Jan Janssens', stageData = null) {
+export async function renderStagedetails(container, userName = 'Jan Janssens', stageData = null) {
     const studentNaam = stageData?.naam || 'Onbekend';
     const studentNummer = stageData?.studentNummer || 'Onbekend';
     const bedrijfNaam = stageData?.bedrijf?.naam || 'Onbekend';
@@ -10,6 +10,15 @@ export function renderStagedetails(container, userName = 'Jan Janssens', stageDa
     const docentNaam = stageData?.docent?.naam || 'Onbekend';
     const omschrijving = stageData?.stageDetails?.omschrijving || 'Geen omschrijving beschikbaar';
     const docValidated = stageData?.document_validated || false;
+
+    let evalAvailable = false;
+    if (docValidated && stageData?.id) {
+        try {
+            const evalRes = await fetch(`/api/evaluaties/tussentijds-status?stage_id=${stageData.id}`, { credentials: 'include' });
+            const evalData = await evalRes.json();
+            evalAvailable = evalData.bestaatDoorDocent === true;
+        } catch {}
+    }
 
     let startDatum = 'Onbekend';
     let eindDatum = 'Onbekend';
@@ -42,7 +51,7 @@ export function renderStagedetails(container, userName = 'Jan Janssens', stageDa
                         <a href="?role=stagedetails" class="sidebar-nav-item active">Stagedetails</a>
                         <a href="?role=documenten" class="sidebar-nav-item">Documenten</a>
                         <a href="${docValidated ? '?role=logboek' : '#'}" class="sidebar-nav-item${docValidated ? '' : ' disabled'}">Logboek</a>
-                        <a href="?role=evaluatie" class="sidebar-nav-item">Evaluatie</a>
+                        <a href="${docValidated && evalAvailable ? '?role=evaluatie' : '#'}" class="sidebar-nav-item${docValidated && evalAvailable ? '' : ' disabled'}">Evaluatie</a>
                     </nav>
                 </div>
                 <div class="sidebar-bottom">

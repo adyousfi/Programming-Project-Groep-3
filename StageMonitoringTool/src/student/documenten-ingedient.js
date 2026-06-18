@@ -16,7 +16,7 @@ export function renderDocumentenIngedient(container, userName = 'Jan Janssens') 
                         <a href="?role=stagedetails" class="sidebar-nav-item">Stagedetails</a>
                         <a href="?role=documenten" class="sidebar-nav-item active">Documenten</a>
                         <a href="#" class="sidebar-nav-item disabled">Logboek</a>
-                        <a href="?role=evaluatie" class="sidebar-nav-item">Evaluatie</a>
+                        <a href="#" class="sidebar-nav-item disabled">Evaluatie</a>
                     </nav>
                 </div>
                 <div class="sidebar-bottom">
