@@ -56,6 +56,7 @@ export async function renderGoedgekeurdStudent(container, userName = 'Jan Jansse
     }
 
     let evalAvailable = false;
+    let studentSubmitted = false;
     if (docValidated && stageData?.id) {
         try {
             const evalRes = await fetch(`/api/evaluaties/tussentijds-status?stage_id=${stageData.id}`, { credentials: 'include' });
@@ -63,6 +64,14 @@ export async function renderGoedgekeurdStudent(container, userName = 'Jan Jansse
             evalAvailable = evalData.bestaatDoorDocent === true;
         } catch (err) {
             console.error('Error fetching evaluatie status:', err);
+        }
+        if (evalAvailable) {
+            try {
+                const statusRes = await fetch(`/api/evaluaties/status?stage_id=${stageData.id}&type_evaluatie=tussentijds`, { credentials: 'include' });
+                const statusData = await statusRes.json();
+                studentSubmitted = statusData.evaluaties && statusData.evaluaties.length > 0
+                    && statusData.evaluaties.every((e) => e.ingediend_student);
+            } catch (_) {}
         }
     }
 
@@ -82,7 +91,7 @@ export async function renderGoedgekeurdStudent(container, userName = 'Jan Jansse
                         <a href="?role=stagedetails" class="sidebar-nav-item">Stagedetails</a>
                         <a href="?role=documenten" class="sidebar-nav-item">Documenten</a>
                         <a href="${docValidated ? '?role=logboek' : '#'}" class="sidebar-nav-item${docValidated ? '' : ' disabled'}">Logboek</a>
-                        <a href="${docValidated && evalAvailable ? '?role=evaluatie' : '#'}" class="sidebar-nav-item${docValidated && evalAvailable ? '' : ' disabled'}">Evaluatie${evalAvailable ? ' <span class="sidebar-badge">Nieuw</span>' : ''}</a>
+                        <a href="${docValidated && evalAvailable ? '?role=evaluatie' : '#'}" class="sidebar-nav-item${docValidated && evalAvailable ? '' : ' disabled'}">Evaluatie${evalAvailable && !studentSubmitted ? ' <span class="sidebar-badge">Nieuw</span>' : ''}</a>
                     </nav>
                 </div>
                 <div class="sidebar-bottom">
@@ -179,8 +188,8 @@ export async function renderGoedgekeurdStudent(container, userName = 'Jan Jansse
                         <a href="${evalAvailable ? '?role=evaluatie' : '#'}" class="coming-soon-card${evalAvailable ? ' active-card' : ' disabled-card'}">
                             <div class="coming-soon-icon${evalAvailable ? ' active-icon' : ''}">&#128202;</div>
                             <div class="coming-soon-content">
-                                <h3 class="coming-soon-title${evalAvailable ? ' active-title' : ''}">Evaluaties${evalAvailable ? ' <span class="sidebar-badge">Nieuw</span>' : ''}</h3>
-                                <p class="coming-soon-sub${evalAvailable ? ' active-sub' : ''}">${evalAvailable ? 'Tussentijdse evaluatie beschikbaar' : 'Bekijk je voortgang en feedback'}</p>
+                                <h3 class="coming-soon-title${evalAvailable ? ' active-title' : ''}">Evaluaties${evalAvailable && !studentSubmitted ? ' <span class="sidebar-badge">Nieuw</span>' : ''}</h3>
+                                <p class="coming-soon-sub${evalAvailable ? ' active-sub' : ''}">${evalAvailable ? (studentSubmitted ? 'Reeds ingediend' : 'Tussentijdse evaluatie beschikbaar') : 'Bekijk je voortgang en feedback'}</p>
                             </div>
                         </a>
                     </div>

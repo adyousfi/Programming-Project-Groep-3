@@ -335,6 +335,7 @@ async function renderEvaluatiePage(app, stagiair, activeTab = 'tussentijds', eva
           stage_id: stagiair.stage_id,
           type_evaluatie: activeTab,
           updates,
+          ingediend_role: isSubmit ? 'student' : undefined,
         }),
       });
 
@@ -419,7 +420,7 @@ async function renderEvaluatieTab(app, stagiair, activeTab = 'tussentijds') {
       const isDoorDocent = status.evaluaties.some((e) => e.docent_id != null);
       if (isDoorDocent) {
         const alreadySubmitted = status.evaluaties.length > 0
-          && status.evaluaties.every((e) => e.score_student != null);
+          && status.evaluaties.every((e) => e.ingediend_student);
         await renderEvaluatiePage(app, stagiair, activeTab, status.evaluaties, alreadySubmitted);
       } else {
         renderWachtOpDocent(app, stagiair, activeTab);

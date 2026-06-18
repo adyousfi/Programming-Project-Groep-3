@@ -73,6 +73,24 @@ const Evaluatie = sequelize.define("Evaluatie", {
         type: DataTypes.DATE,
         allowNull: true,
     },
+
+    ingediend_student: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+    },
+
+    ingediend_mentor: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+    },
+
+    ingediend_docent: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+    },
 });
 
 export default Evaluatie;

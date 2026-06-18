@@ -77,6 +77,9 @@ const getEvaluatieStatus = async (req, res, next) => {
         score_student: e.score_student ?? null,
         score_mentor: e.score_mentor ?? null,
         docent_id: e.docent_id ?? null,
+        ingediend_student: e.ingediend_student ?? false,
+        ingediend_mentor: e.ingediend_mentor ?? false,
+        ingediend_docent: e.ingediend_docent ?? false,
       };
     });
 
@@ -218,7 +221,7 @@ const createEvaluatiesPerCompetentie = async (req, res, next) => {
 const updateEvaluatiesPerCompetentie = async (req, res, next) => {
   try {
     const stageIdFromParam = req.params.stageId;
-    const { stage_id, type_evaluatie, updates } = req.body;
+    const { stage_id, type_evaluatie, updates, ingediend_role } = req.body;
 
     const stageId = stageIdFromParam ?? stage_id;
 
@@ -309,6 +312,9 @@ const updateEvaluatiesPerCompetentie = async (req, res, next) => {
             score_student,
             feedback_mentor,
             score_mentor,
+            ingediend_student: ingediend_role === 'student',
+            ingediend_mentor: ingediend_role === 'mentor',
+            ingediend_docent: ingediend_role === 'docent',
           }, { transaction: t });
           created = true;
         } else {
@@ -322,6 +328,9 @@ const updateEvaluatiesPerCompetentie = async (req, res, next) => {
           if (feedback_student != null) updatesToApply.feedback_student = feedback_student;
           if (score_mentor != null) updatesToApply.score_mentor = score_mentor;
           if (feedback_mentor != null) updatesToApply.feedback_mentor = feedback_mentor;
+          if (ingediend_role === 'student') updatesToApply.ingediend_student = true;
+          if (ingediend_role === 'mentor') updatesToApply.ingediend_mentor = true;
+          if (ingediend_role === 'docent') updatesToApply.ingediend_docent = true;
           await evaluatie.update(updatesToApply, { transaction: t });
         }
 

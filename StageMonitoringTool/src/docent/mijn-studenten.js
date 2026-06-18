@@ -1,11 +1,7 @@
 import './mijn-studenten.css';
 
-let testDateOverride = null;
-let lastApp = null;
-let lastUser = null;
-
 function getNow() {
-  return testDateOverride || new Date();
+  return new Date();
 }
 
 function berekenVoortgang(startDatum, eindDatum) {
@@ -267,8 +263,6 @@ export async function renderMijnStudenten(app, user) {
   const container = app || document.querySelector('#app');
   let stages = [];
   renderMijnStudenten._user = user || null;
-  lastApp = app;
-  lastUser = user;
 
   if (user && user.user_id) {
     try {
@@ -335,36 +329,8 @@ export async function renderMijnStudenten(app, user) {
         </div>
       </main>
     </div>
-
-    <div class="test-date-picker">
-      <label class="test-date-label">Test datum:</label>
-      <input type="date" id="test-date-input" class="test-date-input" value="${testDateOverride ? testDateOverride.toISOString().split('T')[0] : ''}">
-      <button class="test-date-apply" id="test-date-apply">Zet</button>
-      <button class="test-date-reset" id="test-date-reset">Reset</button>
-    </div>
   `;
 
   setupFilter(studenten);
   setupStudentButtons(studenten);
-
-  var testInput = document.getElementById('test-date-input');
-  var testApply = document.getElementById('test-date-apply');
-  var testReset = document.getElementById('test-date-reset');
-
-  if (testApply) {
-    testApply.addEventListener('click', function() {
-      if (testInput.value) {
-        testDateOverride = new Date(testInput.value + 'T00:00:00');
-        renderMijnStudenten(lastApp, lastUser);
-      }
-    });
-  }
-
-  if (testReset) {
-    testReset.addEventListener('click', function() {
-      testDateOverride = null;
-      testInput.value = '';
-      renderMijnStudenten(lastApp, lastUser);
-    });
-  }
 }

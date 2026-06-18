@@ -1,6 +1,7 @@
 import './mijn-stagiairs.css';
 
 let _userName = 'Stagementor';
+let _currentUser = null;
 let _allStagiairs = [];
 let _logboekEntriesCache = [];
 
@@ -430,8 +431,8 @@ function renderStudentDetail(app, stagiair) {
     </div>
   `;
 
-  // Terug naar het overzicht met alle stagiairs.
-  document.querySelector('#sm-back').addEventListener('click', (e) => { e.preventDefault(); renderStagementorPage(app); });
+  // Terug naar het overzicht met alle stagiairs (herlaad data zodat badges kloppen).
+  document.querySelector('#sm-back').addEventListener('click', (e) => { e.preventDefault(); renderMijnStagiairs(app, _currentUser); });
 
   // Activeert de links in de zijbalk.
   attachNav(app, stagiair);
@@ -456,11 +457,7 @@ async function renderEvaluatiePage(app, stagiair, activeTab = 'tussentijds') {
   try {
     const status = await fetchEvaluatieStatus(stageId, activeTab);
     if (!status.bestaat) { renderEvaluatieRegistreerScreen(app, stagiair, activeTab); }
-    else {
-      const alreadySubmitted = status.evaluaties.length > 0
-        && status.evaluaties.every((e) => e.score_mentor != null);
-      await renderEvaluatieScoreScreen(app, stagiair, activeTab, status.evaluaties, alreadySubmitted);
-    }
+    else { await renderEvaluatieScoreScreen(app, stagiair, activeTab, status.evaluaties); }
   } catch (err) {
     console.error(err);
     app.innerHTML = `<div class="sm-layout">${sidebarHtml('evaluatie')}<main class="sm-main sm-main--detail"><div class="sm-detail-top"><div><h1 class="sm-detail-title">Evaluatie</h1><p class="sm-detail-subtitle">Fout bij het laden</p></div><a id="sm-back-evaluatie" class="sm-detail-back" href="#">← Terug naar stagiairs</a></div><div class="sm-eval-block"><div class="sm-eval-block-header"><h3>Verbinding mislukt</h3><p>Kan de evaluatie-informatie niet ophalen.</p></div><div class="sm-eval-actions"><button id="sm-eval-retry" class="sm-button">Opnieuw proberen</button></div></div></main></div>`;
@@ -478,7 +475,7 @@ function renderEvaluatieRegistreerScreen(app, stagiair, activeTab) {
   document.querySelectorAll('.sm-eval-tab').forEach((tab) => { tab.addEventListener('click', () => renderEvaluatiePage(app, stagiair, tab.dataset.tab)); });
 }
 
-async function renderEvaluatieScoreScreen(app, stagiair, activeTab, evaluatieData = [], alreadySubmitted = false) {
+async function renderEvaluatieScoreScreen(app, stagiair, activeTab, evaluatieData = []) {
   const scores = [1, 2, 3, 4, 5];
   const competenties = await fetchCompetentiesMetRubrieken();
   const dataByCode = Object.fromEntries(evaluatieData.map((e) => [e.competentie_code, e]));
@@ -495,8 +492,8 @@ async function renderEvaluatieScoreScreen(app, stagiair, activeTab, evaluatieDat
   document.querySelectorAll('.sm-eval-tab').forEach((tab) => { tab.addEventListener('click', () => renderEvaluatiePage(app, stagiair, tab.dataset.tab)); });
   document.querySelectorAll('.sm-score-card').forEach((card) => { card.addEventListener('click', () => { const c = card.closest('.sm-eval-score-cards'); if (!c) return; c.querySelectorAll('.sm-score-card').forEach((b) => b.classList.remove('selected')); card.classList.add('selected'); const comp = card.closest('.sm-eval-competentie'); if (comp) comp.classList.remove('sm-eval-competentie--error'); const msg = document.querySelector('#sm-eval-save-message'); if (msg) msg.classList.remove('sm-eval-save-message--error'); }); });
 
-  // Grey out everything if already submitted
-  if (alreadySubmitted) {
+  // Grey out if already submitted (check backend flag from evaluatieData)
+  if (evaluatieData.length > 0 && evaluatieData.every((e) => e.ingediend_mentor)) {
     document.querySelectorAll('.sm-score-card').forEach((b) => { b.disabled = true; });
     document.querySelectorAll('.sm-eval-feedback').forEach((t) => { t.disabled = true; });
     const saveBtn = document.querySelector('#sm-eval-save');
@@ -537,7 +534,7 @@ async function renderEvaluatieScoreScreen(app, stagiair, activeTab, evaluatieDat
       return { competentie_code: code, score: null, feedback: null, score_mentor: sel ? Number(sel.dataset.score) : null, feedback_mentor: fb || null };
     });
     try {
-      const res = await fetch(`/api/evaluaties/${stageId}/per-competentie`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, credentials: 'include', body: JSON.stringify({ stage_id: stageId, type_evaluatie: activeTab, updates }) });
+      const res = await fetch(`/api/evaluaties/${stageId}/per-competentie`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, credentials: 'include', body: JSON.stringify({ stage_id: stageId, type_evaluatie: activeTab, updates, ingediend_role: isSubmit ? 'mentor' : undefined }) });
       if (!res.ok) { const t = await res.text().catch(() => ''); throw new Error(`Save failed: ${res.status} ${t}`); }
       const json = await res.json().catch(() => ({}));
       const rc = document.querySelector('#sm-eval-result-column');
@@ -960,13 +957,14 @@ function renderDocumentenPage(app, stagiair) {
 
 
 export async function renderMijnStagiairs(app, user) {
-  _userName = user
-    ? (user.last_name ? `${user.last_name.toUpperCase()} ${user.first_name}` : user.first_name || 'Stagementor')
+  if (user) _currentUser = user;
+  _userName = _currentUser
+    ? (_currentUser.last_name ? `${_currentUser.last_name.toUpperCase()} ${_currentUser.first_name}` : _currentUser.first_name || 'Stagementor')
     : 'Stagementor';
 
-  if (user && user.user_id) {
+  if (_currentUser && _currentUser.user_id) {
     try {
-      const res = await fetch(`/api/stages/stagementor/${user.user_id}`, { credentials: 'include' });
+      const res = await fetch(`/api/stages/stagementor/${_currentUser.user_id}`, { credentials: 'include' });
       const data = await res.json();
       if (Array.isArray(data)) {
         const stagiairsWithLogboek = await Promise.all(data.map(async (s) => {
@@ -989,7 +987,7 @@ export async function renderMijnStagiairs(app, user) {
                 const statusRes = await fetch(`/api/evaluaties/status?stage_id=${s.id}&type_evaluatie=tussentijds`, { credentials: 'include' });
                 const statusData = await statusRes.json();
                 mentorSubmitted = statusData.evaluaties && statusData.evaluaties.length > 0
-                  && statusData.evaluaties.every((e) => e.score_mentor != null);
+                  && statusData.evaluaties.every((e) => e.ingediend_mentor);
               } catch (_) {}
             }
           }
