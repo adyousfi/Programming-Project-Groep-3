@@ -12,7 +12,7 @@ const createStage = async (req, res, next) => {
   try {
     const {
       studentNaam, studentNummer,
-      bedrijfNaam, bedrijfAdres,
+      bedrijfNaam, bedrijfAdres, bedrijfHrEmail,
       mentorVoornaam, mentorAchternaam, mentorEmail,
       opdrachtOmschrijving,
       periodeStart, periodeEind
@@ -31,7 +31,7 @@ const createStage = async (req, res, next) => {
       await old.destroy();
     }
 
-    const bedrijf = await Bedrijf.create({ naam: bedrijfNaam, address: bedrijfAdres });
+    const bedrijf = await Bedrijf.create({ naam: bedrijfNaam, address: bedrijfAdres, hr_email: bedrijfHrEmail || null });
 
     let mentorUser = await User.findOne({ where: { email: mentorEmail } });
     if (!mentorUser) {
@@ -153,16 +153,16 @@ const selectStage = async (req, res, next) => {
         studentEmail: studentUser ? studentUser.email : '',
         functie: '',
         bedrijf: {
-          naam: s.bedrijf ? s.bedrijf.naam : '',
-          adres: s.bedrijf ? s.bedrijf.address : '',
-          contactpersoon: '',
-          email: '',
-          telefoon: '',
+          naam: s.bedrijf ? s.bedrijf.naam : '-',
+          adres: s.bedrijf ? s.bedrijf.address : '-',
+          contactpersoon: '-',
+          email: s.bedrijf ? s.bedrijf.hr_email : '-',
+          telefoon: '-',
         },
         stagementor: {
-          naam: mentorUser ? `${mentorUser.first_name} ${mentorUser.last_name}` : '',
-          email: mentorUser ? mentorUser.email : '',
-          telefoon: mentorUser ? mentorUser.phone : '',
+          naam: mentorUser ? `${mentorUser.first_name} ${mentorUser.last_name}` : '-',
+          email: mentorUser ? mentorUser.email : '-',
+          telefoon: mentorUser ? mentorUser.phone : '-',
         },
         docent: {
           naam: docentUser ? `${docentUser.first_name} ${docentUser.last_name}` : '',
@@ -170,10 +170,10 @@ const selectStage = async (req, res, next) => {
           user_id: s.docent_id || null,
         },
         stageDetails: {
-          omschrijving: s.omschrijving_opdracht || '',
-          start: s.begin_datum || '',
-          einde: s.eind_datum || '',
-          urenPerWeek: '',
+          omschrijving: s.omschrijving_opdracht || '-',
+          start: s.begin_datum || '-',
+          einde: s.eind_datum || '-',
+          urenPerWeek: '-',
         },
         status: mapStageStatus(s.status),
         datum: s.createdAt ? new Date(s.createdAt).toLocaleDateString('nl-BE') : '',
@@ -201,6 +201,7 @@ const getApprovedStages = async (req, res, next) => {
       id: s.stage_id,
       naam: s.student?.User ? `${s.student.User.last_name.toUpperCase()} ${s.student.User.first_name}` : 'Onbekend',
       bedrijf: s.bedrijf?.naam || '',
+      bedrijfHrEmail: s.bedrijf?.hr_email || '',
       stageDetails: {
         start: s.begin_datum,
         einde: s.eind_datum,

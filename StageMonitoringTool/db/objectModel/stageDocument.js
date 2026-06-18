@@ -13,7 +13,7 @@ const StageDocument = sequelize.define('stageDocument', {
         allowNull: false,
     },
     type: {
-        type: DataTypes.ENUM('admin_template', 'student_submission'),
+        type: DataTypes.ENUM('admin_template', 'student_submission', 'contract_unsigned', 'contract_signed'),
         allowNull: false,
     },
     original_name: {
@@ -26,6 +26,20 @@ const StageDocument = sequelize.define('stageDocument', {
     },
     uploaded_by: {
         type: DataTypes.INTEGER,
+        allowNull: true,
+    },
+    // --- Bedrijf signing fields ---
+    signing_token: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        unique: true,
+    },
+    bedrijf_email: {
+        type: DataTypes.STRING,
+        allowNull: true,
+    },
+    signed_at: {
+        type: DataTypes.DATE,
         allowNull: true,
     },
 }, { timestamps: true });

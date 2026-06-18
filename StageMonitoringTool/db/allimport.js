@@ -33,7 +33,7 @@ Student.belongsTo(User, { as: 'User', foreignKey: 'user_id', onDelete: 'CASCADE'
 Docent.belongsTo(User, { as: 'User', foreignKey: 'user_id', onDelete: 'CASCADE' });
 Stagementor.belongsTo(User, { as: 'User', foreignKey: 'user_id', onDelete: 'CASCADE' });
 Stagecommisie.belongsTo(User, { foreignKey: 'user_id', onDelete: 'CASCADE' });
-Admin.belongsTo(User, { foreignKey: 'user_id', onDelete: 'CASCADE' });
+Admin.belongsTo(User, { as: 'User', foreignKey: 'user_id', onDelete: 'CASCADE' });
 
 // --- Bedrijf & Mentor (1-op-N) ---
 // GEFIXED: Als een bedrijf sluit, zetten we de mentor op SET NULL in plaats van de hele user te CASCADEN

@@ -49,6 +49,10 @@ export async function renderStageformulier(container) {
                             <label for="bedrijf-adres">Adres *</label>
                             <input type="text" id="bedrijf-adres" value="">
                         </div>
+                        <div class="form-group">
+                            <label for="bedrijf-hr-email">HR E-mail bedrijf * <span style="font-size:12px;color:#6b7280;font-weight:400;">(voor ondertekening contract)</span></label>
+                            <input type="email" id="bedrijf-hr-email" value="" placeholder="hr@bedrijf.be">
+                        </div>
                     </div>
                     
                     <div class="form-section">
@@ -175,6 +179,7 @@ export async function renderStageformulier(container) {
             container.querySelector('#student-nummer').value = `20${randNum(20, 99)}${randNum(1000, 9999)}`;
             container.querySelector('#bedrijf-naam').value = pick(bedrijven);
             container.querySelector('#bedrijf-adres').value = `${pick(straten)} ${randNum(1, 200)}, ${pick(steden)}`;
+            container.querySelector('#bedrijf-hr-email').value = `hr@${pick(['techsolutions.be', 'webstudio.be', 'innovation.be', 'cloudtech.be'])}`;
             container.querySelector('#mentor-voornaam').value = mentorVoornaam;
             container.querySelector('#mentor-achternaam').value = mentorAchternaam;
             container.querySelector('#mentor-email').value = `${mentorVoornaam.toLowerCase()}.${mentorAchternaam.toLowerCase()}@${pick(['techsolutions.be', 'webstudio.be', 'innovation.be', 'cloudtech.be'])}`;
@@ -209,7 +214,7 @@ export async function renderStageformulier(container) {
                 } else {
                     input.style.borderColor = '#ced4da';
 
-                    if (input.id === 'mentor-email') {
+                    if (input.id === 'mentor-email' || input.id === 'bedrijf-hr-email') {
                         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
                         if (!emailRegex.test(val)) {
                             invalidEmail = true;
@@ -242,6 +247,7 @@ export async function renderStageformulier(container) {
                 studentNummer: container.querySelector('#student-nummer').value.trim(),
                 bedrijfNaam: container.querySelector('#bedrijf-naam').value.trim(),
                 bedrijfAdres: container.querySelector('#bedrijf-adres').value.trim(),
+                bedrijfHrEmail: container.querySelector('#bedrijf-hr-email').value.trim(),
                 mentorVoornaam: container.querySelector('#mentor-voornaam').value.trim(),
                 mentorAchternaam: container.querySelector('#mentor-achternaam').value.trim(),
                 mentorEmail: container.querySelector('#mentor-email').value.trim(),

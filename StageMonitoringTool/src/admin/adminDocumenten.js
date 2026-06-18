@@ -9,8 +9,15 @@ let teVersturen = [];
 let wachtenOpStudent = [];
 let ontvangen = [];
 let afgecheckt = [];
+
+// ── Bedrijf signing state ────────────────────────────────────────────────────
+let contractTeVersturen = [];   // GOEDGEKEURD stages with no contract doc
+let contractWachten = [];       // Contract sent, waiting for signature
+let contractGetekend = [];      // Contract signed
+
 let currentStageId = null;
 let selectedFile = null;
+let currentBedrijfEmail = '';
 
 async function loadData() {
   const res = await fetch('/api/stages/goedgekeurd', { credentials: 'include' });
@@ -20,15 +27,29 @@ async function loadData() {
   const details = await Promise.all(stages.map(async s => {
     const docsRes = await fetch(`/api/documents/stage/${s.id}`, { credentials: 'include' });
     const docs = await docsRes.json().catch(() => []);
-    return { stage: s, docs: Array.isArray(docs) ? docs : [], validated: s.document_validated || false };
+
+    // Load bedrijf contract status
+    const contractRes = await fetch(`/api/documents/contract-status/${s.id}`, { credentials: 'include' });
+    const contractStatus = await contractRes.json().catch(() => ({ status: 'none' }));
+
+    return {
+      stage: s,
+      docs: Array.isArray(docs) ? docs : [],
+      validated: s.document_validated || false,
+      contractStatus,
+    };
   }));
 
   teVersturen = [];
   wachtenOpStudent = [];
   ontvangen = [];
   afgecheckt = [];
+  contractTeVersturen = [];
+  contractWachten = [];
+  contractGetekend = [];
 
-  for (const { stage, docs, validated } of details) {
+  for (const { stage, docs, validated, contractStatus } of details) {
+    // ── Student document flow (unchanged) ───────────────────────────────────
     const adminDocs = docs.filter(d => d.type === 'admin_template');
     const studentDocs = docs.filter(d => d.type === 'student_submission');
     if (validated) {
@@ -40,6 +61,25 @@ async function loadData() {
     } else {
       teVersturen.push(stage);
     }
+
+    // ── Bedrijf contract flow ────────────────────────────────────────────────
+    if (contractStatus.status === 'signed') {
+      contractGetekend.push({
+        ...stage,
+        signed_at: contractStatus.signed_at,
+        bedrijf_email: contractStatus.bedrijf_email,
+        document_id: contractStatus.document_id,
+        original_name: contractStatus.original_name,
+      });
+    } else if (contractStatus.status === 'pending') {
+      contractWachten.push({
+        ...stage,
+        bedrijf_email: contractStatus.bedrijf_email,
+        sent_at: contractStatus.sent_at,
+      });
+    } else {
+      contractTeVersturen.push(stage);
+    }
   }
 }
 
@@ -49,10 +89,12 @@ function formatPeriode(begin, eind) {
   return `${fmt(begin)} – ${fmt(eind)}`;
 }
 
+// ─── Student doc sections (unchanged) ────────────────────────────────────────
+
 function renderTeVersturen(lijst) {
   return `
     <h3 class="kp-sectie-titel kp-sectie-titel--oranje">
-      Contract te versturen (${lijst.length})
+      Contract te versturen naar student (${lijst.length})
     </h3>
     <table class="kp-tabel">
       <thead class="kp-thead--oranje">
@@ -180,11 +222,122 @@ function renderAfgecheckt(lijst) {
   `;
 }
 
+// ─── Bedrijf contract sections ────────────────────────────────────────────────
+
+function renderContractTeVersturen(lijst) {
+  return `
+    <div class="ad-divider"></div>
+    <h2 class="kp-sectie-hoofdtitel">Bedrijfscontract - Ondertekening</h2>
+    <h3 class="kp-sectie-titel kp-sectie-titel--paars">
+      Contract te versturen naar bedrijf (${lijst.length})
+    </h3>
+    <table class="kp-tabel">
+      <thead class="kp-thead--paars">
+        <tr>
+          <th>Student</th>
+          <th>Bedrijf</th>
+          <th>Periode</th>
+          <th>Status</th>
+          <th>Acties</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${lijst.length === 0
+          ? `<tr><td colspan="5" style="padding:16px;color:#6b7280;">Geen stages zonder bedrijfscontract.</td></tr>`
+          : lijst.map(s => `
+            <tr class="kp-rij--paars">
+              <td>${s.naam || '-'}</td>
+              <td>${s.bedrijf || '-'}</td>
+              <td>${formatPeriode(s.stageDetails?.start, s.stageDetails?.einde)}</td>
+              <td><span class="kp-badge kp-badge--paars">Contract te versturen</span></td>
+              <td>
+                <button class="kp-btn kp-btn--paars" data-id="${s.id}" data-email="${s.bedrijfHrEmail || ''}" data-actie="contract-versturen">
+                  Versturen naar bedrijf
+                </button>
+              </td>
+            </tr>
+          `).join('')}
+      </tbody>
+    </table>
+  `;
+}
+
+function renderContractWachten(lijst) {
+  return `
+    <h3 class="kp-sectie-titel kp-sectie-titel--wachten" style="margin-top:32px;">
+      Wachten op handtekening bedrijf (${lijst.length})
+    </h3>
+    <table class="kp-tabel">
+      <thead class="kp-thead--wachten">
+        <tr>
+          <th>Student</th>
+          <th>Bedrijf</th>
+          <th>Periode</th>
+          <th>Verstuurd naar</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${lijst.length === 0
+          ? `<tr><td colspan="5" style="padding:16px;color:#6b7280;">Geen contracten in afwachting.</td></tr>`
+          : lijst.map(s => `
+            <tr class="kp-rij--wachten">
+              <td>${s.naam || '-'}</td>
+              <td>${s.bedrijf || '-'}</td>
+              <td>${formatPeriode(s.stageDetails?.start, s.stageDetails?.einde)}</td>
+              <td style="font-size:13px;color:#6b7280;">${s.bedrijf_email || '-'}</td>
+              <td><span class="kp-badge kp-badge--wachten">Wachten op handtekening</span></td>
+            </tr>
+          `).join('')}
+      </tbody>
+    </table>
+  `;
+}
+
+function renderContractGetekend(lijst) {
+  return `
+    <h3 class="kp-sectie-titel" style="margin-top:32px;">
+      Ondertekend door bedrijf (${lijst.length})
+    </h3>
+    <table class="kp-tabel">
+      <thead>
+        <tr>
+          <th>Student</th>
+          <th>Bedrijf</th>
+          <th>Periode</th>
+          <th>Ondertekend op</th>
+          <th>Acties</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${lijst.length === 0
+          ? `<tr><td colspan="5" style="padding:16px;color:#6b7280;">Nog geen ondertekende contracten.</td></tr>`
+          : lijst.map(s => `
+            <tr>
+              <td>${s.naam || '-'}</td>
+              <td>${s.bedrijf || '-'}</td>
+              <td>${formatPeriode(s.stageDetails?.start, s.stageDetails?.einde)}</td>
+              <td><span class="kp-badge kp-badge--groen">Getekend ${s.signed_at ? new Date(s.signed_at).toLocaleDateString('nl-BE') : '-'}</span></td>
+              <td>
+                <a href="/api/documents/${s.document_id}/download" class="kp-btn kp-btn--downloaden" download>
+                  Download
+                </a>
+              </td>
+            </tr>
+          `).join('')}
+      </tbody>
+    </table>
+  `;
+}
+
 function herrender() {
   document.getElementById('sectie-te-versturen').innerHTML = renderTeVersturen(teVersturen);
   document.getElementById('sectie-wachten').innerHTML = renderWachtenOpStudent(wachtenOpStudent);
   document.getElementById('sectie-ontvangen').innerHTML = renderOntvangen(ontvangen);
   document.getElementById('sectie-afgecheckt').innerHTML = renderAfgecheckt(afgecheckt);
+  document.getElementById('sectie-contract-te-versturen').innerHTML = renderContractTeVersturen(contractTeVersturen);
+  document.getElementById('sectie-contract-wachten').innerHTML = renderContractWachten(contractWachten);
+  document.getElementById('sectie-contract-getekend').innerHTML = renderContractGetekend(contractGetekend);
   setupKnoppen();
 }
 
@@ -194,6 +347,9 @@ function setupKnoppen() {
   });
   document.querySelectorAll('.kp-btn[data-actie="afchecken"]').forEach(btn => {
     btn.addEventListener('click', () => openValidateModal(parseInt(btn.dataset.id)));
+  });
+  document.querySelectorAll('.kp-btn[data-actie="contract-versturen"]').forEach(btn => {
+    btn.addEventListener('click', () => openContractModal(parseInt(btn.dataset.id), btn.dataset.email || ''));
   });
 }
 
@@ -212,6 +368,20 @@ function openUploadModal(stageId) {
   document.getElementById('ad-upload-btn').disabled = true;
   document.getElementById('ad-upload-btn').textContent = 'Versturen';
   document.getElementById('ad-upload-modal').classList.add('active');
+}
+
+function openContractModal(stageId, bedrijfEmail) {
+  currentStageId = stageId;
+  currentBedrijfEmail = bedrijfEmail;
+  selectedFile = null;
+  document.getElementById('ad-contract-file-input').value = '';
+  document.getElementById('ad-contract-upload-zone').style.display = '';
+  document.getElementById('ad-contract-selected').style.display = 'none';
+  document.getElementById('ad-contract-selected-name').textContent = '';
+  document.getElementById('ad-contract-email').value = bedrijfEmail;
+  document.getElementById('ad-contract-send-btn').disabled = true;
+  document.getElementById('ad-contract-send-btn').textContent = 'Versturen';
+  document.getElementById('ad-contract-modal').classList.add('active');
 }
 
 export async function renderAdminDocumenten(app) {
@@ -237,16 +407,22 @@ export async function renderAdminDocumenten(app) {
       <main class="main-content">
         <h1 class="page-title">Documentenbeheer</h1>
 
+        <!-- Student doc sections -->
         <section class="kp-sectie" id="sectie-te-versturen">
           <p style="color:#6b7280;">Laden...</p>
         </section>
         <section class="kp-sectie" id="sectie-wachten"></section>
         <section class="kp-sectie" id="sectie-ontvangen"></section>
         <section class="kp-sectie" id="sectie-afgecheckt"></section>
+
+        <!-- Bedrijf contract sections -->
+        <section class="kp-sectie" id="sectie-contract-te-versturen"></section>
+        <section class="kp-sectie" id="sectie-contract-wachten"></section>
+        <section class="kp-sectie" id="sectie-contract-getekend"></section>
       </main>
     </div>
 
-    <!-- Upload Modal -->
+    <!-- Upload Modal (student flow) -->
     <div class="kp-modal-overlay" id="ad-upload-modal">
       <div class="kp-modal ad-upload-modal-body">
         <h2 class="kp-modal-titel">Contract versturen naar student</h2>
@@ -283,6 +459,41 @@ export async function renderAdminDocumenten(app) {
       </div>
     </div>
 
+    <!-- Contract naar bedrijf Modal -->
+    <div class="kp-modal-overlay" id="ad-contract-modal">
+      <div class="kp-modal ad-upload-modal-body">
+        <h2 class="kp-modal-titel">Contract versturen naar bedrijf</h2>
+        <p style="font-size:14px;color:#6b7280;margin:0 0 20px;line-height:1.5;">
+          Upload het te ondertekenen contract en verstuur het naar de HR-contactpersoon van het bedrijf.
+          Zij ontvangen een e-mail met een persoonlijke ondertekeningslink.
+        </p>
+
+        <label style="font-size:13px;font-weight:600;color:#374151;display:block;margin-bottom:6px;">
+          HR E-mail bedrijf *
+        </label>
+        <input type="email" id="ad-contract-email" class="ad-email-input"
+               placeholder="hr@bedrijf.be" style="width:100%;margin-bottom:20px;">
+
+        <label style="font-size:13px;font-weight:600;color:#374151;display:block;margin-bottom:6px;">
+          Contract PDF *
+        </label>
+        <div class="ad-upload-zone" id="ad-contract-upload-zone">
+          <div class="ad-upload-icon">&#128194;</div>
+          <p class="ad-upload-text">Sleep het PDF-contract hierheen of klik om te selecteren</p>
+          <p class="ad-upload-subtext">PDF - max. 10MB</p>
+          <input type="file" id="ad-contract-file-input" class="ad-file-input" accept=".pdf">
+        </div>
+        <div class="ad-selected" id="ad-contract-selected" style="display:none;">
+          <span class="ad-selected-name" id="ad-contract-selected-name"></span>
+          <button type="button" class="ad-remove-btn" id="ad-contract-remove-btn">&#10005;</button>
+        </div>
+        <div class="kp-modal-acties" style="margin-top:20px;">
+          <button class="kp-btn kp-btn--wijzigen" id="ad-contract-annuleren">Annuleren</button>
+          <button class="kp-btn kp-btn--paars" id="ad-contract-send-btn" disabled>Versturen</button>
+        </div>
+      </div>
+    </div>
+
     <!-- Upload Toast -->
     <div class="ad-toast ad-toast--upload" id="ad-toast-upload" style="display:none;">
       <span class="ad-toast-icon">&#128228;</span>
@@ -295,31 +506,35 @@ export async function renderAdminDocumenten(app) {
       <span class="ad-toast-text">Document succesvol gevalideerd!</span>
     </div>
 
+    <!-- Contract Verstuurd Toast -->
+    <div class="ad-toast ad-toast--paars" id="ad-toast-contract" style="display:none;">
+      <span class="ad-toast-icon">&#10003;</span>
+      <span class="ad-toast-text">Contract succesvol verstuurd naar het bedrijf!</span>
+    </div>
+
   `;
 
   // NAVIGATIE
-// NAVIGATIE
+  document.getElementById('navGebruikers').addEventListener('click', (e) => {
+    e.preventDefault();
+    renderAdmin(app);
+  });
 
-document.getElementById('navGebruikers').addEventListener('click', (e) => {
-  e.preventDefault();
-  renderAdmin(app);
-});
+  document.getElementById('navKoppelingen').addEventListener('click', (e) => {
+    e.preventDefault();
+    renderKoppelingen(app);
+  });
 
-document.getElementById('navKoppelingen').addEventListener('click', (e) => {
-  e.preventDefault();
-  renderKoppelingen(app);
-});
+  document.getElementById('navDocumenten')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    renderAdminDocumenten(app);
+  });
 
-document.getElementById('navDocumenten')?.addEventListener('click', (e) => {
-  e.preventDefault();
-  renderDocumenten(app);
-});
+  document.getElementById('navCompetenties').addEventListener('click', (e) => {
+    e.preventDefault();
+    renderCompetenties(app);
+  });
 
-// deze is current page → mag blijven of opnieuw renderen
-document.getElementById('navCompetenties').addEventListener('click', (e) => {
-  e.preventDefault();
-  renderCompetenties(app);
-});
   // LOGOUT
   document.getElementById('ad-logout').addEventListener('click', async () => {
     try { await fetch('/logout', { method: 'POST', credentials: 'include' }); } catch {}
@@ -327,7 +542,7 @@ document.getElementById('navCompetenties').addEventListener('click', (e) => {
     window.location.href = '/';
   });
 
-  // UPLOAD MODAL
+  // ── STUDENT UPLOAD MODAL ───────────────────────────────────────────────────
   const uploadModal = document.getElementById('ad-upload-modal');
   const uploadZone = document.getElementById('ad-upload-zone');
   const fileInput = document.getElementById('ad-file-input');
@@ -405,7 +620,7 @@ document.getElementById('navCompetenties').addEventListener('click', (e) => {
     }
   });
 
-  // VALIDATE MODAL
+  // ── VALIDATE MODAL ─────────────────────────────────────────────────────────
   const validateModal = document.getElementById('ad-validate-modal');
   const toast = document.getElementById('ad-toast');
 
@@ -441,6 +656,98 @@ document.getElementById('navCompetenties').addEventListener('click', (e) => {
     }
     confirmBtn.disabled = false;
     confirmBtn.textContent = 'Valideer';
+  });
+
+  // ── CONTRACT NAAR BEDRIJF MODAL ────────────────────────────────────────────
+  const contractModal = document.getElementById('ad-contract-modal');
+  const contractUploadZone = document.getElementById('ad-contract-upload-zone');
+  const contractFileInput = document.getElementById('ad-contract-file-input');
+  const contractSelectedEl = document.getElementById('ad-contract-selected');
+  const contractSelectedName = document.getElementById('ad-contract-selected-name');
+  const contractSendBtn = document.getElementById('ad-contract-send-btn');
+  const contractEmailInput = document.getElementById('ad-contract-email');
+  let contractSelectedFile = null;
+
+  function showContractFile(file) {
+    contractSelectedFile = file;
+    contractSelectedName.textContent = file.name;
+    contractUploadZone.style.display = 'none';
+    contractSelectedEl.style.display = 'flex';
+    updateContractSendBtn();
+  }
+
+  function resetContractFile() {
+    contractSelectedFile = null;
+    contractFileInput.value = '';
+    contractUploadZone.style.display = '';
+    contractSelectedEl.style.display = 'none';
+    contractSelectedName.textContent = '';
+    updateContractSendBtn();
+  }
+
+  function updateContractSendBtn() {
+    const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contractEmailInput.value.trim());
+    contractSendBtn.disabled = !contractSelectedFile || !emailValid;
+  }
+
+  contractEmailInput.addEventListener('input', updateContractSendBtn);
+  contractUploadZone.addEventListener('click', () => contractFileInput.click());
+  contractUploadZone.addEventListener('dragover', e => { e.preventDefault(); contractUploadZone.classList.add('dragover'); });
+  contractUploadZone.addEventListener('dragleave', () => contractUploadZone.classList.remove('dragover'));
+  contractUploadZone.addEventListener('drop', e => {
+    e.preventDefault();
+    contractUploadZone.classList.remove('dragover');
+    if (e.dataTransfer.files[0]) showContractFile(e.dataTransfer.files[0]);
+  });
+  contractFileInput.addEventListener('change', () => { if (contractFileInput.files[0]) showContractFile(contractFileInput.files[0]); });
+  document.getElementById('ad-contract-remove-btn').addEventListener('click', resetContractFile);
+
+  contractModal.addEventListener('click', e => {
+    if (e.target === contractModal) { contractModal.classList.remove('active'); resetContractFile(); }
+  });
+  document.getElementById('ad-contract-annuleren').addEventListener('click', () => {
+    contractModal.classList.remove('active');
+    resetContractFile();
+  });
+
+  contractSendBtn.addEventListener('click', async () => {
+    if (!currentStageId || !contractSelectedFile) return;
+    const email = contractEmailInput.value.trim();
+    if (!email) { alert('Vul een e-mailadres in.'); return; }
+
+    contractSendBtn.disabled = true;
+    contractSendBtn.textContent = 'Bezig met versturen...';
+
+    const formData = new FormData();
+    formData.append('document', contractSelectedFile);
+    formData.append('stage_id', currentStageId);
+    formData.append('bedrijf_email', email);
+
+    try {
+      const res = await fetch('/api/documents/send-contract', {
+        method: 'POST',
+        credentials: 'include',
+        body: formData,
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        alert('Fout bij versturen: ' + (err.msg || res.status));
+        contractSendBtn.disabled = false;
+        contractSendBtn.textContent = 'Versturen';
+        return;
+      }
+      contractModal.classList.remove('active');
+      resetContractFile();
+      await loadData();
+      herrender();
+      const contractToast = document.getElementById('ad-toast-contract');
+      contractToast.style.display = 'flex';
+      setTimeout(() => { contractToast.style.display = 'none'; }, 3500);
+    } catch {
+      alert('Geen verbinding met de server.');
+      contractSendBtn.disabled = false;
+      contractSendBtn.textContent = '📤 Versturen';
+    }
   });
 
   // INIT
