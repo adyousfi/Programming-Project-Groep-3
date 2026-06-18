@@ -25,6 +25,10 @@ export function verifyToken(token) {
 }
 
 export default function authMiddleware(req, res, next) {
+  if (req.originalUrl.includes('/api/documents/sign')) {
+    return next();
+  }
+
   const token = req.cookies?.token;
   if (!token) {
     return res.status(401).json({ msg: 'Niet geautoriseerd — geen token' });

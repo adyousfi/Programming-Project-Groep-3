@@ -93,7 +93,10 @@ export async function renderDocumenten(container) {
                                     <span class="doc-file-icon">&#128196;</span>
                                     <span class="doc-file-name">${d.name}</span>
                                     <span class="doc-file-date">${d.datum}</span>
-                                    <a href="/api/documents/${d.id}/download" class="doc-download-btn" download>Downloaden</a>
+                                    <div class="doc-actions">
+                                        <a href="/api/documents/${d.id}/download" class="doc-download-btn" download>Downloaden</a>
+                                        ${!docValidated ? `<button type="button" class="doc-sign-btn" data-doc-id="${d.id}">Onderteken in app</button>` : ''}
+                                    </div>
                                 </div>
                             `).join('')}
                         </div>
@@ -173,6 +176,29 @@ export async function renderDocumenten(container) {
                 </div>
 
             </main>
+        </div>
+
+        <div id="sign-modal" class="modal-overlay" style="display:none;">
+            <div class="modal-card">
+                <div class="modal-header">
+                    <h3>Document Digitaal Ondertekenen</h3>
+                    <button id="close-sign-modal" class="modal-close-btn">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <p style="margin-bottom:16px; font-size:14px; color:#4b5563;">
+                        Teken hieronder met uw muis of vinger. Uw handtekening wordt automatisch onderaan het document toegevoegd.
+                    </p>
+                    <div class="canvas-wrapper">
+                        <canvas id="student-sig-canvas" width="600" height="200"></canvas>
+                        <div class="canvas-placeholder" id="student-canvas-placeholder">Teken hier uw handtekening</div>
+                    </div>
+                    <p id="sign-error" style="color:red; font-size:13px; margin-top:10px; display:none;"></p>
+                </div>
+                <div class="modal-footer">
+                    <button id="clear-sig-btn" class="btn-clear">Wissen</button>
+                    <button id="submit-sig-btn" class="btn-submit" disabled>Ondertekenen en Indienen</button>
+                </div>
+            </div>
         </div>
     `;
 
@@ -287,5 +313,142 @@ export async function renderDocumenten(container) {
             return;
         }
         window.location.href = '/documenten-ingediend';
+    });
+
+    // --- Sign Modal Logic ---
+    const signModal = container.querySelector('#sign-modal');
+    const closeSignModal = container.querySelector('#close-sign-modal');
+    const studentSigCanvas = container.querySelector('#student-sig-canvas');
+    const sigPlaceholder = container.querySelector('#student-canvas-placeholder');
+    const clearSigBtn = container.querySelector('#clear-sig-btn');
+    const submitSigBtn = container.querySelector('#submit-sig-btn');
+    const signError = container.querySelector('#sign-error');
+    
+    let activeDocId = null;
+    let isDrawing = false;
+    let hasSignature = false;
+    let ctx = null;
+
+    if (studentSigCanvas) {
+        ctx = studentSigCanvas.getContext('2d');
+        const ratio = Math.max(window.devicePixelRatio || 1, 1);
+        studentSigCanvas.width = studentSigCanvas.offsetWidth * ratio;
+        studentSigCanvas.height = 200 * ratio;
+        ctx.scale(ratio, ratio);
+        ctx.strokeStyle = '#1e40af';
+        ctx.lineWidth = 2.5;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+
+        function getPos(e) {
+            const rect = studentSigCanvas.getBoundingClientRect();
+            if (e.touches && e.touches.length > 0) {
+                return { x: e.touches[0].clientX - rect.left, y: e.touches[0].clientY - rect.top };
+            }
+            return { x: e.clientX - rect.left, y: e.clientY - rect.top };
+        }
+
+        const startDrawing = (e) => {
+            e.preventDefault();
+            isDrawing = true;
+            hasSignature = true;
+            sigPlaceholder.style.opacity = '0';
+            submitSigBtn.disabled = false;
+            const pos = getPos(e);
+            ctx.beginPath();
+            ctx.moveTo(pos.x, pos.y);
+        };
+
+        const draw = (e) => {
+            if (!isDrawing) return;
+            e.preventDefault();
+            const pos = getPos(e);
+            ctx.lineTo(pos.x, pos.y);
+            ctx.stroke();
+        };
+
+        const stopDrawing = () => {
+            isDrawing = false;
+            ctx.closePath();
+        };
+
+        studentSigCanvas.addEventListener('mousedown', startDrawing);
+        studentSigCanvas.addEventListener('mousemove', draw);
+        window.addEventListener('mouseup', stopDrawing);
+
+        studentSigCanvas.addEventListener('touchstart', startDrawing, { passive: false });
+        studentSigCanvas.addEventListener('touchmove', draw, { passive: false });
+        window.addEventListener('touchend', stopDrawing);
+
+        clearSigBtn.addEventListener('click', () => {
+            ctx.clearRect(0, 0, studentSigCanvas.width, studentSigCanvas.height);
+            hasSignature = false;
+            submitSigBtn.disabled = true;
+            sigPlaceholder.style.opacity = '1';
+            signError.style.display = 'none';
+        });
+
+        submitSigBtn.addEventListener('click', async () => {
+            if (!hasSignature || !activeDocId) return;
+            submitSigBtn.disabled = true;
+            submitSigBtn.textContent = 'Bezig met opslaan...';
+            signError.style.display = 'none';
+
+            const signatureData = studentSigCanvas.toDataURL('image/png');
+
+            try {
+                const res = await fetch(`/api/documents/student-sign/${activeDocId}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ signature: signatureData })
+                });
+
+                if (res.ok) {
+                    window.location.href = '/documenten-ingediend';
+                } else {
+                    const data = await res.json().catch(() => ({}));
+                    signError.textContent = data.msg || 'Fout bij opslaan handtekening.';
+                    signError.style.display = 'block';
+                    submitSigBtn.disabled = false;
+                    submitSigBtn.textContent = 'Ondertekenen en Indienen';
+                }
+            } catch {
+                signError.textContent = 'Netwerkfout. Probeer het opnieuw.';
+                signError.style.display = 'block';
+                submitSigBtn.disabled = false;
+                submitSigBtn.textContent = 'Ondertekenen en Indienen';
+            }
+        });
+    }
+
+    // Open modal
+    const signBtns = container.querySelectorAll('.doc-sign-btn');
+    signBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            activeDocId = btn.getAttribute('data-doc-id');
+            signModal.style.display = 'flex';
+            if (ctx) {
+                // Now that the modal is visible, we can safely compute dimensions
+                const ratio = Math.max(window.devicePixelRatio || 1, 1);
+                studentSigCanvas.width = studentSigCanvas.offsetWidth * ratio;
+                studentSigCanvas.height = 200 * ratio;
+                ctx.scale(ratio, ratio);
+                ctx.strokeStyle = '#1e40af';
+                ctx.lineWidth = 2.5;
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+
+                ctx.clearRect(0, 0, studentSigCanvas.width, studentSigCanvas.height);
+                hasSignature = false;
+                submitSigBtn.disabled = true;
+                sigPlaceholder.style.opacity = '1';
+                signError.style.display = 'none';
+            }
+        });
+    });
+
+    closeSignModal?.addEventListener('click', () => {
+        signModal.style.display = 'none';
+        activeDocId = null;
     });
 }

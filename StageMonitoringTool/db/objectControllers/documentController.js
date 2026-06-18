@@ -10,7 +10,7 @@ import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { v4 as uuidv4 } from 'uuid';
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
-import { sendContractToSign, sendSignedNotification } from '../../mailBot/sendMail/contractMail.js';
+import { sendContractToSign, sendSignedNotification, sendDocumentUploadedToStudent } from '../../mailBot/sendMail/contractMail.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -24,6 +24,7 @@ export const adminUploadDocument = async (req, res, next) => {
     if (!cookieUser) return res.status(401).json({ msg: 'Niet ingelogd' });
     const { stage_id } = req.body;
     if (!stage_id || !req.file) return res.status(400).json({ msg: 'stage_id en bestand zijn verplicht' });
+    
     const doc = await StageDocument.create({
       stage_id: parseInt(stage_id),
       type: 'admin_template',
@@ -31,6 +32,23 @@ export const adminUploadDocument = async (req, res, next) => {
       stored_name: req.file.filename,
       uploaded_by: cookieUser.user_id,
     });
+
+    const stage = await Stage.findByPk(parseInt(stage_id), {
+      include: [
+        { model: Student, as: 'student', include: [{ model: User, as: 'User' }] },
+        { model: Bedrijf, as: 'bedrijf' },
+      ],
+    });
+
+    if (stage) {
+      const studentNaam = stage.student?.User ? `${stage.student.User.first_name} ${stage.student.User.last_name}` : 'Student';
+      const studentEmail = stage.student?.User?.email;
+      const bedrijfNaam = stage.bedrijf?.naam || 'Bedrijf';
+      if (studentEmail) {
+        await sendDocumentUploadedToStudent(studentEmail, studentNaam, bedrijfNaam);
+      }
+    }
+
     return res.status(201).json({ msg: 'Document geupload', document_id: doc.document_id });
   } catch (err) {
     console.error(err);
@@ -687,6 +705,93 @@ export const getContractStatus = async (req, res, next) => {
     return res.status(500).json({ msg: 'Fout bij ophalen contract status' });
   }
 };
+/**
+ * POST /api/documents/student-sign/:id
+ * Allows a student to electronically sign an admin template directly from the app.
+ */
+export const studentSignDocument = async (req, res, next) => {
+  try {
+    const cookieUser = req.user;
+    if (!cookieUser) return res.status(401).json({ msg: 'Niet ingelogd' });
+
+    const docId = req.params.id;
+    const { signature } = req.body;
+    if (!signature || !signature.startsWith('data:image/png;base64,')) {
+      return res.status(400).json({ msg: 'Ongeldige handtekening' });
+    }
+
+    const adminDoc = await StageDocument.findOne({
+      where: { document_id: docId, type: 'admin_template' }
+    });
+    if (!adminDoc) return res.status(404).json({ msg: 'Document niet gevonden' });
+
+    // Ensure the student belongs to the stage
+    const stage = await Stage.findByPk(adminDoc.stage_id, {
+      include: [{ model: Student, as: 'student', include: [{ model: User, as: 'User' }] }]
+    });
+    if (!stage || stage.student?.User?.user_id !== cookieUser.user_id) {
+      return res.status(403).json({ msg: 'Geen toegang tot deze stage' });
+    }
+
+    // Load original PDF
+    const originalPath = path.join(uploadsDir, adminDoc.stored_name);
+    if (!fs.existsSync(originalPath)) {
+      return res.status(404).json({ msg: 'Origineel bestand niet gevonden op server' });
+    }
+
+    const pdfBytes = fs.readFileSync(originalPath);
+    const pdfDoc = await PDFDocument.load(pdfBytes);
+
+    // Embed signature
+    const base64Data = signature.replace(/^data:image\/png;base64,/, '');
+    const signatureBytes = Buffer.from(base64Data, 'base64');
+    const sigImage = await pdfDoc.embedPng(signatureBytes);
+
+    const pages = pdfDoc.getPages();
+    const lastPage = pages[pages.length - 1];
+
+    const sigWidth = 200;
+    const sigHeight = 60;
+    const sigX = 40;
+    const sigY = 80;
+
+    const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+    lastPage.drawText('Handtekening student:', {
+      x: sigX, y: sigY + sigHeight + 8,
+      size: 10, font, color: rgb(0.3, 0.3, 0.3),
+    });
+    lastPage.drawImage(sigImage, {
+      x: sigX, y: sigY,
+      width: sigWidth, height: sigHeight,
+    });
+    const dateText = new Date().toLocaleDateString('nl-BE');
+    lastPage.drawText(`Datum: ${dateText}`, {
+      x: sigX, y: sigY - 15,
+      size: 9, font, color: rgb(0.5, 0.5, 0.5),
+    });
+
+    const modifiedPdfBytes = await pdfDoc.save();
+    const newFilename = `student-signed-${uuidv4()}.pdf`;
+    const newPath = path.join(uploadsDir, newFilename);
+    fs.writeFileSync(newPath, modifiedPdfBytes);
+
+    const newDoc = await StageDocument.create({
+      stage_id: adminDoc.stage_id,
+      type: 'student_submission',
+      original_name: 'ondertekend-' + adminDoc.original_name,
+      stored_name: newFilename,
+      uploaded_by: cookieUser.user_id,
+    });
+
+    stage.status = 'DOCUMENTGEUPLOADED';
+    await stage.save();
+
+    return res.status(201).json({ msg: 'Document succesvol ondertekend', document_id: newDoc.document_id });
+  } catch (err) {
+    console.error('Fout bij student in-app signing:', err);
+    return res.status(500).json({ msg: 'Fout bij opslaan handtekening' });
+  }
+};
 
 export default {
   adminUploadDocument,
@@ -698,4 +803,5 @@ export default {
   getSigningPage,
   submitSignature,
   getContractStatus,
+  studentSignDocument,
 };
