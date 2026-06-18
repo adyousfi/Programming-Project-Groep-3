@@ -124,9 +124,7 @@ const getTussentijdsStatus = async (req, res, next) => {
       },
     });
 
-    const bestaatDoorDocent = evaluaties.some((e) =>
-      e.docent_id != null && (e.score_docent != null || e.feedback_docent != null)
-    );
+    const bestaatDoorDocent = evaluaties.some((e) => e.docent_id != null);
 
     return res.status(200).json({ bestaatDoorDocent });
   } catch (error) {
