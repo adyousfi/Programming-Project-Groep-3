@@ -25,6 +25,7 @@
     "@dropbox/sign": "^1.11.0",
     "@sequelize/core": "^7.0.0-alpha.48",
     "@sequelize/mssql": "^7.0.0-alpha.48",
+    "bcryptjs": "^3.0.3",
     "body-parser": "^2.3.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",

@@ -12,6 +12,7 @@ router.get('/', (req, res) => {
 router.post('/login', userController.loginUser);
 router.get('/me', userController.checkLogin);
 router.post('/logout', userController.logoutUser);
+router.post('/set-password', userController.setPassword);
 
 router.get('/select-user', userController.selectUser);
 router.post('/create-user', userController.createUser);

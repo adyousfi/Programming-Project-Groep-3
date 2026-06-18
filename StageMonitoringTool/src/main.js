@@ -15,6 +15,7 @@ import { renderStagedetails } from './student/stagedetails.js';
 import { renderLogboek } from './student/logboek.js';
 import { renderLogboekDag } from './student/logboek-dag.js';
 import { renderAdmin } from './admin/admin.js';
+import { renderSetPassword } from './auth/set-password.js';
 
 const app = document.querySelector('#app');
 const role = new URLSearchParams(window.location.search).get('role');
@@ -144,6 +145,11 @@ if (role === 'student') {
   } else {
     await renderLogboekDag(app, 'Student', null, weekNumber);
   }
+} else if (role === 'set_password') {
+  app.style.display = 'none';
+  const loginPage = document.querySelector('#login-page');
+  loginPage.style.display = 'flex';
+  renderSetPassword(loginPage);
 } else {
   app.style.display = 'none';
   document.querySelector('#login-page').style.display = 'flex';
