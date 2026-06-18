@@ -468,18 +468,10 @@ async function renderEvaluatiePage(app, stagiair, activeTab = 'tussentijds') {
 function renderEvaluatieRegistreerScreen(app, stagiair, activeTab) {
   const isFinale = activeTab === 'finale';
   const titel = isFinale ? 'Finale evaluatie' : 'Tussentijdse evaluatie';
-  const knopLabel = isFinale ? 'Finale evaluatie registreren' : 'Tussentijdse evaluatie registreren';
-  app.innerHTML = `<div class="sm-layout">${sidebarHtml('evaluatie')}<main class="sm-main sm-main--detail"><div class="sm-detail-top"><div><h1 class="sm-detail-title">Evaluatie</h1><p class="sm-detail-subtitle">Evalueer de stagiair als mentor</p></div><a id="sm-back-evaluatie" class="sm-detail-back" href="#">← Terug naar stagiairs</a></div><div class="sm-eval-tabs"><button class="sm-eval-tab ${activeTab === 'tussentijds' ? 'active' : ''}" data-tab="tussentijds">Tussentijdse evaluatie</button><button class="sm-eval-tab ${activeTab === 'finale' ? 'active' : ''}" data-tab="finale">Finale evaluatie</button></div><div class="sm-eval-block"><div class="sm-eval-block-header"><h3>${titel}</h3><p>Registreren om je evaluatie per competentie in te vullen.</p></div><div class="sm-eval-actions"><button id="sm-eval-registreer" class="sm-button">${knopLabel}</button></div><p id="sm-eval-registreer-message" class="sm-eval-save-message hidden"></p></div></main></div>`;
+  app.innerHTML = `<div class="sm-layout">${sidebarHtml('evaluatie')}<main class="sm-main sm-main--detail"><div class="sm-detail-top"><div><h1 class="sm-detail-title">Evaluatie</h1><p class="sm-detail-subtitle">Evalueer de stagiair als mentor</p></div><a id="sm-back-evaluatie" class="sm-detail-back" href="#">← Terug naar stagiairs</a></div><div class="sm-eval-tabs"><button class="sm-eval-tab ${activeTab === 'tussentijds' ? 'active' : ''}" data-tab="tussentijds">Tussentijdse evaluatie</button><button class="sm-eval-tab ${activeTab === 'finale' ? 'active' : ''}" data-tab="finale">Finale evaluatie</button></div><div class="sm-eval-block"><div class="sm-eval-block-header"><h3>${titel}</h3><p>Wacht tot je docent de evaluatie aanmaakt. Zodra de evaluatie beschikbaar is, kun je hier je mentor-score en feedback invullen.</p></div></div></main></div>`;
   document.querySelector('#sm-back-evaluatie')?.addEventListener('click', (e) => { e.preventDefault(); renderStudentDetail(app, stagiair); });
   attachNav(app, stagiair);
   document.querySelectorAll('.sm-eval-tab').forEach((tab) => { tab.addEventListener('click', () => renderEvaluatiePage(app, stagiair, tab.dataset.tab)); });
-  const btn = document.querySelector('#sm-eval-registreer');
-  const msg = document.querySelector('#sm-eval-registreer-message');
-  btn?.addEventListener('click', async () => {
-    btn.disabled = true; btn.textContent = 'Registreren...';
-    try { const result = await registreerEvaluatie(stagiair.stageData?.id, activeTab); await renderEvaluatieScoreScreen(app, stagiair, activeTab, result.data); }
-    catch (err) { console.error(err); btn.disabled = false; btn.textContent = knopLabel; if (msg) { msg.textContent = 'Registreren mislukt, probeer opnieuw.'; msg.classList.remove('hidden'); } }
-  });
 }
 
 async function renderEvaluatieScoreScreen(app, stagiair, activeTab, evaluatieData = []) {

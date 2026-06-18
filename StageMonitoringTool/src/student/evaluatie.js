@@ -94,12 +94,11 @@ async function fetchCompetentiesMetRubrieken() {
 }
 
 // ---------------------------------------------------------------------------
-// Scherm A: nog geen evaluatie ingepland -> registratiescherm
+// Scherm A: nog geen evaluatie ingepland -> wacht op docent
 // ---------------------------------------------------------------------------
-function renderEvaluatieRegistreerScreen(app, stagiair, activeTab) {
+function renderWachtOpDocent(app, stagiair, activeTab) {
   const isFinale = activeTab === 'finale';
   const titel = isFinale ? 'Finale evaluatie' : 'Tussentijdse evaluatie';
-  const knopLabel = isFinale ? 'Finale evaluatie registreren' : 'Tussentijdse evaluatie registreren';
 
   app.innerHTML = `
     <div class="sm-layout">
@@ -117,40 +116,14 @@ function renderEvaluatieRegistreerScreen(app, stagiair, activeTab) {
         <div class="sm-eval-block">
           <div class="sm-eval-block-header">
             <h3>${titel}</h3>
-            <p>Registreren om je evaluatie per competentie in te vullen.</p>
+            <p>Wacht tot je docent de evaluatie aanmaakt. Je ontvangt een melding wanneer je je evaluatie kunt invullen.</p>
           </div>
-
-          <div class="sm-eval-actions">
-            <button id="sm-eval-registreer" class="sm-button">${knopLabel}</button>
-          </div>
-          <p id="sm-eval-registreer-message" class="sm-eval-save-message hidden"></p>
         </div>
       </main>
     </div>
   `;
 
   attachTabSwitch(app, stagiair);
-
-  const btn = document.querySelector('#sm-eval-registreer');
-  const msg = document.querySelector('#sm-eval-registreer-message');
-
-  btn?.addEventListener('click', async () => {
-    btn.disabled = true;
-    btn.textContent = 'Registreren...';
-
-    try {
-      const result = await registreerEvaluatie(stagiair.stage_id, activeTab);
-      await renderEvaluatiePage(app, stagiair, activeTab, result.data);
-    } catch (err) {
-      console.error(err);
-      btn.disabled = false;
-      btn.textContent = knopLabel;
-      if (msg) {
-        msg.textContent = 'Registreren mislukt, probeer opnieuw.';
-        msg.classList.remove('hidden');
-      }
-    }
-  });
 }
 
 // ---------------------------------------------------------------------------
@@ -426,9 +399,14 @@ async function renderEvaluatieTab(app, stagiair, activeTab = 'tussentijds') {
     const status = await fetchEvaluatieStatus(stagiair.stage_id, activeTab);
 
     if (!status.bestaat) {
-      renderEvaluatieRegistreerScreen(app, stagiair, activeTab);
+      renderWachtOpDocent(app, stagiair, activeTab);
     } else {
-      await renderEvaluatiePage(app, stagiair, activeTab, status.evaluaties);
+      const isDoorDocent = status.evaluaties.some((e) => e.docent_id != null);
+      if (isDoorDocent) {
+        await renderEvaluatiePage(app, stagiair, activeTab, status.evaluaties);
+      } else {
+        renderWachtOpDocent(app, stagiair, activeTab);
+      }
     }
 
   } catch (err) {

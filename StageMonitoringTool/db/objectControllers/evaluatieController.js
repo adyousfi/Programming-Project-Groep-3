@@ -76,6 +76,7 @@ const getEvaluatieStatus = async (req, res, next) => {
         score_docent: e.score_docent ?? null,
         score_student: e.score_student ?? null,
         score_mentor: e.score_mentor ?? null,
+        docent_id: e.docent_id ?? null,
       };
     });
 

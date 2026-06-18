@@ -110,12 +110,12 @@ async function fetchEvaluatieStatus(stageId, type_evaluatie) {
 
 // Maakt voor élke huidige competentie een afzonderlijke evaluatie-instantie
 // aan, gekoppeld aan deze stage en dit type (tussentijds/finale).
-async function registreerEvaluatie(stageId, type_evaluatie) {
+async function registreerEvaluatie(stageId, type_evaluatie, docentId) {
   const res = await fetch('/api/evaluaties/create-per-competentie', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     credentials: 'include',
-    body: JSON.stringify({ stage_id: stageId, type_evaluatie }),
+    body: JSON.stringify({ stage_id: stageId, type_evaluatie, docent_id: docentId }),
   });
 
   if (!res.ok) {
@@ -185,7 +185,7 @@ function renderEvaluatieRegistreerScreen(app, stagiair, activeTab) {
     btn.textContent = 'Registreren...';
 
     try {
-      const result = await registreerEvaluatie(stagiair.stage_id, activeTab);
+      const result = await registreerEvaluatie(stagiair.stage_id, activeTab, _currentUser?.user_id);
       // Voor elke competentie bestaat nu een instantie -> meteen het
       // scoringsscherm tonen, zonder opnieuw te moeten ophalen.
       await renderEvaluatiePage(app, stagiair, activeTab, result.data);
