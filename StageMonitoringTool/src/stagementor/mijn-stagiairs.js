@@ -45,7 +45,7 @@ function getWeekDates(startDate, endDate, weekIndex) {
   };
 }
 
-function mapApiStageToStagiair(s, logboekEntries = [], evalAvailable = false, mentorSubmitted = false) {
+function mapApiStageToStagiair(s, logboekEntries = [], evalAvailable = false, mentorSubmitted = false, finaleEvalAvailable = false, finaleMentorSubmitted = false) {
   const start = s.stageDetails?.start;
   const einde = s.stageDetails?.einde;
   const totalWeeks = start && einde
@@ -80,7 +80,10 @@ function mapApiStageToStagiair(s, logboekEntries = [], evalAvailable = false, me
     einde: einde ? new Date(einde).toLocaleDateString('nl-BE', { day: 'numeric', month: 'short' }) : '–',
     totalWeeks,
     submittedWeeks,
-    badges: evalAvailable && !mentorSubmitted ? [{ type: 'warning', label: 'Tussentijdse evaluatie beschikbaar' }] : [],
+    badges: [
+      ...(evalAvailable && !mentorSubmitted ? [{ type: 'warning', label: 'Tussentijdse evaluatie beschikbaar' }] : []),
+      ...(finaleEvalAvailable && !finaleMentorSubmitted ? [{ type: 'warning', label: 'Finale evaluatie beschikbaar' }] : []),
+    ],
     stageData: s,
   };
 }
@@ -971,6 +974,8 @@ export async function renderMijnStagiairs(app, user) {
           let logboekEntries = [];
           let evalAvailable = false;
           let mentorSubmitted = false;
+          let finaleEvalAvailable = false;
+          let finaleMentorSubmitted = false;
           if (s.id) {
             try {
               const logRes = await fetch(`/api/logboek/stage/${s.id}`, { credentials: 'include' });
@@ -990,8 +995,18 @@ export async function renderMijnStagiairs(app, user) {
                   && statusData.evaluaties.every((e) => e.ingediend_mentor);
               } catch (_) {}
             }
+            try {
+              const finaleStatusRes = await fetch(`/api/evaluaties/status?stage_id=${s.id}&type_evaluatie=finale`, { credentials: 'include' });
+              const finaleStatusData = await finaleStatusRes.json();
+              finaleEvalAvailable = finaleStatusData.bestaat === true
+                && finaleStatusData.evaluaties && finaleStatusData.evaluaties.length > 0
+                && finaleStatusData.evaluaties.some((e) => e.docent_id != null && (e.score != null || e.feedback_docent != null));
+              if (finaleEvalAvailable) {
+                finaleMentorSubmitted = finaleStatusData.evaluaties.every((e) => e.ingediend_mentor);
+              }
+            } catch (_) {}
           }
-          return mapApiStageToStagiair(s, logboekEntries, evalAvailable, mentorSubmitted);
+          return mapApiStageToStagiair(s, logboekEntries, evalAvailable, mentorSubmitted, finaleEvalAvailable, finaleMentorSubmitted);
         }));
         _allStagiairs = stagiairsWithLogboek;
       }

@@ -129,7 +129,7 @@ function renderWachtOpDocent(app, stagiair, activeTab) {
 // ---------------------------------------------------------------------------
 // Scherm B: evaluatie bestaat al -> scoringsscherm per competentie
 // ---------------------------------------------------------------------------
-async function renderEvaluatiePage(app, stagiair, activeTab = 'tussentijds', evaluatieData = [], alreadySubmitted = false) {
+async function renderEvaluatiePage(app, stagiair, activeTab = 'tussentijds', evaluatieData = [], studentSubmitted = false, docentSubmitted = false) {
   const scores = [1, 2, 3, 4, 5];
 
   const competenties = await fetchCompetentiesMetRubrieken();
@@ -160,7 +160,7 @@ async function renderEvaluatiePage(app, stagiair, activeTab = 'tussentijds', eva
     ? 'Geef per competentie een finale score en feedback.'
     : 'Geef per competentie een score en feedback.';
 
-  // Compute total percentage from score_student
+  // Compute total percentage from student's own scores
   const existingScores = evaluatieData
     .map((e) => (e?.score_student ?? null))
     .filter((s) => s !== null && s !== undefined);
@@ -204,6 +204,10 @@ async function renderEvaluatiePage(app, stagiair, activeTab = 'tussentijds', eva
               <p class="sm-eval-datum" style="margin-top:6px;color:#6b7280;">
                 Datum evaluatie: <strong>${new Date().toLocaleDateString('nl-BE')}</strong>
               </p>
+              ${docentSubmitted ? `
+              <div style="margin-top:12px;padding:18px 24px;background:#eff6ff;border:2px solid #3b82f6;border-radius:10px;font-size:20px;font-weight:800;color:#1e40af;text-align:center;letter-spacing:-0.01em;">
+                &#128203; Dit is het resultaat van je ${activeTab === 'finale' ? 'finale' : 'tussentijdse'} evaluatie
+              </div>` : ''}
             </div>
 
             <div id="sm-eval-result-column" style="position:sticky;top:16px;border:1px solid #e5e7eb;border-radius:12px;padding:14px;background:#fff;">
@@ -244,10 +248,11 @@ async function renderEvaluatiePage(app, stagiair, activeTab = 'tussentijds', eva
           `;
             }).join('')}
 
+          ${!studentSubmitted ? `
           <div class="sm-eval-actions">
             <button id="sm-eval-save" class="sm-button">Beoordeling Opslaan</button>
             <button id="sm-eval-submit" class="sm-button" style="margin-left:10px;">Indienen</button>
-          </div>
+          </div>` : ''}
           <p id="sm-eval-save-message" class="sm-eval-save-message hidden">Evaluatie opgeslagen.</p>
         </div>
       </main>
@@ -256,8 +261,8 @@ async function renderEvaluatiePage(app, stagiair, activeTab = 'tussentijds', eva
 
   attachTabSwitch(app, stagiair);
 
-  // Grey out everything if already submitted
-  if (alreadySubmitted) {
+  // Grey out everything if student has submitted
+  if (studentSubmitted) {
     document.querySelectorAll('.sm-score-card').forEach((b) => { b.disabled = true; });
     document.querySelectorAll('.sm-eval-feedback').forEach((t) => { t.disabled = true; });
     const saveBtn = document.querySelector('#sm-eval-save');
@@ -419,9 +424,11 @@ async function renderEvaluatieTab(app, stagiair, activeTab = 'tussentijds') {
     } else {
       const isDoorDocent = status.evaluaties.some((e) => e.docent_id != null);
       if (isDoorDocent) {
-        const alreadySubmitted = status.evaluaties.length > 0
+        const studentSubmitted = status.evaluaties.length > 0
           && status.evaluaties.every((e) => e.ingediend_student);
-        await renderEvaluatiePage(app, stagiair, activeTab, status.evaluaties, alreadySubmitted);
+        const docentSubmitted = status.evaluaties.length > 0
+          && status.evaluaties.every((e) => e.ingediend_docent);
+        await renderEvaluatiePage(app, stagiair, activeTab, status.evaluaties, studentSubmitted, docentSubmitted);
       } else {
         renderWachtOpDocent(app, stagiair, activeTab);
       }

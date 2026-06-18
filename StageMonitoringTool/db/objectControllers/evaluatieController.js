@@ -105,13 +105,13 @@ const getEvaluatieStatus = async (req, res, next) => {
 };
 
 /**
- * GET: controleer of er een door docent aangemaakte tussentijdse evaluatie bestaat
- * Query: stage_id
+ * GET: controleer of er een door docent aangemaakte evaluatie bestaat
+ * Query: stage_id, type_evaluatie (optional, default 'tussentijds')
  * Response: { bestaatDoorDocent: boolean }
  */
 const getTussentijdsStatus = async (req, res, next) => {
   try {
-    const { stage_id } = req.query;
+    const { stage_id, type_evaluatie } = req.query;
 
     if (!stage_id) {
       return res.status(400).json({ msg: "stage_id is verplicht" });
@@ -120,11 +120,13 @@ const getTussentijdsStatus = async (req, res, next) => {
     const evaluaties = await Evaluatie.findAll({
       where: {
         stage_id: Number(stage_id),
-        type_evaluatie: 'tussentijds',
+        type_evaluatie: type_evaluatie || 'tussentijds',
       },
     });
 
-    const bestaatDoorDocent = evaluaties.some((e) => e.docent_id != null);
+    const bestaatDoorDocent = evaluaties.some((e) =>
+      e.docent_id != null && (e.score_docent != null || e.feedback_docent != null)
+    );
 
     return res.status(200).json({ bestaatDoorDocent });
   } catch (error) {

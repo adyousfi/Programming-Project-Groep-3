@@ -57,6 +57,10 @@ export async function renderGoedgekeurdStudent(container, userName = 'Jan Jansse
 
     let evalAvailable = false;
     let studentSubmitted = false;
+    let docentSubmitted = false;
+    let finaleAvailable = false;
+    let finaleStudentSubmitted = false;
+    let finaleDocentSubmitted = false;
     if (docValidated && stageData?.id) {
         try {
             const evalRes = await fetch(`/api/evaluaties/tussentijds-status?stage_id=${stageData.id}`, { credentials: 'include' });
@@ -71,9 +75,29 @@ export async function renderGoedgekeurdStudent(container, userName = 'Jan Jansse
                 const statusData = await statusRes.json();
                 studentSubmitted = statusData.evaluaties && statusData.evaluaties.length > 0
                     && statusData.evaluaties.every((e) => e.ingediend_student);
+                docentSubmitted = statusData.evaluaties && statusData.evaluaties.length > 0
+                    && statusData.evaluaties.every((e) => e.ingediend_docent);
             } catch (_) {}
         }
+        try {
+            const finaleRes = await fetch(`/api/evaluaties/status?stage_id=${stageData.id}&type_evaluatie=finale`, { credentials: 'include' });
+            const finaleStatusData = await finaleRes.json();
+            finaleAvailable = finaleStatusData.bestaat === true
+                && finaleStatusData.evaluaties && finaleStatusData.evaluaties.length > 0
+                && finaleStatusData.evaluaties.some((e) => e.docent_id != null && (e.score != null || e.feedback_docent != null));
+            if (finaleAvailable) {
+                finaleStudentSubmitted = finaleStatusData.evaluaties.every((e) => e.ingediend_student);
+                finaleDocentSubmitted = finaleStatusData.evaluaties.every((e) => e.ingediend_docent);
+            }
+        } catch (err) {
+            console.error('Error fetching finale evaluatie status:', err);
+        }
     }
+
+    const anyEvalAvailable = evalAvailable || finaleAvailable;
+    const anyNewEval = (evalAvailable && (!studentSubmitted || docentSubmitted))
+        || (finaleAvailable && (!finaleStudentSubmitted || finaleDocentSubmitted));
+    const allLogboeksDone = submittedWeeks === totalWeeks && totalWeeks > 0;
 
     const logboekProgress = totalWeeks > 0 ? (submittedWeeks / totalWeeks) * 100 : 0;
 
@@ -91,7 +115,7 @@ export async function renderGoedgekeurdStudent(container, userName = 'Jan Jansse
                         <a href="?role=stagedetails" class="sidebar-nav-item">Stagedetails</a>
                         <a href="?role=documenten" class="sidebar-nav-item">Documenten</a>
                         <a href="${docValidated ? '?role=logboek' : '#'}" class="sidebar-nav-item${docValidated ? '' : ' disabled'}">Logboek</a>
-                        <a href="${docValidated && evalAvailable ? '?role=evaluatie' : '#'}" class="sidebar-nav-item${docValidated && evalAvailable ? '' : ' disabled'}">Evaluatie${evalAvailable && !studentSubmitted ? ' <span class="sidebar-badge">Nieuw</span>' : ''}</a>
+                        <a href="${docValidated && anyEvalAvailable ? '?role=evaluatie' : '#'}" class="sidebar-nav-item${docValidated && anyEvalAvailable ? '' : ' disabled'}">Evaluatie${anyNewEval ? ' <span class="sidebar-badge">Nieuw</span>' : ''}</a>
                     </nav>
                 </div>
                 <div class="sidebar-bottom">
@@ -131,10 +155,10 @@ export async function renderGoedgekeurdStudent(container, userName = 'Jan Jansse
                             <span class="step-sub">${docValidated ? `${submittedWeeks}/${totalWeeks} weken` : 'Gepland'}</span>
                         </div>
                         <div class="step-line"></div>
-                        <div class="step">
+                        <div class="step${allLogboeksDone ? ' next-active' : ''}">
                             <div class="step-circle">5</div>
                             <span class="step-label">Evaluatie</span>
-                            <span class="step-sub">Gepland</span>
+                            <span class="step-sub">${allLogboeksDone ? 'Actief' : 'Gepland'}</span>
                         </div>
                     </div>
                 </div>
@@ -185,11 +209,16 @@ export async function renderGoedgekeurdStudent(container, userName = 'Jan Jansse
                                 <p class="coming-soon-sub${docValidated ? ' active-sub' : ''}">${submittedWeeks}/${totalWeeks} weken ingevuld</p>
                             </div>
                         </a>
-                        <a href="${evalAvailable ? '?role=evaluatie' : '#'}" class="coming-soon-card${evalAvailable ? ' active-card' : ' disabled-card'}">
-                            <div class="coming-soon-icon${evalAvailable ? ' active-icon' : ''}">&#128202;</div>
+                        <a href="${anyEvalAvailable ? '?role=evaluatie' : '#'}" class="coming-soon-card${anyEvalAvailable ? ' active-card' : ' disabled-card'}">
+                            <div class="coming-soon-icon${anyEvalAvailable ? ' active-icon' : ''}">&#128202;</div>
                             <div class="coming-soon-content">
-                                <h3 class="coming-soon-title${evalAvailable ? ' active-title' : ''}">Evaluaties${evalAvailable && !studentSubmitted ? ' <span class="sidebar-badge">Nieuw</span>' : ''}</h3>
-                                <p class="coming-soon-sub${evalAvailable ? ' active-sub' : ''}">${evalAvailable ? (studentSubmitted ? 'Reeds ingediend' : 'Tussentijdse evaluatie beschikbaar') : 'Bekijk je voortgang en feedback'}</p>
+                                <h3 class="coming-soon-title${anyEvalAvailable ? ' active-title' : ''}">Evaluaties${anyNewEval ? ' <span class="sidebar-badge">Nieuw</span>' : ''}</h3>
+                                <p class="coming-soon-sub${anyEvalAvailable ? ' active-sub' : ''}">${anyEvalAvailable ? (() => {
+                                    const parts = [];
+                                    if (evalAvailable) parts.push(docentSubmitted ? 'Tussentijdse evaluatie ingediend' : (studentSubmitted ? 'Tussentijdse evaluatie reeds ingediend' : 'Tussentijdse evaluatie beschikbaar'));
+                                    if (finaleAvailable) parts.push(finaleDocentSubmitted ? 'Finale evaluatie ingediend' : (finaleStudentSubmitted ? 'Finale evaluatie reeds ingediend' : 'Finale evaluatie beschikbaar'));
+                                    return parts.join(' · ');
+                                })() : 'Bekijk je voortgang en feedback'}</p>
                             </div>
                         </a>
                     </div>
