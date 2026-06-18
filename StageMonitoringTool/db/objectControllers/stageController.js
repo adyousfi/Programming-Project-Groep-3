@@ -100,6 +100,15 @@ const updateStage = async (req, res, next) => {
 
     if (!stage) return res.status(404).json({ msg: 'Stage niet gevonden' });
 
+    // ✅ Backend beveiliging: statuswijziging enkel toestaan wanneer stage in AANVRAAG staat
+    // (dit voorkomt dat stagecommissie via request “blijft beoordelen” wanneer stage al verder zit)
+    if (status) {
+      const currentRawStatus = stage.status;
+      if (String(currentRawStatus).toUpperCase() !== 'AANVRAAG') {
+        return res.status(403).json({ msg: 'Status bewerken niet toegestaan voor deze stage.' });
+      }
+    }
+
     const updateData = {};
     if (status) updateData.status = status;
     if (feedback !== undefined) updateData.feedback = feedback;

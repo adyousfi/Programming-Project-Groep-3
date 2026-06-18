@@ -76,7 +76,19 @@ function detailKaart(aanvraag, badgeStatus) {
   `;
 }
 
+function canBeoordeel(aanvraag) {
+  // Stagecommissie mag enkel beslissen voor stages die nog 'In afwachting' staan.
+  // Backend kan dit als rawStatus 'AANVRAAG' doorgeven, of we vallen terug
+  // op het genormaliseerde status-veld 'in_afwachting'.
+  const raw = aanvraag.rawStatus || aanvraag.raw_status;
+  if (raw) {
+    return String(raw).toUpperCase() === 'AANVRAAG';
+  }
+  return aanvraag.status === 'in_afwachting';
+}
+
 export function renderBeoordelen(aanvraag, userName = 'Stagecommissie') {
+  const isAllowed = canBeoordeel(aanvraag);
   document.querySelector('#app').innerHTML = `
     <div class="bd-page">
       <header class="bd-header">
@@ -98,25 +110,33 @@ export function renderBeoordelen(aanvraag, userName = 'Stagecommissie') {
         <div class="bd-card">
           <div class="bd-beoordeling">
             <h4 class="bd-sectie-titel">Beoordeling</h4>
-            <div class="bd-info-box">
-              <strong>Let op:</strong> Controleer alle details zorgvuldig voordat je een beslissing neemt.
-              Bij afkeuring of verzoek tot aanpassingen is feedback verplicht.
-            </div>
-            <label class="bd-feedback-label">
-              Feedback (optioneel bij goedkeuring, verplicht bij afkeuring/aanpassingen)
-            </label>
-            <textarea class="bd-feedback-input" id="bd-feedback" placeholder="Geef feedback over de stage aanvraag..."></textarea>
-            <div class="bd-acties">
-              <button class="bd-btn bd-btn--goedkeuren" id="bd-goedkeuren">✓ Goedkeuren</button>
-              <button class="bd-btn bd-btn--aanpassingen" id="bd-aanpassingen">⚠ Aanpassingen Vragen</button>
-              <button class="bd-btn bd-btn--afkeuren" id="bd-afkeuren">✗ Afkeuren</button>
-            </div>
+            ${isAllowed ? `
+              <div class="bd-info-box">
+                <strong>Let op:</strong> Controleer alle details zorgvuldig voordat je een beslissing neemt.
+                Bij afkeuring of verzoek tot aanpassingen is feedback verplicht.
+              </div>
+              <label class="bd-feedback-label">
+                Feedback (optioneel bij goedkeuring, verplicht bij afkeuring/aanpassingen)
+              </label>
+              <textarea class="bd-feedback-input" id="bd-feedback" placeholder="Geef feedback over de stage aanvraag..."></textarea>
+              <div class="bd-acties">
+                <button class="bd-btn bd-btn--goedkeuren" id="bd-goedkeuren">✓ Goedkeuren</button>
+                <button class="bd-btn bd-btn--aanpassingen" id="bd-aanpassingen">⚠ Aanpassingen Vragen</button>
+                <button class="bd-btn bd-btn--afkeuren" id="bd-afkeuren">✗ Afkeuren</button>
+              </div>
+            ` : `
+              <div class="bd-info-box">
+                <strong>Geen bewerking toegestaan.</strong><br/>
+                Deze stage staat niet meer in <em>In afwachting</em>.
+              </div>
+            `}
           </div>
         </div>
 
       </div>
     </div>
   `;
+
 
   document.querySelector('#bd-terug').addEventListener('click', function(e) {
     e.preventDefault();
@@ -128,58 +148,62 @@ export function renderBeoordelen(aanvraag, userName = 'Stagecommissie') {
     window.location.href = '/login';
   });
 
-  document.querySelector('#bd-goedkeuren').addEventListener('click', async function() {
-    const feedback = document.querySelector('#bd-feedback').value.trim();
-    try {
-      const response = await fetch(`/api/stages/${aanvraag.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ status: 'GOEDGEKEURD', feedback: feedback || null }),
-      });
-      if (!response.ok) throw new Error('Server fout: ' + response.status);
-    } catch (err) {
-      alert('Fout bij opslaan: ' + err.message);
-      return;
-    }
-    toonHistoriek(aanvraag, 'goedgekeurd', feedback, userName);
-  });
+  // Enkel event handlers registreren wanneer bewerking toegestaan is
+  if (isAllowed) {
+    document.querySelector('#bd-goedkeuren').addEventListener('click', async function() {
+      const feedback = document.querySelector('#bd-feedback').value.trim();
+      try {
+        const response = await fetch(`/api/stages/${aanvraag.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ status: 'GOEDGEKEURD', feedback: feedback || null }),
+        });
+        if (!response.ok) throw new Error('Server fout: ' + response.status);
+      } catch (err) {
+        alert('Fout bij opslaan: ' + err.message);
+        return;
+      }
+      toonHistoriek(aanvraag, 'goedgekeurd', feedback, userName);
+    });
 
-  document.querySelector('#bd-aanpassingen').addEventListener('click', async function() {
-    const feedback = document.querySelector('#bd-feedback').value.trim();
-    if (!feedback) { toonFeedbackFout(); return; }
-    try {
-      const response = await fetch(`/api/stages/${aanvraag.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ status: 'AANPASSINGENVEREISD', feedback }),
-      });
-      if (!response.ok) throw new Error('Server fout: ' + response.status);
-    } catch (err) {
-      alert('Fout bij opslaan: ' + err.message);
-      return;
-    }
-    toonHistoriek(aanvraag, 'aanpassingen', feedback, userName);
-  });
+    document.querySelector('#bd-aanpassingen').addEventListener('click', async function() {
+      const feedback = document.querySelector('#bd-feedback').value.trim();
+      if (!feedback) { toonFeedbackFout(); return; }
+      try {
+        const response = await fetch(`/api/stages/${aanvraag.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ status: 'AANPASSINGENVEREISD', feedback }),
+        });
+        if (!response.ok) throw new Error('Server fout: ' + response.status);
+      } catch (err) {
+        alert('Fout bij opslaan: ' + err.message);
+        return;
+      }
+      toonHistoriek(aanvraag, 'aanpassingen', feedback, userName);
+    });
 
-  document.querySelector('#bd-afkeuren').addEventListener('click', async function() {
-    const feedback = document.querySelector('#bd-feedback').value.trim();
-    if (!feedback) { toonFeedbackFout(); return; }
-    try {
-      const response = await fetch(`/api/stages/${aanvraag.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ status: 'AFGEKEURD', feedback }),
-      });
-      if (!response.ok) throw new Error('Server fout: ' + response.status);
-    } catch (err) {
-      alert('Fout bij opslaan: ' + err.message);
-      return;
-    }
-    toonHistoriek(aanvraag, 'afgekeurd', feedback, userName);
-  });
+    document.querySelector('#bd-afkeuren').addEventListener('click', async function() {
+      const feedback = document.querySelector('#bd-feedback').value.trim();
+      if (!feedback) { toonFeedbackFout(); return; }
+      try {
+        const response = await fetch(`/api/stages/${aanvraag.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ status: 'AFGEKEURD', feedback }),
+        });
+        if (!response.ok) throw new Error('Server fout: ' + response.status);
+      } catch (err) {
+        alert('Fout bij opslaan: ' + err.message);
+        return;
+      }
+      toonHistoriek(aanvraag, 'afgekeurd', feedback, userName);
+    });
+  }
+
 }
 
 function toonFeedbackFout() {

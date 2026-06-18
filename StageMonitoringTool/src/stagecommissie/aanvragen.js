@@ -34,7 +34,7 @@ function renderKaarten(lijst) {
             <p class="sc-card-functie">${a.functie}</p>
             <p class="sc-card-bedrijf">${a.bedrijf.naam}</p>
             <p class="sc-card-datum">Ingediend op: ${a.datum}</p>
-            <button class="sc-card-btn" data-id="${a.id}">Beoordelen</button>
+            <button class="sc-card-btn" data-id="${a.id}">${a.status === 'in_afwachting' ? 'Beoordelen' : 'Details'}</button>
           </div>
           <span class="sc-badge sc-badge--${a.status}">${statusLabel(a.status)}</span>
         </div>
