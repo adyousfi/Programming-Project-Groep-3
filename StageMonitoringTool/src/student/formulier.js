@@ -50,7 +50,7 @@ export async function renderStageformulier(container) {
                             <input type="text" id="bedrijf-adres" value="">
                         </div>
                         <div class="form-group">
-                            <label for="bedrijf-hr-email">HR E-mail bedrijf * <span style="font-size:12px;color:#6b7280;font-weight:400;">(voor ondertekening contract)</span></label>
+                            <label for="bedrijf-hr-email">HR E-mail bedrijf * <span style="font-size:12px;color:#6b7280;font-weight:400;"></span></label>
                             <input type="email" id="bedrijf-hr-email" value="" placeholder="hr@bedrijf.be">
                         </div>
                     </div>

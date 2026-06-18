@@ -469,10 +469,10 @@ export async function renderAdminDocumenten(app) {
         </p>
 
         <label style="font-size:13px;font-weight:600;color:#374151;display:block;margin-bottom:6px;">
-          HR E-mail bedrijf *
+          E-mail bedrijf
         </label>
         <input type="email" id="ad-contract-email" class="ad-email-input"
-               placeholder="hr@bedrijf.be" style="width:100%;margin-bottom:20px;">
+               placeholder="email@bedrijf.com" style="width:100%;margin-bottom:20px;">
 
         <label style="font-size:13px;font-weight:600;color:#374151;display:block;margin-bottom:6px;">
           Contract PDF *

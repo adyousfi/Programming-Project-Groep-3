@@ -52,4 +52,7 @@ router.post('/sign/:token', documentController.submitSignature);
 // ✅ Admin dashboard polls contract status for a stage
 router.get('/contract-status/:stageId', documentController.getContractStatus);
 
+// ✅ Student in-app signature
+router.post('/student-sign/:id', documentController.studentSignDocument);
+
 export default router;
