@@ -235,7 +235,7 @@ function setupFilter(studenten) {
         ? studenten.filter(function(s) { return s.status === 'lopend'; })
         : filter === 'alle'
           ? studenten
-              .filter(function(s) { return s.status === 'lopend' || s.status === 'in_afwachting'; })
+              .slice()
               .sort(function(a, b) { return a.status === 'in_afwachting' ? -1 : 1; })
           : filter === 'afgelopen'
             ? studenten.filter(function(s) { return s.status === 'afgelopen'; })
@@ -296,6 +296,7 @@ export async function renderMijnStudenten(app, user) {
       logboek: logboek,
       mijlpalen: bepaalMijlpalen(s.rawStatus, s.stageDetails.start, s.stageDetails.einde),
       laasteLogboek: logboek.laasteLogboek,
+      eindpunt: s.eindresultaat != null ? `${s.eindresultaat}/20` : null,
       stageData: s,
     };
   }));
