@@ -92,9 +92,9 @@ export function renderAdmin(app) {
             <input type="tel" id="telefoon">
           </div>
           <div class="form-group">
-            <label for="wachtwoord">Wachtwoord <span class="required">*</span></label>
+            <label for="wachtwoord">Wachtwoord</label>
             <div class="password-field">
-              <input type="text" id="wachtwoord" required>
+              <input type="text" id="wachtwoord">
               <button type="button" class="btn-generate" id="generatePassword">Genereer</button>
             </div>
           </div>
@@ -171,6 +171,7 @@ export function renderAdmin(app) {
           </div>
           <div class="form-actions">
             <button type="submit" class="btn-submit">Bijwerken</button>
+            <button type="button" class="btn-cancel" id="deleteUserBtn" style="display: none; background: #ef4444; color: white; border-color: #ef4444;">Verwijderen</button>
             <button type="button" class="btn-cancel" id="closeEditModal">Annuleren</button>
           </div>
         </form>
@@ -298,6 +299,15 @@ export function renderAdmin(app) {
       return matchesSearch && matchesRole;
     });
 
+    filtered.sort((a, b) => {
+      const aActive = a.is_active !== false ? 1 : 0;
+      const bActive = b.is_active !== false ? 1 : 0;
+      if (aActive !== bActive) return bActive - aActive;
+      const aName = `${a.first_name} ${a.last_name}`.toLowerCase();
+      const bName = `${b.first_name} ${b.last_name}`.toLowerCase();
+      return aName.localeCompare(bName);
+    });
+
     renderUsers(filtered);
   }
 
@@ -318,7 +328,35 @@ export function renderAdmin(app) {
     document.getElementById('edit-rol').value = user.role;
     document.getElementById('edit-status').value = user.is_active !== false ? 'actief' : 'inactief';
 
+    const deleteBtn = document.getElementById('deleteUserBtn');
+    if (user.is_active === false) {
+      deleteBtn.style.display = 'block';
+      deleteBtn.onclick = () => deleteUser(user.user_id);
+    } else {
+      deleteBtn.style.display = 'none';
+      deleteBtn.onclick = null;
+    }
+
     editModal.classList.add('active');
+  }
+
+  async function deleteUser(userId) {
+    if (!confirm('Weet je zeker dat je deze gebruiker definitief wilt verwijderen? Dit kan niet ongedaan worden gemaakt.')) return;
+
+    try {
+      const response = await fetch(`${API_URL}/delete-user/${userId}`, { method: 'DELETE' });
+      const result = await response.json();
+      if (response.ok) {
+        alert('Gebruiker succesvol verwijderd.');
+        editModal.classList.remove('active');
+        loadUsers();
+      } else {
+        alert('Fout: ' + (result.msg || 'Onbekende fout'));
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Kan geen verbinding maken met de server.');
+    }
   }
 
   // Modal functionality

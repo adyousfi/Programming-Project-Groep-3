@@ -35,7 +35,7 @@ const User = sequelize.define("User", {
     },
     password: { 
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: true
     },
     
     role: {
@@ -52,6 +52,14 @@ const User = sequelize.define("User", {
         type: DataTypes.BOOLEAN,
         allowNull: false,
         defaultValue: true,
+    },
+    reset_token: {
+        type: DataTypes.STRING,
+        allowNull: true,
+    },
+    reset_token_expires: {
+        type: DataTypes.DATE,
+        allowNull: true,
     },
     },
     {

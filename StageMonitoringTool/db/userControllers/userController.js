@@ -10,18 +10,28 @@ import Student from "../userModel/student.js";
 import Stagementor from "../userModel/stagementor.js";
 import Stage from "../objectModel/stage.js";
 import { generateToken, verifyToken } from "../../backend/auth/authMiddleware.js";
+import bcrypt from 'bcryptjs';
+import { v4 as uuidv4 } from 'uuid';
 
 const createUser = async (req, res, next) => {
-    const { first_name, last_name, email, password, role, phone } = req.body;
+    const { first_name, last_name, email, role, phone, password } = req.body;
 
     try {
+        let hashedPassword = null;
+        if (password && password.trim() !== '') {
+            hashedPassword = await bcrypt.hash(password, 10);
+        }
+
+        const setupToken = uuidv4();
         const user = await User.create({
             first_name: first_name,
             last_name: last_name,
             email: email,
-            password: password,
+            password: hashedPassword,
             role: role,
-            phone: phone || "no phone"
+            phone: phone || "no phone",
+            reset_token: setupToken,
+            reset_token_expires: new Date(Date.now() + 24 * 60 * 60 * 1000)
         });
         switch (role.toLowerCase()) {
         case 'student':
@@ -42,7 +52,7 @@ const createUser = async (req, res, next) => {
         default:
             console.log(`No sub-profile table created for role: ${role}`);
     }
-        await createUserMail(email, first_name, password, role);
+        await createUserMail(email, first_name, setupToken, role);
         return res.status(200).json({
             msg: "User created successfully",
             data: user
@@ -82,7 +92,7 @@ const updateUser = async (req, res, next) => {
 
         const updateData = { first_name, last_name, email, role, phone };
         if (password && password.trim() !== '') {
-            updateData.password = password;
+            updateData.password = await bcrypt.hash(password, 10);
         }
         if (req.body.is_active !== undefined) {
             updateData.is_active = req.body.is_active;
@@ -163,7 +173,7 @@ const loginUser = async (req, res, next) => {
     const { email, password } = req.body;
     try {
         const user = await User.findOne({ where: { email } });
-        if (!user || user.password !== password) {
+        if (!user || !user.password || !bcrypt.compareSync(password, user.password)) {
             return res.json({ success: false, message: 'Foute login' });
         }
         if (!user.is_active) {
@@ -223,4 +233,28 @@ const logoutUser = (req, res, next) => {
     res.json({ success: true });
 };
 
-export default { createUser, selectUser, updateUser, deleteUser, loginUser, checkLogin, logoutUser, toggleUserActive };
+const setPassword = async (req, res) => {
+    const { token, password } = req.body;
+    try {
+        const user = await User.findOne({ where: { reset_token: token } });
+        if (!user || !user.reset_token_expires || user.reset_token_expires < new Date()) {
+            return res.status(400).json({ success: false, message: 'Link is ongeldig of verlopen.' });
+        }
+        
+        const hashedPassword = await bcrypt.hash(password, 10);
+        user.password = hashedPassword;
+        user.reset_token = null;
+        user.reset_token_expires = null;
+        await user.save();
+        
+        return res.json({ 
+            success: true, 
+            message: 'Wachtwoord succesvol ingesteld.'
+        });
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ success: false, message: 'Server fout' });
+    }
+};
+
+export default { createUser, selectUser, updateUser, deleteUser, loginUser, checkLogin, logoutUser, toggleUserActive, setPassword };

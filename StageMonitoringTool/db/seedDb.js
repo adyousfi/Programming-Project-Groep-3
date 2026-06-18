@@ -13,32 +13,33 @@ import bedrijfController from "./objectControllers/bedrijfController.js";
 // werden wel gebruikt -> pas het pad aan naar waar jouw modellen effectief staan.
 import Competentie from "./objectModel/competentie.js";
 import Rubriek from "./objectModel/rubriek.js";
+import bcrypt from "bcryptjs";
 
 const dummyUsers = [
     // --- STUDENTS ---
-    { first_name: "Alex", last_name: "De Smet", email: "alex.desmet@student.com", password: "hashedpassword123", role: ROLES.STUDENT, phone: "0470111111" },
-    { first_name: "Emma", last_name: "Peeters", email: "emma.peeters@student.com", password: "hashedpassword123", role: ROLES.STUDENT, phone: "0470222222" },
-    { first_name: "Lucas", last_name: "Maes", email: "lucas.maes@student.com", password: "hashedpassword123", role: ROLES.STUDENT, phone: "0470333333" },
+    { first_name: "Alex", last_name: "De Smet", email: "alex.desmet@student.com", password: "test", role: ROLES.STUDENT, phone: "0470111111" },
+    { first_name: "Emma", last_name: "Peeters", email: "emma.peeters@student.com", password: "test", role: ROLES.STUDENT, phone: "0470222222" },
+    { first_name: "Lucas", last_name: "Maes", email: "lucas.maes@student.com", password: "test", role: ROLES.STUDENT, phone: "0470333333" },
 
     // --- STAGEMENTORS ---
-    { first_name: "Mark", last_name: "Janssens", email: "mark@company-a.com", password: "hashedpassword123", role: ROLES.STAGEMENTOR, phone: "0480111111" },
-    { first_name: "Sophie", last_name: "Willems", email: "sophie@company-b.com", password: "hashedpassword123", role: ROLES.STAGEMENTOR, phone: "0480222222" },
-    { first_name: "Thomas", last_name: "Claes", email: "thomas@company-c.com", password: "hashedpassword123", role: ROLES.STAGEMENTOR, phone: "0480333333" },
+    { first_name: "Mark", last_name: "Janssens", email: "mark@company-a.com", password: "test", role: ROLES.STAGEMENTOR, phone: "0480111111" },
+    { first_name: "Sophie", last_name: "Willems", email: "sophie@company-b.com", password: "test", role: ROLES.STAGEMENTOR, phone: "0480222222" },
+    { first_name: "Thomas", last_name: "Claes", email: "thomas@company-c.com", password: "test", role: ROLES.STAGEMENTOR, phone: "0480333333" },
 
     // --- ADMINS ---
-    { first_name: "Sarah", last_name: "Mertens", email: "sarah.admin@school.com", password: "secureadmin1", role: ROLES.ADMIN, phone: "0490111111" },
-    { first_name: "David", last_name: "Goossens", email: "david.admin@school.com", password: "secureadmin2", role: ROLES.ADMIN, phone: "0490222222" },
-    { first_name: "Elena", last_name: "Dubois", email: "elena.admin@school.com", password: "secureadmin3", role: ROLES.ADMIN, phone: "0490333333" },
+    { first_name: "Sarah", last_name: "Mertens", email: "sarah.admin@school.com", password: "test", role: ROLES.ADMIN, phone: "0490111111" },
+    { first_name: "David", last_name: "Goossens", email: "david.admin@school.com", password: "test", role: ROLES.ADMIN, phone: "0490222222" },
+    { first_name: "Elena", last_name: "Dubois", email: "elena.admin@school.com", password: "test", role: ROLES.ADMIN, phone: "0490333333" },
 
     // --- STAGECOMMISIE ---
-    { first_name: "Jan", last_name: "Pauwels", email: "jan.commisie@school.com", password: "hashedpassword123", role: ROLES.STAGECOMMISIE, phone: "0450111111" },
-    { first_name: "Lisa", last_name: "Vandenberghe", email: "lisa.commisie@school.com", password: "hashedpassword123", role: ROLES.STAGECOMMISIE, phone: "0450222222" },
-    { first_name: "Daan", last_name: "Wauters", email: "daan.commisie@school.com", password: "hashedpassword123", role: ROLES.STAGECOMMISIE, phone: "0450333333" },
+    { first_name: "Jan", last_name: "Pauwels", email: "jan.commisie@school.com", password: "test", role: ROLES.STAGECOMMISIE, phone: "0450111111" },
+    { first_name: "Lisa", last_name: "Vandenberghe", email: "lisa.commisie@school.com", password: "test", role: ROLES.STAGECOMMISIE, phone: "0450222222" },
+    { first_name: "Daan", last_name: "Wauters", email: "daan.commisie@school.com", password: "test", role: ROLES.STAGECOMMISIE, phone: "0450333333" },
 
     // --- DOCENTEN ---
-    { first_name: "Prof. Arthur", last_name: "Devries", email: "arthur.docent@school.com", password: "hashedpassword123", role: ROLES.DOCENT, phone: "0460111111" },
-    { first_name: "Prof. Elena", last_name: "Dumont", email: "elena.docent@school.com", password: "hashedpassword123", role: ROLES.DOCENT, phone: "0460222222" },
-    { first_name: "Prof. Bram", last_name: "Vermeulen", email: "bram.docent@school.com", password: "hashedpassword123", role: ROLES.DOCENT, phone: "0460333333" }
+    { first_name: "Prof. Arthur", last_name: "Devries", email: "arthur.docent@school.com", password: "test", role: ROLES.DOCENT, phone: "0460111111" },
+    { first_name: "Prof. Elena", last_name: "Dumont", email: "elena.docent@school.com", password: "test", role: ROLES.DOCENT, phone: "0460222222" },
+    { first_name: "Prof. Bram", last_name: "Vermeulen", email: "bram.docent@school.com", password: "test", role: ROLES.DOCENT, phone: "0460333333" }
 ];
 
 // ---------------------------------------------------------------------------
@@ -233,17 +234,20 @@ const seedDatabase = async () => {
     console.log("Connected to database for seeding...");
 
     // 2. Clear existing data and recreate the tables fresh
+    await sequelize.query('SET FOREIGN_KEY_CHECKS = 0');
     await sequelize.sync({ force: true });
+    await sequelize.query('SET FOREIGN_KEY_CHECKS = 1');
     console.log("Tables reset cleanly.");
 
     console.log("Starting user database seeding...");
 
     for (const userData of dummyUsers) {
+        const hashedPassword = await bcrypt.hash("test", 10);
         const user = await User.create({
             first_name: userData.first_name,
             last_name: userData.last_name,
             email: userData.email,
-            password: userData.password,
+            password: hashedPassword,
             role: userData.role,
             phone: userData.phone
         })

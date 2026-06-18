@@ -2,12 +2,13 @@
 import transporter from '../mailConnection.js';
 
 // Functie om de mail te versturen
-async function createUserMail(userEmail, userName, userPassword) {
+async function createUserMail(userEmail, userName, setupToken) {
+    const setupUrl = `http://localhost:5173/?role=set_password&token=${setupToken}`;
     const mailOptions = {
         from: '"Stage@EHB" <stageatehb@gmail.com>', // Afzender (moet vaak matchen met de auth user)
         to: userEmail,                         // Ontvanger
         subject: 'Jouw account is aangemaakt',                  // Onderwerp
-        text: `Hallo ${userName}! Jouw account is aangemaakt. Jouw wachtwoord is: ${userPassword}. Je kan inloggen via de website.`, // Tekstversie (fallback)
+        text: `Hallo ${userName}! Jouw account is aangemaakt. Klik op de volgende link om je wachtwoord in te stellen: ${setupUrl}`, // Tekstversie (fallback)
         html: `
 <!DOCTYPE html>
 <html lang="nl">
@@ -63,10 +64,6 @@ async function createUserMail(userEmail, userName, userPassword) {
                                                 <td width="30%" style="font-size: 14px; color: #718096; padding-bottom: 10px; font-weight: bold;">E-mailadres:</td>
                                                 <td style="font-size: 14px; color: #1a202c; padding-bottom: 10px;">${userEmail}</td>
                                             </tr>
-                                            <tr>
-                                                <td width="30%" style="font-size: 14px; color: #718096; font-weight: bold;">Wachtwoord:</td>
-                                                <td style="font-size: 14px; color: #1a202c; font-family: monospace; font-size: 15px; background-color: #edf2f7; padding: 2px 6px; border-radius: 4px;">${userPassword}</td>
-                                            </tr>
                                         </table>
                                     </td>
                                 </tr>
@@ -75,15 +72,15 @@ async function createUserMail(userEmail, userName, userPassword) {
                             <table width="100%" border="0" cellspacing="0" cellpadding="0" style="margin-bottom: 30px;">
                                 <tr>
                                     <td align="center">
-                                        <a href="http://localhost:5173/" target="_blank" style="background-color: #4A90E2; color: #ffffff; padding: 14px 30px; font-size: 16px; font-weight: bold; text-decoration: none; border-radius: 5px; display: inline-block; box-shadow: 0 2px 5px rgba(74,144,226,0.3);">
-                                            Direct Inloggen
+                                        <a href="${setupUrl}" target="_blank" style="background-color: #4A90E2; color: #ffffff; padding: 14px 30px; font-size: 16px; font-weight: bold; text-decoration: none; border-radius: 5px; display: inline-block; box-shadow: 0 2px 5px rgba(74,144,226,0.3);">
+                                            Wachtwoord Instellen
                                         </a>
                                     </td>
                                 </tr>
                             </table>
 
                             <p style="font-size: 14px; line-height: 1.5; color: #718096; margin: 0 0 10px 0;">
-                                <em>Tip: We raden je aan om je wachtwoord na de eerste keer inloggen direct te wijzigen in je accountinstellingen.</em>
+                                <em>Tip: Deze link is slechts 24 uur geldig. Stel je wachtwoord zo snel mogelijk in.</em>
                             </p>
                         </td>
                     </tr>

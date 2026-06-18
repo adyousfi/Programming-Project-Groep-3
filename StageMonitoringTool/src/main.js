@@ -17,6 +17,7 @@ import { renderLogboek } from './student/logboek.js';
 import { renderLogboekDag } from './student/logboek-dag.js';
 import { renderEvaluatieStudent } from './student/evaluatie.js';
 import { renderAdmin } from './admin/admin.js';
+import { renderSetPassword } from './auth/set-password.js';
 
 const app = document.querySelector('#app');
 
