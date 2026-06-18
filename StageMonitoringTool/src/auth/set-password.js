@@ -4,32 +4,36 @@ export function renderSetPassword(app) {
 
   if (!token) {
     app.innerHTML = `
-      <div class="login-card">
-        <h1 class="login-title">Ongeldige Link</h1>
-        <p class="login-subtitle">Er ontbreekt een setup token in de URL.</p>
-        <a href="/" class="login-btn" style="text-decoration:none; text-align:center; display:block;">Terug naar login</a>
+      <div style="display: flex; justify-content: center; align-items: center; min-height: 100vh; background: #f7f8fc;">
+        <div class="login-card">
+          <h1 class="login-title">Ongeldige Link</h1>
+          <p class="login-subtitle">Er ontbreekt een setup token in de URL.</p>
+          <a href="/" class="login-btn" style="text-decoration:none; text-align:center; display:block;">Terug naar login</a>
+        </div>
       </div>
     `;
     return;
   }
 
   app.innerHTML = `
-    <div class="login-card">
-      <h1 class="login-title">Wachtwoord Instellen</h1>
-      <p class="login-subtitle">Kies een nieuw wachtwoord voor je account</p>
-      
-      <div class="login-field">
-        <label class="login-label" for="new-password">Nieuw Wachtwoord</label>
-        <input id="new-password" type="password" placeholder="Minimaal 6 tekens" class="login-input">
+    <div style="display: flex; justify-content: center; align-items: center; min-height: 100vh; background: #f7f8fc;">
+      <div class="login-card">
+        <h1 class="login-title">Wachtwoord Instellen</h1>
+        <p class="login-subtitle">Kies een nieuw wachtwoord voor je account</p>
+        
+        <div class="login-field">
+          <label class="login-label" for="new-password">Nieuw Wachtwoord</label>
+          <input id="new-password" type="password" placeholder="Minimaal 6 tekens" class="login-input">
+        </div>
+        
+        <div class="login-field">
+          <label class="login-label" for="confirm-password">Bevestig Wachtwoord</label>
+          <input id="confirm-password" type="password" placeholder="Minimaal 6 tekens" class="login-input">
+        </div>
+        
+        <button id="set-pwd-btn" class="login-btn">Instellen</button>
+        <p id="set-pwd-msg" class="login-msg"></p>
       </div>
-      
-      <div class="login-field">
-        <label class="login-label" for="confirm-password">Bevestig Wachtwoord</label>
-        <input id="confirm-password" type="password" placeholder="Minimaal 6 tekens" class="login-input">
-      </div>
-      
-      <button id="set-pwd-btn" class="login-btn">Instellen</button>
-      <p id="set-pwd-msg" class="login-msg"></p>
     </div>
   `;
 

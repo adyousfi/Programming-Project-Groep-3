@@ -6,7 +6,19 @@ import Student from "../userModel/student.js";
 import User from "../userModel/user.js";
 import Bedrijf from "../objectModel/bedrijf.js";
 import Docent from "../userModel/docent.js";
+import Evaluatie from "../objectModel/evaluatie.js";
 import { Op } from "sequelize";
+
+// Berekent het eindresultaat (score op 20) op basis van de docent-scores
+// van de finale evaluatie, zelfde formule als op de evaluatiepagina's.
+const berekenEindresultaat = (evaluaties) => {
+  const metScore = evaluaties.filter(e => e.ingediend_docent && e.score_docent !== null && e.score_docent !== undefined);
+  const uniekeCompetenties = new Set(metScore.map(e => e.competentie_id).filter(Boolean));
+  const N = uniekeCompetenties.size;
+  if (!N) return null;
+  const sumScores = metScore.reduce((acc, e) => acc + (Number(e.score_docent) / 5) * 20, 0);
+  return Math.round((sumScores / N) * 10) / 10;
+};
 
 const createStage = async (req, res, next) => {
   try {
@@ -387,6 +399,16 @@ const selectStageByDocentId = async (req, res, next) => {
       order: [['createdAt', 'DESC']]
     });
 
+    const stageIds = stages.map(s => s.stage_id);
+    const finaleEvaluaties = stageIds.length
+      ? await Evaluatie.findAll({ where: { stage_id: stageIds, type_evaluatie: 'finale' } })
+      : [];
+    const evaluatiesPerStage = new Map();
+    for (const e of finaleEvaluaties) {
+      if (!evaluatiesPerStage.has(e.stage_id)) evaluatiesPerStage.set(e.stage_id, []);
+      evaluatiesPerStage.get(e.stage_id).push(e);
+    }
+
     const result = stages.map(s => {
       const studentUser = s.student ? s.student.User : null;
       const mentorUser = s.mentor ? s.mentor.User : null;
@@ -418,6 +440,7 @@ const selectStageByDocentId = async (req, res, next) => {
         status: mapStageStatus(s.status),
         rawStatus: s.status,
         document_validated: s.document_validated || false,
+        eindresultaat: berekenEindresultaat(evaluatiesPerStage.get(s.stage_id) || []),
         datum: s.createdAt ? new Date(s.createdAt).toLocaleDateString('nl-BE') : '',
         createdAt: s.createdAt,
       };
