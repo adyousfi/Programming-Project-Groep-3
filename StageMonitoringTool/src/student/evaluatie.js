@@ -129,7 +129,7 @@ function renderWachtOpDocent(app, stagiair, activeTab) {
 // ---------------------------------------------------------------------------
 // Scherm B: evaluatie bestaat al -> scoringsscherm per competentie
 // ---------------------------------------------------------------------------
-async function renderEvaluatiePage(app, stagiair, activeTab = 'tussentijds', evaluatieData = []) {
+async function renderEvaluatiePage(app, stagiair, activeTab = 'tussentijds', evaluatieData = [], alreadySubmitted = false) {
   const scores = [1, 2, 3, 4, 5];
 
   const competenties = await fetchCompetentiesMetRubrieken();
@@ -255,6 +255,21 @@ async function renderEvaluatiePage(app, stagiair, activeTab = 'tussentijds', eva
   `;
 
   attachTabSwitch(app, stagiair);
+
+  // Grey out everything if already submitted
+  if (alreadySubmitted) {
+    document.querySelectorAll('.sm-score-card').forEach((b) => { b.disabled = true; });
+    document.querySelectorAll('.sm-eval-feedback').forEach((t) => { t.disabled = true; });
+    const saveBtn = document.querySelector('#sm-eval-save');
+    const submitBtn = document.querySelector('#sm-eval-submit');
+    if (saveBtn) saveBtn.disabled = true;
+    if (submitBtn) submitBtn.disabled = true;
+    const msg = document.querySelector('#sm-eval-save-message');
+    if (msg) {
+      msg.textContent = 'Je evaluatie is reeds ingediend en kan niet meer worden gewijzigd.';
+      msg.classList.remove('hidden');
+    }
+  }
 
   // Score card selection
   document.querySelectorAll('.sm-score-card').forEach((card) => {
@@ -403,7 +418,9 @@ async function renderEvaluatieTab(app, stagiair, activeTab = 'tussentijds') {
     } else {
       const isDoorDocent = status.evaluaties.some((e) => e.docent_id != null);
       if (isDoorDocent) {
-        await renderEvaluatiePage(app, stagiair, activeTab, status.evaluaties);
+        const alreadySubmitted = status.evaluaties.length > 0
+          && status.evaluaties.every((e) => e.score_student != null);
+        await renderEvaluatiePage(app, stagiair, activeTab, status.evaluaties, alreadySubmitted);
       } else {
         renderWachtOpDocent(app, stagiair, activeTab);
       }

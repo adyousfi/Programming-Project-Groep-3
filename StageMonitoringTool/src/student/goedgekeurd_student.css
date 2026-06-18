@@ -370,11 +370,17 @@
     color: #6c757d;
 }
 
-/* Blue dot indicator for new evaluatie */
-.sidebar-dot {
-    color: #3b82f6;
-    font-size: 0.6rem;
+/* Blue badge indicator for new evaluatie */
+.sidebar-badge {
+    display: inline-block;
+    background: #3b82f6;
+    color: #ffffff;
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 10px;
+    margin-left: 6px;
     vertical-align: middle;
-    margin-left: 4px;
-    line-height: 1;
+    line-height: 1.4;
+    letter-spacing: 0.02em;
 }

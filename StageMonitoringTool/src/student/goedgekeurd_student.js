@@ -82,7 +82,7 @@ export async function renderGoedgekeurdStudent(container, userName = 'Jan Jansse
                         <a href="?role=stagedetails" class="sidebar-nav-item">Stagedetails</a>
                         <a href="?role=documenten" class="sidebar-nav-item">Documenten</a>
                         <a href="${docValidated ? '?role=logboek' : '#'}" class="sidebar-nav-item${docValidated ? '' : ' disabled'}">Logboek</a>
-                        <a href="${docValidated && evalAvailable ? '?role=evaluatie' : '#'}" class="sidebar-nav-item${docValidated && evalAvailable ? '' : ' disabled'}">Evaluatie${evalAvailable ? ' <span class="sidebar-dot">&#9679;</span>' : ''}</a>
+                        <a href="${docValidated && evalAvailable ? '?role=evaluatie' : '#'}" class="sidebar-nav-item${docValidated && evalAvailable ? '' : ' disabled'}">Evaluatie${evalAvailable ? ' <span class="sidebar-badge">Nieuw</span>' : ''}</a>
                     </nav>
                 </div>
                 <div class="sidebar-bottom">
@@ -179,7 +179,7 @@ export async function renderGoedgekeurdStudent(container, userName = 'Jan Jansse
                         <a href="${evalAvailable ? '?role=evaluatie' : '#'}" class="coming-soon-card${evalAvailable ? ' active-card' : ' disabled-card'}">
                             <div class="coming-soon-icon${evalAvailable ? ' active-icon' : ''}">&#128202;</div>
                             <div class="coming-soon-content">
-                                <h3 class="coming-soon-title${evalAvailable ? ' active-title' : ''}">Evaluaties${evalAvailable ? ' <span class="sidebar-dot">&#9679;</span>' : ''}</h3>
+                                <h3 class="coming-soon-title${evalAvailable ? ' active-title' : ''}">Evaluaties${evalAvailable ? ' <span class="sidebar-badge">Nieuw</span>' : ''}</h3>
                                 <p class="coming-soon-sub${evalAvailable ? ' active-sub' : ''}">${evalAvailable ? 'Tussentijdse evaluatie beschikbaar' : 'Bekijk je voortgang en feedback'}</p>
                             </div>
                         </a>
