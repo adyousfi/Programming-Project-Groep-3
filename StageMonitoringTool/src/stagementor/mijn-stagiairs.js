@@ -44,7 +44,7 @@ function getWeekDates(startDate, endDate, weekIndex) {
   };
 }
 
-function mapApiStageToStagiair(s, logboekEntries = []) {
+function mapApiStageToStagiair(s, logboekEntries = [], evalAvailable = false) {
   const start = s.stageDetails?.start;
   const einde = s.stageDetails?.einde;
   const totalWeeks = start && einde
@@ -79,7 +79,7 @@ function mapApiStageToStagiair(s, logboekEntries = []) {
     einde: einde ? new Date(einde).toLocaleDateString('nl-BE', { day: 'numeric', month: 'short' }) : '–',
     totalWeeks,
     submittedWeeks,
-    badges: [],
+    badges: evalAvailable ? [{ type: 'warning', label: 'Tussentijdse evaluatie beschikbaar' }] : [],
     stageData: s,
   };
 }
@@ -456,7 +456,11 @@ async function renderEvaluatiePage(app, stagiair, activeTab = 'tussentijds') {
   try {
     const status = await fetchEvaluatieStatus(stageId, activeTab);
     if (!status.bestaat) { renderEvaluatieRegistreerScreen(app, stagiair, activeTab); }
-    else { await renderEvaluatieScoreScreen(app, stagiair, activeTab, status.evaluaties); }
+    else {
+      const alreadySubmitted = status.evaluaties.length > 0
+        && status.evaluaties.every((e) => e.score_mentor != null);
+      await renderEvaluatieScoreScreen(app, stagiair, activeTab, status.evaluaties, alreadySubmitted);
+    }
   } catch (err) {
     console.error(err);
     app.innerHTML = `<div class="sm-layout">${sidebarHtml('evaluatie')}<main class="sm-main sm-main--detail"><div class="sm-detail-top"><div><h1 class="sm-detail-title">Evaluatie</h1><p class="sm-detail-subtitle">Fout bij het laden</p></div><a id="sm-back-evaluatie" class="sm-detail-back" href="#">← Terug naar stagiairs</a></div><div class="sm-eval-block"><div class="sm-eval-block-header"><h3>Verbinding mislukt</h3><p>Kan de evaluatie-informatie niet ophalen.</p></div><div class="sm-eval-actions"><button id="sm-eval-retry" class="sm-button">Opnieuw proberen</button></div></div></main></div>`;
@@ -474,7 +478,7 @@ function renderEvaluatieRegistreerScreen(app, stagiair, activeTab) {
   document.querySelectorAll('.sm-eval-tab').forEach((tab) => { tab.addEventListener('click', () => renderEvaluatiePage(app, stagiair, tab.dataset.tab)); });
 }
 
-async function renderEvaluatieScoreScreen(app, stagiair, activeTab, evaluatieData = []) {
+async function renderEvaluatieScoreScreen(app, stagiair, activeTab, evaluatieData = [], alreadySubmitted = false) {
   const scores = [1, 2, 3, 4, 5];
   const competenties = await fetchCompetentiesMetRubrieken();
   const dataByCode = Object.fromEntries(evaluatieData.map((e) => [e.competentie_code, e]));
@@ -490,6 +494,21 @@ async function renderEvaluatieScoreScreen(app, stagiair, activeTab, evaluatieDat
   attachNav(app, stagiair);
   document.querySelectorAll('.sm-eval-tab').forEach((tab) => { tab.addEventListener('click', () => renderEvaluatiePage(app, stagiair, tab.dataset.tab)); });
   document.querySelectorAll('.sm-score-card').forEach((card) => { card.addEventListener('click', () => { const c = card.closest('.sm-eval-score-cards'); if (!c) return; c.querySelectorAll('.sm-score-card').forEach((b) => b.classList.remove('selected')); card.classList.add('selected'); const comp = card.closest('.sm-eval-competentie'); if (comp) comp.classList.remove('sm-eval-competentie--error'); const msg = document.querySelector('#sm-eval-save-message'); if (msg) msg.classList.remove('sm-eval-save-message--error'); }); });
+
+  // Grey out everything if already submitted
+  if (alreadySubmitted) {
+    document.querySelectorAll('.sm-score-card').forEach((b) => { b.disabled = true; });
+    document.querySelectorAll('.sm-eval-feedback').forEach((t) => { t.disabled = true; });
+    const saveBtn = document.querySelector('#sm-eval-save');
+    const submitBtn = document.querySelector('#sm-eval-submit');
+    if (saveBtn) saveBtn.disabled = true;
+    if (submitBtn) submitBtn.disabled = true;
+    const msg = document.querySelector('#sm-eval-save-message');
+    if (msg) {
+      msg.textContent = 'Je evaluatie is reeds ingediend en kan niet meer worden gewijzigd.';
+      msg.classList.remove('hidden');
+    }
+  }
 
   async function saveMentorEvaluatie(isSubmit = false) {
     const saveBtn = document.querySelector('#sm-eval-save');
@@ -952,14 +971,20 @@ export async function renderMijnStagiairs(app, user) {
       if (Array.isArray(data)) {
         const stagiairsWithLogboek = await Promise.all(data.map(async (s) => {
           let logboekEntries = [];
+          let evalAvailable = false;
           if (s.id) {
             try {
               const logRes = await fetch(`/api/logboek/stage/${s.id}`, { credentials: 'include' });
               logboekEntries = await logRes.json();
               if (!Array.isArray(logboekEntries)) logboekEntries = [];
             } catch (_) {}
+            try {
+              const evalRes = await fetch(`/api/evaluaties/tussentijds-status?stage_id=${s.id}`, { credentials: 'include' });
+              const evalData = await evalRes.json();
+              evalAvailable = evalData.bestaatDoorDocent === true;
+            } catch (_) {}
           }
-          return mapApiStageToStagiair(s, logboekEntries);
+          return mapApiStageToStagiair(s, logboekEntries, evalAvailable);
         }));
         _allStagiairs = stagiairsWithLogboek;
       }

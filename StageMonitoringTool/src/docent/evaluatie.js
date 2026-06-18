@@ -203,7 +203,7 @@ function renderEvaluatieRegistreerScreen(app, stagiair, activeTab) {
 // ---------------------------------------------------------------------------
 // Scherm B: evaluatie bestaat al -> scoringsscherm per competentie
 // ---------------------------------------------------------------------------
-async function renderEvaluatiePage(app, stagiair, activeTab = 'tussentijds', evaluatieData = []) {
+async function renderEvaluatiePage(app, stagiair, activeTab = 'tussentijds', evaluatieData = [], alreadySubmitted = false) {
   const scores = [1, 2, 3, 4, 5];
 
   // We moeten per competentie de rubriek_id kunnen wegschrijven bij indienen.
@@ -382,6 +382,21 @@ async function renderEvaluatiePage(app, stagiair, activeTab = 'tussentijds', eva
     });
   });
 
+  // Grey out everything if already submitted
+  if (alreadySubmitted) {
+    document.querySelectorAll('.sm-score-card').forEach((b) => { b.disabled = true; });
+    document.querySelectorAll('.sm-eval-feedback').forEach((t) => { t.disabled = true; });
+    const saveBtn = document.querySelector('#sm-eval-save');
+    const submitBtn = document.querySelector('#sm-eval-submit');
+    if (saveBtn) saveBtn.disabled = true;
+    if (submitBtn) submitBtn.disabled = true;
+    const msg = document.querySelector('#sm-eval-save-message');
+    if (msg) {
+      msg.textContent = 'De evaluatie is reeds ingediend en kan niet meer worden gewijzigd.';
+      msg.classList.remove('hidden');
+    }
+  }
+
   // Save UI
   async function saveDocentEvaluatie(isSubmit = false) {
     const saveBtn = document.querySelector('#sm-eval-save');
@@ -537,7 +552,9 @@ async function renderEvaluatieTab(app, stagiair, activeTab = 'tussentijds') {
     if (!status.bestaat) {
       renderEvaluatieRegistreerScreen(app, stagiair, activeTab);
     } else {
-      await renderEvaluatiePage(app, stagiair, activeTab, status.evaluaties);
+      const alreadySubmitted = status.evaluaties.length > 0
+        && status.evaluaties.every((e) => e.score_docent != null);
+      await renderEvaluatiePage(app, stagiair, activeTab, status.evaluaties, alreadySubmitted);
     }
 
   } catch (err) {
