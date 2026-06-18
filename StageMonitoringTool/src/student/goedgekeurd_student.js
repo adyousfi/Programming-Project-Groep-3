@@ -84,7 +84,7 @@ export async function renderGoedgekeurdStudent(container, userName = 'Jan Jansse
             const finaleStatusData = await finaleRes.json();
             finaleAvailable = finaleStatusData.bestaat === true
                 && finaleStatusData.evaluaties && finaleStatusData.evaluaties.length > 0
-                && finaleStatusData.evaluaties.some((e) => e.docent_id != null && (e.score != null || e.feedback_docent != null));
+                && finaleStatusData.evaluaties.some((e) => e.docent_id != null);
             if (finaleAvailable) {
                 finaleStudentSubmitted = finaleStatusData.evaluaties.every((e) => e.ingediend_student);
                 finaleDocentSubmitted = finaleStatusData.evaluaties.every((e) => e.ingediend_docent);
