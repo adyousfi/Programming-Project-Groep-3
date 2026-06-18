@@ -70,6 +70,7 @@ export async function renderLogboek(container, userName = 'Student', stageData =
 
         let daysFilled = 0;
         let allIngevuld = false;
+        let allGevinkt = false;
         let hasEntries = false;
 
         if (dates.startDateObj) {
@@ -83,10 +84,12 @@ export async function renderLogboek(container, userName = 'Student', stageData =
             const filledEntries = weekEntries.filter(e => e.status === 'DEELSINGEVULD' || e.status === 'INGEVULD');
             daysFilled = filledEntries.length;
             allIngevuld = weekEntries.length > 0 && weekEntries.every(e => e.status === 'INGEVULD');
+            allGevinkt = allIngevuld && weekEntries.every(e => e.gevinkt_door_stagementor);
         }
 
         let status = 'not_submitted';
-        if (allIngevuld) status = 'submitted';
+        if (allGevinkt) status = 'afgevinkt';
+        else if (allIngevuld) status = 'submitted';
         else if (hasEntries) status = 'in_progress';
 
         return {
@@ -129,7 +132,9 @@ export async function renderLogboek(container, userName = 'Student', stageData =
                     ${weeks.map(w => {
                         const progress = (w.daysFilled / w.totalDays) * 100;
                         let statusBadge = '';
-                        if (w.status === 'submitted') {
+                        if (w.status === 'afgevinkt') {
+                            statusBadge = '<span class="logboek-badge logboek-badge-validated">Afgevinkt door stagementor</span>';
+                        } else if (w.status === 'submitted') {
                             statusBadge = '<span class="logboek-badge logboek-badge-validated">Ingediend</span>';
                         } else if (w.status === 'in_progress') {
                             statusBadge = '<span class="logboek-badge logboek-badge-pending">Bezig</span>';
