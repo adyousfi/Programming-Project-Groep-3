@@ -15,6 +15,7 @@ export default defineConfig({
       '/select-stage': { target: 'http://localhost:3000', changeOrigin: true, secure: false },
       '/update-stage': { target: 'http://localhost:3000', changeOrigin: true, secure: false },
       '/select-docent': { target: 'http://localhost:3000', changeOrigin: true, secure: false },
+      '/set-password': { target: 'http://localhost:3000', changeOrigin: true, secure: false },
     },
   },
 });
