@@ -23,7 +23,7 @@ import evaluatieRoutes from '../db/routes/evaluatieRoutes.js';
 const app = express();
 
 dotenv.config();
-await seedDatabase();
+//await seedDatabase();
 
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
