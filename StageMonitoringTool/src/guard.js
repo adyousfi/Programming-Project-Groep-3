@@ -59,6 +59,10 @@ export function wrapFetch() {
         throw new Error('Niet geautoriseerd');
       }
     }
-    return origFetch(input, { ...init, credentials: 'include' });
+    if (init === undefined) {
+      init = {};
+    }
+    init.credentials = 'include';
+    return origFetch(input, init);
   };
 }
