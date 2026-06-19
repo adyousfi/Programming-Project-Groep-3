@@ -35,7 +35,9 @@ export async function renderLogboekDag(container, userName = 'Student', stageDat
     lastStageData = stageData || lastStageData;
     lastWeekNumber = weekNumber || lastWeekNumber;
     const startDate = stageData?.stageDetails?.start ? new Date(stageData.stageDetails.start) : null;
+    if (startDate) startDate.setHours(12, 0, 0, 0);
     const endDate = stageData?.stageDetails?.einde ? new Date(stageData.stageDetails.einde) : null;
+    if (endDate) endDate.setHours(12, 0, 0, 0);
     const today = getNow();
 
     let logboekEntries = [];
@@ -107,8 +109,9 @@ export async function renderLogboekDag(container, userName = 'Student', stageDat
         const dateStr = toDateStr(d);
         return logboekEntries.find(e => {
             if (!e.datum) return false;
-            const entryDate = toDateStr(new Date(e.datum));
-            return entryDate === dateStr;
+            const entryDate = new Date(e.datum);
+            entryDate.setHours(12, 0, 0, 0);
+            return toDateStr(entryDate) === dateStr;
         }) || null;
     }
 
@@ -119,6 +122,7 @@ export async function renderLogboekDag(container, userName = 'Student', stageDat
         ? (() => {
             let count = 1;
             const s = new Date(startDate);
+            s.setHours(12, 0, 0, 0);
             const startDay = s.getDay();
             const daysToMonday = startDay === 1 ? 7 : 8 - startDay;
             s.setDate(s.getDate() + daysToMonday);
@@ -345,7 +349,12 @@ function initLogboekDagHandlers(totalDays, stageData, weekIndex, getDayDateObj, 
         const d = getDayDateObj(weekIndex, i);
         if (!d) return false;
         const dateStr = toDateStr(d);
-        return logboekEntries.some(e => e.datum && toDateStr(new Date(e.datum)) === dateStr && e.status === 'INGEVULD');
+        return logboekEntries.some(e => {
+            if (!e.datum) return false;
+            const ed = new Date(e.datum);
+            ed.setHours(12, 0, 0, 0);
+            return toDateStr(ed) === dateStr && e.status === 'INGEVULD';
+        });
     }).every(Boolean);
 
     if (weekAllIngevuld) {
@@ -588,7 +597,9 @@ function initLogboekDagHandlers(totalDays, stageData, weekIndex, getDayDateObj, 
     if (testApply) {
         testApply.addEventListener('click', () => {
             if (testInput.value) {
-                testDateOverride = new Date(testInput.value + 'T00:00:00');
+                const override = new Date(testInput.value);
+                override.setHours(12, 0, 0, 0);
+                testDateOverride = override;
                 const app = document.getElementById('app');
                 import('./logboek-dag.js').then(m => {
                     m.renderLogboekDag(app, lastUserName, lastStageData, lastWeekNumber);
