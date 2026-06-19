@@ -188,6 +188,7 @@ function renderKaarten(lijst) {
           <div class="dc-badges">
             <span class="dc-badge dc-badge--${s.status === 'afgelopen' ? 'afgerond' : 'lopend'}">${s.status === 'afgelopen' ? 'Afgerond' : 'Lopend'}</span>
             ${s.nieuwLogboek > 0 ? `<span class="dc-badge dc-badge--logboek">${s.nieuwLogboek} nieuw logboek</span>` : ''}
+            ${s.finaleEvalReady ? '<span class="dc-badge dc-badge--evaluatie">Evaluatie gereed</span>' : ''}
           </div>
         </div>
         <div class="dc-meta">
@@ -235,7 +236,7 @@ function setupFilter(studenten) {
         ? studenten.filter(function(s) { return s.status === 'lopend'; })
         : filter === 'alle'
           ? studenten
-              .filter(function(s) { return s.status === 'lopend' || s.status === 'in_afwachting'; })
+              .slice()
               .sort(function(a, b) { return a.status === 'in_afwachting' ? -1 : 1; })
           : filter === 'afgelopen'
             ? studenten.filter(function(s) { return s.status === 'afgelopen'; })
@@ -278,6 +279,19 @@ export async function renderMijnStudenten(app, user) {
     const frontendStatus = mapFrontendStatus(s.rawStatus);
     const voortgang = berekenVoortgang(s.stageDetails.start, s.stageDetails.einde);
     const logboek = await berekenLogboekProgress(s.id, s.stageDetails.start, s.stageDetails.einde);
+
+    let finaleEvalReady = false;
+    try {
+      const evalRes = await fetch('/api/evaluaties/status?stage_id=' + s.id + '&type_evaluatie=finale', { credentials: 'include' });
+      const evalData = await evalRes.json();
+      if (evalData.bestaat && Array.isArray(evalData.evaluaties) && evalData.evaluaties.length > 0) {
+        const allStudentSubmitted = evalData.evaluaties.every(function(e) { return e.ingediend_student; });
+        const allMentorSubmitted = evalData.evaluaties.every(function(e) { return e.ingediend_mentor; });
+        const allDocentSubmitted = evalData.evaluaties.every(function(e) { return e.ingediend_docent; });
+        finaleEvalReady = allStudentSubmitted && allMentorSubmitted && !allDocentSubmitted;
+      }
+    } catch (_) {}
+
     return {
       id: s.id,
       studentId: s.studentId,
@@ -294,8 +308,10 @@ export async function renderMijnStudenten(app, user) {
       nieuwLogboek: 0,
       voortgang: voortgang,
       logboek: logboek,
+      finaleEvalReady: finaleEvalReady,
       mijlpalen: bepaalMijlpalen(s.rawStatus, s.stageDetails.start, s.stageDetails.einde),
       laasteLogboek: logboek.laasteLogboek,
+      eindpunt: s.eindresultaat != null ? `${s.eindresultaat}/20` : null,
       stageData: s,
     };
   }));

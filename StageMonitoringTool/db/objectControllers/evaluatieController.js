@@ -1,6 +1,7 @@
 import Evaluatie from "../objectModel/evaluatie.js";
 import Competentie from "../objectModel/competentie.js";
 import Rubriek from "../objectModel/rubriek.js";
+import Stage from "../objectModel/stage.js";
 import { sequelize } from "../dbConnection.js";
 
 const createEvaluatie = async (req, res, next) => {
@@ -366,6 +367,15 @@ const updateEvaluatiesPerCompetentie = async (req, res, next) => {
 
         // Rond af voor nette display
         totalPercentage = Math.round(totalPercentage * 10) / 10;
+      }
+
+      // Zodra de docent de finale evaluatie indient is de stage afgerond:
+      // de student verschuift dan naar "Afgelopen stages" op het docentdashboard.
+      if (ingediend_role === 'docent' && type_evaluatie === 'finale') {
+        await Stage.update(
+          { status: 'KLAAR' },
+          { where: { stage_id: Number(stageId) }, transaction: t }
+        );
       }
 
       await t.commit();

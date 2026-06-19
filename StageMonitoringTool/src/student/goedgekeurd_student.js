@@ -63,7 +63,7 @@ export async function renderGoedgekeurdStudent(container, userName = 'Jan Jansse
     let finaleDocentSubmitted = false;
     if (docValidated && stageData?.id) {
         try {
-            const evalRes = await fetch(`/api/evaluaties/tussentijds-status?stage_id=${stageData.id}`, { credentials: 'include' });
+            const evalRes = await fetch(`/api/evaluaties/tussentijds-status?stage_id=${stageData.id}`, { credentials: 'include', cache: 'no-store' });
             const evalData = await evalRes.json();
             evalAvailable = evalData.bestaatDoorDocent === true;
         } catch (err) {
@@ -71,7 +71,7 @@ export async function renderGoedgekeurdStudent(container, userName = 'Jan Jansse
         }
         if (evalAvailable) {
             try {
-                const statusRes = await fetch(`/api/evaluaties/status?stage_id=${stageData.id}&type_evaluatie=tussentijds`, { credentials: 'include' });
+                const statusRes = await fetch(`/api/evaluaties/status?stage_id=${stageData.id}&type_evaluatie=tussentijds`, { credentials: 'include', cache: 'no-store' });
                 const statusData = await statusRes.json();
                 studentSubmitted = statusData.evaluaties && statusData.evaluaties.length > 0
                     && statusData.evaluaties.every((e) => e.ingediend_student);
@@ -80,11 +80,11 @@ export async function renderGoedgekeurdStudent(container, userName = 'Jan Jansse
             } catch (_) {}
         }
         try {
-            const finaleRes = await fetch(`/api/evaluaties/status?stage_id=${stageData.id}&type_evaluatie=finale`, { credentials: 'include' });
+            const finaleRes = await fetch(`/api/evaluaties/status?stage_id=${stageData.id}&type_evaluatie=finale`, { credentials: 'include', cache: 'no-store' });
             const finaleStatusData = await finaleRes.json();
             finaleAvailable = finaleStatusData.bestaat === true
                 && finaleStatusData.evaluaties && finaleStatusData.evaluaties.length > 0
-                && finaleStatusData.evaluaties.some((e) => e.docent_id != null && (e.score != null || e.feedback_docent != null));
+                && finaleStatusData.evaluaties.some((e) => e.docent_id != null);
             if (finaleAvailable) {
                 finaleStudentSubmitted = finaleStatusData.evaluaties.every((e) => e.ingediend_student);
                 finaleDocentSubmitted = finaleStatusData.evaluaties.every((e) => e.ingediend_docent);
@@ -156,10 +156,10 @@ export async function renderGoedgekeurdStudent(container, userName = 'Jan Jansse
                         </div>
 
                         <div class="step-line"></div>
-                        <div class="step${allLogboeksDone ? ' next-active' : ''}${((evalAvailable && docentSubmitted) || (evalAvailable && studentSubmitted) || (finaleAvailable && finaleDocentSubmitted) || (finaleAvailable && finaleStudentSubmitted)) ? ' completed' : ''}">
-                            <div class="step-circle">${(evalAvailable && docentSubmitted) || (finaleAvailable && finaleDocentSubmitted) ? '&#10003;' : '5'}</div>
+                        <div class="step${allLogboeksDone ? ' next-active' : ''}${(finaleAvailable && finaleStudentSubmitted) ? ' completed' : ''}">
+                            <div class="step-circle">${(finaleAvailable && finaleStudentSubmitted) ? '&#10003;' : '5'}</div>
                             <span class="step-label">Evaluatie</span>
-                            <span class="step-sub">${(evalAvailable && docentSubmitted) || (finaleAvailable && finaleDocentSubmitted) ? 'Voltooid' : (allLogboeksDone ? 'Actief' : 'Gepland')}</span>
+                            <span class="step-sub">${(finaleAvailable && finaleStudentSubmitted) ? 'Voltooid' : (allLogboeksDone ? 'Actief' : 'Gepland')}</span>
                         </div>
 
                     </div>
