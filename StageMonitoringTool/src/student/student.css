@@ -19,8 +19,9 @@ body {
 /* Header Styles */
 .dashboard-header {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
+    position: relative;
     padding: 1.5rem 2.5rem;
     background-color: #ffffff;
     border-bottom: 1px solid #e9ecef;
@@ -29,6 +30,15 @@ body {
 .brand {
     display: flex;
     flex-direction: column;
+    text-align: center;
+}
+
+.user-profile {
+    position: absolute;
+    right: 2.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
 }
 
 .brand-title {
@@ -41,12 +51,6 @@ body {
 .brand-subtitle {
     font-size: 0.85rem;
     color: #6c757d;
-}
-
-.user-profile {
-    display: flex;
-    align-items: center;
-    gap: 1.5rem;
 }
 
 .user-name {

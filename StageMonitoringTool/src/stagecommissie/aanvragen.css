@@ -1,97 +1,94 @@
 .sc-layout {
   display: flex;
   min-height: 100vh;
+  color-scheme: light;
 }
 
 .sc-sidebar {
-  width: 280px;
+  width: 260px;
+  min-width: 260px;
   flex-shrink: 0;
-  background: #ffffff;
-  border-right: 1px solid #e5e7eb;
+  background-color: #ffffff;
+  border-right: 1px solid #e9ecef;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  padding: 1.5rem 1rem;
+  box-sizing: border-box;
+  position: sticky;
+  top: 0;
+  height: 100vh;
 }
 
-.sc-sidebar-top {
-  padding: 28px 20px 0;
+.sidebar-logo {
+  padding-bottom: 20px;
+  border-bottom: 1px solid #e9ecef;
 }
 
-.sc-logo {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  padding-bottom: 24px;
-  border-bottom: 1px solid #e5e7eb;
-  margin-bottom: 16px;
+.sidebar-logo-title {
+  display: block;
+  font-size: 20px;
+  font-weight: 700;
+  color: #111;
 }
 
-.sc-logo-title {
-  font-size: 16px;
-  font-weight: 600;
-  color: #111827;
-}
-
-.sc-logo-sub {
+.sidebar-logo-sub {
+  display: block;
   font-size: 13px;
-  color: #6b7280;
+  color: #6c757d;
+  margin-top: 0.15rem;
 }
 
-.sc-nav {
+.sidebar-nav {
+  margin-top: 2rem;
+}
+
+.sidebar-nav-item {
+  display: block;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  font-size: 15px;
+  color: #495057;
+  text-decoration: none;
+}
+
+.sidebar-nav-item.active {
+  background-color: #e0e7ff;
+  color: #3b82f6;
+  font-weight: 600;
+}
+
+.sidebar-nav-item:hover:not(.active) {
+  background-color: #f1f3f5;
+}
+
+.sidebar-bottom {
+  padding: 20px;
+  border-top: 1px solid #e5e7eb;
   display: flex;
   flex-direction: column;
   gap: 4px;
 }
 
-.sc-nav-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px 14px;
-  border-radius: 8px;
-  text-decoration: none;
+.sidebar-user-name {
   font-size: 14px;
-  color: #374151;
   font-weight: 500;
-  transition: background 0.15s;
+  color: #212529;
 }
 
-.sc-nav-item:hover {
-  background: #f3f4f6;
+.sidebar-logout {
+  font-size: 14px;
+  color: #0d6efd;
+  text-decoration: none;
 }
 
-.sc-nav-item.active {
-  background: #eff6ff;
-  color: #1d4ed8;
+.sidebar-logout:hover {
+  text-decoration: underline;
 }
 
 .sc-nav-count {
   font-size: 13px;
   font-weight: 400;
-}
-
-.sc-sidebar-bottom {
-  padding: 20px;
-  border-top: 1px solid #e5e7eb;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.sc-user-name {
-  font-size: 14px;
-  font-weight: 500;
-  color: #111827;
-}
-
-.sc-logout {
-  font-size: 14px;
-  color: #2563eb;
-  text-decoration: none;
-}
-
-.sc-logout:hover {
-  text-decoration: underline;
 }
 
 /* Main */

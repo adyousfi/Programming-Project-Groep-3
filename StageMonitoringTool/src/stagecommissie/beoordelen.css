@@ -5,6 +5,7 @@
   background: #f3f4f6;
   display: flex;
   flex-direction: column;
+  color-scheme: light;
 }
 
 /* Header */
@@ -74,7 +75,8 @@
 }
 
 .bd-terug {
-  display: inline-block;
+  display: block;
+  text-align: right;
   font-size: 14px;
   color: #2563eb;
   text-decoration: none;
@@ -232,6 +234,7 @@
   font-size: 14px;
   font-family: inherit;
   color: #111827;
+  background-color: #ffffff;
   resize: vertical;
   margin-bottom: 20px;
   box-sizing: border-box;

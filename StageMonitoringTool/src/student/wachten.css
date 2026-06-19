@@ -61,9 +61,11 @@
 }
 
 .sidebar-bottom {
+    padding: 20px;
+    border-top: 1px solid #e5e7eb;
     display: flex;
     flex-direction: column;
-    gap: 0.3rem;
+    gap: 4px;
 }
 
 .sidebar-user-name {

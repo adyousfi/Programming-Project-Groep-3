@@ -258,6 +258,16 @@ function setupStudentButtons(studenten) {
       import('./student-detail.js').then(function(m) { m.renderStudentDetail(student, renderMijnStudenten._user); });
     });
   });
+
+  document.querySelectorAll('.dc-card--clickable .dc-btn').forEach(function(btn) {
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      const id = parseInt(btn.dataset.id);
+      const student = studenten.find(function(s) { return s.id === id; });
+      if (!student) return;
+      import('./student-detail.js').then(function(m) { m.renderStudentDetail(student, renderMijnStudenten._user); });
+    });
+  });
 }
 
 export async function renderMijnStudenten(app, user) {

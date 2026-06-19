@@ -31,13 +31,42 @@ export async function renderDocumenten(container) {
     } catch {}
 
     let evalAvailable = false;
+    let studentSubmitted = false;
+    let docentSubmitted = false;
+    let finaleAvailable = false;
+    let finaleStudentSubmitted = false;
+    let finaleDocentSubmitted = false;
     if (docValidated && stageId) {
         try {
             const evalRes = await fetch(`/api/evaluaties/tussentijds-status?stage_id=${stageId}`, { credentials: 'include' });
             const evalData = await evalRes.json();
             evalAvailable = evalData.bestaatDoorDocent === true;
         } catch {}
+        if (evalAvailable) {
+            try {
+                const statusRes = await fetch(`/api/evaluaties/status?stage_id=${stageId}&type_evaluatie=tussentijds`, { credentials: 'include' });
+                const statusData = await statusRes.json();
+                studentSubmitted = statusData.evaluaties && statusData.evaluaties.length > 0
+                    && statusData.evaluaties.every((e) => e.ingediend_student);
+                docentSubmitted = statusData.evaluaties && statusData.evaluaties.length > 0
+                    && statusData.evaluaties.every((e) => e.ingediend_docent);
+            } catch {}
+        }
+        try {
+            const finaleRes = await fetch(`/api/evaluaties/status?stage_id=${stageId}&type_evaluatie=finale`, { credentials: 'include' });
+            const finaleStatusData = await finaleRes.json();
+            finaleAvailable = finaleStatusData.bestaat === true
+                && finaleStatusData.evaluaties && finaleStatusData.evaluaties.length > 0
+                && finaleStatusData.evaluaties.some((e) => e.docent_id != null);
+            if (finaleAvailable) {
+                finaleStudentSubmitted = finaleStatusData.evaluaties.every((e) => e.ingediend_student);
+                finaleDocentSubmitted = finaleStatusData.evaluaties.every((e) => e.ingediend_docent);
+            }
+        } catch {}
     }
+    const anyEvalAvailable = evalAvailable || finaleAvailable;
+    const anyNewEval = (evalAvailable && (!studentSubmitted || docentSubmitted))
+        || (finaleAvailable && (!finaleStudentSubmitted || finaleDocentSubmitted));
 
     const hasAdminDoc = adminDocs.length > 0;
     const hasStudentSubmission = studentDocs.length > 0;
@@ -61,7 +90,7 @@ export async function renderDocumenten(container) {
                         <a href="?role=stagedetails" class="sidebar-nav-item">Stagedetails</a>
                         <a href="?role=documenten" class="sidebar-nav-item active">Documenten</a>
                         <a href="${docValidated ? '?role=logboek' : '#'}" class="sidebar-nav-item${docValidated ? '' : ' disabled'}">Logboek</a>
-                        <a href="${docValidated && evalAvailable ? '?role=evaluatie' : '#'}" class="sidebar-nav-item${docValidated && evalAvailable ? '' : ' disabled'}">Evaluatie</a>
+                        <a href="${docValidated && anyEvalAvailable ? '?role=evaluatie' : '#'}" class="sidebar-nav-item${docValidated && anyEvalAvailable ? '' : ' disabled'}">Evaluatie${anyNewEval ? ' <span class="sidebar-badge">Nieuw</span>' : ''}</a>
                     </nav>
                 </div>
                 <div class="sidebar-bottom">
