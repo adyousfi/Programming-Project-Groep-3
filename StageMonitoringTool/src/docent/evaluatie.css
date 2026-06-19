@@ -157,7 +157,7 @@
 .sm-eval-mentor-panel { background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 14px; padding: 20px; margin-top: 20px; }
 .sm-eval-mentor-panel h4 { color: #0b8a3b; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; margin: 0 0 14px; }
 .sm-eval-feedback-label { display: block; margin-bottom: 10px; font-weight: 700; color: #111827; }
-.sm-eval-feedback { width: 100%; min-height: 120px; background: white; border: 1px solid #d1d5db; border-radius: 12px; padding: 14px 16px; font-size: 15px; font-family: inherit; box-sizing: border-box; resize: vertical; }
+.sm-eval-feedback { width: 100%; min-height: 120px; background: white; border: 1px solid #d1d5db; border-radius: 12px; padding: 14px 16px; font-size: 15px; font-family: inherit; box-sizing: border-box; resize: vertical; color: #111827; }
 .sm-eval-feedback:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12); }
 
 /* Opslaan van evaluatie en succesbericht. */
