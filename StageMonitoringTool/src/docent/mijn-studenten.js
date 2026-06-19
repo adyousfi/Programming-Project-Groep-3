@@ -132,19 +132,24 @@ function bepaalMijlpalen(rawStatus, startDatum, eindDatum) {
   const isDocumentIngediend = huidigeIndex >= volgorde.indexOf('DOCUMENTGEUPLOADED');
   const isKlaar = rawStatus === 'KLAAR';
 
-  let isTussentijds = false;
-  if (startDatum && eindDatum) {
+  let hasStarted = isKlaar;
+  if (!hasStarted && startDatum) {
+      hasStarted = normalizeDate(startDatum) <= normalizeDate(getNow());
+  }
+
+  let isTussentijds = isKlaar;
+  if (!isTussentijds && startDatum && eindDatum) {
     const nu = getNow();
     const start = new Date(startDatum);
     const eind = new Date(eindDatum);
     const midpoint = new Date((start.getTime() + eind.getTime()) / 2);
-    isTussentijds = nu >= midpoint && !isKlaar;
+    isTussentijds = nu >= midpoint;
   }
 
   return [
     { label: 'Voorstel goedgekeurd', gedaan: isGoedgekeurd },
     { label: 'Overeenkomst ondertekend', gedaan: isDocumentIngediend },
-    { label: 'Stage gestart', gedaan: startDatum ? normalizeDate(startDatum) <= normalizeDate(getNow()) : false },
+    { label: 'Stage gestart', gedaan: hasStarted },
     { label: 'Tussentijdse evaluatie', gedaan: isTussentijds },
     { label: 'Finale evaluatie', gedaan: isKlaar },
   ];
