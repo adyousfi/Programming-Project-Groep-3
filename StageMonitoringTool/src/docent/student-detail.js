@@ -84,30 +84,40 @@ function formatDate(d) {
 function getWeekDates(startDate, endDate, weekIndex) {
   if (!startDate) return { start: '?', end: '?', days: 5, startDateObj: null, endDateObj: null };
   const weekStart = new Date(startDate);
-  weekStart.setDate(startDate.getDate() + weekIndex * 7);
-  while (weekStart.getDay() === 0 || weekStart.getDay() === 6) {
-    weekStart.setDate(weekStart.getDate() + 1);
+  weekStart.setHours(12, 0, 0, 0);
+
+  if (weekIndex === 0) {
+    while (weekStart.getDay() === 0 || weekStart.getDay() === 6) {
+      weekStart.setDate(weekStart.getDate() + 1);
+    }
+  } else {
+    const startDay = startDate.getDay();
+    const daysToMonday = startDay === 1 ? 7 : 8 - startDay;
+    weekStart.setDate(startDate.getDate() + daysToMonday + (weekIndex - 1) * 7);
   }
+
   const weekEnd = new Date(weekStart);
-  let weekdayCount = 1;
-  while (weekdayCount < 5) {
-    weekEnd.setDate(weekEnd.getDate() + 1);
-    if (weekEnd.getDay() !== 0 && weekEnd.getDay() !== 6) weekdayCount++;
+  if (weekIndex === 0) {
+    weekEnd.setDate(weekEnd.getDate() + (5 - weekStart.getDay()));
+  } else {
+    weekEnd.setDate(weekEnd.getDate() + 4);
   }
+
   if (endDate && weekEnd > endDate) {
     weekEnd.setTime(endDate.getTime());
-    let count = 0;
-    const temp = new Date(weekStart);
-    while (temp <= weekEnd) {
-      if (temp.getDay() !== 0 && temp.getDay() !== 6) count++;
-      temp.setDate(temp.getDate() + 1);
-    }
-    weekdayCount = Math.max(1, count);
   }
+
+  let count = 0;
+  const temp = new Date(weekStart);
+  while (temp <= weekEnd) {
+    if (temp.getDay() !== 0 && temp.getDay() !== 6) count++;
+    temp.setDate(temp.getDate() + 1);
+  }
+
   return {
     start: formatDate(weekStart),
     end: formatDate(weekEnd),
-    days: weekdayCount,
+    days: Math.max(1, count),
     startDateObj: new Date(weekStart),
     endDateObj: new Date(weekEnd)
   };
@@ -153,10 +163,12 @@ async function renderLogboekTab(student) {
     let hasEntries = false;
 
     if (dates.startDateObj) {
+      const ws = new Date(dates.startDateObj); ws.setHours(0,0,0,0);
+      const we = new Date(dates.endDateObj); we.setHours(23,59,59,999);
       const weekEntries = logboekEntriesCache.filter(function(e) {
         if (!e.datum) return false;
         const entryDate = new Date(e.datum);
-        return entryDate >= dates.startDateObj && entryDate <= dates.endDateObj;
+        return entryDate >= ws && entryDate <= we;
       });
       hasEntries = weekEntries.length > 0;
       const validatedEntries = weekEntries.filter(function(e) { return e.status === 'INGEVULD' && e.gevinkt_door_stagementor; });
@@ -416,10 +428,12 @@ function renderLogboekDag(student, weekNumber) {
   var endDate = student.eindDatum ? new Date(student.eindDatum) : null;
   var dates = getWeekDates(startDate, endDate, weekNumber - 1);
 
+  var ws = new Date(dates.startDateObj); ws.setHours(0,0,0,0);
+  var we = new Date(dates.endDateObj); we.setHours(23,59,59,999);
   var weekEntries = logboekEntriesCache.filter(function(e) {
     if (!e.datum || !dates.startDateObj || !dates.endDateObj) return false;
     var d = new Date(e.datum);
-    return d >= dates.startDateObj && d <= dates.endDateObj;
+    return d >= ws && d <= we;
   });
 
   var dagen = [];
