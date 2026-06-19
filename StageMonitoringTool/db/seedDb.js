@@ -234,9 +234,9 @@ const seedDatabase = async () => {
     console.log("Connected to database for seeding...");
 
     // 2. Clear existing data and recreate the tables fresh
-    await sequelize.query('SET FOREIGN_KEY_CHECKS = 0');
+    // await sequelize.query('SET FOREIGN_KEY_CHECKS = 0');
     await sequelize.sync({ force: true });
-    await sequelize.query('SET FOREIGN_KEY_CHECKS = 1');
+    // await sequelize.query('SET FOREIGN_KEY_CHECKS = 1');
     console.log("Tables reset cleanly.");
 
     console.log("Starting user database seeding...");

@@ -123,18 +123,22 @@ const deleteUser = async (req, res, next) => {
 
         switch (user.role) {
             case ROLES.STUDENT:
+                await Stage.update({ student_id: null }, { where: { student_id: user.user_id } });
                 await Student.destroy({ where: { user_id: user.user_id } });
                 break;
             case ROLES.STAGEMENTOR:
+                await Stage.update({ stagementor_id: null }, { where: { stagementor_id: user.user_id } });
                 await Stagementor.destroy({ where: { user_id: user.user_id } });
                 break;
             case ROLES.ADMIN:
+                await Stage.update({ admin_id: null }, { where: { admin_id: user.user_id } });
                 await Admin.destroy({ where: { user_id: user.user_id } });
                 break;
             case ROLES.STAGECOMMISIE:
                 await Stagecommisie.destroy({ where: { user_id: user.user_id } });
                 break;
             case ROLES.DOCENT:
+                await Stage.update({ docent_id: null }, { where: { docent_id: user.user_id } });
                 await Docent.destroy({ where: { user_id: user.user_id } });
                 break;
             default:

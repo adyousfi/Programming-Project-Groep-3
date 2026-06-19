@@ -148,6 +148,22 @@ export const downloadDocument = async (req, res, next) => {
   }
 };
 
+export const downloadDocumentByToken = async (req, res, next) => {
+  try {
+    const doc = await StageDocument.findOne({
+      where: { signing_token: req.params.token }
+    });
+    if (!doc) return res.status(404).send('Document niet gevonden of ongeldige token');
+    const filePath = path.join(uploadsDir, doc.stored_name);
+    if (!fs.existsSync(filePath)) return res.status(404).send('Bestand niet gevonden op server');
+    res.setHeader('Content-Disposition', `attachment; filename="${doc.original_name}"`);
+    return res.sendFile(filePath);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).send('Fout bij downloaden');
+  }
+};
+
 // ─── New: Bedrijf contract signing flow ─────────────────────────────────────
 
 /**
@@ -250,7 +266,7 @@ export const getSigningPage = async (req, res, next) => {
       : 'Student';
     const bedrijfNaam = doc.stage?.bedrijf?.naam || 'Bedrijf';
     const token = req.params.token;
-    const downloadUrl = `/api/documents/${doc.document_id}/download`;
+    const downloadUrl = `/api/documents/download-token/${token}`;
 
     const html = `<!DOCTYPE html>
 <html lang="nl">
@@ -799,9 +815,10 @@ export default {
   getMyDocuments,
   getStageDocuments,
   downloadDocument,
+  downloadDocumentByToken,
   sendContractToBedrijf,
   getSigningPage,
   submitSignature,
   getContractStatus,
-  studentSignDocument,
+  studentSignDocument
 };

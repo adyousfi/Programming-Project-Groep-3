@@ -4,11 +4,13 @@
 De Stage Monitoring Tool is een webapplicatie die ontwikkeld is om het stageproces van studenten te vereenvoudigen en te centraliseren. Met deze tool kunnen studenten hun voortgang bijhouden, terwijl stagebegeleiders en bedrijven deze eenvoudig kunnen opvolgen en evalueren. De applicatie is gericht op studenten, stagebegeleiders en bedrijven.
 
 ## ⚙️ Installatie (lokaal draaien)
+
 Clone eerst de repository met:
+
 ```bash
 git clone https://github.com/adyousfi/Programming-Project-Groep-3.git
 cd Programming-Project-Groep-3/StageMonitoringTool
-````
+```
 
 Installeer daarna alle dependencies met:
 
@@ -23,7 +25,9 @@ Maak vervolgens een `.env` bestand aan in de root van het project en configureer
 DB=
 USER=
 PASSWORD=
-JWT_SECRET = 
+
+# Verander deze waarden voor de beveiliging van het inlogproces — hoe complexer, hoe beter
+JWT_SECRET=
 ```
 
 Start tenslotte de applicatie met:
@@ -32,36 +36,40 @@ Start tenslotte de applicatie met:
 npm run start
 ```
 
-
-
 ## 🗄️ Database
 
 De applicatie werkt met een lokale database die op je eigen computer draait. Dit maakt het eenvoudig om te testen en te ontwikkelen zonder internetverbinding. Zorg ervoor dat je database actief is en dat de instellingen in je `.env` bestand correct zijn.
 
-## 🔄 Rollen en werking
+## 🔄 Ontstaan van het project
 
-Binnen de applicatie zijn er drie hoofdrollen. De student logt in, maakt een stage aan, voegt gegevens toe zoals bedrijf en taken, houdt zijn voortgang bij, uploadt documenten en communiceert met begeleiders. De stagebegeleider bekijkt studenten en hun stages, volgt hun voortgang, geeft feedback en voert evaluaties uit. De bedrijfsmentor volgt de student op de werkvloer, bevestigt activiteiten en geeft feedback of evaluaties.
+We zijn aan dit project begonnen voor een schoolopdracht aan de Erasmushogeschool Brussel, in de richting Toegepaste Informatica, voor het vak Programming Project. We hebben eerst de basisprincipes van programmeren geleerd en daarna een prototype gemaakt. Op basis van dat prototype zijn we vervolgens met de effectieve ontwikkeling gestart.
 
 ## 🔁 Algemene flow
 
-Het proces verloopt als volgt: de student registreert zijn stage en voegt regelmatig updates toe, de begeleider controleert deze informatie en geeft feedback, het bedrijf kan bijkomende feedback geven en uiteindelijk maakt de begeleider een eindbeoordeling.
-
-## 🚀 Features
-
-De tool bevat functionaliteiten zoals stagebeheer, voortgangsregistratie, een feedbacksysteem, evaluaties en communicatie tussen verschillende rollen.
+- Een student dient een stagevoorstel in.
+- Het stagecomité kan deze aanvraag accepteren, afwijzen of aanpassingen vragen.
+- Wanneer goedgekeurd, uploadt een admin een stageovereenkomst naar de student en de stagementor.
+- De stagementor en de student ondertekenen de stageovereenkomst in de applicatie.
+- De admin valideert het antwoord.
+- De student kan zijn logboek dagelijks invullen.
+- De docent, stagementor en student kunnen het logboek bekijken.
+- De docent plant een tussentijdse of finale evaluatie.
+- De student en mentor beoordelen de student.
+- De docent geeft de finale score.
+- De stage eindigt.
 
 ## 🛠️ Technologieën
 
-Het project is gebouwd met JavaScript, Node.js en een database zoals MySQL of MongoDB.
+Het project is gebouwd met JavaScript en Node.js, samen met verschillende packages en een database zoals MySQL of MongoDB.
 
 ## 👥 Team
 
-Adam YousfiI
-Imane Azehaf
-Jon Hysenaj
-Len Jochmans
-Mohamed Ayadi
+- Adam Yousfi
+- Imane Azehaf
+- Jon Hysenaj
+- Len Jochmans
+- Mohamed Ayadi
+
 ## 📄 Licentie
 
-Dit project is ontwikkeld voor educatieve doeleinden.
-
+Dit project is ontwikkeld voor educatieve doeleinden — Erasmushogeschool Brussel.

@@ -28,13 +28,9 @@ export async function renderStageformulier(container) {
                     <div class="form-section">
                         <h3 class="section-title">Studentgegevens</h3>
                         <div class="form-row">
-                            <div class="form-group">
+                            <div class="form-group" style="width: 100%;">
                                 <label for="student-naam">Naam *</label>
                                 <input type="text" id="student-naam" value="${displayName}" readonly>
-                            </div>
-                            <div class="form-group">
-                                <label for="student-nummer">Studentnummer *</label>
-                                <input type="number" id="student-nummer" value="">
                             </div>
                         </div>
                     </div>
@@ -176,7 +172,6 @@ export async function renderStageformulier(container) {
             const mentorVoornaam = pick(voornamen);
             const mentorAchternaam = pick(achternamen);
 
-            container.querySelector('#student-nummer').value = `20${randNum(20, 99)}${randNum(1000, 9999)}`;
             container.querySelector('#bedrijf-naam').value = pick(bedrijven);
             container.querySelector('#bedrijf-adres').value = `${pick(straten)} ${randNum(1, 200)}, ${pick(steden)}`;
             container.querySelector('#bedrijf-hr-email').value = `hr@${pick(['techsolutions.be', 'webstudio.be', 'innovation.be', 'cloudtech.be'])}`;
@@ -244,7 +239,6 @@ export async function renderStageformulier(container) {
 
             const proposal = {
                 studentNaam: container.querySelector('#student-naam').value.trim(),
-                studentNummer: container.querySelector('#student-nummer').value.trim(),
                 bedrijfNaam: container.querySelector('#bedrijf-naam').value.trim(),
                 bedrijfAdres: container.querySelector('#bedrijf-adres').value.trim(),
                 bedrijfHrEmail: container.querySelector('#bedrijf-hr-email').value.trim(),

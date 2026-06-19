@@ -25,7 +25,7 @@ export function verifyToken(token) {
 }
 
 export default function authMiddleware(req, res, next) {
-  if (req.originalUrl.includes('/api/documents/sign')) {
+  if (req.originalUrl.includes('/api/documents/sign') || req.originalUrl.includes('/api/documents/download-token')) {
     return next();
   }
 

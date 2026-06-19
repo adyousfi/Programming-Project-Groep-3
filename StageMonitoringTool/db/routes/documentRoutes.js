@@ -38,6 +38,9 @@ router.get('/stage/:stageId', documentController.getStageDocuments);
 // ✅ Download document
 router.get('/:id/download', documentController.downloadDocument);
 
+// ✅ Download document by token (no auth needed)
+router.get('/download-token/:token', documentController.downloadDocumentByToken);
+
 // ── Bedrijf contract signing routes ─────────────────────────────────────────
 
 // ✅ Admin sends contract PDF to bedrijf HR for signing

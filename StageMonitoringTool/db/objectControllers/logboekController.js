@@ -75,15 +75,23 @@ const upsertLogboek = async (req, res, next) => {
         if (!cookieUser) return res.status(401).json({ msg: 'Niet ingelogd' });
 
         const { stage_id, datum, uitgevoerdeTaken, reflectie, leerpunten, status } = req.body;
+        // Debug info bij 500s
+        // console.log('[upsertLogboek] payload:', req.body);
         if (!stage_id || !datum) return res.status(400).json({ msg: 'stage_id en datum zijn verplicht' });
+
+        // MSSQL + Sequelize kan falen bij `DATE(datum) = 'YYYY-MM-DD'`.
+        // Daarom parsen we de datum naar een echte Date en matchen we op die waarde.
+        // Verwacht: `datum` wordt door de frontend als `YYYY-MM-DD` gestuurd.
+        const parsedDatum = new Date(`${datum}T00:00:00.000Z`);
+        if (Number.isNaN(parsedDatum.getTime())) {
+            return res.status(400).json({ msg: 'Ongeldige datum' });
+        }
 
         const existing = await Logboek.findOne({
             where: {
                 stage_id,
-                [Logboek.sequelize.Sequelize.Op.and]: [
-                    Logboek.sequelize.where(Logboek.sequelize.fn('DATE', Logboek.sequelize.col('datum')), datum)
-                ]
-            }
+                datum: parsedDatum,
+            },
         });
 
         if (existing) {
@@ -115,16 +123,25 @@ const submitWeek = async (req, res, next) => {
         const { stage_id, weekStart, weekEnd } = req.body;
         if (!stage_id || !weekStart || !weekEnd) return res.status(400).json({ msg: 'stage_id, weekStart en weekEnd zijn verplicht' });
 
+        // weekStart/weekEnd komen vanuit de frontend als `YYYY-MM-DD`.
+        // Door MSSQL `DATE(datum)`-vergelijkingen kan dit soms falen.
+        // Daarom parsen we naar echte Date-objecten en gebruiken we een range.
+        const parsedWeekStart = new Date(`${weekStart}T00:00:00.000Z`);
+        const parsedWeekEnd = new Date(`${weekEnd}T23:59:59.999Z`);
+        if (Number.isNaN(parsedWeekStart.getTime()) || Number.isNaN(parsedWeekEnd.getTime())) {
+            return res.status(400).json({ msg: 'Ongeldige weekStart/weekEnd' });
+        }
+
         const [updated] = await Logboek.update(
             { status: 'INGEVULD' },
             {
                 where: {
                     stage_id,
-                    [Logboek.sequelize.Sequelize.Op.and]: [
-                        Logboek.sequelize.where(Logboek.sequelize.fn('DATE', Logboek.sequelize.col('datum')), { [Logboek.sequelize.Sequelize.Op.gte]: weekStart }),
-                        Logboek.sequelize.where(Logboek.sequelize.fn('DATE', Logboek.sequelize.col('datum')), { [Logboek.sequelize.Sequelize.Op.lte]: weekEnd }),
-                    ],
                     status: { [Logboek.sequelize.Sequelize.Op.ne]: 'NIETINGEVULD' },
+                    datum: {
+                        [Logboek.sequelize.Sequelize.Op.gte]: parsedWeekStart,
+                        [Logboek.sequelize.Sequelize.Op.lte]: parsedWeekEnd,
+                    },
                 },
             }
         );
@@ -188,13 +205,19 @@ const afvinkWeekDoorStudent = async (req, res, next) => {
             return res.status(403).json({ msg: 'Geen toegang tot dit logboek' });
         }
 
+        const parsedWeekStart = new Date(`${weekStart}T00:00:00.000Z`);
+        const parsedWeekEnd = new Date(`${weekEnd}T23:59:59.999Z`);
+        if (Number.isNaN(parsedWeekStart.getTime()) || Number.isNaN(parsedWeekEnd.getTime())) {
+            return res.status(400).json({ msg: 'Ongeldige weekStart/weekEnd' });
+        }
+
         const entries = await Logboek.findAll({
             where: {
                 stage_id,
-                [Logboek.sequelize.Sequelize.Op.and]: [
-                    Logboek.sequelize.where(Logboek.sequelize.fn('DATE', Logboek.sequelize.col('datum')), { [Logboek.sequelize.Sequelize.Op.gte]: weekStart }),
-                    Logboek.sequelize.where(Logboek.sequelize.fn('DATE', Logboek.sequelize.col('datum')), { [Logboek.sequelize.Sequelize.Op.lte]: weekEnd }),
-                ],
+                datum: {
+                    [Logboek.sequelize.Sequelize.Op.gte]: parsedWeekStart,
+                    [Logboek.sequelize.Sequelize.Op.lte]: parsedWeekEnd,
+                },
             },
         });
 
@@ -204,17 +227,17 @@ const afvinkWeekDoorStudent = async (req, res, next) => {
         if (!allIngevuld) return res.status(400).json({ msg: 'Niet alle dagen zijn ingevuld' });
 
         const alreadyAfgevinkt = entries.every(e => e.gevinkt_door_stagementor);
-        if (alreadyAfgevinkt) return res.status(400).json({ msg: 'Week is al afgevinkt door student' });
+        if (alreadyAfgevinkt) return res.status(400).json({ msg: 'Week is al afgevinkt' });
 
         await Logboek.update(
             { gevinkt_door_stagementor: true },
             {
                 where: {
                     stage_id,
-                    [Logboek.sequelize.Sequelize.Op.and]: [
-                        Logboek.sequelize.where(Logboek.sequelize.fn('DATE', Logboek.sequelize.col('datum')), { [Logboek.sequelize.Sequelize.Op.gte]: weekStart }),
-                        Logboek.sequelize.where(Logboek.sequelize.fn('DATE', Logboek.sequelize.col('datum')), { [Logboek.sequelize.Sequelize.Op.lte]: weekEnd }),
-                    ],
+                    datum: {
+                        [Logboek.sequelize.Sequelize.Op.gte]: parsedWeekStart,
+                        [Logboek.sequelize.Sequelize.Op.lte]: parsedWeekEnd,
+                    },
                 },
             }
         );
