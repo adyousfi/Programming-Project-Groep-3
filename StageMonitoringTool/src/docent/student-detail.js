@@ -146,8 +146,8 @@ async function renderLogboekTab(student) {
         return entryDate >= dates.startDateObj && entryDate <= dates.endDateObj;
       });
       hasEntries = weekEntries.length > 0;
-      const filledEntries = weekEntries.filter(function(e) { return e.status === 'DEELSINGEVULD' || e.status === 'INGEVULD'; });
-      daysFilled = filledEntries.length;
+      const validatedEntries = weekEntries.filter(function(e) { return e.gevinkt_door_stagementor; });
+      daysFilled = validatedEntries.length;
       allIngevuld = weekEntries.length > 0 && weekEntries.every(function(e) { return e.status === 'INGEVULD'; });
       allGevinkt = allIngevuld && weekEntries.every(function(e) { return e.gevinkt_door_stagementor; });
     }

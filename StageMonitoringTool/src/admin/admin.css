@@ -151,7 +151,9 @@
   border: 1px solid #d1d5db;
   border-radius: 6px;
   font-size: 0.9375rem;
+  color-scheme: light;
   background: white;
+  color: #111827;
 }
 
 .search-input::placeholder {
@@ -169,7 +171,9 @@
   border: 1px solid #d1d5db;
   border-radius: 6px;
   font-size: 0.9375rem;
+  color-scheme: light;
   background: white;
+  color: #111827;
   cursor: pointer;
   min-width: 150px;
 }
@@ -237,6 +241,7 @@
   border: 1px solid #d1d5db;
   border-radius: 6px;
   font-size: 0.9375rem;
+  color-scheme: light;
   background: white;
   color: #111827;
 }
@@ -261,7 +266,9 @@
   padding: 0.75rem 1rem;
   border: 1px solid #d1d5db;
   border-radius: 6px;
+  color-scheme: light;
   background: white;
+  color: #111827;
   font-size: 0.875rem;
   cursor: pointer;
   white-space: nowrap;

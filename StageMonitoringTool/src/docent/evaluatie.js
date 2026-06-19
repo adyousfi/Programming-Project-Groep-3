@@ -266,8 +266,7 @@ async function renderEvaluatiePage(app, stagiair, activeTab = 'tussentijds', eva
 
         ${evalTabsHtml(activeTab)}
 
-        <div class="sm-eval-block" style="display:grid;grid-template-columns: 1fr 320px;gap:16px;align-items:start;">
-          <div>
+        <div class="sm-eval-block">
           <div class="sm-eval-block-header">
               <h3>${blockTitle}</h3>
               <p>${blockDesc}</p>
@@ -276,7 +275,7 @@ async function renderEvaluatiePage(app, stagiair, activeTab = 'tussentijds', eva
               </p>
             </div>
 
-            <div id="sm-eval-result-column" style="position:sticky;top:16px;border:1px solid #e5e7eb;border-radius:12px;padding:14px;background:#fff;">
+            <div id="sm-eval-result-column" style="border:1px solid #e5e7eb;border-radius:12px;padding:14px;background:#fff;margin-bottom:20px;">
               <div style="font-size:13px;color:#6b7280;margin-bottom:8px;">Uitkomst</div>
               <div style="font-size:30px;font-weight:800;letter-spacing:-0.02em;color:#111827;">
                 ${initTotalPercentage !== null ? `${initTotalPercentage.toFixed(1)}/20` : '--'}

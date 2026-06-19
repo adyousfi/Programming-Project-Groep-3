@@ -4,29 +4,29 @@ configDotenv();
  
 //initialising the connection with the database
 //MySQL
-// const sequelize = new Sequelize(process.env.DB, process.env.USER, process.env.PASSWORD, {
-//   host: 'localhost',
-//   dialect: 'mysql'
-// });
+const sequelize = new Sequelize(process.env.DB, process.env.USER, process.env.PASSWORD, {
+  host: 'localhost',
+  dialect: 'mysql'
+});
  
 // Azure
-const sequelize = new Sequelize(
-  'programmingproject3',
-  'programmingproject3',
-  'EhbProjectGroep3',
-  {
-    host: 'programmingproject3.database.windows.net', // Found in Azure portal
-    dialect: 'mssql',
-    port: 1433,                                    // Default Azure SQL port
-    dialectOptions: {
-      options: {
-        encrypt: true,                             // CRITICAL: Azure SQL requires this
-        trustServerCertificate: true,              // Set to true only if using self-signed certs in dev
-        connectTimeout: 60000
-      }
-    },
-  }
-);
+// const sequelize = new Sequelize(
+//   'programmingproject3',
+//   'programmingproject3',
+//   'EhbProjectGroep3',
+//   {
+//     host: 'programmingproject3.database.windows.net', // Found in Azure portal
+//     dialect: 'mssql',
+//     port: 1433,                                    // Default Azure SQL port
+//     dialectOptions: {
+//       options: {
+//         encrypt: true,                             // CRITICAL: Azure SQL requires this
+//         trustServerCertificate: true,              // Set to true only if using self-signed certs in dev
+//         connectTimeout: 60000
+//       }
+//     },
+//   }
+// );
  
 //making the connection with the database
 const run = async () => {
@@ -43,7 +43,7 @@ const run = async () => {
     // await sequelize.sync({ force: false });
     // console.log('Tables have been reset and created successfully!');
     // //doesn't drop the tables
-    await sequelize.sync();
+    await sequelize.sync({ alter: true });
  
   } catch (error) {
     console.error('Unable to connect to the database or create tables:', error);

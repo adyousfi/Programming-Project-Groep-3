@@ -237,7 +237,7 @@ async function renderEvaluatiePage(app, stagiair, activeTab = 'tussentijds', eva
           `;
             }).join('')}
 
-          ${!studentSubmitted ? `
+          ${!studentSubmitted && !docentSubmitted ? `
           <div class="sm-eval-actions">
             <button id="sm-eval-save" class="sm-button">Beoordeling Opslaan</button>
             <button id="sm-eval-submit" class="sm-button" style="margin-left:10px;">Indienen</button>
@@ -250,8 +250,8 @@ async function renderEvaluatiePage(app, stagiair, activeTab = 'tussentijds', eva
 
   attachTabSwitch(app, stagiair);
 
-  // Grey out everything if student has submitted
-  if (studentSubmitted) {
+  // Grey out everything if student has submitted or docent has submitted
+  if (studentSubmitted || docentSubmitted) {
     document.querySelectorAll('.sm-score-card').forEach((b) => { b.disabled = true; });
     document.querySelectorAll('.sm-eval-feedback').forEach((t) => { t.disabled = true; });
     const saveBtn = document.querySelector('#sm-eval-save');
@@ -260,7 +260,11 @@ async function renderEvaluatiePage(app, stagiair, activeTab = 'tussentijds', eva
     if (submitBtn) submitBtn.disabled = true;
     const msg = document.querySelector('#sm-eval-save-message');
     if (msg) {
-      msg.textContent = 'Je evaluatie is reeds ingediend en kan niet meer worden gewijzigd.';
+      if (docentSubmitted && !studentSubmitted) {
+        msg.textContent = 'De docent heeft de evaluatie ingediend. Dit is het resultaat.';
+      } else {
+        msg.textContent = 'Je evaluatie is reeds ingediend en kan niet meer worden gewijzigd.';
+      }
       msg.classList.remove('hidden');
     }
   }

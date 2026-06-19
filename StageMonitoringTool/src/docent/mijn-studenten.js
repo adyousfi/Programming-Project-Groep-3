@@ -68,7 +68,8 @@ function berekenLogboekProgress(stageId, startDatum, eindDatum) {
         });
         if (weekEntries.length > 0) {
           const allIngevuld = weekEntries.every(function(e) { return e.status === 'INGEVULD'; });
-          if (allIngevuld) submittedWeeks++;
+          const allGevinkt = allIngevuld && weekEntries.every(function(e) { return e.gevinkt_door_stagementor; });
+          if (allGevinkt) submittedWeeks++;
         }
       }
 
