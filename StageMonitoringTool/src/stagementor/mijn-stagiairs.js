@@ -61,10 +61,12 @@ function mapApiStageToStagiair(s, logboekEntries = [], evalAvailable = false, me
   if (start && einde) {
     totalWeeks = 1;
     const nextStart = new Date(start);
+    nextStart.setHours(12, 0, 0, 0);
     const startDay = nextStart.getDay();
     const daysToMonday = startDay === 1 ? 7 : 8 - startDay;
     nextStart.setDate(nextStart.getDate() + daysToMonday);
     const endObj = new Date(einde);
+    endObj.setHours(12, 0, 0, 0);
     while (nextStart <= endObj) {
       totalWeeks++;
       nextStart.setDate(nextStart.getDate() + 7);
@@ -74,13 +76,16 @@ function mapApiStageToStagiair(s, logboekEntries = [], evalAvailable = false, me
   let submittedWeeks = 0;
   if (start && einde && logboekEntries.length > 0) {
     const startDateObj = new Date(start);
+    startDateObj.setHours(12, 0, 0, 0);
     const endDateObj = new Date(einde);
+    endDateObj.setHours(12, 0, 0, 0);
     for (let i = 0; i < totalWeeks; i++) {
       const dates = getWeekDates(startDateObj, endDateObj, i);
       if (!dates.startDateObj) continue;
       const weekEntries = logboekEntries.filter(e => {
         if (!e.datum) return false;
         const entryDate = new Date(e.datum);
+        entryDate.setHours(12, 0, 0, 0);
         return entryDate >= dates.startDateObj && entryDate <= dates.endDateObj;
       });
       if (weekEntries.length > 0 && weekEntries.every(e => e.status === 'INGEVULD' || e.status === 'DEELSINGEVULD')) {
@@ -579,7 +584,9 @@ async function renderEvaluatieScoreScreen(app, stagiair, activeTab, evaluatieDat
 async function renderLogboekOverview(app, stagiair) {
   const sd = stagiair.stageData || {};
   const startDate = sd.stageDetails?.start ? new Date(sd.stageDetails.start) : null;
+  if (startDate) startDate.setHours(12, 0, 0, 0);
   const endDate = sd.stageDetails?.einde ? new Date(sd.stageDetails.einde) : null;
+  if (endDate) endDate.setHours(12, 0, 0, 0);
 
   let logboekEntries = [];
   if (sd.id) {
@@ -622,6 +629,7 @@ async function renderLogboekOverview(app, stagiair) {
       const weekEntries = logboekEntries.filter(e => {
         if (!e.datum) return false;
         const entryDate = new Date(e.datum);
+        entryDate.setHours(12, 0, 0, 0);
         return entryDate >= dates.startDateObj && entryDate <= dates.endDateObj;
       });
       hasEntries = weekEntries.length > 0;
@@ -698,7 +706,9 @@ async function renderLogboekOverview(app, stagiair) {
 async function renderWeekDetail(app, stagiair, weekNum) {
   const sd = stagiair.stageData || {};
   const startDate = sd.stageDetails?.start ? new Date(sd.stageDetails.start) : null;
+  if (startDate) startDate.setHours(12, 0, 0, 0);
   const endDate = sd.stageDetails?.einde ? new Date(sd.stageDetails.einde) : null;
+  if (endDate) endDate.setHours(12, 0, 0, 0);
 
   let logboekEntries = [];
   if (sd.id) {

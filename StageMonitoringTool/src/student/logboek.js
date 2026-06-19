@@ -2,7 +2,9 @@ import './logboek.css';
 
 export async function renderLogboek(container, userName = 'Student', stageData = null) {
     const startDate = stageData?.stageDetails?.start ? new Date(stageData.stageDetails.start) : null;
+    if (startDate) startDate.setHours(12, 0, 0, 0);
     const endDate = stageData?.stageDetails?.einde ? new Date(stageData.stageDetails.einde) : null;
+    if (endDate) endDate.setHours(12, 0, 0, 0);
 
     let logboekEntries = [];
     let evalAvailable = false;
@@ -99,6 +101,7 @@ export async function renderLogboek(container, userName = 'Student', stageData =
             const weekEntries = logboekEntries.filter(e => {
                 if (!e.datum) return false;
                 const entryDate = new Date(e.datum);
+                entryDate.setHours(12, 0, 0, 0);
                 return entryDate >= dates.startDateObj && entryDate <= dates.endDateObj;
             });
 
