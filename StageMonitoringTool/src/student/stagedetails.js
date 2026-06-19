@@ -2,7 +2,6 @@ import './stagedetails.css';
 
 export async function renderStagedetails(container, userName = 'Jan Janssens', stageData = null) {
     const studentNaam = stageData?.naam || 'Onbekend';
-    const studentNummer = stageData?.studentNummer || 'Onbekend';
     const bedrijfNaam = stageData?.bedrijf?.naam || 'Onbekend';
     const bedrijfAdres = stageData?.bedrijf?.adres || 'Onbekend';
     const mentorNaam = stageData?.stagementor?.naam || 'Onbekend';
@@ -61,10 +60,12 @@ export async function renderStagedetails(container, userName = 'Jan Janssens', s
     const statusClass = stageData?.rawStatus === 'GOEDGEKEURD' ? 'status-goedgekeurd'
         : stageData?.rawStatus === 'AANVRAAG' ? 'status-in_afwachting'
         : stageData?.rawStatus === 'AFGEKEURD' ? 'status-afgekeurd'
+        : stageData?.rawStatus === 'DOCUMENTGEUPLOADED' ? (docValidated ? 'status-goedgekeurd' : 'status-in_afwachting')
         : 'status-goedgekeurd';
     const statusLabel = stageData?.rawStatus === 'GOEDGEKEURD' ? 'Goedgekeurd'
         : stageData?.rawStatus === 'AANVRAAG' ? 'In afwachting'
         : stageData?.rawStatus === 'AFGEKEURD' ? 'Afgekeurd'
+        : stageData?.rawStatus === 'DOCUMENTGEUPLOADED' ? (docValidated ? 'Document gevalideerd' : 'Document geüpload')
         : stageData?.rawStatus || 'Onbekend';
 
     container.innerHTML = `
@@ -97,7 +98,6 @@ export async function renderStagedetails(container, userName = 'Jan Janssens', s
                     <div class="detail-section">
                         <h3 class="detail-label">Student</h3>
                         <p class="detail-value">${studentNaam}</p>
-                        <p class="detail-sub">Studentnummer: ${studentNummer}</p>
                     </div>
 
                     <div class="detail-section">

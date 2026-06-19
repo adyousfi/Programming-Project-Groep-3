@@ -227,10 +227,12 @@ function renderStagedetailsTab(student) {
   const statusClass = sd.rawStatus === 'GOEDGEKEURD' ? 'status-goedgekeurd'
     : sd.rawStatus === 'AANVRAAG' ? 'status-in_afwachting'
     : sd.rawStatus === 'AFGEKEURD' ? 'status-afgekeurd'
+    : sd.rawStatus === 'DOCUMENTGEUPLOADED' ? (sd.document_validated ? 'status-goedgekeurd' : 'status-in_afwachting')
     : 'status-goedgekeurd';
   const statusLabel = sd.rawStatus === 'GOEDGEKEURD' ? 'Goedgekeurd'
     : sd.rawStatus === 'AANVRAAG' ? 'In afwachting'
     : sd.rawStatus === 'AFGEKEURD' ? 'Afgekeurd'
+    : sd.rawStatus === 'DOCUMENTGEUPLOADED' ? (sd.document_validated ? 'Document gevalideerd' : 'Document geüpload')
     : sd.rawStatus || 'Onbekend';
 
   return `
@@ -276,7 +278,7 @@ async function renderTabContent(tab, student) {
 }
 
 export async function renderStudentDetail(student, user, initialTab) {
-  const displayName = user ? (user.last_name ? user.last_name.toUpperCase() + ' ' + user.first_name : user.first_name || 'Docent') : 'Docent';
+  const displayName = user ? (user.last_name ? user.last_name.toUpperCase().replace(/^PROF\.\s*/i, '') + ' ' + (user.first_name || '').replace(/^Prof\.\s*/i, '') : (user.first_name || '').replace(/^Prof\.\s*/i, '') || 'Docent') : 'Docent';
   const startTab = initialTab || 'overzicht';
 
   document.querySelector('#app').innerHTML = `
@@ -292,7 +294,7 @@ export async function renderStudentDetail(student, user, initialTab) {
           </nav>
         </div>
         <div class="sd-sidebar-bottom">
-          <span class="sd-user-name">Prof. ${displayName}</span>
+          <span class="sd-user-name">Docent ${displayName}</span>
           <a href="/" class="sd-logout">Uitloggen</a>
         </div>
       </aside>
@@ -309,10 +311,10 @@ export async function renderStudentDetail(student, user, initialTab) {
     </div>
   `;
 
-  document.querySelector('#sd-terug').addEventListener('click', function(e) {
+  document.querySelector('#sd-terug').onclick = function(e) {
     e.preventDefault();
     import('./mijn-studenten.js').then(function(m) { m.renderMijnStudenten(document.querySelector('#app'), user); });
-  });
+  };
 
   document.querySelectorAll('.sd-nav-item').forEach(function(item) {
     item.addEventListener('click', async function(e) {
@@ -328,6 +330,14 @@ export async function renderStudentDetail(student, user, initialTab) {
       }
 
       document.querySelector('#sd-content').innerHTML = '<p class="sd-tab-content">Laden...</p>';
+      var topback = document.querySelector('#sd-terug');
+      if (topback) {
+        topback.textContent = '← Terug naar studenten';
+        topback.onclick = function(e) {
+          e.preventDefault();
+          import('./mijn-studenten.js').then(function(m) { m.renderMijnStudenten(document.querySelector('#app'), user); });
+        };
+      }
       document.querySelector('#sd-content').innerHTML = await renderTabContent(item.dataset.tab, student);
       setupWeekCards(student);
         if (item.dataset.tab === 'overzicht') setupActieCards(student, user);
@@ -428,7 +438,6 @@ function renderLogboekDag(student, weekNumber) {
   var nextDisabled = weekNumber >= totalWeeks ? ' disabled' : '';
 
   var html = '<div class="sd-tab-content">';
-  html += '<a href="#" class="sd-logboek-terug" id="sd-logboek-terug">← Terug naar overzicht</a>';
   html += '<div class="sd-logboek-nav">';
   html += '<button class="sd-logboek-nav-btn" id="sd-logboek-prev"' + prevDisabled + '>&#8592; Vorige week</button>';
   html += '<span class="sd-logboek-nav-info">Week ' + weekNumber + ' / ' + totalWeeks + '</span>';
@@ -464,13 +473,20 @@ function renderLogboekDag(student, weekNumber) {
 
   document.querySelector('#sd-content').innerHTML = html;
 
-  document.querySelector('#sd-logboek-terug').addEventListener('click', function(e) {
-    e.preventDefault();
-    renderLogboekTab(student).then(function(html) {
-      document.querySelector('#sd-content').innerHTML = html;
-      setupWeekCards(student);
-    });
-  });
+  var topback = document.querySelector('#sd-terug');
+  if (topback) {
+    var origTerugHandler = topback.onclick;
+    topback.textContent = '← Terug naar overzicht';
+    topback.onclick = function(e) {
+      e.preventDefault();
+      topback.textContent = '← Terug naar studenten';
+      topback.onclick = origTerugHandler;
+      renderLogboekTab(student).then(function(html) {
+        document.querySelector('#sd-content').innerHTML = html;
+        setupWeekCards(student);
+      });
+    };
+  }
 
   document.querySelector('#sd-logboek-prev').addEventListener('click', function() {
     if (currentWeekNumber > 1) renderLogboekDag(student, currentWeekNumber - 1);

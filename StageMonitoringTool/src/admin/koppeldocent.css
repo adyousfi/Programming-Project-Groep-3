@@ -107,7 +107,7 @@
   display: none;
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.4);
+  background: rgba(0, 0, 0, 0.5);
   z-index: 100;
   justify-content: center;
   align-items: center;
@@ -118,19 +118,20 @@
 }
 
 .kp-modal {
+  color-scheme: light;
   background: #ffffff;
   border-radius: 12px;
   padding: 28px;
   width: 100%;
   max-width: 420px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
 }
 
 .kp-modal-titel {
+  margin: 0 0 20px;
   font-size: 18px;
   font-weight: 700;
   color: #111827;
-  margin-bottom: 20px;
 }
 
 .kp-modal-body {
@@ -148,19 +149,53 @@
 .kp-modal-select {
   width: 100%;
   padding: 10px 12px;
-  border: 1.5px solid #e5e7eb;
-  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
   font-size: 14px;
+  font-family: inherit;
   color: #111827;
+  background: #ffffff;
   outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
 }
 
 .kp-modal-select:focus {
   border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
 .kp-modal-acties {
   display: flex;
   gap: 10px;
   justify-content: flex-end;
+}
+
+.kp-modal-btn {
+  padding: 8px 18px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.kp-modal-btn--annuleren {
+  background: #f3f4f6;
+  color: #374151;
+  border: 1px solid #e5e7eb;
+}
+
+.kp-modal-btn--annuleren:hover {
+  background: #e5e7eb;
+}
+
+.kp-modal-btn--opslaan {
+  background: #2563eb;
+  color: #ffffff;
+  border: none;
+}
+
+.kp-modal-btn--opslaan:hover {
+  background: #1d4ed8;
 }

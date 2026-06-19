@@ -24,31 +24,31 @@ export async function renderGoedgekeurdStudent(container, userName = 'Jan Jansse
             const res = await fetch(`/api/logboek/stage/${stageData.id}`, { credentials: 'include' });
             const entries = await res.json();
             if (Array.isArray(entries)) {
-                const submittedDates = entries
-                    .filter(e => e.status === 'INGEVULD' && e.datum)
-                    .map(e => new Date(e.datum));
+                let gevinktWeeks = 0;
+                for (let w = 0; w < totalWeeks; w++) {
+                    const weekStart = new Date(startDate);
+                    weekStart.setDate(startDate.getDate() + w * 7);
+                    while (weekStart.getDay() === 0 || weekStart.getDay() === 6) {
+                        weekStart.setDate(weekStart.getDate() + 1);
+                    }
+                    const weekEnd = new Date(weekStart);
+                    let count = 1;
+                    while (count < 4) {
+                        weekEnd.setDate(weekEnd.getDate() + 1);
+                        if (weekEnd.getDay() !== 0 && weekEnd.getDay() !== 6) count++;
+                    }
 
-                const submittedWeekNumbers = new Set();
-                for (const d of submittedDates) {
-                    for (let w = 0; w < totalWeeks; w++) {
-                        const weekStart = new Date(startDate);
-                        weekStart.setDate(startDate.getDate() + w * 7);
-                        while (weekStart.getDay() === 0 || weekStart.getDay() === 6) {
-                            weekStart.setDate(weekStart.getDate() + 1);
-                        }
-                        const weekEnd = new Date(weekStart);
-                        let count = 1;
-                        while (count < 4) {
-                            weekEnd.setDate(weekEnd.getDate() + 1);
-                            if (weekEnd.getDay() !== 0 && weekEnd.getDay() !== 6) count++;
-                        }
-                        if (d >= weekStart && d <= weekEnd) {
-                            submittedWeekNumbers.add(w);
-                            break;
-                        }
+                    const weekEntries = entries.filter(e => {
+                        if (!e.datum) return false;
+                        const d = new Date(e.datum);
+                        return d >= weekStart && d <= weekEnd;
+                    });
+
+                    if (weekEntries.length > 0 && weekEntries.every(e => e.status === 'INGEVULD' && e.gevinkt_door_stagementor)) {
+                        gevinktWeeks++;
                     }
                 }
-                submittedWeeks = submittedWeekNumbers.size;
+                submittedWeeks = gevinktWeeks;
             }
         } catch (err) {
             console.error('Error fetching logboek:', err);

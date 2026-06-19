@@ -31,7 +31,7 @@ function sidebarHtml(activePage) {
           <span class="sm-logo-title">Stage Monitoring</span>
           <span class="sm-logo-sub">Erasmushogeschool Brussel</span>
         </div>
-        <nav class="sm-nav sm-nav--detail">
+        <nav class="sm-nav">
           ${items.map(i => `<a class="sm-nav-item ${i.key === activePage ? 'active' : ''}" data-page="${i.key}" href="#">${i.label}</a>`).join('')}
         </nav>
       </div>
@@ -55,9 +55,9 @@ function evalTabsHtml(activeTab) {
 function attachBackLink() {
   document.querySelector('#sm-back-evaluatie')?.addEventListener('click', (e) => {
     e.preventDefault();
-    if (_currentStudent && _currentUser) {
-      import('./student-detail.js').then((m) => {
-        m.renderStudentDetail(_currentStudent, _currentUser);
+    if (_currentUser) {
+      import('./mijn-studenten.js').then((m) => {
+        m.renderMijnStudenten(document.querySelector('#app'), _currentUser);
       });
     } else {
       window.location.href = '#';
@@ -154,13 +154,11 @@ function renderEvaluatieRegistreerScreen(app, stagiair, activeTab) {
     <div class="sm-layout">
       ${sidebarHtml('evaluatie')}
       <main class="sm-main sm-main--detail">
-        <div class="sm-detail-top">
-          <div>
-            <h1 class="sm-detail-title">Evaluatie</h1>
-            <p class="sm-detail-subtitle">Bekijk studentevaluaties en geef feedback</p>
-          </div>
-          <a id="sm-back-evaluatie" class="sm-detail-back" href="#">← Terug naar stagiairs</a>
+        <div class="sm-topbar">
+          <a id="sm-back-evaluatie" class="sm-detail-back" href="#">← Terug naar studenten</a>
         </div>
+        <h1 class="sm-detail-title">Evaluatie</h1>
+        <p class="sm-detail-subtitle">Bekijk studentevaluaties en geef feedback</p>
 
         ${evalTabsHtml(activeTab)}
 
@@ -277,13 +275,11 @@ async function renderEvaluatiePage(app, stagiair, activeTab = 'tussentijds', eva
     <div class="sm-layout">
       ${sidebarHtml('evaluatie')}
       <main class="sm-main sm-main--detail">
-        <div class="sm-detail-top">
-          <div>
-            <h1 class="sm-detail-title">${pageTitle}</h1>
-            <p class="sm-detail-subtitle">${pageSubtitle}</p>
-          </div>
-          <a id="sm-back-evaluatie" class="sm-detail-back" href="#">← Terug naar stagiairs</a>
+        <div class="sm-topbar">
+          <a id="sm-back-evaluatie" class="sm-detail-back" href="#">← Terug naar studenten</a>
         </div>
+        <h1 class="sm-detail-title">${pageTitle}</h1>
+        <p class="sm-detail-subtitle">${pageSubtitle}</p>
 
         ${evalTabsHtml(activeTab)}
 
@@ -570,13 +566,11 @@ async function renderEvaluatieTab(app, stagiair, activeTab = 'tussentijds') {
       <div class="sm-layout">
         ${sidebarHtml('evaluatie')}
         <main class="sm-main sm-main--detail">
-          <div class="sm-detail-top">
-            <div>
-              <h1 class="sm-detail-title">Evaluatie</h1>
-              <p class="sm-detail-subtitle">Fout bij het laden</p>
-            </div>
-            <a id="sm-back-evaluatie" class="sm-detail-back" href="#">← Terug naar stagiairs</a>
+          <div class="sm-topbar">
+            <a id="sm-back-evaluatie" class="sm-detail-back" href="#">← Terug naar studenten</a>
           </div>
+          <h1 class="sm-detail-title">Evaluatie</h1>
+          <p class="sm-detail-subtitle">Fout bij het laden</p>
           <div class="sm-eval-block">
             <div class="sm-eval-block-header">
               <h3>Verbinding mislukt</h3>
@@ -605,8 +599,8 @@ export async function renderEvaluatieDocent(app, user, student) {
   _currentStudent = student;
 
   _userName = user && user.last_name
-    ? `${user.last_name.toUpperCase()} ${user.first_name}`
-    : user?.first_name || 'Docent';
+    ? `Docent ${user.last_name.toUpperCase().replace(/^PROF\.\s*/i, '')} ${(user.first_name || '').replace(/^Prof\.\s*/i, '')}`
+    : (user?.first_name || '').replace(/^Prof\.\s*/i, '') || 'Docent';
 
   const stagiair = {
     naam: student?.naam || 'Stagiair',
@@ -621,13 +615,11 @@ export async function renderEvaluatieDocent(app, user, student) {
       <div class="sm-layout">
         ${sidebarHtml('evaluatie')}
         <main class="sm-main sm-main--detail">
-          <div class="sm-detail-top">
-            <div>
-              <h1 class="sm-detail-title">Evaluatie</h1>
-              <p class="sm-detail-subtitle">Geen stage gevonden</p>
-            </div>
-            <a id="sm-back-evaluatie" class="sm-detail-back" href="#">← Terug naar stagiairs</a>
+          <div class="sm-topbar">
+            <a id="sm-back-evaluatie" class="sm-detail-back" href="#">← Terug naar studenten</a>
           </div>
+          <h1 class="sm-detail-title">Evaluatie</h1>
+          <p class="sm-detail-subtitle">Geen stage gevonden</p>
 
           <div class="sm-eval-block">
             <div class="sm-eval-block-header">

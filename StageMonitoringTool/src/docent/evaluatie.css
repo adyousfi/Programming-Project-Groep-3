@@ -1,11 +1,11 @@
 /* Algemene pagina-layout.
    display:flex zet de zijbalk en hoofdinhoud naast elkaar.
    min-height:100vh zorgt dat de pagina minstens zo hoog is als het scherm. */
-.sm-layout { display: flex; min-height: 100vh; font-family: system-ui, sans-serif; }
+.sm-layout { display: flex; min-height: 100vh; background: #f3f4f6; }
 
 /* Linker zijbalk.
    flex-shrink:0 zorgt dat de zijbalk niet smaller wordt als de pagina weinig ruimte heeft. */
-.sm-sidebar { width: 260px; flex-shrink: 0; background: #ffffff; border-right: 1px solid #e5e7eb; display: flex; flex-direction: column; justify-content: space-between; position: sticky; top: 0; height: 100vh; }
+.sm-sidebar { width: 260px; min-width: 260px; background: #ffffff; border-right: 1px solid #e5e7eb; display: flex; flex-direction: column; justify-content: space-between; position: sticky; top: 0; height: 100vh; }
 
 /* Bovenste deel van de zijbalk met logo en navigatie. */
 .sm-sidebar-top { padding: 28px 20px 0; }
@@ -13,43 +13,45 @@
 
 
 /* Logo-blok in de zijbalk. */
-.sm-logo { display: flex; flex-direction: column; gap: 4px; padding-bottom: 24px; border-bottom: 1px solid #e5e7eb; margin-bottom: 16px; }
+.sm-logo { padding-bottom: 24px; border-bottom: 1px solid #e5e7eb; margin-bottom: 16px; }
 
 /* Titel en subtitel van het logo. */
-.sm-logo-title { font-size: 20px; font-weight: 700; color: #111827; }
-.sm-logo-sub { font-size: 13px; color: #6b7280; }
+.sm-logo-title { display: block; font-size: 20px; font-weight: 700; color: #111827; }
+.sm-logo-sub { display: block; font-size: 13px; color: #6b7280; margin-top: 2px; }
 
 /* Navigatie-items onder elkaar. */
-.sm-nav { display: flex; flex-direction: column; gap: 6px; }
+.sm-nav { display: flex; flex-direction: column; gap: 4px; }
 
 /* Een link in het menu. */
-.sm-nav-item { display: block; padding: 10px 14px; border-radius: 10px; text-decoration: none; color: #374151; font-size: 15px; font-weight: 500; transition: background 0.15s; cursor: pointer; }
+.sm-nav-item { display: block; padding: 10px 12px; border-radius: 8px; text-decoration: none; color: #374151; font-size: 15px; font-weight: 500; transition: background 0.15s; }
 
-/* Hover is wanneer je met de muis over het item gaat.
-   active is het menu-item van de huidige pagina. */
-.sm-nav-item:hover, .sm-nav-item.active { background: #eff6ff; color: #1d4ed8; }
+/* Hover is wanneer je met de muis over het item gaat. */
+.sm-nav-item:hover { background: #f3f4f6; }
+
+/* Active is het menu-item van de huidige pagina. */
+.sm-nav-item.active { background: #dbeafe; color: #1d4ed8; font-weight: 600; }
 
 /* Onderste deel van de zijbalk met gebruiker en uitloggen. */
-.sm-sidebar-bottom { padding: 20px; border-top: 1px solid #e5e7eb; display: flex; flex-direction: column; gap: 6px; }
-.sm-user-name { font-size: 14px; font-weight: 600; color: #111827; }
+.sm-sidebar-bottom { padding: 20px; border-top: 1px solid #e5e7eb; }
+.sm-user-name { display: block; font-size: 14px; font-weight: 500; color: #111827; margin-bottom: 4px; }
 .sm-logout { font-size: 14px; color: #2563eb; text-decoration: none; cursor: pointer; }
 .sm-logout:hover { text-decoration: underline; }
 
 /* Hoofdinhoud rechts van de zijbalk. */
-.sm-main { flex: 1; background: #f8fafc; padding: 28px 32px; }
+.sm-main { flex: 1; padding: 28px 40px; }
 .sm-main-header { margin-bottom: 14px; }
-.sm-main-title { margin: 0; font-size: 30px; font-weight: 800; color: #111827; }
+.sm-main-title { margin: 0; font-size: 26px; font-weight: 700; color: #111827; }
 .sm-main-header .sm-welcome { margin: 8px 0 0; font-size: 15px; color: #4b5563; }
 
 /* Witte container rond de inhoud. */
-.sm-content { background: #ffffff; border: 1px solid #e5e7eb; border-radius: 18px; padding: 24px; }
+.sm-content { background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px; }
 .sm-welcome { margin: 0 0 24px; font-size: 15px; color: #4b5563; }
 
 /* Lijst met stagiairkaarten. */
 .sm-stagiair-list { display: flex; flex-direction: column; gap: 18px; }
 
 /* Kaart van 1 stagiair. */
-.sm-stagiair-card { padding: 24px; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 18px; box-shadow: 0 6px 16px rgba(15, 23, 42, 0.04); }
+.sm-stagiair-card { padding: 24px; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; box-shadow: 0 6px 16px rgba(15, 23, 42, 0.04); }
 
 /* Bovenste rij in een stagiairkaart: info links, badges rechts. */
 .sm-stagiair-row { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; align-items: flex-start; }
@@ -67,7 +69,7 @@
 .sm-stagiair-value { font-weight: 600; color: #111827; }
 
 /* Algemene blauwe knop. */
-.sm-button { border: none; background: #2563eb; color: #ffffff; padding: 12px 20px; border-radius: 10px; font-weight: 600; cursor: pointer; transition: background 0.2s ease; }
+.sm-button { border: none; background: #2563eb; color: #ffffff; padding: 12px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: background 0.2s ease; }
 .sm-button:hover { background: #1d4ed8; }
 
 /* Badges tonen meldingen of waarschuwingen. */
@@ -78,21 +80,19 @@
 /* Varianten voor detailpagina's. */
 .sm-sidebar--detail { width: 260px; }
 .sm-nav--detail { margin-top: 16px; }
-.sm-main--detail { padding: 28px 32px; }
+.sm-main--detail { padding: 28px 40px; }
 
 /* Bovenste deel van detailpagina's met titel en terugknop. */
-.sm-detail-top { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 24px; }
-.sm-detail-back-group { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; }
-.sm-detail-back { color: #2563eb; text-decoration: none; font-weight: 600; cursor: pointer; }
-.sm-detail-back--secondary { color: #2563eb; opacity: 0.9; }
-.sm-detail-top > div { flex: 1; display: flex; flex-direction: column; align-items: flex-start; text-align: left; }
-.sm-detail-title { margin: 0 0 8px; font-size: 32px; font-weight: 800; color: #111827; }
+.sm-topbar { display: flex; justify-content: flex-end; margin-bottom: 20px; }
+.sm-detail-back { font-size: 14px; color: #2563eb; text-decoration: none; }
+.sm-detail-back:hover { text-decoration: underline; }
+.sm-detail-title { margin: 0 0 8px; font-size: 26px; font-weight: 700; color: #111827; }
 .sm-detail-email { margin: 0; color: #6b7280; font-size: 15px; }
 .sm-detail-subtitle { margin: 8px 0 0; font-size: 14px; color: #6b7280; }
 
 /* Grid met drie infokaarten op de studentdetailpagina. */
 .sm-detail-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; margin-bottom: 24px; }
-.sm-detail-card { background: #ffffff; border: 1px solid #e5e7eb; border-radius: 18px; padding: 22px; }
+.sm-detail-card { background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 22px; }
 .sm-detail-card-label { margin: 0 0 10px; color: #6b7280; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
 .sm-detail-card-value { margin: 0 0 6px; font-size: 20px; font-weight: 700; color: #111827; }
 .sm-detail-card-meta { margin: 0; color: #6b7280; font-size: 14px; }
@@ -103,8 +103,8 @@
 
 /* Actiekaarten op de detailpagina, zoals logboek en evaluaties. */
 .sm-detail-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
-.sm-action-card { display: flex; align-items: center; gap: 16px; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 18px; padding: 20px; cursor: pointer; }
-.sm-action-icon { width: 44px; height: 44px; display: inline-flex; align-items: center; justify-content: center; border-radius: 14px; background: #eef2ff; font-size: 20px; }
+.sm-action-card { display: flex; align-items: center; gap: 16px; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px; cursor: pointer; }
+.sm-action-icon { width: 44px; height: 44px; display: inline-flex; align-items: center; justify-content: center; border-radius: 12px; background: #eef2ff; font-size: 20px; }
 .sm-action-title { margin: 0 0 6px; font-size: 16px; font-weight: 700; color: #111827; }
 .sm-action-text { margin: 0; color: #6b7280; font-size: 14px; }
 
@@ -116,7 +116,7 @@
 .sm-eval-tab:hover:not(.active) { color: #1d4ed8; }
 
 /* Groot wit blok rond de evaluatie-inhoud. */
-.sm-eval-block { background: #ffffff; border: 1px solid #e5e7eb; border-radius: 18px; padding: 28px; margin-bottom: 18px; }
+.sm-eval-block { background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 28px; margin-bottom: 18px; }
 .sm-eval-block-header h3 { margin: 0 0 8px; font-size: 22px; color: #111827; font-weight: 700; }
 .sm-eval-block-header p { margin: 0 0 20px; color: #6b7280; font-size: 15px; }
 
@@ -124,7 +124,7 @@
 .sm-score-title { color: #0b8a3b; font-size: 13px; font-weight: 700; text-transform: uppercase; margin-bottom: 14px; display: block; letter-spacing: 0.03em; }
 
 /* Grid met de vijf scorekaarten. */
-.sm-eval-score-cards { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; padding: 20px; background: #edf8f0; border: 1px solid #9be7b3; border-radius: 14px; }
+.sm-eval-score-cards { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; padding: 20px; background: #edf8f0; border: 1px solid #9be7b3; border-radius: 12px; }
 
 /* Een individuele scorekaart. */
 .sm-score-card { background: #ffffff; border: 2px solid #e5e7eb; border-radius: 12px; padding: 18px; display: flex; flex-direction: column; gap: 12px; cursor: pointer; transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease; text-align: left; min-height: 260px; }
@@ -154,7 +154,7 @@
 .sm-score-card--5.selected { background: #2e7d32; border-color: #2e7d32; }
 
 /* Groen panel met feedbackveld van de mentor. */
-.sm-eval-mentor-panel { background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 14px; padding: 20px; margin-top: 20px; }
+.sm-eval-mentor-panel { background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 12px; padding: 20px; margin-top: 20px; }
 .sm-eval-mentor-panel h4 { color: #0b8a3b; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; margin: 0 0 14px; }
 .sm-eval-feedback-label { display: block; margin-bottom: 10px; font-weight: 700; color: #111827; }
 .sm-eval-feedback { width: 100%; min-height: 120px; background: white; border: 1px solid #d1d5db; border-radius: 12px; padding: 14px 16px; font-size: 15px; font-family: inherit; box-sizing: border-box; resize: vertical; }

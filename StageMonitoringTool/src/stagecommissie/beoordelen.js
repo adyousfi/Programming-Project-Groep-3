@@ -56,8 +56,8 @@ function detailKaart(aanvraag, badgeStatus) {
         <p class="bd-veld bd-omschrijving-label">Omschrijving:</p>
         <p class="bd-omschrijving">${aanvraag.stageDetails.omschrijving}</p>
         <div class="bd-grid bd-grid--3">
-          <p class="bd-veld"><span class="bd-label">Start:</span> ${aanvraag.stageDetails.start}</p>
-          <p class="bd-veld"><span class="bd-label">Einde:</span> ${aanvraag.stageDetails.einde}</p>
+          <p class="bd-veld"><span class="bd-label">Start:</span> ${new Date(aanvraag.stageDetails.start).toLocaleDateString('nl-BE', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
+          <p class="bd-veld"><span class="bd-label">Einde:</span> ${new Date(aanvraag.stageDetails.einde).toLocaleDateString('nl-BE', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
           <p class="bd-veld"><span class="bd-label">Uren/week:</span> ${aanvraag.stageDetails.urenPerWeek}</p>
         </div>
       </div>

@@ -159,12 +159,6 @@
 .sm-afvink-message--idle { color: #6b7280; font-size: 13px; margin-top: 10px; }
 .sm-afvink-message--success { color: #16a34a; font-weight: 700; font-size: 13px; margin-top: 10px; }
 
-/* Kaart met opmerkingenveld voor de mentor. */
-.sm-week-comment-card { background: #ffffff; border: 1px solid #e5e7eb; border-radius: 18px; padding: 22px 24px; box-shadow: 0 6px 18px rgba(15, 23, 42, 0.04); }
-.sm-week-comment-label { display: block; margin-bottom: 12px; font-size: 14px; font-weight: 700; color: #111827; }
-.sm-week-comment { width: 100%; min-height: 140px; resize: vertical; border: 1px solid #d1d5db; border-radius: 16px; padding: 14px 16px; font-size: 15px; color: #111827; background: #f8fafc; font-family: inherit; box-sizing: border-box; }
-.sm-week-comment:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12); }
-
 /* Evaluatie */
 /* Tabs bovenaan de evaluatiepagina. */
 .sm-eval-tabs { display: flex; gap: 0; margin-bottom: 22px; border-bottom: 1px solid #e5e7eb; }

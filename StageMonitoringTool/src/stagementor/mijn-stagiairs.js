@@ -109,11 +109,6 @@ function smIsWeekAfgevinkt(email, week) { try { return localStorage.getItem(`sm_
 // Slaat op dat een week afgevinkt is.
 function smSetWeekAfgevinkt(email, week) { try { localStorage.setItem(`sm_afgevinkt_${email}_${week}`, '1'); } catch {} }
 
-// Haalt de opmerking van een week op.
-function smGetWeekComment(email, week) { try { return localStorage.getItem(`sm_comment_${email}_${week}`) || ''; } catch { return ''; } }
-
-// Slaat de opmerking van een week op.
-function smSaveWeekComment(email, week, text) { try { localStorage.setItem(`sm_comment_${email}_${week}`, text); } catch {} }
 
 // Haalt een opgeslagen evaluatiescore op.
 function smGetEvaluationScore(email, type, c) { try { return localStorage.getItem(`sm_eval_score_${email}_${type}_${c}`) || ''; } catch { return ''; } }
@@ -472,7 +467,7 @@ async function renderEvaluatiePage(app, stagiair, activeTab = 'tussentijds') {
 function renderEvaluatieRegistreerScreen(app, stagiair, activeTab) {
   const isFinale = activeTab === 'finale';
   const titel = isFinale ? 'Finale evaluatie' : 'Tussentijdse evaluatie';
-  app.innerHTML = `<div class="sm-layout">${sidebarHtml('evaluatie')}<main class="sm-main sm-main--detail"><div class="sm-detail-top"><div><h1 class="sm-detail-title">Evaluatie</h1><p class="sm-detail-subtitle">Evalueer de stagiair als mentor</p></div><a id="sm-back-evaluatie" class="sm-detail-back" href="#">← Terug naar stagiairs</a></div><div class="sm-eval-tabs"><button class="sm-eval-tab ${activeTab === 'tussentijds' ? 'active' : ''}" data-tab="tussentijds">Tussentijdse evaluatie</button><button class="sm-eval-tab ${activeTab === 'finale' ? 'active' : ''}" data-tab="finale">Finale evaluatie</button></div><div class="sm-eval-block"><div class="sm-eval-block-header"><h3>${titel}</h3><p>Wacht tot je docent de evaluatie aanmaakt. Zodra de evaluatie beschikbaar is, kun je hier je mentor-score en feedback invullen.</p></div></div></main></div>`;
+  app.innerHTML = `<div class="sm-layout">${sidebarHtml('evaluatie')}<main class="sm-main sm-main--detail"><div class="sm-detail-top"><div><h1 class="sm-detail-title">Evaluatie</h1><p class="sm-detail-subtitle">Evalueer de stagiair als mentor</p></div><a id="sm-back-evaluatie" class="sm-detail-back" href="#">← Terug naar stagiairs</a></div><div class="sm-eval-tabs"><button class="sm-eval-tab ${activeTab === 'tussentijds' ? 'active' : ''}" data-tab="tussentijds">Tussentijdse evaluatie</button><button class="sm-eval-tab ${activeTab === 'finale' ? 'active' : ''}" data-tab="finale">Finale evaluatie</button></div><div class="sm-eval-block"><div class="sm-eval-block-header"><h3>${titel}</h3><p>Wacht tot de docent de evaluatie aanmaakt. Zodra de evaluatie beschikbaar is, kun je hier je mentor-score en feedback invullen.</p></div></div></main></div>`;
   document.querySelector('#sm-back-evaluatie')?.addEventListener('click', (e) => { e.preventDefault(); renderStudentDetail(app, stagiair); });
   attachNav(app, stagiair);
   document.querySelectorAll('.sm-eval-tab').forEach((tab) => { tab.addEventListener('click', () => renderEvaluatiePage(app, stagiair, tab.dataset.tab)); });
@@ -743,7 +738,6 @@ async function renderWeekDetail(app, stagiair, weekNum) {
 
   const afgevinkt = days.length > 0 && days.every(d => d.status === 'Afgevinkt door stagementor');
   const allDaysIngevuld = days.length > 0 && days.every(d => d.status === 'Ingediend' || d.status === 'Afgevinkt door stagementor');
-  const comment = smGetWeekComment(stagiair.email, weekNum);
 
   app.innerHTML = `
     <div class="sm-layout">
@@ -786,15 +780,6 @@ async function renderWeekDetail(app, stagiair, weekNum) {
           <p id="sm-afvink-message" class="${afgevinkt ? 'sm-afvink-message--success' : 'sm-afvink-message--idle'}">${afgevinkt ? 'Deze week is afgevinkt en opgeslagen.' : 'Klik op Week Afvinken om deze week te bevestigen.'}</p>
         </div>
         ` : ''}
-        ${allDaysIngevuld ? `
-        <div class="sm-week-comment-card">
-          <label class="sm-week-comment-label" for="sm-comment">Opmerking bij Week ${weekNum}</label>
-          <textarea id="sm-comment" class="sm-week-comment" placeholder="Schrijf hier je opmerkingen...">${escapeHtml(comment)}</textarea>
-          <div style="margin-top:14px;">
-            <button id="sm-save-comment" class="sm-button">Opmerking Opslaan</button>
-          </div>
-        </div>
-        ` : ''}
       </main>
     </div>
   `;
@@ -805,16 +790,6 @@ async function renderWeekDetail(app, stagiair, weekNum) {
   // Terug naar het detailoverzicht van de stagiair.
   document.querySelector('#sm-back-stagiairs').addEventListener('click', (e) => { e.preventDefault(); renderStudentDetail(app, stagiair); });
   attachNav(app, stagiair);
-
-  // Slaat de tekst uit het opmerkingenveld op.
-  const saveCommentBtn = document.querySelector('#sm-save-comment');
-  if (saveCommentBtn) {
-    saveCommentBtn.addEventListener('click', () => {
-      const val = document.querySelector('#sm-comment').value.trim();
-      smSaveWeekComment(stagiair.email, weekNum, val);
-      alert(val ? 'Opmerking opgeslagen.' : 'Opmerking verwijderd.');
-    });
-  }
 
   // Zoekt de knop waarmee de mentor de week kan afvinken.
   const afvinkBtn = document.querySelector('#sm-afvink');

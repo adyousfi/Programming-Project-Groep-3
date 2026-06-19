@@ -117,7 +117,7 @@ function renderWachtOpDocent(app, stagiair, activeTab) {
         <div class="sm-eval-block">
           <div class="sm-eval-block-header">
             <h3>${titel}</h3>
-            <p>Wacht tot je docent de evaluatie aanmaakt. Je ontvangt een melding wanneer je je evaluatie kunt invullen.</p>
+            <p>Wacht tot de docent de evaluatie aanmaakt. Je ontvangt een melding wanneer je je evaluatie kunt invullen.</p>
           </div>
         </div>
       </main>

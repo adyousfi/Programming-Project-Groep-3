@@ -31,45 +31,45 @@ export async function renderStudentDashboard(container, userName = '') {
             </header>
 
             <main class="dashboard-content">
-                <!-- Stepper Section -->
-                <section class="stepper-section">
-                    <div class="stepper-container">
+                <!-- Voortgangsbalk (Stepper) -->
+                <div class="stepper-wrapper">
+                    <div class="stepper">
                         <!-- Step 1 -->
-                        <div class="step active">
+                        <div class="step completed">
                             <div class="step-circle">1</div>
-                            <div class="step-title">Aanvraag</div>
-                            <div class="step-status">Actief</div>
+                            <span class="step-label">Aanvraag</span>
+                            <span class="step-sub">Actief</span>
                         </div>
-                        <div class="step-line"></div>
+                        <div class="step-line completed"></div>
                         <!-- Step 2 -->
                         <div class="step">
                             <div class="step-circle">2</div>
-                            <div class="step-title">In beoordeling</div>
-                            <div class="step-status">Gepland</div>
+                            <span class="step-label">In beoordeling</span>
+                            <span class="step-sub">Gepland</span>
                         </div>
                         <div class="step-line"></div>
                         <!-- Step 3 -->
                         <div class="step">
                             <div class="step-circle">3</div>
-                            <div class="step-title">Goedgekeurd</div>
-                            <div class="step-status">Gepland</div>
+                            <span class="step-label">Goedgekeurd</span>
+                            <span class="step-sub">Gepland</span>
                         </div>
                         <div class="step-line"></div>
                         <!-- Step 4 -->
                         <div class="step">
                             <div class="step-circle">4</div>
-                            <div class="step-title">Stage actief</div>
-                            <div class="step-status">Gepland</div>
+                            <span class="step-label">Stage actief</span>
+                            <span class="step-sub">Gepland</span>
                         </div>
                         <div class="step-line"></div>
                         <!-- Step 5 -->
                         <div class="step">
                             <div class="step-circle">5</div>
-                            <div class="step-title">Evaluatie</div>
-                            <div class="step-status">Gepland</div>
+                            <span class="step-label">Evaluatie</span>
+                            <span class="step-sub">Gepland</span>
                         </div>
                     </div>
-                </section>
+                </div>
 
 
                 <section class="welcome-section">
