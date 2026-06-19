@@ -140,7 +140,7 @@ const competentiesPayload = [
 // ---------------------------------------------------------------------------
 // RUBRIEKEN (= de generieke indicatoren "GI x.x" per leerresultaat)
 // Key = competentie code waaraan ze hangen, gebruikt om competentie_id te koppelen.
-// volgnummer = positie binnen die competentie (1, 2, 3 ...)
+// score = positie binnen die competentie (1, 2, 3 ...)
 // ---------------------------------------------------------------------------
 const rubriekenPerCompetentie = {
   'TI_LO01_22-23': [
@@ -322,7 +322,7 @@ const seedDatabase = async () => {
       const gis = rubriekenPerCompetentie[competentie.code] || [];
       const rubriekenPayload = gis.map((gi, index) => ({
         competentie_id: competentie.competentie_id,
-        volgnummer: index + 1,
+        score: gi.score,
         code: gi.code,
         beschrijving: gi.beschrijving,
       }));

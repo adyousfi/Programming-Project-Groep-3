@@ -8,6 +8,7 @@ router.get('/all-met-rubrieken', competentieController.getAllCompetentiesMetRubr
 router.post("/create-competentie", competentieController.createCompetentie);
 router.post("/create-competentie-met-rubrieken", competentieController.createCompetentieMetRubrieken);
 router.put('/update-competentie/:competentie_id', competentieController.updateCompetentie);
+router.delete('/delete-competentie/:competentie_id', competentieController.deleteCompetentie);
 
 export default router;
 

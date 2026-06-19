@@ -1,5 +1,6 @@
 import Competentie from "../objectModel/competentie.js";
 import Rubriek from "../objectModel/rubriek.js";
+import Behaaldescore from "../objectModel/behaaldeScore.js";
 import { sequelize } from "../dbConnection.js";
 
 const createCompetentie  = async(req,res,next) =>{
@@ -141,13 +142,39 @@ const createCompetentieMetRubrieken = async (req, res, next) => {
   }
 };
 
+const deleteCompetentie = async (req, res, next) => {
+  const { competentie_id } = req.params;
+
+  try {
+    const competentie = await Competentie.findByPk(competentie_id);
+    if (!competentie) {
+      return res.status(404).json({ msg: 'Competentie niet gevonden' });
+    }
+
+    const rubrieken = await Rubriek.findAll({ where: { competentie_id } });
+    const rubriekIds = rubrieken.map(r => r.rubriek_id);
+
+    if (rubriekIds.length > 0) {
+      await Behaaldescore.destroy({ where: { rubriek_id: rubriekIds } });
+    }
+    await Behaaldescore.destroy({ where: { competentie_id } });
+
+    await competentie.destroy();
+
+    return res.status(200).json({ msg: 'Competentie verwijderd' });
+  } catch (error) {
+    console.error('Error deleting competentie:', error);
+    return res.status(500).json({ msg: 'Verwijderen mislukt', debug: error?.message ?? String(error) });
+  }
+};
+
 const getAllCompetentiesMetRubrieken = async (req, res, next) => {
   try {
     const competenties = await Competentie.findAll({
       include: [{
         model: Rubriek,
         as: 'Rubrieks',
-        attributes: ['rubriek_id', 'competentie_id', 'code', 'volgnummer', 'score', 'beschrijving'],
+        attributes: ['rubriek_id', 'competentie_id', 'code', 'score', 'beschrijving'],
       }],
       order: [['competentie_id', 'ASC']],
     });
@@ -161,5 +188,5 @@ const getAllCompetentiesMetRubrieken = async (req, res, next) => {
   }
 };
 
-export default { createCompetentie, getAllCompetenties, getAllCompetentiesMetRubrieken, updateCompetentie, createCompetentieMetRubrieken };
+export default { createCompetentie, getAllCompetenties, getAllCompetentiesMetRubrieken, updateCompetentie, createCompetentieMetRubrieken, deleteCompetentie };
 
