@@ -1,67 +1,81 @@
-/* RESET */
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-  font-family: Inter, Arial, sans-serif;
-}
-
-body {
-  background: #f9fafb;
-  color: #111827;
-}
-
-/* Layout, sidebar en page-header voor deze pagina worden gedeeld met de
+/* Sidebar, layout en page-header voor deze pagina worden gedeeld met de
    andere admin-pagina's via admin.css (.admin-layout, .sidebar, .main-content,
-   .page-header, .page-title, ...) zodat alle admin-sidebars identiek zijn. */
+   .page-header, .page-title, ...) zodat alle admin-sidebars identiek zijn.
+   De reset hieronder is bewust beperkt tot binnen .admin-layout, zodat hij
+   geen invloed heeft op andere pagina's van de app. */
+.admin-layout * {
+  box-sizing: border-box;
+}
 
 /* CARD */
 .card {
   background: #ffffff;
-  border-radius: 10px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-  margin-bottom: 20px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  margin-bottom: 24px;
   overflow: hidden;
 }
 
-/* COMP HEADER */
+/* COMPETENTIE HEADER — alles netjes gecentreerd en samenhangend */
 .competentie-header {
-  padding: 14px 16px;
+  padding: 24px 28px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  border-bottom: 1px solid #f3f4f6;
+  align-items: center;
+  gap: 14px;
+  text-align: center;
+  background: #eef0f4;
+  border-bottom: 1px solid #d8dce3;
 }
 
 .competentie-titel {
-  display: block;
-  font-size: 24px;
+  margin: 0;
+  font-size: 19px;
   font-weight: 700;
-  text-align: center;
-  width: 100%;
+  color: #111827;
 }
 
 .competentie-row {
   display: flex;
-  flex-direction: row;
-  justify-content: space-between;
+  flex-direction: column;
   align-items: center;
-  gap: 16px;
+  gap: 14px;
+  width: 100%;
 }
 
 .competentie-info {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  text-align: left;
+  align-items: center;
+  gap: 8px;
+  max-width: 640px;
+}
+
+.competentie-omschrijving {
+  margin: 0;
+  font-size: 14px;
+  color: #4b5563;
+  line-height: 1.55;
+}
+
+.competentie-gewicht {
+  margin: 0;
+  display: inline-block;
+  background: #eff6ff;
+  color: #1d4ed8;
+  font-weight: 600;
+  font-size: 13px;
+  padding: 4px 14px;
+  border-radius: 999px;
 }
 
 .competentie-row .btn-outline {
   flex-shrink: 0;
 }
 
-/* TABLE */
-table {
+/* RUBRIEKEN TABLE */
+.rubriektabel {
   width: 100%;
   border-collapse: collapse;
   table-layout: fixed;
@@ -84,28 +98,46 @@ table {
   text-align: center;
 }
 
-thead {
+.rubriektabel thead {
   background: #f9fafb;
 }
 
-thead th {
-  padding: 12px;
-  font-size: 13px;
+.rubriektabel thead th {
+  padding: 12px 16px;
+  font-size: 12px;
   font-weight: 600;
-  color: #374151;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #6b7280;
   text-align: left;
   border-bottom: 1px solid #e5e7eb;
 }
 
-tbody td {
-  padding: 12px;
-  font-size: 13px;
-  border-bottom: 1px solid #f3f4f6;
-  word-wrap: break-word;
+.rubriektabel thead th:nth-child(2),
+.rubriektabel thead th:nth-child(3) {
+  text-align: center;
 }
 
-tbody tr:last-child td {
+.rubriektabel tbody td {
+  padding: 12px 16px;
+  font-size: 14px;
+  color: #111827;
+  border-bottom: 1px solid #f3f4f6;
+  word-wrap: break-word;
+  vertical-align: middle;
+}
+
+.rubriektabel tbody tr:last-child td {
   border-bottom: none;
+}
+
+.rubriektabel tbody tr:hover {
+  background: #f9fafb;
+}
+
+.rubriektabel tbody td:nth-child(2) {
+  font-weight: 600;
+  color: #374151;
 }
 
 /* BUTTONS */
