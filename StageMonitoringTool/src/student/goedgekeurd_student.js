@@ -30,31 +30,53 @@ export async function renderGoedgekeurdStudent(container, userName = 'Jan Jansse
     }
 
     if (stageData?.id) {
+        function getWeekDates(startDate, endDate, weekIndex) {
+            const weekStart = new Date(startDate);
+            weekStart.setHours(12, 0, 0, 0);
+            if (weekIndex === 0) {
+                while (weekStart.getDay() === 0 || weekStart.getDay() === 6) {
+                    weekStart.setDate(weekStart.getDate() + 1);
+                }
+            } else {
+                const startDay = startDate.getDay();
+                const daysToMonday = startDay === 1 ? 7 : 8 - startDay;
+                weekStart.setDate(startDate.getDate() + daysToMonday + (weekIndex - 1) * 7);
+            }
+            const weekEnd = new Date(weekStart);
+            if (weekIndex === 0) {
+                weekEnd.setDate(weekEnd.getDate() + (5 - weekStart.getDay()));
+            } else {
+                weekEnd.setDate(weekEnd.getDate() + 4);
+            }
+            if (endDate && weekEnd > endDate) {
+                weekEnd.setTime(endDate.getTime());
+            }
+            return { startDateObj: new Date(weekStart), endDateObj: new Date(weekEnd) };
+        }
+
         try {
             const res = await fetch(`/api/logboek/stage/${stageData.id}`, { credentials: 'include' });
             const entries = await res.json();
             if (Array.isArray(entries)) {
                 let gevinktWeeks = 0;
                 for (let w = 0; w < totalWeeks; w++) {
-                    const weekStart = new Date(startDate);
-                    weekStart.setDate(startDate.getDate() + w * 7);
-                    while (weekStart.getDay() === 0 || weekStart.getDay() === 6) {
-                        weekStart.setDate(weekStart.getDate() + 1);
-                    }
-                    const weekEnd = new Date(weekStart);
-                    let count = 1;
-                    while (count < 4) {
-                        weekEnd.setDate(weekEnd.getDate() + 1);
-                        if (weekEnd.getDay() !== 0 && weekEnd.getDay() !== 6) count++;
-                    }
+                    const weekDates = getWeekDates(startDate, endDate, w);
+                    const weekStart = weekDates.startDateObj;
+                    const weekEnd = weekDates.endDateObj;
 
                     const weekEntries = entries.filter(e => {
                         if (!e.datum) return false;
                         const d = new Date(e.datum);
-                        return d >= weekStart && d <= weekEnd;
+                        const ws = new Date(weekStart); ws.setHours(0,0,0,0);
+                        const we = new Date(weekEnd); we.setHours(23,59,59,999);
+                        return d >= ws && d <= we;
                     });
 
-                    if (weekEntries.length > 0 && weekEntries.every(e => e.status === 'INGEVULD' && e.gevinkt_door_stagementor)) {
+                    // De backend vereist niet per se dat elke dag een logboek entry heeft (bijv. feestdagen).
+                    // Zolang de ingevulde dagen van deze week door de mentor zijn afgevinkt, beschouwen we de week als afgevinkt.
+                    const gevinkteEntries = weekEntries.filter(e => e.status === 'INGEVULD' && e.gevinkt_door_stagementor);
+                    
+                    if (weekEntries.length > 0 && gevinkteEntries.length === weekEntries.length) {
                         gevinktWeeks++;
                     }
                 }

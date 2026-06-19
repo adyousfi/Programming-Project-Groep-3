@@ -159,10 +159,12 @@ async function renderLogboekTab(student) {
         return entryDate >= dates.startDateObj && entryDate <= dates.endDateObj;
       });
       hasEntries = weekEntries.length > 0;
-      const validatedEntries = weekEntries.filter(function(e) { return e.gevinkt_door_stagementor; });
+      const validatedEntries = weekEntries.filter(function(e) { return e.status === 'INGEVULD' && e.gevinkt_door_stagementor; });
+      const filledEntries = weekEntries.filter(function(e) { return e.status === 'INGEVULD'; });
+      
       daysFilled = validatedEntries.length;
-      allIngevuld = weekEntries.length > 0 && weekEntries.every(function(e) { return e.status === 'INGEVULD'; });
-      allGevinkt = allIngevuld && weekEntries.every(function(e) { return e.gevinkt_door_stagementor; });
+      allIngevuld = dates.days > 0 && filledEntries.length === dates.days;
+      allGevinkt = dates.days > 0 && validatedEntries.length === dates.days;
     }
 
     let status = 'not_submitted';

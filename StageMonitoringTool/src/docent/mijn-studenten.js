@@ -54,15 +54,21 @@ function berekenLogboekProgress(stageId, startDatum, eindDatum) {
 
   function getWeekDates(weekIndex) {
     const weekStart = new Date(start);
-    weekStart.setDate(start.getDate() + weekIndex * 7);
-    while (weekStart.getDay() === 0 || weekStart.getDay() === 6) {
-      weekStart.setDate(weekStart.getDate() + 1);
+    weekStart.setHours(12, 0, 0, 0);
+    if (weekIndex === 0) {
+      while (weekStart.getDay() === 0 || weekStart.getDay() === 6) {
+        weekStart.setDate(weekStart.getDate() + 1);
+      }
+    } else {
+      const startDay = start.getDay();
+      const daysToMonday = startDay === 1 ? 7 : 8 - startDay;
+      weekStart.setDate(start.getDate() + daysToMonday + (weekIndex - 1) * 7);
     }
     const weekEnd = new Date(weekStart);
-    let count = 1;
-    while (count < 5) {
-      weekEnd.setDate(weekEnd.getDate() + 1);
-      if (weekEnd.getDay() !== 0 && weekEnd.getDay() !== 6) count++;
+    if (weekIndex === 0) {
+      weekEnd.setDate(weekEnd.getDate() + (5 - weekStart.getDay()));
+    } else {
+      weekEnd.setDate(weekEnd.getDate() + 4);
     }
     if (eind && weekEnd > eind) {
       weekEnd.setTime(eind.getTime());
@@ -81,15 +87,18 @@ function berekenLogboekProgress(stageId, startDatum, eindDatum) {
 
       for (let w = 0; w < totalWeeks; w++) {
         const dates = getWeekDates(w);
+        const ws = new Date(dates.startDateObj); ws.setHours(0,0,0,0);
+        const we = new Date(dates.endDateObj); we.setHours(23,59,59,999);
+
         const weekEntries = entries.filter(function(e) {
           if (!e.datum) return false;
           const d = new Date(e.datum);
-          return d >= dates.startDateObj && d <= dates.endDateObj;
+          return d >= ws && d <= we;
         });
-        if (weekEntries.length > 0) {
-          const allIngevuld = weekEntries.every(function(e) { return e.status === 'INGEVULD'; });
-          const allGevinkt = allIngevuld && weekEntries.every(function(e) { return e.gevinkt_door_stagementor; });
-          if (allGevinkt) submittedWeeks++;
+
+        const gevinkteEntries = weekEntries.filter(e => e.status === 'INGEVULD' && e.gevinkt_door_stagementor);
+        if (weekEntries.length > 0 && gevinkteEntries.length === weekEntries.length) {
+          submittedWeeks++;
         }
       }
 

@@ -58,27 +58,24 @@ function mapApiStageToStagiair(s, logboekEntries = [], evalAvailable = false, me
   const start = s.stageDetails?.start;
   const einde = s.stageDetails?.einde;
   let totalWeeks = 0;
+  let submittedWeeks = 0;
+
   if (start && einde) {
+    const startDateObj = new Date(start);
+    const endDateObj = new Date(einde);
+    startDateObj.setHours(12, 0, 0, 0);
+    endDateObj.setHours(12, 0, 0, 0);
+
     totalWeeks = 1;
-    const nextStart = new Date(start);
-    nextStart.setHours(12, 0, 0, 0);
+    const nextStart = new Date(startDateObj);
     const startDay = nextStart.getDay();
     const daysToMonday = startDay === 1 ? 7 : 8 - startDay;
     nextStart.setDate(nextStart.getDate() + daysToMonday);
-    const endObj = new Date(einde);
-    endObj.setHours(12, 0, 0, 0);
-    while (nextStart <= endObj) {
+    
+    while (nextStart <= endDateObj) {
       totalWeeks++;
       nextStart.setDate(nextStart.getDate() + 7);
     }
-  }
-
-  let submittedWeeks = 0;
-  if (start && einde && logboekEntries.length > 0) {
-    const startDateObj = new Date(start);
-    startDateObj.setHours(12, 0, 0, 0);
-    const endDateObj = new Date(einde);
-    endDateObj.setHours(12, 0, 0, 0);
     for (let i = 0; i < totalWeeks; i++) {
       const dates = getWeekDates(startDateObj, endDateObj, i);
       if (!dates.startDateObj) continue;
@@ -88,7 +85,12 @@ function mapApiStageToStagiair(s, logboekEntries = [], evalAvailable = false, me
         entryDate.setHours(12, 0, 0, 0);
         return entryDate >= dates.startDateObj && entryDate <= dates.endDateObj;
       });
-      if (weekEntries.length > 0 && weekEntries.every(e => e.status === 'INGEVULD' || e.status === 'DEELSINGEVULD')) {
+      const gevinkteEntries = weekEntries.filter(e => e.status === 'INGEVULD' && e.gevinkt_door_stagementor);
+      
+      if (weekEntries.length > 0 && gevinkteEntries.length === weekEntries.length) {
+        submittedWeeks++;
+      } else if (smIsWeekAfgevinkt(s.studentEmail, i + 1)) {
+        // Fallback for UI consistency if recently clicked but no network refresh yet
         submittedWeeks++;
       }
     }
