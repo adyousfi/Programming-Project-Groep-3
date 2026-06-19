@@ -32,7 +32,6 @@ const StageDocument = sequelize.define('stageDocument', {
     signing_token: {
         type: DataTypes.STRING,
         allowNull: true,
-        unique: true,
     },
     bedrijf_email: {
         type: DataTypes.STRING,
