@@ -205,13 +205,19 @@ const afvinkWeekDoorStudent = async (req, res, next) => {
             return res.status(403).json({ msg: 'Geen toegang tot dit logboek' });
         }
 
+        const parsedWeekStart = new Date(`${weekStart}T00:00:00.000Z`);
+        const parsedWeekEnd = new Date(`${weekEnd}T23:59:59.999Z`);
+        if (Number.isNaN(parsedWeekStart.getTime()) || Number.isNaN(parsedWeekEnd.getTime())) {
+            return res.status(400).json({ msg: 'Ongeldige weekStart/weekEnd' });
+        }
+
         const entries = await Logboek.findAll({
             where: {
                 stage_id,
-                [Logboek.sequelize.Sequelize.Op.and]: [
-                    Logboek.sequelize.where(Logboek.sequelize.fn('DATE', Logboek.sequelize.col('datum')), { [Logboek.sequelize.Sequelize.Op.gte]: weekStart }),
-                    Logboek.sequelize.where(Logboek.sequelize.fn('DATE', Logboek.sequelize.col('datum')), { [Logboek.sequelize.Sequelize.Op.lte]: weekEnd }),
-                ],
+                datum: {
+                    [Logboek.sequelize.Sequelize.Op.gte]: parsedWeekStart,
+                    [Logboek.sequelize.Sequelize.Op.lte]: parsedWeekEnd,
+                },
             },
         });
 
@@ -221,17 +227,17 @@ const afvinkWeekDoorStudent = async (req, res, next) => {
         if (!allIngevuld) return res.status(400).json({ msg: 'Niet alle dagen zijn ingevuld' });
 
         const alreadyAfgevinkt = entries.every(e => e.gevinkt_door_stagementor);
-        if (alreadyAfgevinkt) return res.status(400).json({ msg: 'Week is al afgevinkt door student' });
+        if (alreadyAfgevinkt) return res.status(400).json({ msg: 'Week is al afgevinkt' });
 
         await Logboek.update(
             { gevinkt_door_stagementor: true },
             {
                 where: {
                     stage_id,
-                    [Logboek.sequelize.Sequelize.Op.and]: [
-                        Logboek.sequelize.where(Logboek.sequelize.fn('DATE', Logboek.sequelize.col('datum')), { [Logboek.sequelize.Sequelize.Op.gte]: weekStart }),
-                        Logboek.sequelize.where(Logboek.sequelize.fn('DATE', Logboek.sequelize.col('datum')), { [Logboek.sequelize.Sequelize.Op.lte]: weekEnd }),
-                    ],
+                    datum: {
+                        [Logboek.sequelize.Sequelize.Op.gte]: parsedWeekStart,
+                        [Logboek.sequelize.Sequelize.Op.lte]: parsedWeekEnd,
+                    },
                 },
             }
         );
