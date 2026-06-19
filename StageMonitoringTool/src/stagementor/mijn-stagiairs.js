@@ -711,62 +711,48 @@ async function renderWeekDetail(app, stagiair, weekNum) {
   }
   _logboekEntriesCache = logboekEntries;
 
-  function getWeekDateObj(weekIndex, dayIndex) {
-    if (!startDate) return null;
-    const weekDates = getWeekDates(startDate, endDate, weekIndex);
-    if (!weekDates.startDateObj) return null;
-    const d = new Date(weekDates.startDateObj);
-    let count = 0;
-    while (count < dayIndex) {
-      d.setDate(d.getDate() + 1);
-      if (d.getDay() !== 0 && d.getDay() !== 6) count++;
-    }
-    return d;
-  }
-
-  const DAYS = [
-    { name: 'Maandag', short: 'ma' },
-    { name: 'Dinsdag', short: 'di' },
-    { name: 'Woensdag', short: 'wo' },
-    { name: 'Donderdag', short: 'do' },
-    { name: 'Vrijdag', short: 'vr' }
-  ];
-
   const weekIndex = weekNum - 1;
   const days = [];
-  for (let i = 0; i < 5; i++) {
-    const dayDate = getWeekDateObj(weekIndex, i);
-    if (!dayDate) continue;
-    if (endDate && dayDate > endDate) break;
+  const weekDates = getWeekDates(startDate, endDate, weekIndex);
 
-    const dateStr = dayDate.toLocaleDateString('nl-BE', { day: 'numeric', month: 'short' });
-    const y = dayDate.getFullYear();
-    const m = String(dayDate.getMonth() + 1).padStart(2, '0');
-    const d = String(dayDate.getDate()).padStart(2, '0');
-    const dateKey = `${y}-${m}-${d}`;
-    const entry = logboekEntries.find(e => {
-      if (!e.datum) return false;
-      const ed = new Date(e.datum);
-      const ey = ed.getFullYear();
-      const em = String(ed.getMonth() + 1).padStart(2, '0');
-      const eday = String(ed.getDate()).padStart(2, '0');
-      return `${ey}-${em}-${eday}` === dateKey;
-    });
+  if (weekDates.startDateObj) {
+    const dag = new Date(weekDates.startDateObj);
+    while (dag <= weekDates.endDateObj) {
+      if (dag.getDay() !== 0 && dag.getDay() !== 6) {
+        const dateStr = dag.toLocaleDateString('nl-BE', { day: 'numeric', month: 'short' });
+        const nameRaw = dag.toLocaleDateString('nl-BE', { weekday: 'long' });
+        const nameCapitalized = nameRaw.charAt(0).toUpperCase() + nameRaw.slice(1);
 
-    const isGevinkt = entry && entry.gevinkt_door_stagementor;
-    const isIngevuld = entry && (entry.status === 'INGEVULD' || entry.status === 'DEELSINGEVULD');
-    let status = 'Nog niet ingediend';
-    if (isGevinkt) status = 'Afgevinkt door stagementor';
-    else if (isIngevuld) status = 'Ingediend';
+        const y = dag.getFullYear();
+        const m = String(dag.getMonth() + 1).padStart(2, '0');
+        const d_str = String(dag.getDate()).padStart(2, '0');
+        const dateKey = `${y}-${m}-${d_str}`;
+        const entry = logboekEntries.find(e => {
+          if (!e.datum) return false;
+          const ed = new Date(e.datum);
+          const ey = ed.getFullYear();
+          const em = String(ed.getMonth() + 1).padStart(2, '0');
+          const eday = String(ed.getDate()).padStart(2, '0');
+          return `${ey}-${em}-${eday}` === dateKey;
+        });
 
-    days.push({
-      name: DAYS[i].name,
-      date: dateStr,
-      status,
-      tasks: entry ? entry.uitgevoerdeTaken || '' : '',
-      reflection: entry ? entry.reflectie || '' : '',
-      problems: entry ? entry.leerpunten || '' : ''
-    });
+        const isGevinkt = entry && entry.gevinkt_door_stagementor;
+        const isIngevuld = entry && (entry.status === 'INGEVULD' || entry.status === 'DEELSINGEVULD');
+        let status = 'Nog niet ingediend';
+        if (isGevinkt) status = 'Afgevinkt door stagementor';
+        else if (isIngevuld) status = 'Ingediend';
+
+        days.push({
+          name: nameCapitalized,
+          date: dateStr,
+          status,
+          tasks: entry ? entry.uitgevoerdeTaken || '' : '',
+          reflection: entry ? entry.reflectie || '' : '',
+          problems: entry ? entry.leerpunten || '' : ''
+        });
+      }
+      dag.setDate(dag.getDate() + 1);
+    }
   }
 
   const afgevinkt = days.length > 0 && days.every(d => d.status === 'Afgevinkt door stagementor');
@@ -846,22 +832,10 @@ async function renderWeekDetail(app, stagiair, weekNum) {
           return `${year}-${month}-${day}`;
         }
 
-        function getWeekDateObj(weekIdx, dayIdx) {
-          if (!startDateObj) return null;
-          const d = new Date(startDateObj);
-          d.setDate(startDateObj.getDate() + weekIdx * 7);
-          while (d.getDay() === 0 || d.getDay() === 6) d.setDate(d.getDate() + 1);
-          let count = 0;
-          while (count < dayIdx) {
-            d.setDate(d.getDate() + 1);
-            if (d.getDay() !== 0 && d.getDay() !== 6) count++;
-          }
-          return d;
-        }
-
         const weekIdx = weekNum - 1;
-        const firstDay = getWeekDateObj(weekIdx, 0);
-        const lastDay = getWeekDateObj(weekIdx, 4);
+        const weekDates = getWeekDates(startDateObj, endDateObj, weekIdx);
+        const firstDay = weekDates.startDateObj;
+        const lastDay = weekDates.endDateObj;
         if (!firstDay || !lastDay || !sd.id) {
           afvinkBtn.disabled = false;
           afvinkBtn.textContent = 'Week Afvinken';
