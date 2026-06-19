@@ -128,9 +128,22 @@ async function renderLogboekTab(student) {
     }
   }
 
-  totalWeeks = startDate && endDate
-    ? Math.ceil(((endDate - startDate) / (1000 * 60 * 60 * 24) + 1) / 7)
-    : 16;
+  if (startDate && endDate) {
+    totalWeeks = 1;
+    const nextStart = new Date(startDate);
+    nextStart.setHours(12, 0, 0, 0);
+    const startDay = nextStart.getDay();
+    const daysToMonday = startDay === 1 ? 7 : 8 - startDay;
+    nextStart.setDate(nextStart.getDate() + daysToMonday);
+    const endObj = new Date(endDate);
+    endObj.setHours(12, 0, 0, 0);
+    while (nextStart <= endObj) {
+      totalWeeks++;
+      nextStart.setDate(nextStart.getDate() + 7);
+    }
+  } else {
+    totalWeeks = 16;
+  }
 
   const weeks = Array.from({ length: Math.max(1, totalWeeks) }, function(_, i) {
     const dates = getWeekDates(startDate, endDate, i);

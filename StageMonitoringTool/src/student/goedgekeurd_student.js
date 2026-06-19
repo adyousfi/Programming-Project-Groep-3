@@ -15,8 +15,18 @@ export async function renderGoedgekeurdStudent(container, userName = 'Jan Jansse
     let submittedWeeks = 0;
 
     if (startDate && endDate) {
-        const totalDays = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
-        totalWeeks = Math.max(1, Math.ceil(totalDays / 7));
+        totalWeeks = 1;
+        const nextStart = new Date(startDate);
+        nextStart.setHours(12, 0, 0, 0);
+        const startDay = nextStart.getDay();
+        const daysToMonday = startDay === 1 ? 7 : 8 - startDay;
+        nextStart.setDate(nextStart.getDate() + daysToMonday);
+        const endObj = new Date(endDate);
+        endObj.setHours(12, 0, 0, 0);
+        while (nextStart <= endObj) {
+            totalWeeks++;
+            nextStart.setDate(nextStart.getDate() + 7);
+        }
     }
 
     if (stageData?.id) {

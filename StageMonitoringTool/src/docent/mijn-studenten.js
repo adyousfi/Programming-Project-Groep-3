@@ -9,8 +9,18 @@ function berekenVoortgang(startDatum, eindDatum) {
   const start = new Date(startDatum);
   const eind = new Date(eindDatum);
   const nu = getNow();
-  const totaalDagen = Math.ceil((eind - start) / (1000 * 60 * 60 * 24)) + 1;
-  const totaalWeken = Math.max(1, Math.ceil(totaalDagen / 7));
+  let totaalWeken = 1;
+  const nextStart = new Date(startDatum);
+  nextStart.setHours(12, 0, 0, 0);
+  const startDay = nextStart.getDay();
+  const daysToMonday = startDay === 1 ? 7 : 8 - startDay;
+  nextStart.setDate(nextStart.getDate() + daysToMonday);
+  const endObj = new Date(eindDatum);
+  endObj.setHours(12, 0, 0, 0);
+  while (nextStart <= endObj) {
+    totaalWeken++;
+    nextStart.setDate(nextStart.getDate() + 7);
+  }
   const verstrekenDagen = Math.max(0, Math.floor((nu - start) / (1000 * 60 * 60 * 24)));
   const verstrekenWeken = Math.floor(verstrekenDagen / 7);
   const dagenOver = Math.max(0, Math.ceil((eind - nu) / (1000 * 60 * 60 * 24)));
@@ -29,8 +39,18 @@ function berekenLogboekProgress(stageId, startDatum, eindDatum) {
   const eind = new Date(eindDatum);
   const nu = getNow();
 
-  const totaalDagen = Math.ceil((eind - start) / (1000 * 60 * 60 * 24)) + 1;
-  const totalWeeks = Math.max(1, Math.ceil(totaalDagen / 7));
+  let totalWeeks = 1;
+  const nextStart = new Date(startDatum);
+  nextStart.setHours(12, 0, 0, 0);
+  const startDay = nextStart.getDay();
+  const daysToMonday = startDay === 1 ? 7 : 8 - startDay;
+  nextStart.setDate(nextStart.getDate() + daysToMonday);
+  const endObj = new Date(eindDatum);
+  endObj.setHours(12, 0, 0, 0);
+  while (nextStart <= endObj) {
+    totalWeeks++;
+    nextStart.setDate(nextStart.getDate() + 7);
+  }
 
   function getWeekDates(weekIndex) {
     const weekStart = new Date(start);
