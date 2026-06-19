@@ -1,6 +1,6 @@
 import Competentie from "../objectModel/competentie.js";
 import Rubriek from "../objectModel/rubriek.js";
-import Behaaldescore from "../objectModel/behaaldeScore.js";
+
 import { sequelize } from "../dbConnection.js";
 
 const createCompetentie  = async(req,res,next) =>{
@@ -15,7 +15,7 @@ const createCompetentie  = async(req,res,next) =>{
             code: code,
             titel: title,
             omschrijving: omschrijving,
-            gewicht_percentage: gewicht
+            gewicht: gewicht
         })
 
 
@@ -54,7 +54,7 @@ const updateCompetentie = async (req, res, next) => {
   console.log('[updateCompetentie] req.body:', req.body);
 
   try {
-    console.log('[updateCompetentie] update payload:', { code, titel: title, omschrijving, gewicht_percentage: gewicht });
+    console.log('[updateCompetentie] update payload:', { code, titel: title, omschrijving, gewicht: gewicht });
 
 const competentie = await Competentie.findByPk(competentie_id);
     if (!competentie) return res.status(404).json({ msg: 'Competentie niet gevonden' });
@@ -63,7 +63,7 @@ const competentie = await Competentie.findByPk(competentie_id);
       code,
       titel: title,
       omschrijving,
-      gewicht_percentage: gewicht,
+      gewicht: gewicht,
     });
 
 
@@ -105,7 +105,7 @@ const createCompetentieMetRubrieken = async (req, res, next) => {
         code,
         titel: title,
         omschrijving,
-        gewicht_percentage: gewicht,
+        gewicht: gewicht,
       },
       { transaction: t }
     );
@@ -155,9 +155,8 @@ const deleteCompetentie = async (req, res, next) => {
     const rubriekIds = rubrieken.map(r => r.rubriek_id);
 
     if (rubriekIds.length > 0) {
-      await Behaaldescore.destroy({ where: { rubriek_id: rubriekIds } });
+      // cascading deletion handled by db relationships or manual rubriek deletion if needed
     }
-    await Behaaldescore.destroy({ where: { competentie_id } });
 
     await competentie.destroy();
 

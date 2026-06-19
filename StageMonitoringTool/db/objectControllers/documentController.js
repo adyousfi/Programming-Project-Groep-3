@@ -175,9 +175,9 @@ export const sendContractToBedrijf = async (req, res, next) => {
     const cookieUser = req.user;
     if (!cookieUser) return res.status(401).json({ msg: 'Niet ingelogd' });
 
-    const { stage_id, bedrijf_email } = req.body;
-    if (!stage_id || !bedrijf_email || !req.file) {
-      return res.status(400).json({ msg: 'stage_id, bedrijf_email en een PDF-bestand zijn verplicht' });
+    const { stage_id } = req.body;
+    if (!stage_id || !req.file) {
+      return res.status(400).json({ msg: 'stage_id en een PDF-bestand zijn verplicht' });
     }
 
     // Load stage info for the email
@@ -193,6 +193,10 @@ export const sendContractToBedrijf = async (req, res, next) => {
       ? `${stage.student.User.first_name} ${stage.student.User.last_name}`
       : 'Student';
     const bedrijfNaam = stage.bedrijf?.naam || 'Bedrijf';
+    const bedrijf_email = stage.bedrijf?.hr_email;
+    if (!bedrijf_email) {
+      return res.status(400).json({ msg: 'Bedrijf heeft geen HR e-mailadres ingesteld.' });
+    }
 
     // Generate unique signing token
     const token = uuidv4();
@@ -205,7 +209,6 @@ export const sendContractToBedrijf = async (req, res, next) => {
       stored_name: req.file.filename,
       uploaded_by: cookieUser.user_id,
       signing_token: token,
-      bedrijf_email: bedrijf_email,
     });
 
     // Build signing URL (served by Express directly)
@@ -651,7 +654,6 @@ export const submitSignature = async (req, res, next) => {
       original_name: `ondertekend-${doc.original_name}`,
       stored_name: signedFileName,
       uploaded_by: doc.uploaded_by,
-      bedrijf_email: doc.bedrijf_email,
       signed_at: new Date(),
     });
 
@@ -699,11 +701,16 @@ export const getContractStatus = async (req, res, next) => {
       order: [['createdAt', 'DESC']],
     });
 
+    const stage = await Stage.findByPk(stageId, {
+      include: [{ model: Bedrijf, as: 'bedrijf' }]
+    });
+    const bedrijf_email = stage?.bedrijf?.hr_email || null;
+
     if (signed) {
       return res.json({
         status: 'signed',
         signed_at: signed.signed_at,
-        bedrijf_email: signed.bedrijf_email,
+        bedrijf_email: bedrijf_email,
         document_id: signed.document_id,
         original_name: signed.original_name,
       });
@@ -711,7 +718,7 @@ export const getContractStatus = async (req, res, next) => {
     if (unsigned) {
       return res.json({
         status: 'pending',
-        bedrijf_email: unsigned.bedrijf_email,
+        bedrijf_email: bedrijf_email,
         sent_at: unsigned.createdAt,
       });
     }

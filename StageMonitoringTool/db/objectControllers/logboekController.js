@@ -60,7 +60,6 @@ const getLogboekById = async (req, res, next) => {
             reflectie: logboek.reflectie,
             leerpunten: logboek.leerpunten,
             status: logboek.status,
-            checkmark: logboek.checkmark,
             gevinkt_door_stagementor: logboek.gevinkt_door_stagementor,
         });
     } catch (err) {
@@ -105,7 +104,6 @@ const upsertLogboek = async (req, res, next) => {
                 reflectie,
                 leerpunten,
                 status: status || 'DEELSINGEVULD',
-                checkmark: false,
             });
             return res.status(201).json({ msg: 'Logboek aangemaakt', data: entry });
         }
@@ -159,7 +157,6 @@ const createLogboek = async (req, res, next) => {
         uitgevoerdeTaken,
         datum,
         leerpunten,
-        checkmark,
         reflectie,
         status
     } = req.body;
@@ -169,7 +166,6 @@ const createLogboek = async (req, res, next) => {
             uitgevoerdeTaken: uitgevoerdeTaken,
             datum: datum,
             leerpunten: leerpunten,
-            checkmark: checkmark,
             reflectie: reflectie,
             status: status
         });

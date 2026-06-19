@@ -1,6 +1,5 @@
 import { sequelize } from "../dbConnection.js";
 import { DataTypes, Deferrable } from "sequelize";
-import Opmerkinglogboek from "./opmerkingLogboek.js";
 
 export const status = {
     NIETINGEVULD: "NIETINGEVULD",
@@ -21,10 +20,6 @@ const Logboek = sequelize.define("Logboek", {
         type: DataTypes.INTEGER,
         allowNull: false,
     },
-    opmerkinglogboek_id:{
-        type:DataTypes.INTEGER,
-        allowNull:true
-    },
 
     uitgevoerdeTaken:{
         type:DataTypes.STRING,
@@ -34,9 +29,6 @@ const Logboek = sequelize.define("Logboek", {
     },
     leerpunten:{
         type: DataTypes.STRING
-    },
-    checkmark:{
-        type: DataTypes.BOOLEAN,
     },
     reflectie:{
         type: DataTypes.STRING
@@ -60,6 +52,5 @@ const Logboek = sequelize.define("Logboek", {
     }
 )
 
-Logboek.belongsTo(Opmerkinglogboek, { foreignKey: 'opmerkinglogboek_id', onDelete: 'SET NULL'});
 
 export default Logboek;

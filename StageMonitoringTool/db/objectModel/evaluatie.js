@@ -64,11 +64,6 @@ const Evaluatie = sequelize.define("Evaluatie", {
         allowNull: true,
     },
 
-    rubriek_id: {
-        type: DataTypes.INTEGER,
-        allowNull: true,
-    },
-
     datum_evaluatie: {
         type: DataTypes.DATE,
         allowNull: true,

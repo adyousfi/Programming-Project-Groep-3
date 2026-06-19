@@ -20,7 +20,7 @@ const Competentie = sequelize.define("Competentie", {
         type: DataTypes.TEXT,
         allowNull: false
     },
-    gewicht_percentage: {
+    gewicht: {
         type: DataTypes.INTEGER, // Bijv: 10 voor 10%
         allowNull: false
     }

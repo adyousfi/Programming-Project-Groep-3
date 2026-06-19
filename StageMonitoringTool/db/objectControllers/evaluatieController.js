@@ -35,7 +35,7 @@ const createEvaluatie = async (req, res, next) => {
  * Response (frontend gebruikt enkel: bestaat + evaluaties[]):
  * {
  *   bestaat: boolean,
- *   evaluaties: [{ competentie_code, competentie_id, score, feedback_docent, feedback_student, feedback_mentor, rubriek_id, type_evaluatie, datum_evaluatie }]
+ *   evaluaties: [{ competentie_code, competentie_id, score, feedback_docent, feedback_student, feedback_mentor, type_evaluatie, datum_evaluatie }]
  * }
  */
 const getEvaluatieStatus = async (req, res, next) => {
@@ -69,7 +69,7 @@ const getEvaluatieStatus = async (req, res, next) => {
         stage_id: e.stage_id,
         competentie_id: e.competentie_id,
         competentie_code: c?.code ?? null,
-        rubriek_id: e.rubriek_id,
+
         datum_evaluatie: e.datum_evaluatie,
         feedback_docent: e.feedback_docent ?? '',
         feedback_student: e.feedback_student ?? '',
@@ -83,18 +83,9 @@ const getEvaluatieStatus = async (req, res, next) => {
         ingediend_docent: e.ingediend_docent ?? false,
       };
     });
-
-
-    // Vul score via rubriek als rubriek_id gezet is.
-    const rubriekIds = Array.from(new Set(evaluatiesMapped.map((e) => e.rubriek_id).filter(Boolean)));
-    const rubrieken = rubriekIds.length ? await Rubriek.findAll({ where: { rubriek_id: rubriekIds } }) : [];
-    const rubriekById = Object.fromEntries(rubrieken.map((r) => [r.rubriek_id, r]));
-
     const evaluatiesFinal = evaluatiesMapped.map((e) => ({
       ...e,
-      // Voor docentpagina gebruiken we score_docent als bron.
-      // (score_docent werd weggeschreven bij opslaan en is veiliger dan enkel rubriek_id.)
-      score: e.score_docent ?? (e.rubriek_id ? rubriekById[e.rubriek_id]?.score ?? null : null),
+      score: e.score_docent ?? null,
     }));
 
 
@@ -162,10 +153,6 @@ const createEvaluatiesPerCompetentie = async (req, res, next) => {
     try {
       const created = [];
 
-      // Voor rubriek_id: standaard setten we niet (want score wordt pas later gekozen).
-      // UI kan rubriek_id pas nodig hebben als je score opslaat.
-      // We zetten rubriek_id null.
-
       for (const c of competenties) {
         if (bestaandeKey.has(String(c.competentie_id))) continue;
 
@@ -174,7 +161,7 @@ const createEvaluatiesPerCompetentie = async (req, res, next) => {
             type_evaluatie,
             stage_id: Number(stage_id),
             competentie_id: c.competentie_id,
-            rubriek_id: null,
+
             datum_evaluatie: new Date(),
             feedback_docent: null,
             feedback_student: null,
@@ -243,31 +230,7 @@ const updateEvaluatiesPerCompetentie = async (req, res, next) => {
       competenties.map((c) => [c.code, c])
     );
 
-    // Alleen docent-score heeft een rubriek-mapping nodig.
-    const uniqueDocentScores = Array.from(
-      new Set(
-        updates
-          .map((u) => u?.score)
-          .filter((s) => s !== null && s !== undefined)
-      )
-    );
 
-    // We hebben rubrieken nodig om score -> rubriek_id te mappen.
-    const competentieIds = competenties.map((c) => c.competentie_id);
-
-    const rubrieken = (competentieIds.length && uniqueDocentScores.length)
-      ? await Rubriek.findAll({
-          where: {
-            competentie_id: competentieIds,
-            score: uniqueDocentScores,
-          },
-        })
-      : [];
-
-    const rubriekIndex = new Map();
-    for (const r of rubrieken) {
-      rubriekIndex.set(`${r.competentie_id}:${r.score}`, r);
-    }
 
     const t = await sequelize.transaction();
     try {
@@ -285,10 +248,7 @@ const updateEvaluatiesPerCompetentie = async (req, res, next) => {
         const comp = compCode ? competentieByCode[compCode] : null;
         if (!comp) continue;
 
-        const rubriek =
-          docentScore !== null && docentScore !== undefined
-            ? rubriekIndex.get(`${comp.competentie_id}:${docentScore}`)
-            : null;
+
 
         let evaluatie = await Evaluatie.findOne({
           where: {
@@ -305,7 +265,7 @@ const updateEvaluatiesPerCompetentie = async (req, res, next) => {
             stage_id: Number(stageId),
             type_evaluatie,
             competentie_id: comp.competentie_id,
-            rubriek_id: rubriek?.rubriek_id ?? null,
+
             datum_evaluatie: new Date(),
             feedback_docent: docentFeedback,
             score_docent: docentScore ?? null,
@@ -322,7 +282,7 @@ const updateEvaluatiesPerCompetentie = async (req, res, next) => {
           const updatesToApply = { datum_evaluatie: new Date() };
           if (docentScore != null) {
             updatesToApply.score_docent = docentScore;
-            updatesToApply.rubriek_id = rubriek?.rubriek_id ?? null;
+
           }
           if (docentFeedback != null) updatesToApply.feedback_docent = docentFeedback;
           if (score_student != null) updatesToApply.score_student = score_student;
@@ -338,8 +298,7 @@ const updateEvaluatiesPerCompetentie = async (req, res, next) => {
         results.push({
           competentie_code: compCode,
           competentie_id: comp.competentie_id,
-          rubriek_id: rubriek?.rubriek_id ?? null,
-          score: docentScore ?? rubriek?.score ?? null,
+          score: docentScore ?? null,
           score_student,
           score_mentor,
           updated: !created,

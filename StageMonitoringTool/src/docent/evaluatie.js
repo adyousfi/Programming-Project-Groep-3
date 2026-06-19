@@ -210,12 +210,6 @@ function renderEvaluatieRegistreerScreen(app, stagiair, activeTab) {
 async function renderEvaluatiePage(app, stagiair, activeTab = 'tussentijds', evaluatieData = [], alreadySubmitted = false) {
   const scores = [1, 2, 3, 4, 5];
 
-  // We moeten per competentie de rubriek_id kunnen wegschrijven bij indienen.
-  // In evaluatieData zit rubriek_id (via getEvaluatieStatus).
-  const rubriekIdByCode = Object.fromEntries(
-    (evaluatieData || []).map((e) => [e.competentie_code, e.rubriek_id ?? null])
-  );
-
   const competenties = await fetchCompetentiesMetRubrieken();
 
   const dataByCode = Object.fromEntries(
@@ -414,7 +408,6 @@ async function renderEvaluatiePage(app, stagiair, activeTab = 'tussentijds', eva
     // dit per instantie (= per competentie) kan worden opgeslagen.
     const updates = Array.from(document.querySelectorAll('.sm-eval-competentie')).map((el) => {
       const code = el.dataset.competentieCode;
-      const containerRubriekId = el.dataset.rubriek_id ?? null;
 
       const selected = el.querySelector('.sm-score-card.selected');
       const feedback = el.querySelector('.sm-eval-feedback')?.value ?? '';
@@ -422,11 +415,8 @@ async function renderEvaluatiePage(app, stagiair, activeTab = 'tussentijds', eva
       // Enkel docentscore in dit scherm. student/mentor worden via andere UI's ingevuld.
       return {
         competentie_code: code,
-        // docent bepaalt rubriek_id via backend mapping op basis van competentie_id + score
         score: selected ? Number(selected.dataset.score) : null,
         feedback,
-        // zorgt ervoor dat backend ook meteen de correcte rubriek_id kan wegschrijven
-        rubriek_id: containerRubriekId ? Number(containerRubriekId) : null,
       };
     });
 

@@ -378,7 +378,6 @@ function openContractModal(stageId, bedrijfEmail) {
   document.getElementById('ad-contract-upload-zone').style.display = '';
   document.getElementById('ad-contract-selected').style.display = 'none';
   document.getElementById('ad-contract-selected-name').textContent = '';
-  document.getElementById('ad-contract-email').value = bedrijfEmail;
   document.getElementById('ad-contract-send-btn').disabled = true;
   document.getElementById('ad-contract-send-btn').textContent = 'Versturen';
   document.getElementById('ad-contract-modal').classList.add('active');
@@ -468,11 +467,7 @@ export async function renderAdminDocumenten(app) {
           Zij ontvangen een e-mail met een persoonlijke ondertekeningslink.
         </p>
 
-        <label style="font-size:13px;font-weight:600;color:#374151;display:block;margin-bottom:6px;">
-          E-mail bedrijf
-        </label>
-        <input type="email" id="ad-contract-email" class="ad-email-input"
-               placeholder="email@bedrijf.com" style="width:100%;margin-bottom:20px;">
+
 
         <label style="font-size:13px;font-weight:600;color:#374151;display:block;margin-bottom:6px;">
           Contract PDF *
@@ -664,7 +659,6 @@ export async function renderAdminDocumenten(app) {
   const contractSelectedEl = document.getElementById('ad-contract-selected');
   const contractSelectedName = document.getElementById('ad-contract-selected-name');
   const contractSendBtn = document.getElementById('ad-contract-send-btn');
-  const contractEmailInput = document.getElementById('ad-contract-email');
   let contractSelectedFile = null;
 
   function showContractFile(file) {
@@ -685,11 +679,10 @@ export async function renderAdminDocumenten(app) {
   }
 
   function updateContractSendBtn() {
-    const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contractEmailInput.value.trim());
-    contractSendBtn.disabled = !contractSelectedFile || !emailValid;
+    contractSendBtn.disabled = !contractSelectedFile;
   }
 
-  contractEmailInput.addEventListener('input', updateContractSendBtn);
+
   contractUploadZone.addEventListener('click', () => contractFileInput.click());
   contractUploadZone.addEventListener('dragover', e => { e.preventDefault(); contractUploadZone.classList.add('dragover'); });
   contractUploadZone.addEventListener('dragleave', () => contractUploadZone.classList.remove('dragover'));
@@ -711,8 +704,6 @@ export async function renderAdminDocumenten(app) {
 
   contractSendBtn.addEventListener('click', async () => {
     if (!currentStageId || !contractSelectedFile) return;
-    const email = contractEmailInput.value.trim();
-    if (!email) { alert('Vul een e-mailadres in.'); return; }
 
     contractSendBtn.disabled = true;
     contractSendBtn.textContent = 'Bezig met versturen...';
@@ -720,7 +711,6 @@ export async function renderAdminDocumenten(app) {
     const formData = new FormData();
     formData.append('document', contractSelectedFile);
     formData.append('stage_id', currentStageId);
-    formData.append('bedrijf_email', email);
 
     try {
       const res = await fetch('/api/documents/send-contract', {

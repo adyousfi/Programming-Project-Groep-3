@@ -10,8 +10,6 @@ import Stagecommisie from "./userModel/stagecommisie.js";
 import Bedrijf from "./objectModel/bedrijf.js";
 import Stage from "./objectModel/stage.js";
 import Logboek from "./objectModel/logboek.js";
-import Opmerkinglogboek from "./objectModel/opmerkingLogboek.js";
-import Behaaldescore from './objectModel/behaaldeScore.js';
 import Evaluatie from "./objectModel/evaluatie.js";
 import Competentie from "./objectModel/competentie.js";
 import Rubriek from "./objectModel/rubriek.js";
@@ -55,27 +53,10 @@ Evaluatie.belongsTo(Stage, { foreignKey: 'stage_id' });
 Stage.hasMany(Logboek, { foreignKey: 'stage_id', onDelete: 'CASCADE' });
 Logboek.belongsTo(Stage, { foreignKey: 'stage_id' });
 
-Opmerkinglogboek.hasMany(Logboek, { foreignKey: 'opmerkinglogboek_id', onDelete: 'CASCADE' });
-Logboek.belongsTo(Opmerkinglogboek, { foreignKey: 'opmerkinglogboek_id', onDelete: 'CASCADE' });
-
-// --- Evaluatie & De ingevulde Scores (1-op-N) ---
-Evaluatie.hasMany(Behaaldescore, { foreignKey: 'evaluatie_id', onDelete: 'CASCADE' });
-Behaaldescore.belongsTo(Evaluatie, { foreignKey: 'evaluatie_id' });
-
-// --- Stage & Behaaldescore ---
-// GEFIXED: Zet op NO ACTION om het conflict met de route (Stage -> Evaluatie -> Behaaldescore) te omzeilen
-Stage.hasMany(Behaaldescore, { foreignKey: 'stage_id', onDelete: 'NO ACTION' });
-Behaaldescore.belongsTo(Stage, { foreignKey: 'stage_id', onDelete: 'NO ACTION' });
-
 // --- Competentie & Rubriek (1-op-N) ---
 Competentie.hasMany(Rubriek, { foreignKey: 'competentie_id', onDelete: 'CASCADE' });
 Rubriek.belongsTo(Competentie, { foreignKey: 'competentie_id' });
 
-// --- Behaaldescore & Rubriek / Competentie ---
-Competentie.hasMany(Behaaldescore, { foreignKey: 'competentie_id', onDelete: 'NO ACTION' });
-Behaaldescore.belongsTo(Competentie, { foreignKey: 'competentie_id' });
 
-Rubriek.hasMany(Behaaldescore, { foreignKey: 'rubriek_id', onDelete: 'NO ACTION' });
-Behaaldescore.belongsTo(Rubriek, { foreignKey: 'rubriek_id' });
 
 export const confirmRelations = "relations are made";

@@ -53,7 +53,7 @@ const competentiesPayload = [
     omschrijving: 'De lerende professional beheerst het volledige project - of operationeel planningsproces.',
     niveau: 'Gespecialiseerd',
     categorie: 'DLR',
-    gewicht_percentage: 10,
+    gewicht: 10,
   },
   {
     code: 'TI_LO02_22-23',
@@ -61,7 +61,7 @@ const competentiesPayload = [
     omschrijving: 'De lerende professional ontwerpt IT-oplossingen volgens de industriestandaarden.',
     niveau: 'Gespecialiseerd',
     categorie: 'DLR',
-    gewicht_percentage: 10,
+    gewicht: 10,
   },
   {
     code: 'TI_LO03_22-23',
@@ -69,7 +69,7 @@ const competentiesPayload = [
     omschrijving: 'De lerende professional implementeert digitale producten in een professionele omgeving.',
     niveau: 'Gespecialiseerd',
     categorie: 'DLR',
-    gewicht_percentage: 10,
+    gewicht: 10,
   },
   {
     code: 'TI_LO04_22-23',
@@ -77,7 +77,7 @@ const competentiesPayload = [
     omschrijving: 'De lerende professional integreert technologie en infrastructuur binnen een professionele omgeving.',
     niveau: 'Gespecialiseerd',
     categorie: 'DLR',
-    gewicht_percentage: 10,
+    gewicht: 10,
   },
   {
     code: 'TI_LO05_22-23',
@@ -85,7 +85,7 @@ const competentiesPayload = [
     omschrijving: 'De lerende professional hanteert een onderzoekende houding om tot innovatieve oplossingen te komen.',
     niveau: 'Gespecialiseerd',
     categorie: 'DLR',
-    gewicht_percentage: 10,
+    gewicht: 10,
   },
   {
     code: 'TI_LO06_22-23',
@@ -93,7 +93,7 @@ const competentiesPayload = [
     omschrijving: 'De lerende professional communiceert helder en transparant in een professionele omgeving en/of in teamverband.',
     niveau: 'Gespecialiseerd',
     categorie: 'DLR',
-    gewicht_percentage: 10,
+    gewicht: 10,
   },
   {
     code: 'TI_LO07_22-23',
@@ -101,7 +101,7 @@ const competentiesPayload = [
     omschrijving: 'De lerende professional denkt kritisch na om problemen efficiënt en effectief op te lossen.',
     niveau: 'Gespecialiseerd',
     categorie: 'DLR',
-    gewicht_percentage: 10,
+    gewicht: 10,
   },
   {
     code: 'TI_LO08_22-23',
@@ -109,7 +109,7 @@ const competentiesPayload = [
     omschrijving: 'De lerende professional ziet persoonlijke ontwikkeling als de basis voor professionele groei.',
     niveau: 'Gespecialiseerd',
     categorie: 'DLR',
-    gewicht_percentage: 10,
+    gewicht: 10,
   },
   {
     code: 'TI_LO09_22-23',
@@ -117,7 +117,7 @@ const competentiesPayload = [
     omschrijving: 'De lerende professional ontwikkelt een professionele attitude en handelt kwaliteitsvol.',
     niveau: 'Gespecialiseerd',
     categorie: 'DLR',
-    gewicht_percentage: 10,
+    gewicht: 10,
   },
   {
     code: 'TI_LO10_22-23',
@@ -125,7 +125,7 @@ const competentiesPayload = [
     omschrijving: 'De lerende professional demonstreert ondernemend handelen in functie van waardecreatie.',
     niveau: 'Gespecialiseerd',
     categorie: 'DLR',
-    gewicht_percentage: 10,
+    gewicht: 10,
   },
   {
     code: 'TI_LO11_22-23',
@@ -133,7 +133,7 @@ const competentiesPayload = [
     omschrijving: 'De lerende professional handelt ethisch en deontologisch.',
     niveau: 'Gespecialiseerd',
     categorie: 'DLR',
-    gewicht_percentage: 10,
+    gewicht: 10,
   },
 ];
 

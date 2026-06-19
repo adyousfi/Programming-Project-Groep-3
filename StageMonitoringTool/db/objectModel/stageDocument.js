@@ -33,10 +33,6 @@ const StageDocument = sequelize.define('stageDocument', {
         type: DataTypes.STRING,
         allowNull: true,
     },
-    bedrijf_email: {
-        type: DataTypes.STRING,
-        allowNull: true,
-    },
     signed_at: {
         type: DataTypes.DATE,
         allowNull: true,

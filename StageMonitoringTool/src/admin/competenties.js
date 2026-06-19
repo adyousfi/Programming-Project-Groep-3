@@ -11,7 +11,7 @@ function mapCompetentie(dbRow) {
     code: dbRow.code,
     titel: dbRow.titel,
     omschrijving: dbRow.omschrijving,
-    gewicht: dbRow.gewicht_percentage,
+    gewicht: dbRow.gewicht,
   };
 }
 
