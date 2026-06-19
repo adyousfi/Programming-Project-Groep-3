@@ -75,15 +75,23 @@ const upsertLogboek = async (req, res, next) => {
         if (!cookieUser) return res.status(401).json({ msg: 'Niet ingelogd' });
 
         const { stage_id, datum, uitgevoerdeTaken, reflectie, leerpunten, status } = req.body;
+        // Debug info bij 500s
+        // console.log('[upsertLogboek] payload:', req.body);
         if (!stage_id || !datum) return res.status(400).json({ msg: 'stage_id en datum zijn verplicht' });
+
+        // MSSQL + Sequelize kan falen bij `DATE(datum) = 'YYYY-MM-DD'`.
+        // Daarom parsen we de datum naar een echte Date en matchen we op die waarde.
+        // Verwacht: `datum` wordt door de frontend als `YYYY-MM-DD` gestuurd.
+        const parsedDatum = new Date(`${datum}T00:00:00.000Z`);
+        if (Number.isNaN(parsedDatum.getTime())) {
+            return res.status(400).json({ msg: 'Ongeldige datum' });
+        }
 
         const existing = await Logboek.findOne({
             where: {
                 stage_id,
-                [Logboek.sequelize.Sequelize.Op.and]: [
-                    Logboek.sequelize.where(Logboek.sequelize.fn('DATE', Logboek.sequelize.col('datum')), datum)
-                ]
-            }
+                datum: parsedDatum,
+            },
         });
 
         if (existing) {
