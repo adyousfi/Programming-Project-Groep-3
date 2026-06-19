@@ -43,35 +43,33 @@ export async function renderCompetenties(app) {
   const competenties = await getCompetenties();
 
   let html = `
-    <div class="app">
+    <div class="admin-layout">
 
       <aside class="sidebar">
         <div class="sidebar-header">
-          <h1>Administratie</h1>
-          <p>Erasmushogeschool Brussel</p>
+          <h1 class="sidebar-title">Administratie</h1>
+          <p class="sidebar-subtitle">Erasmushogeschool Brussel</p>
         </div>
 
         <nav class="sidebar-nav">
-          <button id="navGebruikers" class="nav-item">Gebruikers</button>
-          <button id="navKoppelingen" class="nav-item">Koppelingen</button>
-          <button id="navDocumenten" class="nav-item">Documenten</button>
-          <button id="navCompetenties" class="nav-item active">Competenties</button>
+          <a href="#" id="navGebruikers" class="nav-item">Gebruikers</a>
+          <a href="#" id="navKoppelingen" class="nav-item">Koppelingen</a>
+          <a href="#" id="navDocumenten" class="nav-item">Documenten</a>
+          <a href="#" id="navCompetenties" class="nav-item active">Competenties</a>
         </nav>
 
         <div class="sidebar-footer">
-          <p>Admin User</p>
-          <button class="logout">Uitloggen</button>
+          <p class="user-name">Admin User</p>
+          <button class="logout-link" id="co-logout">Uitloggen</button>
         </div>
       </aside>
 
-      <main class="main">
+      <main class="main-content">
 
-        <div class="header">
-          <div>
-            <h2>Competenties beheren</h2>
-          </div>
+        <header class="page-header">
+          <h1 class="page-title">Competenties beheren</h1>
           <button class="btn-primary" id="addCompetentieBtn">+ Competentie toevoegen</button>
-        </div>
+        </header>
   `;
 
   for (const comp of competenties) {
@@ -150,9 +148,18 @@ export async function renderCompetenties(app) {
   app.innerHTML = html;
 
   /* ✅ NAVIGATIE */
-  document.getElementById('navGebruikers').onclick = () => renderAdmin(app);
-  document.getElementById('navKoppelingen').onclick = () => renderKoppelingen(app);
-  document.getElementById('navDocumenten').onclick = () => renderAdminDocumenten(app);
+  document.getElementById('navGebruikers').addEventListener('click', (e) => { e.preventDefault(); renderAdmin(app); });
+  document.getElementById('navKoppelingen').addEventListener('click', (e) => { e.preventDefault(); renderKoppelingen(app); });
+  document.getElementById('navDocumenten').addEventListener('click', (e) => { e.preventDefault(); renderAdminDocumenten(app); });
+
+  /* ✅ UITLOGGEN */
+  document.getElementById('co-logout').addEventListener('click', async () => {
+    try {
+      await fetch('/logout', { method: 'POST', credentials: 'include' });
+    } catch {}
+    document.cookie = 'user=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+    window.location.href = '/';
+  });
 
   /* ✅ MODAL */
   const modal = document.getElementById('editModal');

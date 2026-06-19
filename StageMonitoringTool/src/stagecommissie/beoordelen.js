@@ -41,9 +41,7 @@ function detailKaart(aanvraag, badgeStatus) {
         <div class="bd-grid">
           <p class="bd-veld"><span class="bd-label">Naam:</span> ${aanvraag.bedrijf.naam}</p>
           <p class="bd-veld"><span class="bd-label">Adres:</span> ${aanvraag.bedrijf.adres}</p>
-          <p class="bd-veld"><span class="bd-label">Contactpersoon:</span> ${aanvraag.bedrijf.contactpersoon}</p>
           <p class="bd-veld"><span class="bd-label">Email:</span> ${aanvraag.bedrijf.email}</p>
-          <p class="bd-veld"><span class="bd-label">Telefoon:</span> ${aanvraag.bedrijf.telefoon}</p>
         </div>
       </div>
       <div class="bd-sectie">
@@ -51,19 +49,10 @@ function detailKaart(aanvraag, badgeStatus) {
         <div class="bd-grid">
           <p class="bd-veld"><span class="bd-label">Naam:</span> ${aanvraag.stagementor.naam}</p>
           <p class="bd-veld"><span class="bd-label">Email:</span> ${aanvraag.stagementor.email}</p>
-          <p class="bd-veld"><span class="bd-label">Telefoon:</span> ${aanvraag.stagementor.telefoon}</p>
-        </div>
-      </div>
-      <div class="bd-sectie">
-        <h4 class="bd-sectie-titel">EhB Docent (Begeleider)</h4>
-        <div class="bd-grid">
-          <p class="bd-veld"><span class="bd-label">Naam:</span> ${aanvraag.docent.naam}</p>
-          <p class="bd-veld"><span class="bd-label">Email:</span> ${aanvraag.docent.email}</p>
         </div>
       </div>
       <div class="bd-sectie">
         <h4 class="bd-sectie-titel">Stage Details</h4>
-        <p class="bd-veld"><span class="bd-label">Functie:</span> ${aanvraag.functie}</p>
         <p class="bd-veld bd-omschrijving-label">Omschrijving:</p>
         <p class="bd-omschrijving">${aanvraag.stageDetails.omschrijving}</p>
         <div class="bd-grid bd-grid--3">
