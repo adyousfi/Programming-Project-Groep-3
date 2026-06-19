@@ -187,8 +187,8 @@ export async function renderGoedgekeurdStudent(container, userName = 'Jan Jansse
                             <span class="step-sub">${allLogboeksDone ? 'Voltooid' : (docValidated ? `${submittedWeeks}/${totalWeeks} weken` : 'Gepland')}</span>
                         </div>
 
-                        <div class="step-line"></div>
-                        <div class="step${allLogboeksDone ? ' next-active' : ''}${(finaleAvailable && finaleStudentSubmitted) ? ' completed' : ''}">
+                        <div class="step-line${(finaleAvailable && finaleStudentSubmitted) ? ' completed' : ''}"></div>
+                        <div class="step${(finaleAvailable && finaleStudentSubmitted) ? ' completed' : (allLogboeksDone ? ' next-active' : '')}">
                             <div class="step-circle">${(finaleAvailable && finaleStudentSubmitted) ? '&#10003;' : '5'}</div>
                             <span class="step-label">Evaluatie</span>
                             <span class="step-sub">${(finaleAvailable && finaleStudentSubmitted) ? 'Voltooid' : (allLogboeksDone ? 'Actief' : 'Gepland')}</span>
