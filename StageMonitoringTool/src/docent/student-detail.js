@@ -283,8 +283,10 @@ export async function renderStudentDetail(student, user, initialTab) {
     <div class="sd-layout">
       <aside class="sd-sidebar">
         <div class="sd-sidebar-top">
-          <span class="sd-logo-title">Stage Monitoring</span>
-          <span class="sd-logo-sub">Erasmushogeschool Brussel</span>
+          <div class="sd-logo">
+            <span class="sd-logo-title">Stage Monitoring</span>
+            <span class="sd-logo-sub">Erasmushogeschool Brussel</span>
+          </div>
           <nav class="sd-nav">
             ${renderNav(startTab)}
           </nav>

@@ -5,7 +5,7 @@
 
 /* Linker zijbalk.
    flex-shrink:0 zorgt dat de zijbalk niet smaller wordt als de pagina weinig ruimte heeft. */
-.sm-sidebar { width: 280px; flex-shrink: 0; background: #ffffff; border-right: 1px solid #e5e7eb; display: flex; flex-direction: column; justify-content: space-between; }
+.sm-sidebar { width: 260px; flex-shrink: 0; background: #ffffff; border-right: 1px solid #e5e7eb; display: flex; flex-direction: column; justify-content: space-between; position: sticky; top: 0; height: 100vh; }
 
 /* Bovenste deel van de zijbalk met logo en navigatie. */
 .sm-sidebar-top { padding: 28px 20px 0; }
@@ -16,14 +16,14 @@
 .sm-logo { display: flex; flex-direction: column; gap: 4px; padding-bottom: 24px; border-bottom: 1px solid #e5e7eb; margin-bottom: 16px; }
 
 /* Titel en subtitel van het logo. */
-.sm-logo-title { font-size: 18px; font-weight: 700; color: #111827; }
+.sm-logo-title { font-size: 20px; font-weight: 700; color: #111827; }
 .sm-logo-sub { font-size: 13px; color: #6b7280; }
 
 /* Navigatie-items onder elkaar. */
 .sm-nav { display: flex; flex-direction: column; gap: 6px; }
 
 /* Een link in het menu. */
-.sm-nav-item { display: block; padding: 10px 14px; border-radius: 10px; text-decoration: none; color: #374151; font-weight: 500; transition: background 0.15s; cursor: pointer; }
+.sm-nav-item { display: block; padding: 10px 14px; border-radius: 10px; text-decoration: none; color: #374151; font-size: 15px; font-weight: 500; transition: background 0.15s; cursor: pointer; }
 
 /* Hover is wanneer je met de muis over het item gaat.
    active is het menu-item van de huidige pagina. */

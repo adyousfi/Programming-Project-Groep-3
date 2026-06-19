@@ -324,8 +324,10 @@ export async function renderMijnStudenten(app, user) {
     <div class="dc-layout">
       <aside class="dc-sidebar">
         <div class="dc-sidebar-top">
-          <span class="dc-logo-title">EhB-docent</span>
-          <span class="dc-logo-sub">Erasmushogeschool Brussel</span>
+          <div class="dc-logo">
+            <span class="dc-logo-title">EhB-docent</span>
+            <span class="dc-logo-sub">Erasmushogeschool Brussel</span>
+          </div>
           <nav class="dc-nav">
             <a href="#" class="dc-nav-item active" data-filter="actief">Actieve stages <span class="dc-nav-count">(${actief.length})</span></a>
             <a href="#" class="dc-nav-item" data-filter="alle">Alle studenten <span class="dc-nav-count">(${studenten.length})</span></a>
