@@ -56,7 +56,7 @@ function setupBeoordelenButtons() {
 }
 
 function setupFilter() {
-  const navItems = document.querySelectorAll('.sc-nav-item');
+  const navItems = document.querySelectorAll('.sidebar-nav-item');
   const kaartenDiv = document.querySelector('.sc-kaarten');
 
   navItems.forEach(function(item) {
@@ -85,19 +85,19 @@ export async function renderAanvragen() {
   document.querySelector('#app').innerHTML = `
     <div class="sc-layout">
       <aside class="sc-sidebar">
-        <div class="sc-sidebar-top">
-          <div class="sc-logo">
-            <span class="sc-logo-title">Stagecommissie</span>
-            <span class="sc-logo-sub">Erasmushogeschool Brussel</span>
+        <div class="sidebar-top">
+          <div class="sidebar-logo">
+            <span class="sidebar-logo-title">Stage Monitoring</span>
+            <span class="sidebar-logo-sub">Erasmushogeschool Brussel</span>
           </div>
-          <nav class="sc-nav">
-            <a href="#" class="sc-nav-item active" data-filter="in_afwachting">In afwachting <span class="sc-nav-count">${aantalAfwachting}</span></a>
-            <a href="#" class="sc-nav-item" data-filter="alle">Alle aanvragen <span class="sc-nav-count">${aanvragen.length}</span></a>
+          <nav class="sidebar-nav">
+            <a href="#" class="sidebar-nav-item active" data-filter="in_afwachting">In afwachting <span class="sc-nav-count">${aantalAfwachting}</span></a>
+            <a href="#" class="sidebar-nav-item" data-filter="alle">Alle aanvragen <span class="sc-nav-count">${aanvragen.length}</span></a>
           </nav>
         </div>
-        <div class="sc-sidebar-bottom">
-          <span class="sc-user-name">${userName}</span>
-          <a href="/" class="sc-logout">Uitloggen</a>
+        <div class="sidebar-bottom">
+          <span class="sidebar-user-name">${userName}</span>
+          <a href="/" class="sidebar-logout">Uitloggen</a>
         </div>
       </aside>
       <main class="sc-main">

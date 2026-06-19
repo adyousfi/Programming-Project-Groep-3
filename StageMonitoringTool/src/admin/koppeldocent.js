@@ -368,14 +368,14 @@ export async function renderKoppelingen(app) {
     <!-- Docent Modal -->
     <div class="kp-modal-overlay" id="kp-modal">
       <div class="kp-modal">
-        <h2 id="kp-modal-titel"></h2>
-        <div>
-          <label>Kies een docent</label>
-          <select id="kp-docent-select"></select>
+        <h2 class="kp-modal-titel" id="kp-modal-titel"></h2>
+        <div class="kp-modal-body">
+          <label class="kp-modal-label">Kies een docent</label>
+          <select class="kp-modal-select" id="kp-docent-select"></select>
         </div>
-        <div>
-          <button id="kp-modal-opslaan">Opslaan</button>
-          <button id="kp-modal-annuleren">Annuleren</button>
+        <div class="kp-modal-acties">
+          <button class="kp-modal-btn kp-modal-btn--annuleren" id="kp-modal-annuleren">Annuleren</button>
+          <button class="kp-modal-btn kp-modal-btn--opslaan" id="kp-modal-opslaan">Opslaan</button>
         </div>
       </div>
     </div>
@@ -383,14 +383,14 @@ export async function renderKoppelingen(app) {
     <!-- Mentor Modal -->
     <div class="kp-modal-overlay" id="kp-mentor-modal">
       <div class="kp-modal">
-        <h2 id="kp-mentor-modal-titel">Mentor wijzigen</h2>
-        <div>
-          <label>Kies een mentor</label>
-          <select id="kp-mentor-select"></select>
+        <h2 class="kp-modal-titel" id="kp-mentor-modal-titel">Mentor wijzigen</h2>
+        <div class="kp-modal-body">
+          <label class="kp-modal-label">Kies een mentor</label>
+          <select class="kp-modal-select" id="kp-mentor-select"></select>
         </div>
-        <div>
-          <button id="kp-mentor-modal-opslaan">Opslaan</button>
-          <button id="kp-mentor-modal-annuleren">Annuleren</button>
+        <div class="kp-modal-acties">
+          <button class="kp-modal-btn kp-modal-btn--annuleren" id="kp-mentor-modal-annuleren">Annuleren</button>
+          <button class="kp-modal-btn kp-modal-btn--opslaan" id="kp-mentor-modal-opslaan">Opslaan</button>
         </div>
       </div>
     </div>

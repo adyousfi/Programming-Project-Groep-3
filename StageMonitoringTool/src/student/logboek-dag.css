@@ -22,30 +22,30 @@
     height: 100vh;
 }
 
-.logboek-dag-sidebar .sidebar-logo {
+.sidebar-logo {
     padding-bottom: 20px;
     border-bottom: 1px solid #e9ecef;
 }
 
-.logboek-dag-sidebar .sidebar-logo-title {
+.sidebar-logo-title {
     display: block;
     font-size: 20px;
     font-weight: 700;
     color: #111;
 }
 
-.logboek-dag-sidebar .sidebar-logo-sub {
+.sidebar-logo-sub {
     display: block;
     font-size: 13px;
     color: #6c757d;
     margin-top: 0.15rem;
 }
 
-.logboek-dag-sidebar .sidebar-nav {
+.sidebar-nav {
     margin-top: 2rem;
 }
 
-.logboek-dag-sidebar .sidebar-nav-item {
+.sidebar-nav-item {
     display: block;
     padding: 0.5rem 0.75rem;
     border-radius: 6px;
@@ -54,42 +54,58 @@
     text-decoration: none;
 }
 
-.logboek-dag-sidebar .sidebar-nav-item.active {
+.sidebar-nav-item.active {
     background-color: #e0e7ff;
     color: #3b82f6;
     font-weight: 600;
 }
 
-.logboek-dag-sidebar .sidebar-nav-item:hover:not(.active) {
+.sidebar-nav-item:hover:not(.active) {
     background-color: #f1f3f5;
 }
 
-.logboek-dag-sidebar .sidebar-nav-item.disabled {
+.sidebar-nav-item.disabled {
     color: #adb5bd;
     pointer-events: none;
     cursor: default;
 }
 
-.logboek-dag-sidebar .sidebar-bottom {
+.sidebar-bottom {
+    padding: 20px;
+    border-top: 1px solid #e5e7eb;
     display: flex;
     flex-direction: column;
-    gap: 0.3rem;
+    gap: 4px;
 }
 
-.logboek-dag-sidebar .sidebar-user-name {
+.sidebar-user-name {
     font-size: 14px;
     font-weight: 500;
     color: #212529;
 }
 
-.logboek-dag-sidebar .sidebar-logout {
+.sidebar-logout {
     font-size: 14px;
     color: #0d6efd;
     text-decoration: none;
 }
 
-.logboek-dag-sidebar .sidebar-logout:hover {
+.sidebar-logout:hover {
     text-decoration: underline;
+}
+
+.sidebar-badge {
+    display: inline-block;
+    background: #3b82f6;
+    color: #ffffff;
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 10px;
+    margin-left: 6px;
+    vertical-align: middle;
+    line-height: 1.4;
+    letter-spacing: 0.02em;
 }
 
 /* Main */
@@ -101,7 +117,8 @@
 
 /* Back link */
 .logboek-dag-back {
-    display: inline-block;
+    display: block;
+    text-align: right;
     font-size: 0.875rem;
     color: #0d6efd;
     text-decoration: none;

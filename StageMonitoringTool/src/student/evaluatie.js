@@ -4,6 +4,7 @@ let _userName = 'Student';
 let _currentUser = null;
 let _stageData = null;
 let _competentiesCache = null;
+let _anyNewEval = false;
 
 function escapeHtml(s) {
   return String(s ?? '')
@@ -18,24 +19,24 @@ function escapeHtml(s) {
 
 function sidebarHtml() {
   return `
-    <aside class="sm-sidebar">
-      <div class="sm-sidebar-top">
-        <div class="sm-logo">
-          <span class="sm-logo-title">Stage Monitoring</span>
-          <span class="sm-logo-sub">Erasmushogeschool Brussel</span>
+    <aside class="evaluatie-sidebar">
+        <div class="sidebar-top">
+            <div class="sidebar-logo">
+                <span class="sidebar-logo-title">Stage Monitoring</span>
+                <span class="sidebar-logo-sub">Erasmushogeschool Brussel</span>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="?role=goedgekeurd_student" class="sidebar-nav-item">Overzicht</a>
+                <a href="?role=stagedetails" class="sidebar-nav-item">Stagedetails</a>
+                <a href="?role=documenten" class="sidebar-nav-item">Documenten</a>
+                <a href="?role=logboek" class="sidebar-nav-item">Logboek</a>
+                <a href="?role=evaluatie" class="sidebar-nav-item active">Evaluatie${_anyNewEval ? ' <span class="sidebar-badge">Nieuw</span>' : ''}</a>
+            </nav>
         </div>
-        <nav class="sm-nav">
-          <a class="sm-nav-item" href="?role=goedgekeurd_student">Overzicht</a>
-          <a class="sm-nav-item" href="?role=stagedetails">Stagedetails</a>
-          <a class="sm-nav-item" href="?role=documenten">Documenten</a>
-          <a class="sm-nav-item" href="?role=logboek">Logboek</a>
-          <a class="sm-nav-item active" href="?role=evaluatie">Evaluatie</a>
-        </nav>
-      </div>
-      <div class="sm-sidebar-bottom">
-        <span class="sm-user-name">${_userName}</span>
-        <a class="sm-logout" href="/">Uitloggen</a>
-      </div>
+        <div class="sidebar-bottom">
+            <span class="sidebar-user-name">${_userName}</span>
+            <a href="/" class="sidebar-logout">Uitloggen</a>
+        </div>
     </aside>
   `;
 }
@@ -101,9 +102,9 @@ function renderWachtOpDocent(app, stagiair, activeTab) {
   const titel = isFinale ? 'Finale evaluatie' : 'Tussentijdse evaluatie';
 
   app.innerHTML = `
-    <div class="sm-layout">
+    <div class="evaluatie-layout">
       ${sidebarHtml()}
-      <main class="sm-main sm-main--detail">
+      <main class="evaluatie-main">
         <div class="sm-detail-top">
           <div>
             <h1 class="sm-detail-title">Evaluatie</h1>
@@ -116,7 +117,7 @@ function renderWachtOpDocent(app, stagiair, activeTab) {
         <div class="sm-eval-block">
           <div class="sm-eval-block-header">
             <h3>${titel}</h3>
-            <p>Wacht tot je docent de evaluatie aanmaakt. Je ontvangt een melding wanneer je je evaluatie kunt invullen.</p>
+            <p>Wacht tot de docent de evaluatie aanmaakt. Je ontvangt een melding wanneer je je evaluatie kunt invullen.</p>
           </div>
         </div>
       </main>
@@ -170,9 +171,9 @@ async function renderEvaluatiePage(app, stagiair, activeTab = 'tussentijds', eva
   })();
 
   app.innerHTML = `
-    <div class="sm-layout">
+    <div class="evaluatie-layout">
       ${sidebarHtml()}
-      <main class="sm-main sm-main--detail">
+      <main class="evaluatie-main">
         <div class="sm-detail-top">
           <div>
             <h1 class="sm-detail-title">Evaluatie</h1>
@@ -182,29 +183,28 @@ async function renderEvaluatiePage(app, stagiair, activeTab = 'tussentijds', eva
 
         ${evalTabsHtml(activeTab)}
 
-        <div class="sm-eval-block" style="display:grid;grid-template-columns: 1fr 320px;gap:16px;align-items:start;">
-          <div>
+        <div class="sm-eval-block">
           <div class="sm-eval-block-header">
-              <h3>${blockTitle}</h3>
-              <p>${blockDesc}</p>
-              <p class="sm-eval-datum" style="margin-top:6px;color:#6b7280;">
-                Datum evaluatie: <strong>${new Date().toLocaleDateString('nl-BE')}</strong>
-              </p>
-              ${docentSubmitted ? `
-              <div style="margin-top:12px;padding:18px 24px;background:#eff6ff;border:2px solid #3b82f6;border-radius:10px;font-size:20px;font-weight:800;color:#1e40af;text-align:center;letter-spacing:-0.01em;">
-                &#128203; Dit is het resultaat van je ${activeTab === 'finale' ? 'finale' : 'tussentijdse'} evaluatie
-              </div>` : ''}
-            </div>
+            <h3>${blockTitle}</h3>
+            <p>${blockDesc}</p>
+            <p class="sm-eval-datum" style="margin-top:6px;color:#6b7280;">
+              Datum evaluatie: <strong>${new Date().toLocaleDateString('nl-BE')}</strong>
+            </p>
+            ${docentSubmitted ? `
+            <div style="margin-top:12px;padding:18px 24px;background:#eff6ff;border:2px solid #3b82f6;border-radius:10px;font-size:20px;font-weight:800;color:#1e40af;text-align:center;letter-spacing:-0.01em;">
+              &#128203; Dit is het resultaat van je ${activeTab === 'finale' ? 'finale' : 'tussentijdse'} evaluatie
+            </div>` : ''}
+          </div>
 
-            <div id="sm-eval-result-column" style="position:sticky;top:16px;border:1px solid #e5e7eb;border-radius:12px;padding:14px;background:#fff;">
-              <div style="font-size:13px;color:#6b7280;margin-bottom:8px;">Uitkomst</div>
-              <div style="font-size:30px;font-weight:800;letter-spacing:-0.02em;color:#111827;">
-                ${initTotalPercentage !== null ? `${initTotalPercentage.toFixed(1)}/20` : '--'}
-              </div>
-              <div style="font-size:13px;color:#6b7280;margin-top:6px;">
-                Gebaseerd op ${isDocentView ? 'docent-scores' : 'je scores'} per competentie
-              </div>
+          <div id="sm-eval-result-column" style="border:1px solid #e5e7eb;border-radius:12px;padding:14px;background:#fff;margin-bottom:20px;">
+            <div style="font-size:13px;color:#6b7280;margin-bottom:8px;">Uitkomst</div>
+            <div style="font-size:30px;font-weight:800;letter-spacing:-0.02em;color:#111827;">
+              ${initTotalPercentage !== null ? `${initTotalPercentage.toFixed(1)}/20` : '--'}
             </div>
+            <div style="font-size:13px;color:#6b7280;margin-top:6px;">
+              Gebaseerd op ${isDocentView ? 'docent-scores' : 'je scores'} per competentie
+            </div>
+          </div>
 
             ${competenties.map((comp) => {
               const bestaande = dataByCode[comp.code];
@@ -237,7 +237,7 @@ async function renderEvaluatiePage(app, stagiair, activeTab = 'tussentijds', eva
           `;
             }).join('')}
 
-          ${!studentSubmitted ? `
+          ${!studentSubmitted && !docentSubmitted ? `
           <div class="sm-eval-actions">
             <button id="sm-eval-save" class="sm-button">Beoordeling Opslaan</button>
             <button id="sm-eval-submit" class="sm-button" style="margin-left:10px;">Indienen</button>
@@ -250,8 +250,8 @@ async function renderEvaluatiePage(app, stagiair, activeTab = 'tussentijds', eva
 
   attachTabSwitch(app, stagiair);
 
-  // Grey out everything if student has submitted
-  if (studentSubmitted) {
+  // Grey out everything if student has submitted or docent has submitted
+  if (studentSubmitted || docentSubmitted) {
     document.querySelectorAll('.sm-score-card').forEach((b) => { b.disabled = true; });
     document.querySelectorAll('.sm-eval-feedback').forEach((t) => { t.disabled = true; });
     const saveBtn = document.querySelector('#sm-eval-save');
@@ -260,7 +260,11 @@ async function renderEvaluatiePage(app, stagiair, activeTab = 'tussentijds', eva
     if (submitBtn) submitBtn.disabled = true;
     const msg = document.querySelector('#sm-eval-save-message');
     if (msg) {
-      msg.textContent = 'Je evaluatie is reeds ingediend en kan niet meer worden gewijzigd.';
+      if (docentSubmitted && !studentSubmitted) {
+        msg.textContent = 'De docent heeft de evaluatie ingediend. Dit is het resultaat.';
+      } else {
+        msg.textContent = 'Je evaluatie is reeds ingediend en kan niet meer worden gewijzigd.';
+      }
       msg.classList.remove('hidden');
     }
   }
@@ -397,9 +401,9 @@ async function renderEvaluatiePage(app, stagiair, activeTab = 'tussentijds', eva
 // ---------------------------------------------------------------------------
 async function renderEvaluatieTab(app, stagiair, activeTab = 'tussentijds') {
   app.innerHTML = `
-    <div class="sm-layout">
+    <div class="evaluatie-layout">
       ${sidebarHtml()}
-      <main class="sm-main sm-main--detail">
+      <main class="evaluatie-main">
         <p style="padding:24px;color:#6b7280;">Evaluatie laden...</p>
       </main>
     </div>
@@ -426,9 +430,9 @@ async function renderEvaluatieTab(app, stagiair, activeTab = 'tussentijds') {
   } catch (err) {
     console.error(err);
     app.innerHTML = `
-      <div class="sm-layout">
+      <div class="evaluatie-layout">
         ${sidebarHtml()}
-        <main class="sm-main sm-main--detail">
+        <main class="evaluatie-main">
           <div class="sm-detail-top">
             <div>
               <h1 class="sm-detail-title">Evaluatie</h1>
@@ -469,11 +473,44 @@ export async function renderEvaluatieStudent(app, user, stageData) {
     stage_id: stageData?.id || null,
   };
 
+  _anyNewEval = false;
+  if (stagiair.stage_id) {
+    try {
+      const evalRes = await fetch(`/api/evaluaties/tussentijds-status?stage_id=${stagiair.stage_id}`, { credentials: 'include' });
+      const evalData = await evalRes.json();
+      const evalAvailable = evalData.bestaatDoorDocent === true;
+      let studentSubmitted = false;
+      let docentSubmitted = false;
+      if (evalAvailable) {
+        const statusRes = await fetch(`/api/evaluaties/status?stage_id=${stagiair.stage_id}&type_evaluatie=tussentijds`, { credentials: 'include' });
+        const statusData = await statusRes.json();
+        studentSubmitted = statusData.evaluaties && statusData.evaluaties.length > 0
+          && statusData.evaluaties.every((e) => e.ingediend_student);
+        docentSubmitted = statusData.evaluaties && statusData.evaluaties.length > 0
+          && statusData.evaluaties.every((e) => e.ingediend_docent);
+      }
+      let finaleAvailable = false;
+      let finaleStudentSubmitted = false;
+      let finaleDocentSubmitted = false;
+      const finaleRes = await fetch(`/api/evaluaties/status?stage_id=${stagiair.stage_id}&type_evaluatie=finale`, { credentials: 'include' });
+      const finaleStatusData = await finaleRes.json();
+      finaleAvailable = finaleStatusData.bestaat === true
+        && finaleStatusData.evaluaties && finaleStatusData.evaluaties.length > 0
+        && finaleStatusData.evaluaties.some((e) => e.docent_id != null);
+      if (finaleAvailable) {
+        finaleStudentSubmitted = finaleStatusData.evaluaties.every((e) => e.ingediend_student);
+        finaleDocentSubmitted = finaleStatusData.evaluaties.every((e) => e.ingediend_docent);
+      }
+      _anyNewEval = (evalAvailable && (!studentSubmitted || docentSubmitted))
+        || (finaleAvailable && (!finaleStudentSubmitted || finaleDocentSubmitted));
+    } catch {}
+  }
+
   if (!stagiair.stage_id) {
     app.innerHTML = `
-      <div class="sm-layout">
+      <div class="evaluatie-layout">
         ${sidebarHtml()}
-        <main class="sm-main sm-main--detail">
+        <main class="evaluatie-main">
           <div class="sm-detail-top">
             <div>
               <h1 class="sm-detail-title">Evaluatie</h1>

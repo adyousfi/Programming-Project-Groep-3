@@ -133,11 +133,6 @@ function smIsWeekAfgevinkt(email, week) { try { return localStorage.getItem(`sm_
 // Slaat op dat een week afgevinkt is.
 function smSetWeekAfgevinkt(email, week) { try { localStorage.setItem(`sm_afgevinkt_${email}_${week}`, '1'); } catch {} }
 
-// Haalt de opmerking van een week op.
-function smGetWeekComment(email, week) { try { return localStorage.getItem(`sm_comment_${email}_${week}`) || ''; } catch { return ''; } }
-
-// Slaat de opmerking van een week op.
-function smSaveWeekComment(email, week, text) { try { localStorage.setItem(`sm_comment_${email}_${week}`, text); } catch {} }
 
 // Haalt een opgeslagen evaluatiescore op.
 function smGetEvaluationScore(email, type, c) { try { return localStorage.getItem(`sm_eval_score_${email}_${type}_${c}`) || ''; } catch { return ''; } }
@@ -351,15 +346,13 @@ function renderStageDetailsPage(app, stagiair) {
       ${sidebarHtml('stagedetails')}
 
       <main class="sm-main sm-main--detail">
-        <div class="sm-detail-top">
-          <div>
-            <h1 class="sm-detail-title">Stagedetails</h1>
-            <span class="sm-stage-status">${statusLabel}</span>
-          </div>
+        <div class="sm-topbar">
           <a href="#" id="sm-back-stagedetails" class="sm-detail-back">
             ← Terug naar stagiairs
           </a>
         </div>
+        <h1 class="sm-detail-title">Stagedetails</h1>
+        <span class="sm-stage-status">${statusLabel}</span>
 
         <div class="sm-stage-card">
           <div class="sm-stage-section">
@@ -414,13 +407,11 @@ function renderStudentDetail(app, stagiair) {
     <div class="sm-layout">
       ${sidebarHtml('overzicht')}
       <main class="sm-main sm-main--detail">
-        <div class="sm-detail-top">
-          <div>
-            <a id="sm-back" class="sm-detail-back" href="#">← Terug naar stagiairs</a>
-            <h1 class="sm-detail-title">Stagiair: ${escapeHtml(stagiair.naam)}</h1>
-            <p class="sm-detail-email">${escapeHtml(stagiair.email)}</p>
-          </div>
+        <div class="sm-topbar">
+          <a id="sm-back" class="sm-detail-back" href="#">← Terug naar stagiairs</a>
         </div>
+        <h1 class="sm-detail-title">Stagiair: ${escapeHtml(stagiair.naam)}</h1>
+        <p class="sm-detail-email">${escapeHtml(stagiair.email)}</p>
         <div class="sm-detail-grid">
           <div class="sm-detail-card">
             <p class="sm-detail-card-label">Stage Periode</p>
@@ -487,7 +478,7 @@ async function renderEvaluatiePage(app, stagiair, activeTab = 'tussentijds') {
     else { await renderEvaluatieScoreScreen(app, stagiair, activeTab, status.evaluaties); }
   } catch (err) {
     console.error(err);
-    app.innerHTML = `<div class="sm-layout">${sidebarHtml('evaluatie')}<main class="sm-main sm-main--detail"><div class="sm-detail-top"><div><h1 class="sm-detail-title">Evaluatie</h1><p class="sm-detail-subtitle">Fout bij het laden</p></div><a id="sm-back-evaluatie" class="sm-detail-back" href="#">← Terug naar stagiairs</a></div><div class="sm-eval-block"><div class="sm-eval-block-header"><h3>Verbinding mislukt</h3><p>Kan de evaluatie-informatie niet ophalen.</p></div><div class="sm-eval-actions"><button id="sm-eval-retry" class="sm-button">Opnieuw proberen</button></div></div></main></div>`;
+    app.innerHTML = `<div class="sm-layout">${sidebarHtml('evaluatie')}<main class="sm-main sm-main--detail"><div class="sm-topbar"><a id="sm-back-evaluatie" class="sm-detail-back" href="#">← Terug naar stagiairs</a></div><h1 class="sm-detail-title">Evaluatie</h1><p class="sm-detail-subtitle">Fout bij het laden</p><div class="sm-eval-block"><div class="sm-eval-block-header"><h3>Verbinding mislukt</h3><p>Kan de evaluatie-informatie niet ophalen.</p></div><div class="sm-eval-actions"><button id="sm-eval-retry" class="sm-button">Opnieuw proberen</button></div></div></main></div>`;
     document.querySelector('#sm-back-evaluatie')?.addEventListener('click', (e) => { e.preventDefault(); renderStudentDetail(app, stagiair); });
     document.querySelector('#sm-eval-retry')?.addEventListener('click', () => renderEvaluatiePage(app, stagiair, activeTab));
   }
@@ -496,7 +487,7 @@ async function renderEvaluatiePage(app, stagiair, activeTab = 'tussentijds') {
 function renderEvaluatieRegistreerScreen(app, stagiair, activeTab) {
   const isFinale = activeTab === 'finale';
   const titel = isFinale ? 'Finale evaluatie' : 'Tussentijdse evaluatie';
-  app.innerHTML = `<div class="sm-layout">${sidebarHtml('evaluatie')}<main class="sm-main sm-main--detail"><div class="sm-detail-top"><div><h1 class="sm-detail-title">Evaluatie</h1><p class="sm-detail-subtitle">Evalueer de stagiair als mentor</p></div><a id="sm-back-evaluatie" class="sm-detail-back" href="#">← Terug naar stagiairs</a></div><div class="sm-eval-tabs"><button class="sm-eval-tab ${activeTab === 'tussentijds' ? 'active' : ''}" data-tab="tussentijds">Tussentijdse evaluatie</button><button class="sm-eval-tab ${activeTab === 'finale' ? 'active' : ''}" data-tab="finale">Finale evaluatie</button></div><div class="sm-eval-block"><div class="sm-eval-block-header"><h3>${titel}</h3><p>Wacht tot je docent de evaluatie aanmaakt. Zodra de evaluatie beschikbaar is, kun je hier je mentor-score en feedback invullen.</p></div></div></main></div>`;
+  app.innerHTML = `<div class="sm-layout">${sidebarHtml('evaluatie')}<main class="sm-main sm-main--detail"><div class="sm-topbar"><a id="sm-back-evaluatie" class="sm-detail-back" href="#">← Terug naar stagiairs</a></div><h1 class="sm-detail-title">Evaluatie</h1><p class="sm-detail-subtitle">Evalueer de stagiair als mentor</p><div class="sm-eval-tabs"><button class="sm-eval-tab ${activeTab === 'tussentijds' ? 'active' : ''}" data-tab="tussentijds">Tussentijdse evaluatie</button><button class="sm-eval-tab ${activeTab === 'finale' ? 'active' : ''}" data-tab="finale">Finale evaluatie</button></div><div class="sm-eval-block"><div class="sm-eval-block-header"><h3>${titel}</h3><p>Wacht tot de docent de evaluatie aanmaakt. Zodra de evaluatie beschikbaar is, kun je hier je mentor-score en feedback invullen.</p></div></div></main></div>`;
   document.querySelector('#sm-back-evaluatie')?.addEventListener('click', (e) => { e.preventDefault(); renderStudentDetail(app, stagiair); });
   attachNav(app, stagiair);
   document.querySelectorAll('.sm-eval-tab').forEach((tab) => { tab.addEventListener('click', () => renderEvaluatiePage(app, stagiair, tab.dataset.tab)); });
@@ -509,7 +500,7 @@ async function renderEvaluatieScoreScreen(app, stagiair, activeTab, evaluatieDat
   const blockTitle = activeTab === 'finale' ? 'Finale beoordeling' : 'Tussentijdse bespreking';
   const initTotal = (() => { const ids = Array.from(new Set(evaluatieData.map(e => e?.competentie_id).filter(Boolean))); const N = ids.length; if (!N) return null; return Math.round((evaluatieData.reduce((a, e) => { const s = e?.score_mentor; return s == null ? a : a + (Number(s) / 5) * 20; }, 0) / N) * 10) / 10; })();
 
-  app.innerHTML = `<div class="sm-layout">${sidebarHtml('evaluatie')}<main class="sm-main sm-main--detail"><div class="sm-detail-top"><div><h1 class="sm-detail-title">Evaluatie</h1><p class="sm-detail-subtitle">Evalueer de stagiair als mentor</p></div><a id="sm-back-evaluatie" class="sm-detail-back" href="#">← Terug naar stagiairs</a></div><div class="sm-eval-tabs"><button class="sm-eval-tab ${activeTab === 'tussentijds' ? 'active' : ''}" data-tab="tussentijds">Tussentijdse evaluatie</button><button class="sm-eval-tab ${activeTab === 'finale' ? 'active' : ''}" data-tab="finale">Finale evaluatie</button></div><div class="sm-eval-block" style="display:grid;grid-template-columns:1fr 320px;gap:16px;align-items:start;"><div><div class="sm-eval-block-header"><h3>${blockTitle}</h3><p>Geef per competentie een score en feedback.</p><p style="margin-top:6px;color:#6b7280;">Datum: <strong>${new Date().toLocaleDateString('nl-BE')}</strong></p></div><div id="sm-eval-result-column" style="position:sticky;top:16px;border:1px solid #e5e7eb;border-radius:12px;padding:14px;background:#fff;"><div style="font-size:13px;color:#6b7280;margin-bottom:8px;">Uitkomst</div><div style="font-size:30px;font-weight:800;color:#111827;">${initTotal != null ? initTotal.toFixed(1) + '/20' : '--'}</div><div style="font-size:13px;color:#6b7280;margin-top:6px;">Gebaseerd op je mentor-scores</div></div>${competenties.map((comp) => { const b = dataByCode[comp.code]; const rubriekMap = Object.fromEntries((comp.Rubrieks || []).map(r => [r.score, escapeHtml(r.beschrijving)])); return `<div class="sm-eval-competentie" data-competentie-id="${comp.competentie_id}" data-competentie-code="${comp.code}"><h3 style="margin:0 0 6px;font-size:20px;font-weight:700;color:#111827;">${escapeHtml(comp.titel)}</h3><p style="margin:0 0 16px;color:#6b7280;">${escapeHtml(comp.omschrijving)}</p><div><span class="sm-score-title">Hoe scoor je deze competentie? Klik op een score (1 = laag, 5 = hoog)</span><div class="sm-eval-score-cards">${scores.map((sc) => `<button type="button" class="sm-score-card sm-score-card--${sc} ${b?.score_mentor === sc ? 'selected' : ''}" data-score="${sc}" data-competentie="${comp.competentie_id}" data-competentie-code="${comp.code}"><span class="sm-score-card-number">${sc}</span><span class="sm-score-card-text">${rubriekMap[sc] || ''}</span></button>`).join('')}</div></div><div class="sm-eval-mentor-panel"><h4>Feedback (mentor)</h4><label class="sm-eval-feedback-label" for="feedback-${comp.competentie_id}">Feedback</label><textarea id="feedback-${comp.competentie_id}" class="sm-eval-feedback" placeholder="Beschrijf je feedback...">${escapeHtml(b?.feedback_mentor ?? '')}</textarea></div></div>`; }).join('')}<div class="sm-eval-actions"><button id="sm-eval-save" class="sm-button">Beoordeling Opslaan</button><button id="sm-eval-submit" class="sm-button" style="margin-left:10px;">Indienen</button></div><p id="sm-eval-save-message" class="sm-eval-save-message hidden"></p></div></main></div>`;
+  app.innerHTML = `<div class="sm-layout">${sidebarHtml('evaluatie')}<main class="sm-main sm-main--detail"><div class="sm-topbar"><a id="sm-back-evaluatie" class="sm-detail-back" href="#">← Terug naar stagiairs</a></div><h1 class="sm-detail-title">Evaluatie</h1><p class="sm-detail-subtitle">Evalueer de stagiair als mentor</p><div class="sm-eval-tabs"><button class="sm-eval-tab ${activeTab === 'tussentijds' ? 'active' : ''}" data-tab="tussentijds">Tussentijdse evaluatie</button><button class="sm-eval-tab ${activeTab === 'finale' ? 'active' : ''}" data-tab="finale">Finale evaluatie</button></div><div class="sm-eval-block"><div class="sm-eval-block-header"><h3>${blockTitle}</h3><p>Geef per competentie een score en feedback.</p><p style="margin-top:6px;color:#6b7280;">Datum: <strong>${new Date().toLocaleDateString('nl-BE')}</strong></p></div><div id="sm-eval-result-column" style="border:1px solid #e5e7eb;border-radius:12px;padding:14px;background:#fff;margin-bottom:20px;"><div style="font-size:13px;color:#6b7280;margin-bottom:8px;">Uitkomst</div><div style="font-size:30px;font-weight:800;color:#111827;">${initTotal != null ? initTotal.toFixed(1) + '/20' : '--'}</div><div style="font-size:13px;color:#6b7280;margin-top:6px;">Gebaseerd op je mentor-scores</div></div>${competenties.map((comp) => { const b = dataByCode[comp.code]; const rubriekMap = Object.fromEntries((comp.Rubrieks || []).map(r => [r.score, escapeHtml(r.beschrijving)])); return `<div class="sm-eval-competentie" data-competentie-id="${comp.competentie_id}" data-competentie-code="${comp.code}"><h3 style="margin:0 0 6px;font-size:20px;font-weight:700;color:#111827;">${escapeHtml(comp.titel)}</h3><p style="margin:0 0 16px;color:#6b7280;">${escapeHtml(comp.omschrijving)}</p><div><span class="sm-score-title">Hoe scoor je deze competentie? Klik op een score (1 = laag, 5 = hoog)</span><div class="sm-eval-score-cards">${scores.map((sc) => `<button type="button" class="sm-score-card sm-score-card--${sc} ${b?.score_mentor === sc ? 'selected' : ''}" data-score="${sc}" data-competentie="${comp.competentie_id}" data-competentie-code="${comp.code}"><span class="sm-score-card-number">${sc}</span><span class="sm-score-card-text">${rubriekMap[sc] || ''}</span></button>`).join('')}</div></div><div class="sm-eval-mentor-panel"><h4>Feedback (mentor)</h4><label class="sm-eval-feedback-label" for="feedback-${comp.competentie_id}">Feedback</label><textarea id="feedback-${comp.competentie_id}" class="sm-eval-feedback" placeholder="Beschrijf je feedback...">${escapeHtml(b?.feedback_mentor ?? '')}</textarea></div></div>`; }).join('')}<div class="sm-eval-actions"><button id="sm-eval-save" class="sm-button">Beoordeling Opslaan</button><button id="sm-eval-submit" class="sm-button" style="margin-left:10px;">Indienen</button></div><p id="sm-eval-save-message" class="sm-eval-save-message hidden"></p></div></main></div>`;
 
   document.querySelector('#sm-back-evaluatie')?.addEventListener('click', (e) => { e.preventDefault(); renderStudentDetail(app, stagiair); });
   attachNav(app, stagiair);
@@ -651,13 +642,11 @@ async function renderLogboekOverview(app, stagiair) {
     <div class="sm-layout">
       ${sidebarHtml('logboek')}
       <main class="sm-main sm-main--detail">
-        <div class="sm-detail-top">
-          <div>
-            <a id="sm-back-logboek" class="sm-detail-back" href="#">← Terug naar stagiairs</a>
-            <h1 class="sm-detail-title">Logboek - Weekoverzicht</h1>
-            <p class="sm-detail-subtitle">Bekijk en controleer de wekelijkse logboeken van ${escapeHtml(stagiair.naam)}</p>
-          </div>
+        <div class="sm-topbar">
+          <a id="sm-back-logboek" class="sm-detail-back" href="#">← Terug naar stagiairs</a>
         </div>
+        <h1 class="sm-detail-title">Logboek - Weekoverzicht</h1>
+        <p class="sm-detail-subtitle">Bekijk en controleer de wekelijkse logboeken van ${escapeHtml(stagiair.naam)}</p>
         <div class="sm-logboek-list">
           ${weeks.map((w) => {
             const pct = w.total > 0 ? (w.filled / w.total) * 100 : 0;
@@ -782,20 +771,17 @@ async function renderWeekDetail(app, stagiair, weekNum) {
 
   const afgevinkt = days.length > 0 && days.every(d => d.status === 'Afgevinkt door stagementor');
   const allDaysIngevuld = days.length > 0 && days.every(d => d.status === 'Ingediend' || d.status === 'Afgevinkt door stagementor');
-  const comment = smGetWeekComment(stagiair.email, weekNum);
 
   app.innerHTML = `
     <div class="sm-layout">
       ${sidebarHtml('logboek')}
       <main class="sm-main sm-main--detail">
-        <div class="sm-detail-top">
-          <div class="sm-detail-back-group">
-            <a id="sm-back-stagiairs" class="sm-detail-back" href="#">← Terug naar stagiairs</a>
-            <a id="sm-back-week" class="sm-detail-back sm-detail-back--secondary" href="#">← Terug naar weekoverzicht</a>
-            <h1 class="sm-detail-title">Week ${weekNum}</h1>
-            <p class="sm-detail-subtitle">${escapeHtml(stagiair.start)} t/m ${escapeHtml(stagiair.einde)}</p>
-          </div>
+        <div class="sm-topbar">
+          <a id="sm-back-stagiairs" class="sm-detail-back" href="#">← Terug naar stagiairs</a>
+          <a id="sm-back-week" class="sm-detail-back" href="#" style="margin-left:12px;">← Terug naar weekoverzicht</a>
         </div>
+        <h1 class="sm-detail-title">Week ${weekNum}</h1>
+        <p class="sm-detail-subtitle">${escapeHtml(stagiair.start)} t/m ${escapeHtml(stagiair.einde)}</p>
         <div class="sm-week-day-list">
           ${days.map((d) => `
             <div class="sm-week-day-card">
@@ -825,15 +811,6 @@ async function renderWeekDetail(app, stagiair, weekNum) {
           <p id="sm-afvink-message" class="${afgevinkt ? 'sm-afvink-message--success' : 'sm-afvink-message--idle'}">${afgevinkt ? 'Deze week is afgevinkt en opgeslagen.' : 'Klik op Week Afvinken om deze week te bevestigen.'}</p>
         </div>
         ` : ''}
-        ${allDaysIngevuld ? `
-        <div class="sm-week-comment-card">
-          <label class="sm-week-comment-label" for="sm-comment">Opmerking bij Week ${weekNum}</label>
-          <textarea id="sm-comment" class="sm-week-comment" placeholder="Schrijf hier je opmerkingen...">${escapeHtml(comment)}</textarea>
-          <div style="margin-top:14px;">
-            <button id="sm-save-comment" class="sm-button">Opmerking Opslaan</button>
-          </div>
-        </div>
-        ` : ''}
       </main>
     </div>
   `;
@@ -844,16 +821,6 @@ async function renderWeekDetail(app, stagiair, weekNum) {
   // Terug naar het detailoverzicht van de stagiair.
   document.querySelector('#sm-back-stagiairs').addEventListener('click', (e) => { e.preventDefault(); renderStudentDetail(app, stagiair); });
   attachNav(app, stagiair);
-
-  // Slaat de tekst uit het opmerkingenveld op.
-  const saveCommentBtn = document.querySelector('#sm-save-comment');
-  if (saveCommentBtn) {
-    saveCommentBtn.addEventListener('click', () => {
-      const val = document.querySelector('#sm-comment').value.trim();
-      smSaveWeekComment(stagiair.email, weekNum, val);
-      alert(val ? 'Opmerking opgeslagen.' : 'Opmerking verwijderd.');
-    });
-  }
 
   // Zoekt de knop waarmee de mentor de week kan afvinken.
   const afvinkBtn = document.querySelector('#sm-afvink');
@@ -947,15 +914,12 @@ function renderDocumentenPage(app, stagiair) {
       ${sidebarHtml('documenten')}
 
       <main class="sm-main sm-main--detail">
-        <div class="sm-detail-top">
-          <div>
-            <h1 class="sm-detail-title">Documenten</h1>
-          </div>
-
+        <div class="sm-topbar">
           <a href="#" id="sm-back-documenten" class="sm-detail-back">
             ← Terug naar stagiairs
           </a>
         </div>
+        <h1 class="sm-detail-title">Documenten</h1>
 
         <div class="sm-document-card">
           <div class="sm-document-header">

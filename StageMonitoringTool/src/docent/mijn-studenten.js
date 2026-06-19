@@ -68,7 +68,8 @@ function berekenLogboekProgress(stageId, startDatum, eindDatum) {
         });
         if (weekEntries.length > 0) {
           const allIngevuld = weekEntries.every(function(e) { return e.status === 'INGEVULD'; });
-          if (allIngevuld) submittedWeeks++;
+          const allGevinkt = allIngevuld && weekEntries.every(function(e) { return e.gevinkt_door_stagementor; });
+          if (allGevinkt) submittedWeeks++;
         }
       }
 
@@ -258,6 +259,16 @@ function setupStudentButtons(studenten) {
       import('./student-detail.js').then(function(m) { m.renderStudentDetail(student, renderMijnStudenten._user); });
     });
   });
+
+  document.querySelectorAll('.dc-card--clickable .dc-btn').forEach(function(btn) {
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      const id = parseInt(btn.dataset.id);
+      const student = studenten.find(function(s) { return s.id === id; });
+      if (!student) return;
+      import('./student-detail.js').then(function(m) { m.renderStudentDetail(student, renderMijnStudenten._user); });
+    });
+  });
 }
 
 export async function renderMijnStudenten(app, user) {
@@ -318,7 +329,7 @@ export async function renderMijnStudenten(app, user) {
 
   const actief    = studenten.filter(function(s) { return s.status === 'lopend'; });
   const afgelopen = studenten.filter(function(s) { return s.status === 'afgelopen'; });
-  const displayName = user ? (user.last_name ? user.last_name.toUpperCase() + ' ' + user.first_name : user.first_name || 'Docent') : 'Docent';
+  const displayName = user ? (user.last_name ? user.last_name.toUpperCase().replace(/^PROF\.\s*/i, '') + ' ' + (user.first_name || '').replace(/^Prof\.\s*/i, '') : (user.first_name || '').replace(/^Prof\.\s*/i, '') || 'Docent') : 'Docent';
 
   container.innerHTML = `
     <div class="dc-layout">
@@ -335,13 +346,13 @@ export async function renderMijnStudenten(app, user) {
           </nav>
         </div>
         <div class="dc-sidebar-bottom">
-          <span class="dc-user-name">Prof. ${displayName}</span>
+          <span class="dc-user-name">Docent ${displayName}</span>
           <a href="/" class="dc-logout">Uitloggen</a>
         </div>
       </aside>
       <main class="dc-main">
         <h1 class="dc-main-title">Mijn Studenten</h1>
-        <p class="dc-main-sub">Welkom, Prof. ${displayName}</p>
+        <p class="dc-main-sub">Welkom, Docent ${displayName}</p>
         <div class="dc-kaarten">
           ${studenten.length > 0 ? renderKaarten(actief) : '<p>Geen actieve stages gevonden.</p>'}
         </div>
