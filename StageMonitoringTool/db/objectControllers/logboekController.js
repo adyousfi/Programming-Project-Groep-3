@@ -123,16 +123,25 @@ const submitWeek = async (req, res, next) => {
         const { stage_id, weekStart, weekEnd } = req.body;
         if (!stage_id || !weekStart || !weekEnd) return res.status(400).json({ msg: 'stage_id, weekStart en weekEnd zijn verplicht' });
 
+        // weekStart/weekEnd komen vanuit de frontend als `YYYY-MM-DD`.
+        // Door MSSQL `DATE(datum)`-vergelijkingen kan dit soms falen.
+        // Daarom parsen we naar echte Date-objecten en gebruiken we een range.
+        const parsedWeekStart = new Date(`${weekStart}T00:00:00.000Z`);
+        const parsedWeekEnd = new Date(`${weekEnd}T23:59:59.999Z`);
+        if (Number.isNaN(parsedWeekStart.getTime()) || Number.isNaN(parsedWeekEnd.getTime())) {
+            return res.status(400).json({ msg: 'Ongeldige weekStart/weekEnd' });
+        }
+
         const [updated] = await Logboek.update(
             { status: 'INGEVULD' },
             {
                 where: {
                     stage_id,
-                    [Logboek.sequelize.Sequelize.Op.and]: [
-                        Logboek.sequelize.where(Logboek.sequelize.fn('DATE', Logboek.sequelize.col('datum')), { [Logboek.sequelize.Sequelize.Op.gte]: weekStart }),
-                        Logboek.sequelize.where(Logboek.sequelize.fn('DATE', Logboek.sequelize.col('datum')), { [Logboek.sequelize.Sequelize.Op.lte]: weekEnd }),
-                    ],
                     status: { [Logboek.sequelize.Sequelize.Op.ne]: 'NIETINGEVULD' },
+                    datum: {
+                        [Logboek.sequelize.Sequelize.Op.gte]: parsedWeekStart,
+                        [Logboek.sequelize.Sequelize.Op.lte]: parsedWeekEnd,
+                    },
                 },
             }
         );
