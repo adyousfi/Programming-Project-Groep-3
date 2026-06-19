@@ -180,11 +180,11 @@ export async function renderGoedgekeurdStudent(container, userName = 'Jan Jansse
                             <span class="step-label">Document</span>
                             <span class="step-sub">${docValidated ? 'Voltooid' : 'Actief'}</span>
                         </div>
-                        <div class="step-line"></div>
-                        <div class="step${docValidated ? ' next-active' : ''}${allLogboeksDone ? ' completed-logboek' : ''}">
-                            <div class="step-circle step-icon-logboek">${docValidated ? '&#128203;' : '4'}</div>
+                        <div class="step-line${allLogboeksDone ? ' completed' : ''}"></div>
+                        <div class="step${allLogboeksDone ? ' completed' : (docValidated ? ' active' : '')}">
+                            <div class="step-circle step-icon-logboek">${allLogboeksDone ? '&#10003;' : (docValidated ? '&#128203;' : '4')}</div>
                             <span class="step-label">Logboek</span>
-                            <span class="step-sub">${docValidated ? `${submittedWeeks}/${totalWeeks} weken` : 'Gepland'}</span>
+                            <span class="step-sub">${allLogboeksDone ? 'Voltooid' : (docValidated ? `${submittedWeeks}/${totalWeeks} weken` : 'Gepland')}</span>
                         </div>
 
                         <div class="step-line"></div>
