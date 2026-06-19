@@ -33,43 +33,59 @@ export async function renderLogboek(container, userName = 'Student', stageData =
 
     function getWeekDates(weekIndex) {
         if (!startDate) return { start: '?', end: '?', days: 5, startDateObj: null, endDateObj: null };
+
         const weekStart = new Date(startDate);
-        weekStart.setDate(startDate.getDate() + weekIndex * 7);
-        while (weekStart.getDay() === 0 || weekStart.getDay() === 6) {
-            weekStart.setDate(weekStart.getDate() + 1);
-        }
-        const weekEnd = new Date(weekStart);
-        let weekdayCount = 1;
-        while (weekdayCount < 5) {
-            weekEnd.setDate(weekEnd.getDate() + 1);
-            if (weekEnd.getDay() !== 0 && weekEnd.getDay() !== 6) {
-                weekdayCount++;
+        if (weekIndex === 0) {
+            while (weekStart.getDay() === 0 || weekStart.getDay() === 6) {
+                weekStart.setDate(weekStart.getDate() + 1);
             }
+        } else {
+            const startDay = startDate.getDay();
+            const daysToMonday = startDay === 1 ? 7 : 8 - startDay;
+            weekStart.setDate(startDate.getDate() + daysToMonday + (weekIndex - 1) * 7);
+        }
+
+        const weekEnd = new Date(weekStart);
+        if (weekIndex === 0) {
+            weekEnd.setDate(weekEnd.getDate() + (5 - weekStart.getDay()));
+        } else {
+            weekEnd.setDate(weekEnd.getDate() + 4);
         }
 
         if (endDate && weekEnd > endDate) {
             weekEnd.setTime(endDate.getTime());
-            let count = 0;
-            const temp = new Date(weekStart);
-            while (temp <= weekEnd) {
-                if (temp.getDay() !== 0 && temp.getDay() !== 6) count++;
-                temp.setDate(temp.getDate() + 1);
-            }
-            weekdayCount = Math.max(1, count);
+        }
+
+        let count = 0;
+        const temp = new Date(weekStart);
+        while (temp <= weekEnd) {
+            if (temp.getDay() !== 0 && temp.getDay() !== 6) count++;
+            temp.setDate(temp.getDate() + 1);
         }
 
         return {
             start: formatDate(weekStart),
             end: formatDate(weekEnd),
-            days: weekdayCount,
+            days: Math.max(1, count),
             startDateObj: new Date(weekStart),
             endDateObj: new Date(weekEnd)
         };
     }
 
-    const totalWeeks = startDate && endDate
-        ? Math.ceil(((endDate - startDate) / (1000 * 60 * 60 * 24) + 1) / 7)
-        : 16;
+    function getTotalWeeks() {
+        if (!startDate || !endDate) return 16;
+        let count = 1;
+        const nextStart = new Date(startDate);
+        const startDay = nextStart.getDay();
+        const daysToMonday = startDay === 1 ? 7 : 8 - startDay;
+        nextStart.setDate(nextStart.getDate() + daysToMonday);
+        while (nextStart <= endDate) {
+            count++;
+            nextStart.setDate(nextStart.getDate() + 7);
+        }
+        return count;
+    }
+    const totalWeeks = getTotalWeeks();
 
     const weeks = Array.from({ length: Math.max(1, totalWeeks) }, (_, i) => {
         const dates = getWeekDates(i);

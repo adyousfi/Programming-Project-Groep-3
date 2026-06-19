@@ -57,10 +57,20 @@ export async function renderLogboekDag(container, userName = 'Student', stageDat
     function getDayDateObj(weekIndex, dayIndex) {
         if (!startDate) return null;
         const d = new Date(startDate);
-        d.setDate(startDate.getDate() + weekIndex * 7);
-        while (d.getDay() === 0 || d.getDay() === 6) {
-            d.setDate(d.getDate() + 1);
+
+        if (weekIndex === 0) {
+            while (d.getDay() === 0 || d.getDay() === 6) {
+                d.setDate(d.getDate() + 1);
+            }
+            const startDay = d.getDay();
+            const daysInWeek0 = 6 - startDay;
+            if (dayIndex >= daysInWeek0) return null;
+        } else {
+            const startDay = startDate.getDay();
+            const daysToMonday = startDay === 1 ? 7 : 8 - startDay;
+            d.setDate(startDate.getDate() + daysToMonday + (weekIndex - 1) * 7);
         }
+
         let count = 0;
         while (count < dayIndex) {
             d.setDate(d.getDate() + 1);
@@ -78,7 +88,8 @@ export async function renderLogboekDag(container, userName = 'Student', stageDat
 
     function isDayInStage(weekIndex, dayIndex) {
         const d = getDayDateObj(weekIndex, dayIndex);
-        if (!d || !endDate) return true;
+        if (!d) return false;
+        if (!endDate) return true;
         return d <= endDate;
     }
 
@@ -105,7 +116,18 @@ export async function renderLogboekDag(container, userName = 'Student', stageDat
     const weekStart = getDayDateStr(weekIndex, 0);
 
     const totalWeeks = startDate && endDate
-        ? Math.ceil(((endDate - startDate) / (1000 * 60 * 60 * 24) + 1) / 7)
+        ? (() => {
+            let count = 1;
+            const s = new Date(startDate);
+            const startDay = s.getDay();
+            const daysToMonday = startDay === 1 ? 7 : 8 - startDay;
+            s.setDate(s.getDate() + daysToMonday);
+            while (s <= endDate) {
+                count++;
+                s.setDate(s.getDate() + 7);
+            }
+            return count;
+        })()
         : 16;
 
     const visibleDays = DAYS.filter((_, i) => isDayInStage(weekIndex, i));
@@ -540,7 +562,19 @@ function initLogboekDagHandlers(totalDays, stageData, weekIndex, getDayDateObj, 
     if (nextBtn) {
         nextBtn.addEventListener('click', () => {
             const maxWeeks = lastStageData?.stageDetails?.start && lastStageData?.stageDetails?.einde
-                ? Math.ceil(((new Date(lastStageData.stageDetails.einde) - new Date(lastStageData.stageDetails.start)) / (1000 * 60 * 60 * 24) + 1) / 7)
+                ? (() => {
+                    const s = new Date(lastStageData.stageDetails.start);
+                    const e = new Date(lastStageData.stageDetails.einde);
+                    let count = 1;
+                    const startDay = s.getDay();
+                    const daysToMonday = startDay === 1 ? 7 : 8 - startDay;
+                    s.setDate(s.getDate() + daysToMonday);
+                    while (s <= e) {
+                        count++;
+                        s.setDate(s.getDate() + 7);
+                    }
+                    return count;
+                })()
                 : 16;
             if (lastWeekNumber < maxWeeks) {
                 const app = document.getElementById('app');
