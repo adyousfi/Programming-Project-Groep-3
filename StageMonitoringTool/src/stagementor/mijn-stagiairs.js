@@ -15,53 +15,77 @@ function formatDatumLang(d) {
 
 function getWeekDates(startDate, endDate, weekIndex) {
   if (!startDate) return { start: '?', end: '?', days: 5, startDateObj: null, endDateObj: null };
+
   const weekStart = new Date(startDate);
-  weekStart.setDate(startDate.getDate() + weekIndex * 7);
-  while (weekStart.getDay() === 0 || weekStart.getDay() === 6) {
-    weekStart.setDate(weekStart.getDate() + 1);
+  if (weekIndex === 0) {
+      while (weekStart.getDay() === 0 || weekStart.getDay() === 6) {
+          weekStart.setDate(weekStart.getDate() + 1);
+      }
+  } else {
+      const startDay = startDate.getDay();
+      const daysToMonday = startDay === 1 ? 7 : 8 - startDay;
+      weekStart.setDate(startDate.getDate() + daysToMonday + (weekIndex - 1) * 7);
   }
+
   const weekEnd = new Date(weekStart);
-  let weekdayCount = 1;
-  while (weekdayCount < 5) {
-    weekEnd.setDate(weekEnd.getDate() + 1);
-    if (weekEnd.getDay() !== 0 && weekEnd.getDay() !== 6) weekdayCount++;
+  if (weekIndex === 0) {
+      weekEnd.setDate(weekEnd.getDate() + (5 - weekStart.getDay()));
+  } else {
+      weekEnd.setDate(weekEnd.getDate() + 4);
   }
+
   if (endDate && weekEnd > endDate) {
-    weekEnd.setTime(endDate.getTime());
-    let count = 0;
-    const temp = new Date(weekStart);
-    while (temp <= weekEnd) {
+      weekEnd.setTime(endDate.getTime());
+  }
+
+  let count = 0;
+  const temp = new Date(weekStart);
+  while (temp <= weekEnd) {
       if (temp.getDay() !== 0 && temp.getDay() !== 6) count++;
       temp.setDate(temp.getDate() + 1);
-    }
-    weekdayCount = Math.max(1, count);
   }
+
   return {
-    start: formatDatumKort(weekStart),
-    end: formatDatumKort(weekEnd),
-    days: weekdayCount,
-    startDateObj: new Date(weekStart),
-    endDateObj: new Date(weekEnd)
+      start: formatDatumKort(weekStart),
+      end: formatDatumKort(weekEnd),
+      days: Math.max(1, count),
+      startDateObj: new Date(weekStart),
+      endDateObj: new Date(weekEnd)
   };
 }
 
 function mapApiStageToStagiair(s, logboekEntries = [], evalAvailable = false, mentorSubmitted = false, finaleEvalAvailable = false, finaleMentorSubmitted = false) {
   const start = s.stageDetails?.start;
   const einde = s.stageDetails?.einde;
-  const totalWeeks = start && einde
-    ? Math.max(1, Math.ceil((new Date(einde) - new Date(start)) / (7 * 24 * 60 * 60 * 1000)))
-    : 0;
+  let totalWeeks = 0;
+  if (start && einde) {
+    totalWeeks = 1;
+    const nextStart = new Date(start);
+    nextStart.setHours(12, 0, 0, 0);
+    const startDay = nextStart.getDay();
+    const daysToMonday = startDay === 1 ? 7 : 8 - startDay;
+    nextStart.setDate(nextStart.getDate() + daysToMonday);
+    const endObj = new Date(einde);
+    endObj.setHours(12, 0, 0, 0);
+    while (nextStart <= endObj) {
+      totalWeeks++;
+      nextStart.setDate(nextStart.getDate() + 7);
+    }
+  }
 
   let submittedWeeks = 0;
   if (start && einde && logboekEntries.length > 0) {
     const startDateObj = new Date(start);
+    startDateObj.setHours(12, 0, 0, 0);
     const endDateObj = new Date(einde);
+    endDateObj.setHours(12, 0, 0, 0);
     for (let i = 0; i < totalWeeks; i++) {
       const dates = getWeekDates(startDateObj, endDateObj, i);
       if (!dates.startDateObj) continue;
       const weekEntries = logboekEntries.filter(e => {
         if (!e.datum) return false;
         const entryDate = new Date(e.datum);
+        entryDate.setHours(12, 0, 0, 0);
         return entryDate >= dates.startDateObj && entryDate <= dates.endDateObj;
       });
       if (weekEntries.length > 0 && weekEntries.every(e => e.status === 'INGEVULD' || e.status === 'DEELSINGEVULD')) {
@@ -477,13 +501,10 @@ async function renderEvaluatieScoreScreen(app, stagiair, activeTab, evaluatieDat
   const scores = [1, 2, 3, 4, 5];
   const competenties = await fetchCompetentiesMetRubrieken();
   const dataByCode = Object.fromEntries(evaluatieData.map((e) => [e.competentie_code, e]));
-  const desc = activeTab === 'finale'
-    ? { 1: '{c} is onvoldoende beheerst.', 2: '{c} blijft onder eindniveau.', 3: '{c} voldoende, beperkte zelfstandigheid.', 4: '{c} goed beheerst, zelfstandig werk.', 5: '{c} uitstekend, met initiatief en reflectie.' }
-    : { 1: '{c} niet aangetoond.', 2: '{c} nipt aanwezig.', 3: '{c} voldoende, nog niet zelfstandig.', 4: '{c} correct, lichte begeleiding.', 5: '{c} zelfstandig, boven verwachting.' };
   const blockTitle = activeTab === 'finale' ? 'Finale beoordeling' : 'Tussentijdse bespreking';
   const initTotal = (() => { const ids = Array.from(new Set(evaluatieData.map(e => e?.competentie_id).filter(Boolean))); const N = ids.length; if (!N) return null; return Math.round((evaluatieData.reduce((a, e) => { const s = e?.score_mentor; return s == null ? a : a + (Number(s) / 5) * 20; }, 0) / N) * 10) / 10; })();
 
-  app.innerHTML = `<div class="sm-layout">${sidebarHtml('evaluatie')}<main class="sm-main sm-main--detail"><div class="sm-detail-top"><div><h1 class="sm-detail-title">Evaluatie</h1><p class="sm-detail-subtitle">Evalueer de stagiair als mentor</p></div><a id="sm-back-evaluatie" class="sm-detail-back" href="#">← Terug naar stagiairs</a></div><div class="sm-eval-tabs"><button class="sm-eval-tab ${activeTab === 'tussentijds' ? 'active' : ''}" data-tab="tussentijds">Tussentijdse evaluatie</button><button class="sm-eval-tab ${activeTab === 'finale' ? 'active' : ''}" data-tab="finale">Finale evaluatie</button></div><div class="sm-eval-block" style="display:grid;grid-template-columns:1fr 320px;gap:16px;align-items:start;"><div><div class="sm-eval-block-header"><h3>${blockTitle}</h3><p>Geef per competentie een score en feedback.</p><p style="margin-top:6px;color:#6b7280;">Datum: <strong>${new Date().toLocaleDateString('nl-BE')}</strong></p></div><div id="sm-eval-result-column" style="position:sticky;top:16px;border:1px solid #e5e7eb;border-radius:12px;padding:14px;background:#fff;"><div style="font-size:13px;color:#6b7280;margin-bottom:8px;">Uitkomst</div><div style="font-size:30px;font-weight:800;color:#111827;">${initTotal != null ? initTotal.toFixed(1) + '/20' : '--'}</div><div style="font-size:13px;color:#6b7280;margin-top:6px;">Gebaseerd op je mentor-scores</div></div>${competenties.map((comp) => { const b = dataByCode[comp.code]; return `<div class="sm-eval-competentie" data-competentie-id="${comp.competentie_id}" data-competentie-code="${comp.code}"><h3 style="margin:0 0 6px;font-size:20px;font-weight:700;color:#111827;">${escapeHtml(comp.titel)}</h3><p style="margin:0 0 16px;color:#6b7280;">${escapeHtml(comp.omschrijving)}</p><div><span class="sm-score-title">Hoe scoor je deze competentie? Klik op een score (1 = laag, 5 = hoog)</span><div class="sm-eval-score-cards">${scores.map((sc) => `<button type="button" class="sm-score-card sm-score-card--${sc} ${b?.score_mentor === sc ? 'selected' : ''}" data-score="${sc}" data-competentie="${comp.competentie_id}" data-competentie-code="${comp.code}"><span class="sm-score-card-number">${sc}</span><span class="sm-score-card-text">${desc[sc].replace('{c}', escapeHtml(comp.titel))}</span></button>`).join('')}</div></div><div class="sm-eval-mentor-panel"><h4>Feedback (mentor)</h4><label class="sm-eval-feedback-label" for="feedback-${comp.competentie_id}">Feedback</label><textarea id="feedback-${comp.competentie_id}" class="sm-eval-feedback" placeholder="Beschrijf je feedback...">${escapeHtml(b?.feedback_mentor ?? '')}</textarea></div></div>`; }).join('')}<div class="sm-eval-actions"><button id="sm-eval-save" class="sm-button">Beoordeling Opslaan</button><button id="sm-eval-submit" class="sm-button" style="margin-left:10px;">Indienen</button></div><p id="sm-eval-save-message" class="sm-eval-save-message hidden"></p></div></main></div>`;
+  app.innerHTML = `<div class="sm-layout">${sidebarHtml('evaluatie')}<main class="sm-main sm-main--detail"><div class="sm-detail-top"><div><h1 class="sm-detail-title">Evaluatie</h1><p class="sm-detail-subtitle">Evalueer de stagiair als mentor</p></div><a id="sm-back-evaluatie" class="sm-detail-back" href="#">← Terug naar stagiairs</a></div><div class="sm-eval-tabs"><button class="sm-eval-tab ${activeTab === 'tussentijds' ? 'active' : ''}" data-tab="tussentijds">Tussentijdse evaluatie</button><button class="sm-eval-tab ${activeTab === 'finale' ? 'active' : ''}" data-tab="finale">Finale evaluatie</button></div><div class="sm-eval-block" style="display:grid;grid-template-columns:1fr 320px;gap:16px;align-items:start;"><div><div class="sm-eval-block-header"><h3>${blockTitle}</h3><p>Geef per competentie een score en feedback.</p><p style="margin-top:6px;color:#6b7280;">Datum: <strong>${new Date().toLocaleDateString('nl-BE')}</strong></p></div><div id="sm-eval-result-column" style="position:sticky;top:16px;border:1px solid #e5e7eb;border-radius:12px;padding:14px;background:#fff;"><div style="font-size:13px;color:#6b7280;margin-bottom:8px;">Uitkomst</div><div style="font-size:30px;font-weight:800;color:#111827;">${initTotal != null ? initTotal.toFixed(1) + '/20' : '--'}</div><div style="font-size:13px;color:#6b7280;margin-top:6px;">Gebaseerd op je mentor-scores</div></div>${competenties.map((comp) => { const b = dataByCode[comp.code]; const rubriekMap = Object.fromEntries((comp.Rubrieks || []).map(r => [r.score, escapeHtml(r.beschrijving)])); return `<div class="sm-eval-competentie" data-competentie-id="${comp.competentie_id}" data-competentie-code="${comp.code}"><h3 style="margin:0 0 6px;font-size:20px;font-weight:700;color:#111827;">${escapeHtml(comp.titel)}</h3><p style="margin:0 0 16px;color:#6b7280;">${escapeHtml(comp.omschrijving)}</p><div><span class="sm-score-title">Hoe scoor je deze competentie? Klik op een score (1 = laag, 5 = hoog)</span><div class="sm-eval-score-cards">${scores.map((sc) => `<button type="button" class="sm-score-card sm-score-card--${sc} ${b?.score_mentor === sc ? 'selected' : ''}" data-score="${sc}" data-competentie="${comp.competentie_id}" data-competentie-code="${comp.code}"><span class="sm-score-card-number">${sc}</span><span class="sm-score-card-text">${rubriekMap[sc] || ''}</span></button>`).join('')}</div></div><div class="sm-eval-mentor-panel"><h4>Feedback (mentor)</h4><label class="sm-eval-feedback-label" for="feedback-${comp.competentie_id}">Feedback</label><textarea id="feedback-${comp.competentie_id}" class="sm-eval-feedback" placeholder="Beschrijf je feedback...">${escapeHtml(b?.feedback_mentor ?? '')}</textarea></div></div>`; }).join('')}<div class="sm-eval-actions"><button id="sm-eval-save" class="sm-button">Beoordeling Opslaan</button><button id="sm-eval-submit" class="sm-button" style="margin-left:10px;">Indienen</button></div><p id="sm-eval-save-message" class="sm-eval-save-message hidden"></p></div></main></div>`;
 
   document.querySelector('#sm-back-evaluatie')?.addEventListener('click', (e) => { e.preventDefault(); renderStudentDetail(app, stagiair); });
   attachNav(app, stagiair);
@@ -558,7 +579,9 @@ async function renderEvaluatieScoreScreen(app, stagiair, activeTab, evaluatieDat
 async function renderLogboekOverview(app, stagiair) {
   const sd = stagiair.stageData || {};
   const startDate = sd.stageDetails?.start ? new Date(sd.stageDetails.start) : null;
+  if (startDate) startDate.setHours(12, 0, 0, 0);
   const endDate = sd.stageDetails?.einde ? new Date(sd.stageDetails.einde) : null;
+  if (endDate) endDate.setHours(12, 0, 0, 0);
 
   let logboekEntries = [];
   if (sd.id) {
@@ -572,9 +595,22 @@ async function renderLogboekOverview(app, stagiair) {
   }
   _logboekEntriesCache = logboekEntries;
 
-  const totalWeeks = stagiair.totalWeeks || (startDate && endDate
-    ? Math.max(1, Math.ceil(((endDate - startDate) / (1000 * 60 * 60 * 24) + 1) / 7))
-    : 16);
+  let totalWeeks = stagiair.totalWeeks;
+  if (!totalWeeks) {
+    if (startDate && endDate) {
+      totalWeeks = 1;
+      const nextStart = new Date(startDate);
+      const startDay = nextStart.getDay();
+      const daysToMonday = startDay === 1 ? 7 : 8 - startDay;
+      nextStart.setDate(nextStart.getDate() + daysToMonday);
+      while (nextStart <= endDate) {
+        totalWeeks++;
+        nextStart.setDate(nextStart.getDate() + 7);
+      }
+    } else {
+      totalWeeks = 16;
+    }
+  }
 
   const weeks = Array.from({ length: totalWeeks }, (_, i) => {
     const weekNum = i + 1;
@@ -588,6 +624,7 @@ async function renderLogboekOverview(app, stagiair) {
       const weekEntries = logboekEntries.filter(e => {
         if (!e.datum) return false;
         const entryDate = new Date(e.datum);
+        entryDate.setHours(12, 0, 0, 0);
         return entryDate >= dates.startDateObj && entryDate <= dates.endDateObj;
       });
       hasEntries = weekEntries.length > 0;
@@ -664,7 +701,9 @@ async function renderLogboekOverview(app, stagiair) {
 async function renderWeekDetail(app, stagiair, weekNum) {
   const sd = stagiair.stageData || {};
   const startDate = sd.stageDetails?.start ? new Date(sd.stageDetails.start) : null;
+  if (startDate) startDate.setHours(12, 0, 0, 0);
   const endDate = sd.stageDetails?.einde ? new Date(sd.stageDetails.einde) : null;
+  if (endDate) endDate.setHours(12, 0, 0, 0);
 
   let logboekEntries = [];
   if (sd.id) {
@@ -680,9 +719,9 @@ async function renderWeekDetail(app, stagiair, weekNum) {
 
   function getWeekDateObj(weekIndex, dayIndex) {
     if (!startDate) return null;
-    const d = new Date(startDate);
-    d.setDate(startDate.getDate() + weekIndex * 7);
-    while (d.getDay() === 0 || d.getDay() === 6) d.setDate(d.getDate() + 1);
+    const weekDates = getWeekDates(startDate, endDate, weekIndex);
+    if (!weekDates.startDateObj) return null;
+    const d = new Date(weekDates.startDateObj);
     let count = 0;
     while (count < dayIndex) {
       d.setDate(d.getDate() + 1);

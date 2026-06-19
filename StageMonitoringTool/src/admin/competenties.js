@@ -88,14 +88,20 @@ export async function renderCompetenties(app) {
               <p class="competentie-gewicht">Gewicht: ${comp.gewicht}</p>
             </div>
 
-            <button class="btn-outline edit-comp-btn"
-              data-id="${comp.id}"
-              data-code="${comp.code}"
-              data-titel="${comp.titel}"
-              data-omschrijving="${comp.omschrijving}"
-              data-gewicht="${comp.gewicht}">
-              Competentie bewerken
-            </button>
+            <div style="display:flex;gap:8px;">
+              <button class="btn-outline edit-comp-btn"
+                data-id="${comp.id}"
+                data-code="${comp.code}"
+                data-titel="${comp.titel}"
+                data-omschrijving="${comp.omschrijving}"
+                data-gewicht="${comp.gewicht}">
+                Bewerken
+              </button>
+              <button class="btn-danger delete-comp-btn"
+                data-id="${comp.id}">
+                Verwijderen
+              </button>
+            </div>
           </div>
         </div>
 
@@ -297,6 +303,26 @@ export async function renderCompetenties(app) {
   modal.onclick = (e) => {
     if (e.target === modal) closeModal();
   };
+
+  /* ✅ DELETE COMPETENTIE */
+  document.querySelectorAll('.delete-comp-btn').forEach(btn => {
+    btn.onclick = async () => {
+      if (!confirm('Weet je zeker dat je deze competentie wilt verwijderen?\nAlle bijhorende rubrieken en scores worden ook verwijderd.')) return;
+      try {
+        const res = await fetch(`${API_URL}/competenties/delete-competentie/${btn.dataset.id}`, {
+          method: 'DELETE',
+          credentials: 'include',
+        });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json?.msg || 'Verwijderen mislukt');
+        alert('Competentie verwijderd!');
+        await renderCompetenties(app);
+      } catch (e) {
+        console.error(e);
+        alert(e?.message || 'Verwijderen mislukt');
+      }
+    };
+  });
 
   /* ✅ ADD COMPETENTIE */
   const addModal = document.getElementById('addCompetentieModal');

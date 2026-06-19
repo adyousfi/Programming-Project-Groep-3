@@ -222,23 +222,6 @@ async function renderEvaluatiePage(app, stagiair, activeTab = 'tussentijds', eva
     evaluatieData.map((e) => [e.competentie_code, e])
   );
 
-  const descriptions =
-    activeTab === 'finale'
-      ? {
-          1: '{c} is op het einde van de stage onvoldoende beheerst; het eindniveau wordt niet gehaald.',
-          2: '{c} blijft net onder het verwachte eindniveau; er zijn nog duidelijke tekortkomingen.',
-          3: '{c} wordt op eindniveau voldoende beheerst, maar met beperkte zelfstandigheid.',
-          4: '{c} wordt op eindniveau goed beheerst, met zelfstandig en consistent werk.',
-          5: '{c} wordt op eindniveau uitstekend beheerst, met initiatief, reflectie en meerwaarde voor het team.',
-        }
-      : {
-          1: '{c} is niet of onvoldoende aangetoond binnen de verwachtingen van de stage.',
-          2: '{c} is nipt aanwezig; belangrijke aspecten ontbreken of zijn nog onzeker.',
-          3: '{c} wordt voldoende uitgevoerd, maar nog niet volledig zelfstandig of consistent.',
-          4: '{c} wordt correct uitgevoerd, met af en toe lichte begeleiding of bijsturing nodig.',
-          5: '{c} wordt zelfstandig en boven de verwachtingen uitgevoerd, met initiatief en reflectie.',
-        };
-
   const pageTitle = 'Evaluatie';
   const pageSubtitle = 'Evalueer de stagiair op basis van competenties';
 
@@ -305,7 +288,9 @@ async function renderEvaluatiePage(app, stagiair, activeTab = 'tussentijds', eva
 
             ${competenties.map((comp) => {
               const bestaande = dataByCode[comp.code];
-              const rubrieken = comp.Rubrieks || [];
+              const rubriekMap = Object.fromEntries(
+                (comp.Rubrieks || []).map(r => [r.score, escapeHtml(r.beschrijving)])
+              );
               return `
             <div class="sm-eval-competentie" data-competentie-id="${comp.competentie_id}" data-competentie-code="${comp.code}">
               <h3 style="margin:0 0 6px;font-size:20px;font-weight:700;color:#111827;">${escapeHtml(comp.titel)}</h3>
@@ -340,7 +325,7 @@ async function renderEvaluatiePage(app, stagiair, activeTab = 'tussentijds', eva
                   ${scores.map((score) => `
                     <button type="button" class="sm-score-card sm-score-card--${score} ${bestaande?.score === score ? 'selected' : ''}" data-score="${score}" data-competentie="${comp.competentie_id}" data-competentie-code="${comp.code}">
                       <span class="sm-score-card-number">${score}</span>
-                      <span class="sm-score-card-text">${descriptions[score].replace('{c}', escapeHtml(comp.titel))}</span>
+                      <span class="sm-score-card-text">${rubriekMap[score] || ''}</span>
                     </button>
                   `).join('')}
                 </div>
