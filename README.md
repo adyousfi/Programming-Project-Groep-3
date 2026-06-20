@@ -48,8 +48,8 @@ We zijn aan dit project begonnen voor een schoolopdracht aan de Erasmushogeschoo
 
 - Een student dient een stagevoorstel in.
 - Het stagecomité kan deze aanvraag accepteren, afwijzen of aanpassingen vragen.
-- Wanneer goedgekeurd, uploadt een admin een stageovereenkomst naar de student en de stagementor.
-- De stagementor en de student ondertekenen de stageovereenkomst in de applicatie.
+- Wanneer goedgekeurd, uploadt een admin een stageovereenkomst naar de student en het bedrijf.
+- Het bedrijf en de student ondertekenen de stageovereenkomst in de applicatie.
 - De admin valideert het antwoord.
 - De student kan zijn logboek dagelijks invullen.
 - De docent, stagementor en student kunnen het logboek bekijken.
