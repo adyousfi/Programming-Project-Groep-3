@@ -3,30 +3,32 @@ import { Sequelize } from "sequelize";
 configDotenv();
  
 //initialising the connection with the database
-//MySQL
+//MySQL (Local/Server)
 const sequelize = new Sequelize(process.env.DB, process.env.USER, process.env.PASSWORD, {
   host: 'localhost',
   dialect: 'mysql'
 });
- 
-// Azure
-// const sequelize = new Sequelize(
-//   'programmingproject3',
-//   'programmingproject3',
-//   'EhbProjectGroep3',
-//   {
-//     host: 'programmingproject3.database.windows.net', // Found in Azure portal
-//     dialect: 'mssql',
-//     port: 1433,                                    // Default Azure SQL port
-//     dialectOptions: {
-//       options: {
-//         encrypt: true,                             // CRITICAL: Azure SQL requires this
-//         trustServerCertificate: true,              // Set to true only if using self-signed certs in dev
-//         connectTimeout: 60000
-//       }
-//     },
-//   }
-// );
+
+// Azure (Public)
+/*
+const sequelize = new Sequelize(
+  'programmingproject3',
+  'programmingproject3',
+  'EhbProjectGroep3',
+  {
+    host: 'programmingproject3.database.windows.net', // Found in Azure portal
+    dialect: 'mssql',
+    port: 1433,                                    // Default Azure SQL port
+    dialectOptions: {
+      options: {
+        encrypt: true,                             // CRITICAL: Azure SQL requires this
+        trustServerCertificate: false,             // Should be false for production Azure SQL
+        connectTimeout: 60000
+      }
+    },
+  }
+);
+*/
  
 //making the connection with the database
 const run = async () => {
