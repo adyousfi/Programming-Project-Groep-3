@@ -212,7 +212,7 @@ export const sendContractToBedrijf = async (req, res, next) => {
     });
 
     // Build signing URL (served by Express directly)
-    const signingUrl = `http://localhost:3000/api/documents/sign/${token}`;
+    const signingUrl = `http://10.2.160.244/api/documents/sign/${token}`;
 
     // Send mail to bedrijf HR
     await sendContractToSign(bedrijf_email, signingUrl, studentNaam, bedrijfNaam);
@@ -670,7 +670,7 @@ export const submitSignature = async (req, res, next) => {
     try {
       const adminUser = await Admin.findOne({ include: [{ model: User, as: 'User' }] });
       if (adminUser?.User?.email) {
-        const downloadUrl = `http://localhost:3000/api/documents/${signedDoc.document_id}/download`;
+        const downloadUrl = `http://10.2.160.244/api/documents/${signedDoc.document_id}/download`;
         await sendSignedNotification(adminUser.User.email, studentNaam, bedrijfNaam, downloadUrl);
       }
     } catch (mailErr) {

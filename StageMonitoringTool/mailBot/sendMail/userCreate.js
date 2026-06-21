@@ -3,7 +3,7 @@ import transporter from '../mailConnection.js';
 
 // Functie om de mail te versturen
 async function createUserMail(userEmail, userName, setupToken) {
-    const setupUrl = `http://localhost:5173/?role=set_password&token=${setupToken}`;
+    const setupUrl = `http://10.2.160.244/?role=set_password&token=${setupToken}`;
     const mailOptions = {
         from: '"Stage@EHB" <stageatehb@gmail.com>', // Afzender (moet vaak matchen met de auth user)
         to: userEmail,                         // Ontvanger
