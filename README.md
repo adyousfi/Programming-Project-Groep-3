@@ -80,7 +80,7 @@ Alle chatlogs en bronnen die zijn gebruikt bij de ontwikkeling van dit project(C
 
 > **Opmerking:** Naast de bovenstaande 81 sessies zijn er 81 bijkomende subagent-sessies (achtergrondtaken van OpenCode zoals "Explore codebase structure") die automatisch werden aangemaakt als kind-processen van de bovenstaande sessies. Deze bevatten alleen interne onderzoekstaken (bestanden lezen, code analyseren) en geen aparte gesprekken. Ik heb bewust besloten om deze niet op te nemen in de bronnenlijst, maar ze zijn wel beschikbaar indien gewenst.
 
-> **Opmerking:** Enkele OpenCode chatlogs zijn verwijderd voordat ik wist dat bronnenmelding van de chatlogs vereist was. Mocht dit gebeurd zijn, dan betreur ik dat en kunnen deze niet meer gereferent worden. De bovenstaande lijst bevat alle chatlogs die nog beschikbaar zijn en die gebruikt zijn voor dit project. Hopelijk ben ik niets vergeten en mijn excuses daarvoor
+> **Opmerking:** Enkele OpenCode chatlogs zijn verwijderd voordat ik wist dat bronnenmelding van de chatlogs vereist was. Mocht dit gebeurd zijn, dan betreur ik dat en kunnen deze niet meer gereferent worden. De bovenstaande lijst bevat alle chatlogs die nog beschikbaar zijn en die gebruikt zijn voor dit project. Hopelijk ben ik geen enkel chatlog vergeten en mijn excuses daarvoor.
 > — Mohamed
 
 ### GitHub Copilot chatlogs
@@ -92,7 +92,6 @@ Alle chatlogs en bronnen die zijn gebruikt bij de ontwikkeling van dit project(C
 
 ### Antigravity chatlog
 - **Antigravity chatlog** — Student pagina bouwen (js/css, stap voor stap): [`antigravity_chatlog.md`](StageMonitoringTool/docs/mohamed_chatlogs/antigravity_chatlog.md)
-
 
 
 ---
