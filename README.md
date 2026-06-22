@@ -88,7 +88,7 @@ Alle chatlogs en bronnen die zijn gebruikt bij de ontwikkeling van dit project(v
 ### Antigravity chatlog
 - **Antigravity chatlog** — Student pagina bouwen (js/css, stap voor stap): [`antigravity_chatlog.md`](StageMonitoringTool/docs/mohamed_chatlogs/antigravity_chatlog.md)
 
-> **Opmerking:** Enkele OpenCode chatlogs zijn verwijderd voordat ik wist dat bronnenmelding van de chatlogs vereist was. Mocht dit gebeurd zijn, dan betreur ik dat en kunnen deze niet meer gereferent worden. De bovenstaande lijst bevat alle chatlogs die nog beschikbaar zijn en die gebruikt zijn voor dit project. Hopelijk ben ik niets vergeten en mijn excuses daarvoor
+> **Opmerking:** Enkele OpenCode chatlogs/AI-chatlogs had ik waarschijnlijk verwijderd voordat ik wist dat bronnenmelding van de chatlogs vereist was. Mocht dit gebeurd zijn, dan betreur ik dat en kunnen deze niet meer gereferent worden. De bovenstaande lijst bevat alle chatlogs die nog beschikbaar zijn en die gebruikt zijn voor dit project. Hopelijk ben ik geen enkel andere chatlog(s) vergeten en mijn excuses daarvoor.
 > — Mohamed
 
 ---
