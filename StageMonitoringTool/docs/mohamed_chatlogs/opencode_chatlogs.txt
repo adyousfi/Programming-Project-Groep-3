@@ -1,5 +1,6 @@
 OpenCode Chatlog Bronnen - Stage Monitoring Tool
-Alle sessies (80 links), chronologisch geordend
+Alle sessies (80 chatlogs), chronologisch geordend
+Er zijn twee chatlogs met een identiek naam("Document upload zichtbaarheid issue") op 15 juni, deze zijn verschillend. Een van de twee werd als bestand genoteerd(omwille probleem met link). Het bestand heeft een echte output van mijn AI bot, terwijl de link normaalgezien geen echte output heeft.
 ================================================
 
 5 juni 2026
@@ -75,7 +76,7 @@ https://opncd.ai/share/b9OcUA0h — Explore document flow codebase (subagent)
 https://opncd.ai/share/eJ25Rmco — Student missing in documenten na validatie
 https://opncd.ai/share/eO7hHeVP — Find documenten admin files (subagent)
 https://opncd.ai/share/PpmuVvxQ — Document upload zichtbaarheid issue
-[Zie opencode_chatlogs_document_upload_visibility.md] — Document upload zichtbaarheid issue (share link werkt niet, chatlog hier bewaard)
+CHATLOG ALS BESTAND, GEEN LINK: [Zie ook opencode_chatlogs_document_upload_visibility.md in mohamed_chatlogs dossier] — IS EEN VERSCHILLENDE CHATLOG VAN https://opncd.ai/share/PpmuVvxQ , gewoon met exact hetzelfde naam: Document upload zichtbaarheid issue (share link werkt niet, chatlog hier bewaard in .md bestand)
 https://opncd.ai/share/fllrUxEJ — Explore document flow codebase (subagent)
 
 16 juni 2026
