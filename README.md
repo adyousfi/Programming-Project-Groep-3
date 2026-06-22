@@ -70,6 +70,31 @@ Het project is gebouwd met JavaScript en Node.js, samen met verschillende packag
 - Len Jochmans
 - Mohamed Ayadi
 
+
+## 🔗 Bronnenmelding
+
+Alle chatlogs en bronnen die zijn gebruikt bij de ontwikkeling van dit project(van AYADI Mohamed).
+
+### OpenCode chatlogs
+- **OpenCode chatlogs** — 79 sessies (5 juni – 21 juni 2026): [`StageMonitoringTool/docs/mohamed_chatlogs/opencode_chatlogs.txt`](StageMonitoringTool/docs/mohamed_chatlogs/opencode_chatlogs.txt)
+
+### GitHub Copilot chatlogs
+- **Transcript 1** — Wachten pagina bouwen + uitloggen button fix: [`github_copilot_chatlog1_transcript.txt`](StageMonitoringTool/docs/mohamed_chatlogs/github_copilot_chatlog1_transcript.txt) (JSON-bestand ook beschikbaar: `github_copilot_chatlog1.json`)
+- **Transcript 2** — Indienen button fout "Er is een fout opgetreden" debuggen: [`github_copilot_chatlog2_transcript.txt`](StageMonitoringTool/docs/mohamed_chatlogs/github_copilot_chatlog2_transcript.txt) (JSON-bestand ook beschikbaar: `github_copilot_chatlog2.json`)
+- **Transcript 3** — Indienen redirect naar wachten pagina werkt niet voor specifieke user: [`github_copilot_chatlog3_transcript.txt`](StageMonitoringTool/docs/mohamed_chatlogs/github_copilot_chatlog3_transcript.txt) (JSON-bestand ook beschikbaar: `github_copilot_chatlog3.json`)
+- **Transcript 4** — Nieuwe pagina voor "aanpassingen vereist" status maken: [`github_copilot_chatlog4_transcript.txt`](StageMonitoringTool/docs/mohamed_chatlogs/github_copilot_chatlog4_transcript.txt) (JSON-bestand ook beschikbaar: `github_copilot_chatlog4.json`)
+- **Transcript 5** — Admin kan document niet zien na student sendback (document geupload status): [`github_copilot_chatlog5_transcript.txt`](StageMonitoringTool/docs/mohamed_chatlogs/github_copilot_chatlog5_transcript.txt) (JSON-bestand ook beschikbaar: `github_copilot_chatlog5.json`)
+
+### Antigravity chatlog
+- **Antigravity chatlog** — Student pagina bouwen (js/css, stap voor stap): [`antigravity_chatlog.md`](StageMonitoringTool/docs/mohamed_chatlogs/antigravity_chatlog.md)
+
+> **Opmerking:** Enkele OpenCode chatlogs zijn verwijderd voordat ik wist dat bronnenmelding van de chatlogs vereist was. Mocht dit gebeurd zijn, dan betreur ik dat en kunnen deze niet meer gereferent worden. De bovenstaande lijst bevat alle chatlogs die nog beschikbaar zijn en die gebruikt zijn voor dit project. Hopelijk ben ik niets vergeten en mijn excuses daarvoor
+> — Mohamed
+
+---
+
+
 ## 📄 Licentie
 
 Dit project is ontwikkeld voor educatieve doeleinden — Erasmushogeschool Brussel.
+

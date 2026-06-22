@@ -1,0 +1,110 @@
+OpenCode Chatlog Bronnen - Stage Monitoring Tool
+Alle sessies (79 links), chronologisch geordend
+================================================
+
+5 juni 2026
+https://opncd.ai/share/z5oXxq2b — Pagina nabootsen uit afbeelding (student folder, js/css)
+
+7 juni 2026
+https://opncd.ai/share/BipzsG3J — Verkennen indienen flow (hoe knop opslaat naar json)
+https://opncd.ai/share/QOURcM0K — Explore indienen flow integration (subagent)
+https://opncd.ai/share/7DRct3iY — Algemene sessie
+https://opncd.ai/share/e5IwLCQ1 — Find-skills skill installeren van skills.sh
+https://opncd.ai/share/Xv6KhJw6 — Find-skills skill setup
+https://opncd.ai/share/BHQEut4G — Explore project structure (subagent)
+https://opncd.ai/share/Uk239iU4 — Find-skills skill configureren
+https://opncd.ai/share/08yQn2Ln — Find-skills skill setup (vervolg)
+https://opncd.ai/share/Bhe5rLgc — Explore project structure (subagent)
+
+8 juni 2026
+https://opncd.ai/share/BOU09E75 — Pagina bouwen uit afbeelding (student folder)
+https://opncd.ai/share/ZA6mFOVr — Aanpassen formulier → wachten pagina flow
+https://opncd.ai/share/RjnSsIjo — Explore codebase structure (subagent)
+https://opncd.ai/share/GBp164qb — Project controleren na main.js conflict merge
+https://opncd.ai/share/lc6dSftD — Fix npm run start error
+https://opncd.ai/share/7xAWnPlw — Hoe indienen knop opslaat naar json
+https://opncd.ai/share/1JftHoCg — Nieuwe portaal maken met frontend/backend knoppen
+https://opncd.ai/share/eM90fLmv — Explore current portal structure (subagent)
+
+9 juni 2026
+https://opncd.ai/share/ouFJHWdl — Explore JSON data flow (subagent)
+https://opncd.ai/share/hykIDoeJ — Pagina nabootsen uit afbeelding (stap voor stap)
+
+10 juni 2026
+https://opncd.ai/share/RI1bkn3Y — Fix node server.js ESM error
+https://opncd.ai/share/VzUZr4N5 — Explore frontend routing (subagent)
+https://opncd.ai/share/XPFeyL8g — Login pagina redirect flow
+https://opncd.ai/share/s5BE5g6j — Dynamische student aanvraag (indienen/goedgekeurd/aanpassingen)
+https://opncd.ai/share/nLFEIxDp — Explore codebase structure (subagent)
+https://opncd.ai/share/gKj1jF3f — Analyze project structure (subagent)
+
+11 juni 2026
+https://opncd.ai/share/XOrV3Lvs — Sync systeem fixen (aanvraag → account → stagecommissie)
+https://opncd.ai/share/dEL3mqFQ — Explore sync system codebase (subagent)
+https://opncd.ai/share/sBRQ3BV1 — .env bestand aanmaken
+https://opncd.ai/share/uh0SDBVC — Explore project structure (subagent)
+https://opncd.ai/share/V4hobALg — Explore overzicht and student pages (subagent)
+https://opncd.ai/share/lmtj6INq — Navigeerbare knowledge graph maken
+https://opncd.ai/share/4XIEVQXX — Semantic extraction (knowledge graph)
+https://opncd.ai/share/56z3y0iq — Logboek weekoverzicht bouwen
+https://opncd.ai/share/P43QmAb2 — Stageaanvraag: fix user-document ties
+https://opncd.ai/share/VFRPquIC — Explore internship system (subagent)
+https://opncd.ai/share/y603Mlhr — Portal verwijderen, login pagina stylen zoals PreMain
+https://opncd.ai/share/fXOOEPQ0 — Explore codebase structure (subagent)
+https://opncd.ai/share/T9a53Ll3 — npm run startdb redundantie checken
+
+12 juni 2026
+https://opncd.ai/share/kd21vD3j — Skill selectie en CSS standaardisatie
+https://opncd.ai/share/Z7Mkmp1P — Explore project structure en tech stack (subagent)
+https://opncd.ai/share/00OZF9w4 — Stagedetails en documenten navigatie
+https://opncd.ai/share/fs3cYCe9 — Explore codebase structure (subagent)
+https://opncd.ai/share/Up4j6XTf — Verify merge consistency (subagent)
+https://opncd.ai/share/6Kz0ZZT0 — Investigate broken stage flow (subagent)
+https://opncd.ai/share/YLrnQe7M — Find why document shows submitted (subagent)
+
+15 juni 2026
+https://opncd.ai/share/dShx68Jg — Server fout (500 error) fixen
+https://opncd.ai/share/syQj1UGo — Explore project structure (subagent)
+https://opncd.ai/share/4adB5mxo — Serverfout POST login 500 fixen
+https://opncd.ai/share/J2lWbddA — Login endpoint 500 error
+https://opncd.ai/share/t2uF0ENL — Find login route and server error cause (subagent)
+https://opncd.ai/share/MndP2Yuz — Logboek database integratie met user sync
+https://opncd.ai/share/8hBL5lAS — Explore logboek and auth (subagent)
+https://opncd.ai/share/iSxxia62 — Document niet in admin na student sendback
+https://opncd.ai/share/b9OcUA0h — Explore document flow codebase (subagent)
+https://opncd.ai/share/eJ25Rmco — Student missing in documenten na validatie
+https://opncd.ai/share/eO7hHeVP — Find documenten admin files (subagent)
+https://opncd.ai/share/PpmuVvxQ — Document upload zichtbaarheid issue
+https://opncd.ai/share/T5AWhi1R — Document upload zichtbaarheid issue
+https://opncd.ai/share/fllrUxEJ — Explore document flow codebase (subagent)
+
+16 juni 2026
+https://opncd.ai/share/osceGDrN — Vergelijk server.js en maindb.js voor integratie
+https://opncd.ai/share/8Psuk9jb — Onverwachte documents in user account bij login
+
+17 juni 2026
+https://opncd.ai/share/1p18ZuIO — Styling student card op stagementor pagina
+https://opncd.ai/share/grA6ZCNn — Student Bekijken: DB of static data
+https://opncd.ai/share/pxWxfGPB — Week 1 status niet updaten in Stagementor
+https://opncd.ai/share/Wz28ETsD — Student logbook API endpoint check
+https://opncd.ai/share/fSxv4QxE — Fix evaluatie.js JSX parsing error
+
+18 juni 2026
+https://opncd.ai/share/jshbb2nz — Logboek stage docent evaluatie unlock
+https://opncd.ai/share/g958FOuy — Docent submission en evaluatie pagina update
+https://opncd.ai/share/8ctcO3lJ — Evaluatie niet zichtbaar voor student
+
+19 juni 2026
+https://opncd.ai/share/EKyHsWJf — Implementatie en auteurscheck via commits
+https://opncd.ai/share/0OnbLhyX — Fix CSS styling issues op admin koppeling pagina
+https://opncd.ai/share/5lBs609t — Student pagina UI lijn boven gebruikersnaam aanpassen
+https://opncd.ai/share/a0X7ovsL — Progression bar voor stageaanvraag vs goedgekeurd
+https://opncd.ai/share/kV3VjMjq — Fix date format in student stage request view
+https://opncd.ai/share/3RvusqYn — Implementatie van feedback-API's: wie en wanneer
+
+20 juni 2026
+https://opncd.ai/share/s9BLWqxK — Student selectie implementatie voor docent role
+https://opncd.ai/share/r58J6qmH — Exporteren opencode sessies naar .md
+
+21 juni 2026
+https://opncd.ai/share/6vRFb7QF — Ontwikkelen API-endpoint tussentijdse evaluatie
