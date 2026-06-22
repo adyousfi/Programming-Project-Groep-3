@@ -2,11 +2,10 @@ import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import multer from 'multer';
-import path from 'path';
-import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 import { run } from '../db/dbConnection.js';
 import '../db/allimport.js';
+import seedDatabase from '../db/seedDb.js';
 import authMiddleware from './auth/authMiddleware.js';
 
 import userRoutes from '../db/routes/userRoutes.js';
@@ -22,6 +21,7 @@ import evaluatieRoutes from '../db/routes/evaluatieRoutes.js';
 const app = express();
 
 dotenv.config();
+await seedDatabase();
 
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
@@ -51,15 +51,6 @@ app.use('/api/rubrieken', rubriekRoutes);
 app.use('/api/evaluaties', evaluatieRoutes);
 console.log('✅ eval routes mounted');
 
-// Serve Vite frontend in production
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-app.use(express.static(path.join(__dirname, '../dist')));
-
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../dist/index.html'));
-});
-
 
 app.use((err, req, res, next) => {
   if (err instanceof multer.MulterError) {
@@ -75,17 +66,12 @@ app.use((err, req, res, next) => {
 });
 
 async function start() {
-  try {
-    await run();
-    // process.env.PORT is provided by IISNode on the Windows server
-    const PORT = process.env.PORT || 3000;
-    app.listen(PORT, () => {
-      console.log(`Server running on ${PORT}`);
-    });
-  } catch (error) {
-    console.error("FATAL ERROR DURING STARTUP:", error);
-    process.exit(1);
-  }
+  await run();
+  // process.env.PORT is provided by IISNode on the Windows server
+  const PORT = process.env.PORT || 3000;
+  app.listen(PORT, () => {
+    console.log(`Server running on ${PORT}`);
+  });
 }
 
 start();
