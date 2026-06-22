@@ -5,7 +5,9 @@ import docentController from '../userControllers/docentController.js';
 
 const router = express.Router();
 
-
+router.get('/', (req, res) => {
+  res.json({ status: "API is working perfectly!" });
+});
 
 router.post('/login', userController.loginUser);
 router.get('/me', userController.checkLogin);

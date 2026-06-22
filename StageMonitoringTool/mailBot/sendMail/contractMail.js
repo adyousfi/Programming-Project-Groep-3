@@ -106,7 +106,7 @@ export async function sendContractToSign(hrEmail, signingUrl, studentNaam, bedri
  * Notifies the student that a document has been uploaded for them by the admin.
  */
 export async function sendDocumentUploadedToStudent(studentEmail, studentNaam, bedrijfNaam) {
-    const loginUrl = 'http://10.2.160.244/login';
+    const loginUrl = 'http://localhost:5173/login';
     const mailOptions = {
         from: '"Stage@EHB" <stageatehb@gmail.com>',
         to: studentEmail,

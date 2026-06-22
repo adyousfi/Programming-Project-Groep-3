@@ -110,7 +110,7 @@ async function createActivationMail(userEmail, userName, userPassword, role) {
                             <table width="100%" border="0" cellspacing="0" cellpadding="0" style="margin-bottom: 30px;">
                                 <tr>
                                     <td align="center">
-                                        <a href="http://10.2.160.244/" target="_blank" style="background-color: #4A90E2; color: #ffffff; padding: 14px 30px; font-size: 16px; font-weight: bold; text-decoration: none; border-radius: 5px; display: inline-block; box-shadow: 0 2px 5px rgba(74,144,226,0.3);">
+                                        <a href="http://localhost:5173/" target="_blank" style="background-color: #4A90E2; color: #ffffff; padding: 14px 30px; font-size: 16px; font-weight: bold; text-decoration: none; border-radius: 5px; display: inline-block; box-shadow: 0 2px 5px rgba(74,144,226,0.3);">
                                             Naar ${dashboardText}
                                         </a>
                                     </td>
