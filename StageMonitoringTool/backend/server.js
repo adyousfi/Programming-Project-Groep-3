@@ -31,9 +31,15 @@ app.use('/api', authMiddleware);
 
 app.use(cors({
   origin: (origin, cb) => {
-    // For a public server, you should ideally add your public domain to the allowed list, 
-    // or allow all origins dynamically. Here we allow all origins for public access.
-    return cb(null, true);
+    const allowed = [
+      'http://localhost:5173',
+      'http://localhost:5174',
+      'http://127.0.0.1:5500',
+      'http://localhost:3000'
+    ];
+    if (!origin) return cb(null, true);
+    if (allowed.includes(origin)) return cb(null, true);
+    return cb(new Error('Not allowed by CORS'));
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
@@ -67,10 +73,8 @@ app.use((err, req, res, next) => {
 
 async function start() {
   await run();
-  // process.env.PORT is provided by IISNode on the Windows server
-  const PORT = process.env.PORT || 3000;
-  app.listen(PORT, () => {
-    console.log(`Server running on ${PORT}`);
+  app.listen(3000, () => {
+    console.log('Server running on 3000');
   });
 }
 
