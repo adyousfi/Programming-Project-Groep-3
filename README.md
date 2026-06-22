@@ -76,9 +76,9 @@ Het project is gebouwd met JavaScript en Node.js, samen met verschillende packag
 Alle chatlogs en bronnen die zijn gebruikt bij de ontwikkeling van dit project(Chatlogs van AYADI Mohamed):
 
 ### OpenCode chatlogs
-- **OpenCode chatlogs** — 81 sessies (5 juni – 22 juni 2026): [`StageMonitoringTool/docs/mohamed_chatlogs/opencode_chatlogs.txt`](StageMonitoringTool/docs/mohamed_chatlogs/opencode_chatlogs.txt)
+- **OpenCode chatlogs** — 80 sessies (5 juni – 22 juni 2026): [`StageMonitoringTool/docs/mohamed_chatlogs/opencode_chatlogs.txt`](StageMonitoringTool/docs/mohamed_chatlogs/opencode_chatlogs.txt)
 
-> **Opmerking:** Naast de bovenstaande 81 sessies zijn er 81 bijkomende subagent-sessies (achtergrondtaken van OpenCode zoals "Explore codebase structure") die automatisch werden aangemaakt als kind-processen van de bovenstaande sessies. Deze bevatten alleen interne onderzoekstaken (bestanden lezen, code analyseren) en geen aparte gesprekken. Ik heb bewust besloten om deze niet op te nemen in de bronnenlijst, maar ze zijn wel beschikbaar indien gewenst.
+> **Opmerking:** Naast de bovenstaande 80 sessies zijn er ~87 bijkomende subagent-sessies (achtergrondtaken van OpenCode zoals "Explore codebase structure") die automatisch werden aangemaakt als kind-processen van de bovenstaande sessies. Deze bevatten alleen interne onderzoekstaken (bestanden lezen, code analyseren) en geen aparte gesprekken. Ik heb bewust besloten om deze niet op te nemen in de bronnenlijst, maar ze zijn wel beschikbaar indien gewenst.
 
 > **Opmerking:** Enkele OpenCode chatlogs zijn verwijderd voordat ik wist dat bronnenmelding van de chatlogs vereist was. Mocht dit gebeurd zijn, dan betreur ik dat en kunnen deze niet meer gereferent worden. De bovenstaande lijst bevat alle chatlogs die nog beschikbaar zijn en die gebruikt zijn voor dit project. Hopelijk ben ik geen enkel chatlog vergeten en mijn excuses daarvoor.
 > — Mohamed

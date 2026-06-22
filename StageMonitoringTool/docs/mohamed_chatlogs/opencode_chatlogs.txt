@@ -1,5 +1,5 @@
 OpenCode Chatlog Bronnen - Stage Monitoring Tool
-Alle sessies (81 chatlogs), chronologisch geordend
+Alle sessies (80 chatlogs), chronologisch geordend
 Er zijn twee chatlogs met een identiek naam("Document upload zichtbaarheid issue") op 15 juni, deze zijn verschillend. Een van de twee werd als bestand genoteerd(omwille probleem met link). Het bestand heeft een echte output van mijn AI bot, terwijl de link normaalgezien geen echte output heeft.
 ================================================
 
