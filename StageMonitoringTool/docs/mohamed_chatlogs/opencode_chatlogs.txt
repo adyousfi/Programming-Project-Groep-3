@@ -1,5 +1,5 @@
 OpenCode Chatlog Bronnen - Stage Monitoring Tool
-Alle sessies (79 links), chronologisch geordend
+Alle sessies (80 links), chronologisch geordend
 ================================================
 
 5 juni 2026
@@ -75,7 +75,7 @@ https://opncd.ai/share/b9OcUA0h — Explore document flow codebase (subagent)
 https://opncd.ai/share/eJ25Rmco — Student missing in documenten na validatie
 https://opncd.ai/share/eO7hHeVP — Find documenten admin files (subagent)
 https://opncd.ai/share/PpmuVvxQ — Document upload zichtbaarheid issue
-https://opncd.ai/share/T5AWhi1R — Document upload zichtbaarheid issue
+[Zie opencode_chatlogs_document_upload_visibility.md] — Document upload zichtbaarheid issue (share link werkt niet, chatlog hier bewaard)
 https://opncd.ai/share/fllrUxEJ — Explore document flow codebase (subagent)
 
 16 juni 2026
@@ -108,3 +108,6 @@ https://opncd.ai/share/r58J6qmH — Exporteren opencode sessies naar .md
 
 21 juni 2026
 https://opncd.ai/share/6vRFb7QF — Ontwikkelen API-endpoint tussentijdse evaluatie
+
+22 juni 2026
+https://opncd.ai/share/AaiC4UEC — Zoeken naar oude chatlogs en aanmaken van share links
